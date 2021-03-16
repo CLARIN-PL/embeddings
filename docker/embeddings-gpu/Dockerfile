@@ -15,5 +15,13 @@ RUN python3 -m pip install --no-cache-dir --upgrade pip && \
     python3 -m pip install --no-cache-dir \
     jupyter \
     tensorflow \
-    torch \
-    transformers
+    torch
+
+RUN git clone https://github.com/NVIDIA/apex
+RUN cd apex && \
+    python3 setup.py install && \
+    pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./
+
+WORKDIR /workspace
+
+CMD ["/bin/bash"]
