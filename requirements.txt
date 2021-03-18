@@ -2,3 +2,6 @@ jupyter
 tensorflow
 torch
 transformers
+flair
+pan
+requests
