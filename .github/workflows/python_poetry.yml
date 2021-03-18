@@ -43,6 +43,6 @@ jobs:
       - name: Install deps
         run: poetry install -vv
       - name: Check style
-        run: poetry run black --check
+        run: poetry run black --check ./
       - name: Check types
         run: poetry run mypy .
