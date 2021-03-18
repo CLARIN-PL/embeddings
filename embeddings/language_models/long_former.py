@@ -1,8 +1,8 @@
-from transformers import LongformerTokenizer, TFLongformerForMultipleChoice
+from transformers import AutoTokenizer, AutoModel
 import tensorflow as tf
 
-tokenizer = LongformerTokenizer.from_pretrained("clarin-polish-longformer")
-model = TFLongformerForMultipleChoice.from_pretrained("clarin-polish-longformer")
+tokenizer = AutoTokenizer.from_pretrained("clarin-pl/long-former-polish")
+model = AutoModel.from_pretrained("clarin-pl/long-former-polish")
 
 prompt = "Zażółć gęślą jaźń"
 choice0 = "Gęś"
