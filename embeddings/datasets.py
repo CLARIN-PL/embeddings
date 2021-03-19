@@ -1,7 +1,7 @@
 import base64
 import os
 import zipfile
-from typing import Optional
+from typing import Optional, List, Union
 
 import requests
 from tqdm.auto import tqdm
@@ -16,7 +16,7 @@ class DatasetDownloader:
         self._chunk_size = 1024
 
     @property
-    def _dl_path(self):
+    def _dl_path(self) -> str:
         return os.path.join(self.root_dir, self.filename)
 
     def _download_zip(self):
@@ -40,16 +40,20 @@ class DatasetDownloader:
 
         pbar.close()
 
-    def _unzip(self):
+    def _unzip(self) -> List[str]:
         zf = zipfile.ZipFile(self._dl_path, 'r')
         zf.extractall(self.root_dir)
         zf.close()
         os.remove(self._dl_path)
+        return [
+            os.path.join(self.root_dir, it) for it in os.listdir(self.root_dir)
+        ]
 
-    def download(self):
+    def download(self) -> Union[str, List[str]]:
         self._download_zip()
         if zipfile.is_zipfile(self._dl_path):
-            self._unzip()
+            return self._unzip()
+        return self._dl_path
 
 
 def create_onedrive_directdownload(onedrive_link: str) -> str:
