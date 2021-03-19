@@ -5,3 +5,4 @@ transformers
 flair
 pan
 requests
+sklearn
