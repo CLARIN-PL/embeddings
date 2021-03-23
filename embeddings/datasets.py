@@ -19,7 +19,7 @@ class DatasetDownloader:
     def _dl_path(self) -> str:
         return os.path.join(self.root_dir, self.filename)
 
-    def _download_zip(self):
+    def _download_file(self):
         r = requests.get(self.url, stream=True)
         assert r.status_code == 200
 
@@ -50,7 +50,7 @@ class DatasetDownloader:
         ]
 
     def download(self) -> Union[str, List[str]]:
-        self._download_zip()
+        self._download_file()
         if zipfile.is_zipfile(self._dl_path):
             return self._unzip()
         return self._dl_path

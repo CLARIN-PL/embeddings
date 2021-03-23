@@ -124,7 +124,6 @@ def evaluate_sequence_tagging():
     embeddings = TransformerWordEmbeddings(args.embedding)
 
     print('Training model...')
-
     tagger = SequenceTagger(
         hidden_size=256,
         embeddings=embeddings,
@@ -134,15 +133,14 @@ def evaluate_sequence_tagging():
     )
 
     trainer = ModelTrainer(tagger, corpus)
-    trainer.train(
+    training_log = trainer.train(
         os.path.join(out_dir, 'tagger/'),
         learning_rate=0.1,
-        mini_batch_size=32,
+        mini_batch_size=64,
         max_epochs=150
     )
-
+    print('Training log', training_log)
     print('Done!')
-
 
 if __name__ == '__main__':
     evaluate_sequence_tagging()
