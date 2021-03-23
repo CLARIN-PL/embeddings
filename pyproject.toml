@@ -3,7 +3,12 @@ name = "embeddings"
 version = "0.1.0"
 description = ""
 license="MIT"
-authors = ["Roman Bartusiak <riomus@gmail.com>"]
+authors = [
+    "Roman Bartusiak <riomus@gmail.com>",
+    "Łukasz Augustyniak <luk.augustyniak@gmail.com>",
+    "Albert Sawczyn <albertsawczyn@gmail.com>",
+    "Kamil Tagowski <kamil.tagowski@gmail.com>"
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
