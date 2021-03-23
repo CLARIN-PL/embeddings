@@ -25,15 +25,17 @@ class DatasetDownloader:
 
         if not self.filename:
             print(r.headers.get("Content-Disposition"))
-            self.filename = r.headers.get(
-                "Content-Disposition", "filename=ds"
-            ).split("filename=")[1].replace('\"', '')
+            self.filename = (
+                r.headers.get("Content-Disposition", "filename=ds")
+                .split("filename=")[1]
+                .replace('"', "")
+            )
 
-        filesize = int(r.headers.get('Content-Length', '0'))
-        pbar = tqdm(total=filesize, unit='iB', unit_scale=True)
+        filesize = int(r.headers.get("Content-Length", "0"))
+        pbar = tqdm(total=filesize, unit="iB", unit_scale=True)
         os.makedirs(os.path.dirname(self._dl_path), exist_ok=True)
 
-        with open(self._dl_path, 'wb') as f:
+        with open(self._dl_path, "wb") as f:
             for data in r.iter_content(chunk_size=self._chunk_size):
                 f.write(data)
                 pbar.update(len(data))
@@ -41,31 +43,14 @@ class DatasetDownloader:
         pbar.close()
 
     def _unzip(self) -> List[str]:
-        zf = zipfile.ZipFile(self._dl_path, 'r')
+        zf = zipfile.ZipFile(self._dl_path, "r")
         zf.extractall(self.root_dir)
         zf.close()
         os.remove(self._dl_path)
-        return [
-            os.path.join(self.root_dir, it) for it in os.listdir(self.root_dir)
-        ]
+        return [os.path.join(self.root_dir, it) for it in os.listdir(self.root_dir)]
 
     def download(self) -> Union[str, List[str]]:
         self._download_file()
         if zipfile.is_zipfile(self._dl_path):
             return self._unzip()
         return self._dl_path
-
-
-def create_onedrive_directdownload(onedrive_link: str) -> str:
-    # Stąd ukradli: https://towardsdatascience.com/how-to-get-onedrive-direct-download-link-ecb52a62fee4
-    data_b64 = base64.b64encode(bytes(onedrive_link, 'utf-8'))
-    data_b64_str = (
-        data_b64
-        .decode('utf-8')
-        .replace('/', '_')
-        .replace('+', '-')
-        .rstrip("=")
-    )
-    result = f"https://api.onedrive.com/v1.0/shares/u!" \
-             f"{data_b64_str}/root/content"
-    return result
