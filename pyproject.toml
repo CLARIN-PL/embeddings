@@ -13,6 +13,7 @@ authors = [
 [tool.poetry.dependencies]
 python = "^3.8"
 transformers = "^4.4.2"
+tensorflow = "^2.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
