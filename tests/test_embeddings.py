@@ -1,4 +1,4 @@
-from embeddings import __version__
+from experimental.embeddings import __version__
 
 
 def test_version() -> None:
