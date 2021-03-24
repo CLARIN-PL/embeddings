@@ -10,7 +10,7 @@ from experimental.embeddings import datasets
 from experimental.embeddings.tasks import sequence_tagging as st
 
 
-def get_args():
+def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -51,12 +51,12 @@ def get_args():
     return parser.parse_args()
 
 
-def setup(device):
-    flair.device = torch.device(device)
+def setup(device: str) -> None:
+    flair.device = torch.device(device)  # type:ignore
     flair.set_seed(441)
 
 
-def evaluate_sequence_tagging():
+def evaluate_sequence_tagging() -> None:
     args = get_args()
     setup(args.device)
 

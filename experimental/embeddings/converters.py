@@ -1,7 +1,7 @@
-from typing import List, Dict
+from typing import List, Dict, Any
 
 
-def convert_jsonl_to_connl(data: List[Dict], out_path: str) -> None:
+def convert_jsonl_to_connl(data: List[Dict[Any, Any]], out_path: str) -> None:
     """Convert jsonl data to connl format.
 
     TODO: Should be adapted for other column names"""
