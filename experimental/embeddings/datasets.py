@@ -60,7 +60,7 @@ class PromisesElectionsPLDataset(Dataset):
         )
         downloaded = downloader.download()
         if not isinstance(downloaded, str):
-            raise ValueError('Download failed. Expected one file.')
+            raise ValueError("Download failed. Expected one file.")
 
         return downloaded
 
