@@ -2,7 +2,8 @@ import abc
 import importlib
 import os
 import zipfile
-from typing import Optional, List, Union
+from types import ModuleType
+from typing import Optional, List, Union, Dict, Any
 
 import requests
 import srsly
@@ -13,7 +14,7 @@ from tqdm.auto import tqdm
 from experimental.embeddings.converters import convert_jsonl_to_connl
 
 
-def split_train_test_dev(data: List):
+def split_train_test_dev(data: List[Any]) -> Dict[str, List[Any]]:
     train, test = train_test_split(data, test_size=0.4, random_state=1)
     dev, test = train_test_split(test, test_size=0.5, random_state=1)
     return {"train": train, "dev": dev, "test": test}
@@ -27,7 +28,7 @@ class Dataset:
 
 def get_dataset_cls(
     name: str, datasets_module: str = "experimental.embeddings.datasets"
-):
+) -> Any:
     try:
         return getattr(importlib.import_module(datasets_module), name)
     except AttributeError:
@@ -52,11 +53,16 @@ class PromisesElectionsPLDataset(Dataset):
         return all([os.path.exists(os.path.join(path, file)) for file in files])
 
     def _download(self) -> str:
+        assert isinstance(self.url, str)
         downloader = DatasetDownloader(
             root_dir="resources/datasets/promises-elections-pl/",
             url=self.url,
         )
-        return downloader.download()
+        downloaded = downloader.download()
+        if not isinstance(downloaded, str):
+            raise ValueError('Download failed. Expected one file.')
+
+        return downloaded
 
     def _preprocess(self) -> None:
         path = self._download()
@@ -86,6 +92,7 @@ class DatasetDownloader:
 
     @property
     def _dl_path(self) -> str:
+        assert isinstance(self.filename, str)
         return os.path.join(self.root_dir, self.filename)
 
     def _download_file(self) -> None:
