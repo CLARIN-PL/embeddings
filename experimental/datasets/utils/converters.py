@@ -2,9 +2,7 @@ from typing import List, Dict, Any
 
 
 def convert_spacy_jsonl_to_connl(data: List[Dict[Any, Any]], out_path: str) -> None:
-    """Convert jsonl data to connl format.
-
-    TODO: Should be adapted for other column names"""
+    """Convert spacy jsonl data to connl format."""
     for tweet in data:
         tokens = [it["text"] for it in tweet["tokens"]]
         labels = ["O" for i in range(len(tokens))]

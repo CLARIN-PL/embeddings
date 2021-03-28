@@ -10,11 +10,15 @@ from experimental.datasets.utils.misc import split_train_test_dev, DatasetDownlo
 
 
 class PromisesElectionsPLDataset(Dataset):
-    def __init__(self, url: Optional[str] = None):
+    def __init__(
+        self,
+        url: Optional[str] = None,
+        output_path: str = "resources/datasets/promises-elections-pl/",
+    ):
         super().__init__()
         self.ds_files = ["train.csv", "dev.csv", "test.csv"]
         self.url = url
-        self.path = Path("resources/datasets/promises-elections-pl/")
+        self.path = Path(output_path)
         if not self._detect_files(path=self.path, files=self.ds_files):
             if url:
                 print("Downloading and preprocessing data.")
