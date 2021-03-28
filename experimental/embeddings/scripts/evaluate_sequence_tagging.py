@@ -1,13 +1,13 @@
 import argparse
-import os
 import pickle
 
 import flair
 import torch
 from flair.embeddings import TransformerWordEmbeddings
 
-from experimental.embeddings import datasets
+import experimental.datasets.utils.misc
 from experimental.embeddings.tasks import sequence_tagging as st
+from pathlib import Path
 
 
 def get_args() -> argparse.Namespace:
@@ -60,11 +60,11 @@ def evaluate_sequence_tagging() -> None:
     args = get_args()
     setup(args.device)
 
-    out_dir = os.path.join(args.root, args.embedding)
-    os.makedirs(out_dir, exist_ok=True)
+    out_dir = Path(args.root, args.embedding, args.dataset)
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     ds_args = {"url": args.dataset_url} if args.dataset_url else {}
-    dataset_cls = datasets.get_dataset_cls(args.dataset)
+    dataset_cls = experimental.datasets.utils.misc.get_dataset_cls(args.dataset)
     dataset = dataset_cls(**ds_args)
     corpus = dataset.to_flair_column_corpus()
     tag_dictionary = corpus.make_tag_dictionary(tag_type="tag")
@@ -77,11 +77,11 @@ def evaluate_sequence_tagging() -> None:
         embeddings=embeddings,
         hidden_dim=256,
         tag_dictionary=tag_dictionary,
-        output_path=out_dir,
+        output_path=str(out_dir),
     )
 
     training_log = tagger.fit(corpus)
-    with open(os.path.join(out_dir, "results.pkl"), "wb") as f:
+    with out_dir.joinpath("results.pkl").open(mode="wb") as f:
         pickle.dump(obj=training_log, file=f)
 
     print("Done!", training_log)

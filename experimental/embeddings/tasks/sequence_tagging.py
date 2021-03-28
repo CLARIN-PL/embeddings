@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from typing import Any, Optional
 
 from flair.data import Dictionary
@@ -27,7 +27,7 @@ class FlairSequenceTagger:
             tag_type="tag",
             **self.model_hparams
         )
-        self.output_path = output_path
+        self.output_path = Path(output_path)
         self.trainer: Optional[ModelTrainer] = None
 
     def fit(
@@ -39,7 +39,7 @@ class FlairSequenceTagger:
     ) -> Any:
         self.trainer = ModelTrainer(self.model, corpus)
         log = self.trainer.train(
-            os.path.join(self.output_path, "tagger/"),
+            base_path=self.output_path,
             learning_rate=learning_rate,
             mini_batch_size=mini_batch_size,
             max_epochs=max_epochs,
