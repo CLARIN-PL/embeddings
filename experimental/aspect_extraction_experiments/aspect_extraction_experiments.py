@@ -1,5 +1,3 @@
-from __future__ import division, print_function, unicode_literals, absolute_import
-
 import pickle
 import pprint
 from collections import namedtuple
@@ -8,14 +6,13 @@ from pathlib import Path
 from typing import Iterable
 
 import click
+from aspect_extraction import AspectExtraction
 from keras.callbacks import TensorBoard, EarlyStopping
 from keras.utils import to_categorical
 from nlp_architect.contrib.keras.callbacks import ConllCallback
 from nlp_architect.data.sequential_tagging import SequentialTaggingDataset
 from nlp_architect.utils.metrics import get_conll_scores
 from tqdm import tqdm
-
-from aspect_extraction import AspectExtraction
 
 DatasetFiles = namedtuple("Dataset", ["name", "train_file", "test_file"])
 
