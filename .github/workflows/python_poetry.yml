@@ -72,6 +72,6 @@ jobs:
       - name: Build and publish
         run: |
           poetry build
-          poetry version $(git describe --tags)
+          poetry version $(git describe --tags)-SNAPSHOT
           poetry publish -r testpypi --username __token__ --password ${{ secrets.TEST_PYPI_API_TOKEN }}
 
