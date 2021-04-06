@@ -1,4 +1,4 @@
-name: CI
+name: CI Main
 on:
   push:
     branches:
@@ -63,6 +63,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+        fetch-depth: 0
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
@@ -74,7 +75,7 @@ jobs:
         run: poetry install -vv
       - name: Build and publish
         run:  |
-          poetry build
           poetry version $(git describe --tags)
+          poetry build
           poetry publish --username __token__ --password ${{ secrets.PYPI_API_TOKEN }}
 

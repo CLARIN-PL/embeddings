@@ -60,6 +60,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+        fetch-depth: 0
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
@@ -71,7 +72,7 @@ jobs:
         run: poetry install -vv
       - name: Build and publish
         run: |
-          poetry version $(git describe --tags)-SNAPSHOT
+          poetry version "$(git describe --tags)-SNAPSHOT"
           poetry build
           poetry config repositories.testpypi https://test.pypi.org/legacy
           poetry publish -r testpypi --username __token__ --password ${{ secrets.TEST_PYPI_API_TOKEN }}
