@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "embeddings"
-version = "0.1.0"
+name = "clarinpl-embeddings"
+version = "0.0.1"
 description = ""
 license="MIT"
 authors = [
@@ -8,6 +8,13 @@ authors = [
     "Łukasz Augustyniak <luk.augustyniak@gmail.com>",
     "Albert Sawczyn <albertsawczyn@gmail.com>",
     "Kamil Tagowski <kamil.tagowski@gmail.com>"
+]
+homepage = "https://github.com/CLARIN-PL/embeddings"
+packages = [
+    { include = "experimental" },
+    { include = "embeddings" },
+    { include = "experimental/**/*.py" },
+    { include = "embeddings/**/*.py" },
 ]
 
 [tool.poetry.dependencies]

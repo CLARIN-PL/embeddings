@@ -1,5 +1,8 @@
-name: CI
-on: pull_request
+name: CI Main
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   tests:
@@ -50,7 +53,7 @@ jobs:
     needs:
       - tests
       - lint
-    environment: Test deployment
+    environment: Deployment
     strategy:
       fail-fast: true
       matrix:
@@ -72,9 +75,8 @@ jobs:
       - name: Install deps
         run: poetry install -vv
       - name: Build and publish
-        run: |
-          poetry version "$(git describe --tags --abbrev=0)a$(git rev-list  `git rev-list --tags --no-walk --max-count=1`..HEAD --count)"
+        run:  |
+          poetry version "$(git describe --tags --abbrev=0)rc$(git rev-list  `git rev-list --tags --no-walk --max-count=1`..HEAD --count)"
           poetry build
-          poetry config repositories.testpypi https://test.pypi.org/legacy/
-          poetry publish -r testpypi --username __token__ --password ${{ secrets.TEST_PYPI_API_TOKEN }}
+          poetry publish --username __token__ --password ${{ secrets.PYPI_API_TOKEN }}
 
