@@ -53,7 +53,7 @@ jobs:
     needs:
       - tests
       - lint
-    environment: Test deployment
+    environment: Deployment
     strategy:
       fail-fast: true
       matrix:
