@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "clarinpl-embeddings"
-version = "0.0.1"
+version = "0.0.1a13"
 description = ""
 license="MIT"
 authors = [
