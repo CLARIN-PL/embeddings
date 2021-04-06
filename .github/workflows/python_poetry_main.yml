@@ -76,7 +76,7 @@ jobs:
         run: poetry install -vv
       - name: Build and publish
         run:  |
-          poetry version "$(git describe --tags --abbrev=0"
+          poetry version "$(git describe --tags --abbrev=0)rc$(git rev-list  `git rev-list --tags --no-walk --max-count=1`..HEAD --count)"
           poetry build
           poetry publish --username __token__ --password ${{ secrets.PYPI_API_TOKEN }}
 
