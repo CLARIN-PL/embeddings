@@ -69,12 +69,9 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install deps
         run: poetry install -vv
-      - name: Version
-        run: poetry version $(git describe --tags)
-      - name: Build
-        run: poetry build
-      - name: Configuring test PyPI repo
-        run: poetry config repositories.testpypi https://test.pypi.org/legacy
-      - name: Publish
-        run:  poetry publish -r testpypi --username __token__ --password ${{ secrets.TEST_PYPI_API_TOKEN }}
+      - name: Build and publish
+        run: |
+          poetry build
+          poetry version $(git describe --tags)
+          poetry publish -r testpypi --username __token__ --password ${{ secrets.TEST_PYPI_API_TOKEN }}
 

@@ -72,10 +72,9 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install deps
         run: poetry install -vv
-      - name: Version
-        run: poetry version $(git describe --tags)
-      - name: Build
-        run: poetry build
-      - name: Publish
-        run:  poetry publish --username __token__ --password ${{ secrets.PYPI_API_TOKEN }}
+      - name: Build and publish
+        run:  |
+          poetry build
+          poetry version $(git describe --tags)
+          poetry publish --username __token__ --password ${{ secrets.PYPI_API_TOKEN }}
 
