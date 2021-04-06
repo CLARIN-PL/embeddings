@@ -10,7 +10,10 @@ authors = [
     "Kamil Tagowski <kamil.tagowski@gmail.com>"
 ]
 homepage = "https://github.com/CLARIN-PL/embeddings"
-
+packages = [
+    { include = "experimental" },
+    { include = "embeddings" },
+]
 [tool.poetry.dependencies]
 python = "^3.8"
 transformers = "^4.4.2"
