@@ -13,7 +13,10 @@ homepage = "https://github.com/CLARIN-PL/embeddings"
 packages = [
     { include = "experimental" },
     { include = "embeddings" },
+    { include = "experimental/**/*.py" },
+    { include = "embeddings/**/*.py" },
 ]
+
 [tool.poetry.dependencies]
 python = "^3.8"
 transformers = "^4.4.2"
