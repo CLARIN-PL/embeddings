@@ -75,6 +75,6 @@ jobs:
         run: |
           poetry version "$(git describe --tags --abbrev=0)a$(git rev-list  `git rev-list --tags --no-walk --max-count=1`..HEAD --count)"
           poetry build
-          poetry config repositories.testpypi https://test.pypi.org/simple
+          poetry config repositories.testpypi https://test.pypi.org/legacy
           poetry publish -r testpypi --username __token__ --password ${{ secrets.TEST_PYPI_API_TOKEN }}
 
