@@ -47,9 +47,9 @@ jobs:
       - name: Check types
         run: poetry run mypy --strict .
   publish:
-#    needs:
-#      - tests
-#      - lint
+    needs:
+      - tests
+      - lint
     environment: Test deployment
     strategy:
       fail-fast: true
@@ -75,6 +75,6 @@ jobs:
         run: |
           poetry version "$(git describe --tags | sed 's/-/+/' | sed 's/-/./').SNAPSHOT"
           poetry build
-          poetry config repositories.testpypi https://test.pypi.org/legacy
+          poetry config repositories.testpypi https://test.pypi.org/simple
           poetry publish -r testpypi --username __token__ --password ${{ secrets.TEST_PYPI_API_TOKEN }}
 
