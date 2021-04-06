@@ -9,6 +9,7 @@ authors = [
     "Albert Sawczyn <albertsawczyn@gmail.com>",
     "Kamil Tagowski <kamil.tagowski@gmail.com>"
 ]
+homepage = "https://github.com/CLARIN-PL/embeddings"
 
 [tool.poetry.dependencies]
 python = "^3.8"
