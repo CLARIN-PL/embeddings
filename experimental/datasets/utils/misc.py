@@ -8,6 +8,8 @@ import requests
 from sklearn.model_selection import train_test_split
 from tqdm.auto import tqdm
 
+from experimental.data.io import T_path
+
 
 def split_train_test_dev(data: List[Any]) -> Dict[str, List[Any]]:
     train, test = train_test_split(data, test_size=0.4, random_state=1)
@@ -30,9 +32,7 @@ def download_file(url: str, chunk_size: int = 1024) -> Tuple[Any, str]:
         )
 
     filename = (
-        r.headers.get("Content-Disposition", "filename=ds")
-        .split("filename=")[1]
-        .replace('"', "")
+        r.headers.get("Content-Disposition", "filename=ds").split("filename=")[1].replace('"', "")
     )
     filesize = int(r.headers.get("Content-Length", "0"))
 
@@ -58,6 +58,11 @@ def unzip_file(path: str, out_dir: str) -> List[Path]:
     return list(output_dir.iterdir())
 
 
+def all_files_exists(path: T_path, files: List[str]) -> bool:
+    path = Path(path)
+    return all([path.joinpath(file).exists() for file in files])
+
+
 class DatasetDownloader:
     def __init__(self, root_dir: str, url: str, filename: Optional[str] = None):
         self.root_dir = root_dir
@@ -71,9 +76,7 @@ class DatasetDownloader:
 
         output_paths = []
         if zipfile.is_zipfile(tmp_dl_file.name):
-            output_paths.extend(
-                unzip_file(path=tmp_dl_file.name, out_dir=self.root_dir)
-            )
+            output_paths.extend(unzip_file(path=tmp_dl_file.name, out_dir=self.root_dir))
         else:
             root_dir = Path(self.root_dir)
             root_dir.mkdir(parents=True)
