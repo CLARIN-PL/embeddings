@@ -1,55 +1,35 @@
 import os
-import tempfile
 
-from datasets import load_dataset
-from flair.data import Corpus
-from flair.datasets import CSVClassificationDataset
 from flair.embeddings import TransformerDocumentEmbeddings
 from flair.models import TextClassifier
 from flair.trainers import ModelTrainer
 
-MODEL = "/home/albert/dev/clarin/long-former-polish"
+from experimental.datasets.hugging_face_dataset import HuggingFaceClassificationDataset
 
-polemo_dataset = load_dataset("polemo2")
+MODEL = "allegro/herbert-base-cased"
 
-with tempfile.TemporaryDirectory() as tmp_dir_path:
-    flair_datasets = {}
+DATASET_NAME = "polemo2"
+TARGET_COLUMN_NAME = "target"
+INPUT_TEXT_COLUMN_NAME = "sentence"
 
-    for set_name in ["train", "validation", "test"]:
-        label_map = polemo_dataset[set_name].features["target"].names
-        polemo_dataset[set_name] = polemo_dataset[set_name].map(
-            lambda row: {"named_target": label_map[row["target"]]},
-            remove_columns=["target"],
-        )
-        polemo_dataset[set_name].to_csv(
-            os.path.join(tmp_dir_path, f"{set_name}.csv"), header=False, index=False
-        )
-
-        column_name_map = {
-            polemo_dataset[set_name].column_names.index("sentence"): "text",
-            polemo_dataset[set_name].column_names.index("named_target"): "label",
-        }
-
-        flair_datasets[set_name] = CSVClassificationDataset(
-            os.path.join(tmp_dir_path, f"{set_name}.csv"), column_name_map
-        )
-
-corpus = Corpus(
-    train=flair_datasets["train"],
-    dev=flair_datasets["validation"],
-    test=flair_datasets["test"],
-    name="polemo2",
+dataset = HuggingFaceClassificationDataset(
+    dataset_name=DATASET_NAME,
+    input_text_column_name=INPUT_TEXT_COLUMN_NAME,
+    target_column_name=TARGET_COLUMN_NAME,
 )
+
+flair_dataset = dataset.to_flair_column_corpus()
 
 embeddings = TransformerDocumentEmbeddings(MODEL, fine_tune=False)
 
-label_dict = corpus.make_label_dictionary()
+label_dict = flair_dataset.make_label_dictionary()
 model = TextClassifier(embeddings, label_dictionary=label_dict)
-trainer = ModelTrainer(model, corpus, use_tensorboard=True)
+trainer = ModelTrainer(model, flair_dataset, use_tensorboard=True)
 log = trainer.train(
     os.path.join("log", "classification"),
-    # learning_rate=learning_rate,
     mini_batch_size=128,
-    # max_epochs=max_epochs,
 )
-model.evaluate(corpus.test)
+result, loss = model.evaluate(flair_dataset.dev)
+
+print(result.log_line)
+print(result.detailed_results)
