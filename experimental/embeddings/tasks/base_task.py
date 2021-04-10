@@ -1,6 +1,6 @@
 import abc
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Tuple
 from typing import Optional
 
 import flair
@@ -35,5 +35,5 @@ class BaseTask(abc.ABC):
         )
         return log
 
-    def evaluate(self, dataset: FlairDataset) -> (Result, float):
+    def evaluate(self, dataset: FlairDataset) -> Tuple[Result, float]:
         return self.model.evaluate(dataset)

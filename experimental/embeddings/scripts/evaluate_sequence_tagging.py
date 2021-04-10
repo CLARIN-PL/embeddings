@@ -15,12 +15,7 @@ def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "-d",
-        "--device",
-        help="Device for Flair e.g. cpu",
-        type=str,
-        required=True,
-        default=None
+        "-d", "--device", help="Device for Flair e.g. cpu", type=str, required=True, default=None
     )
     parser.add_argument(
         "-e",
@@ -48,7 +43,7 @@ def get_args() -> argparse.Namespace:
         help="Root directory for output files",
         type=str,
         required=False,
-        default=RESULTS_PATH.joinpath('tagging'),
+        default=RESULTS_PATH.joinpath("tagging"),
     )
     return parser.parse_args()
 
