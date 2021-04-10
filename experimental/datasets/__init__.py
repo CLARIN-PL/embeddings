@@ -1,3 +1,3 @@
-from .promises_elections_twitter import PromisesElectionsPLBaseDataset
+from .promises_elections_twitter import PromisesElectionsPLDataset
 
-__all__ = ["PromisesElectionsPLBaseDataset"]
+__all__ = ["PromisesElectionsPLDataset"]

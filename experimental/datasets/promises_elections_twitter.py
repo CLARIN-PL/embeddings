@@ -14,7 +14,7 @@ from experimental.datasets.utils.misc import (
 )
 
 
-class PromisesElectionsPLBaseDataset(BaseDataset):
+class PromisesElectionsPLDataset(BaseDataset):
     def __init__(
         self,
         url: Optional[str] = None,

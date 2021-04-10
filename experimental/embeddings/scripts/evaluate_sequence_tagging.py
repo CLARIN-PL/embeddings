@@ -6,6 +6,7 @@ import torch
 from flair.embeddings import TransformerWordEmbeddings
 
 import experimental.datasets.utils.misc
+from experimental.defaults import RESULTS_PATH
 from experimental.embeddings.tasks import sequence_tagging as st
 from pathlib import Path
 
@@ -19,6 +20,7 @@ def get_args() -> argparse.Namespace:
         help="Device for Flair e.g. cpu",
         type=str,
         required=True,
+        default=None
     )
     parser.add_argument(
         "-e",
@@ -46,7 +48,7 @@ def get_args() -> argparse.Namespace:
         help="Root directory for output files",
         type=str,
         required=False,
-        default="resources/tagging/",
+        default=RESULTS_PATH.joinpath('tagging'),
     )
     return parser.parse_args()
 
@@ -87,5 +89,4 @@ def evaluate_sequence_tagging() -> None:
     print("Done!", training_log)
 
 
-if __name__ == "__main__":
-    evaluate_sequence_tagging()
+evaluate_sequence_tagging()
