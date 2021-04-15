@@ -1,6 +1,6 @@
 import abc
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Any
 from typing import Optional
 
 import flair
@@ -15,8 +15,8 @@ class BaseTask(abc.ABC):
         model: flair.nn.Model,
         output_path: str,
     ):
-        self.output_path = Path(output_path)
-        self.model = model
+        self.output_path: Path = Path(output_path)
+        self.model: flair.nn.Model = model
         self.trainer: Optional[ModelTrainer] = None
 
     def fit(
@@ -25,9 +25,9 @@ class BaseTask(abc.ABC):
         learning_rate: float = 0.1,
         mini_batch_size: int = 32,
         max_epochs: int = 1,
-    ) -> Dict:
+    ) -> Dict[Any, Any]:
         self.trainer = ModelTrainer(self.model, corpus)
-        log = self.trainer.train(
+        log: Dict[Any, Any] = self.trainer.train(
             base_path=self.output_path,
             learning_rate=learning_rate,
             mini_batch_size=mini_batch_size,
@@ -36,4 +36,5 @@ class BaseTask(abc.ABC):
         return log
 
     def evaluate(self, dataset: FlairDataset) -> Tuple[Result, float]:
-        return self.model.evaluate(dataset)
+        log: Tuple[Result, float] = self.model.evaluate(dataset)
+        return log
