@@ -1,35 +1,42 @@
 import os
+from pprint import pprint
 
+import typer
 from flair.embeddings import TransformerDocumentEmbeddings
 from flair.models import TextClassifier
 from flair.trainers import ModelTrainer
 
 from experimental.datasets.hugging_face_dataset import HuggingFaceClassificationDataset
 
-MODEL = "allegro/herbert-base-cased"
+app = typer.Typer()
 
-DATASET_NAME = "polemo2"
-TARGET_COLUMN_NAME = "target"
-INPUT_TEXT_COLUMN_NAME = "sentence"
 
-dataset = HuggingFaceClassificationDataset(
-    dataset_name=DATASET_NAME,
-    input_text_column_name=INPUT_TEXT_COLUMN_NAME,
-    target_column_name=TARGET_COLUMN_NAME,
-)
+def run(
+    model: str = typer.Option(...),
+    dataset_name: str = typer.Option("polemo2"),
+    input_text_column_name: str = typer.Option("sentence"),
+    target_column_name: str = typer.Option("target"),
+) -> None:
+    pprint(locals())
 
-flair_dataset = dataset.to_flair_column_corpus()
+    dataset = HuggingFaceClassificationDataset(
+        dataset_name=dataset_name,
+        input_text_column_name=input_text_column_name,
+        target_column_name=target_column_name,
+    )
 
-embeddings = TransformerDocumentEmbeddings(MODEL, fine_tune=False)
+    flair_dataset = dataset.to_flair_column_corpus()
+    embeddings = TransformerDocumentEmbeddings(model, fine_tune=False)
 
-label_dict = flair_dataset.make_label_dictionary()
-model = TextClassifier(embeddings, label_dictionary=label_dict)
-trainer = ModelTrainer(model, flair_dataset, use_tensorboard=True)
-log = trainer.train(
-    os.path.join("log", "classification"),
-    mini_batch_size=128,
-)
-result, loss = model.evaluate(flair_dataset.dev)
+    label_dict = flair_dataset.make_label_dictionary()
+    classifier = TextClassifier(embeddings, label_dictionary=label_dict)
+    trainer = ModelTrainer(classifier, flair_dataset, use_tensorboard=True)
+    log = trainer.train(os.path.join("log", "classification"), mini_batch_size=128)
+    # todo: should be flair_dataset.test, but there is a bug
+    #  in test set in polemo2 on huggingface dataset
+    result, loss = classifier.evaluate(flair_dataset.dev)
+    print(result.log_line)
+    print(result.detailed_results)
 
-print(result.log_line)
-print(result.detailed_results)
+
+typer.run(run)

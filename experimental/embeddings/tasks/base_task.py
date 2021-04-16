@@ -1,6 +1,6 @@
 import abc
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Any
 from typing import Optional
 
 import flair
@@ -10,6 +10,7 @@ from flair.training_utils import Result
 
 
 class BaseTask(abc.ABC):
+
     def __init__(self, model: flair.nn.Model, output_path: str):
         self.output_path = Path(output_path)
         self.model = model
