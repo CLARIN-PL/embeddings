@@ -1,4 +1,4 @@
-from typing import Union, List, Tuple, Any
+from typing import List, Tuple, Any
 
 import datasets
 from experimental.embeddings.tasks.base_task import BaseTask
@@ -47,7 +47,7 @@ class FlairSequenceTagger(BaseTask):
         )
         super().__init__(model, output_path)
 
-    def evaluate(self, sentences: Union[Sentence, List[Sentence]]) -> Tuple[Any, float]:
+    def evaluate(self, sentences: List[Sentence]) -> Tuple[Any, float]:
         self.model.predict(sentences, label_name="prediction")
         y_true, y_pred = get_labels_from_flair_sentences(sentences)
 
