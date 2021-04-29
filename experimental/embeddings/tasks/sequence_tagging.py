@@ -1,3 +1,6 @@
+from typing import List, Tuple, Dict, Any
+
+from datasets import Metric
 from flair.data import Dictionary
 from flair.embeddings import TransformerWordEmbeddings
 from flair.models import SequenceTagger
@@ -25,3 +28,6 @@ class FlairSequenceTagger(BaseTask):
             **self.model_hparams
         )
         super().__init__(model, output_path)
+
+    def _get_default_metrics(self) -> List[Tuple[Metric, Dict[str, Any]]]:
+        raise NotImplementedError

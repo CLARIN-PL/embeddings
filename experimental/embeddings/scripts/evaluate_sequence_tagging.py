@@ -20,7 +20,7 @@ def get_args() -> argparse.Namespace:
     parser.add_argument(
         "-e",
         "--embedding",
-        help="Huggingface embedding model name",
+        help="Hugging Face embedding model name",
         type=str,
         required=True,
     )

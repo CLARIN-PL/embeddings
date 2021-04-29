@@ -49,7 +49,7 @@ class HuggingFaceClassificationDataset(BaseDataset):
     def _preprocess(self) -> Dict[str, CSVClassificationDataset]:
         flair_datasets = {}
 
-        hf_dataset = load_dataset(self.dataset_name)
+        hf_dataset = load_dataset(self.dataset_name, "all_text")
         self._log_info(hf_dataset)
 
         for subset_name in hf_dataset.keys():
