@@ -35,9 +35,7 @@ class FlairTextClassification(BaseTask):
         y_true = [self.model.label_dictionary.get_idx_for_item(labels[0]) for labels in y_true]
         y_pred = [self.model.label_dictionary.get_idx_for_item(labels[0]) for labels in y_pred]
 
-        result = self.compute_metrics(y_true, y_pred)
-
-        return result
+        return self.compute_metrics(y_true, y_pred)
 
     def predict(
         self,

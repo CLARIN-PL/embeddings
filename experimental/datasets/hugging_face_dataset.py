@@ -9,7 +9,7 @@ from datasets import load_dataset, ClassLabel, DatasetDict, Dataset
 from flair.data import Corpus
 
 from flair.datasets import CSVClassificationDataset
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Any
 
 from experimental.data.io import T_path
 from experimental.datasets.base import BaseDataset
@@ -27,6 +27,7 @@ class HuggingFaceClassificationDataset(BaseDataset):
         input_text_column_name: str,
         target_column_name: str,
         output_path: Optional[T_path] = None,
+        load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         self._logger = get_logger(str(self))
 
@@ -37,6 +38,7 @@ class HuggingFaceClassificationDataset(BaseDataset):
         self.dataset_name = dataset_name
         self.input_text_column_name = input_text_column_name
         self.target_column_name = target_column_name
+        self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
 
         if not all_files_exists(
             path=self.output_path, files=[x + ".csv" for x in self.HUGGING_FACE_SUBSETS]
@@ -49,7 +51,7 @@ class HuggingFaceClassificationDataset(BaseDataset):
     def _preprocess(self) -> Dict[str, CSVClassificationDataset]:
         flair_datasets = {}
 
-        hf_dataset = load_dataset(self.dataset_name, "all_text")
+        hf_dataset = load_dataset(self.dataset_name, **self.load_dataset_kwargs)
         self._log_info(hf_dataset)
 
         for subset_name in hf_dataset.keys():
