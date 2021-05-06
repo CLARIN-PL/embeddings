@@ -3,7 +3,8 @@ from embeddings.pipeline.PipelineBuilder import PipelineBuilder
 from embeddings.data.Dataset import Dataset
 from embeddings.data.DataLoader import DataLoader, Input, Output
 from embeddings.transformation.Transformation import Transformation
-from embeddings.model.Model import Model
+from embeddings.model.BaseModel import BaseModel
+from embeddings.embedding.Embedding import Embedding
 from embeddings.task.Task import Task
 from embeddings.evaluator.Evaluator import Evaluator
 
@@ -22,8 +23,8 @@ class DummyTransformation(Transformation[str, int]):
         pass
 
 
-class DummyModel(Model[int, float]):
-    def model(self, data: Input) -> Output:
+class DummyEmbedding(Embedding[int, float]):
+    def embed(self, data: Input) -> Output:
         pass
 
 
@@ -41,15 +42,15 @@ def test_pipeline_builder() -> None:
     dataset = DummyDataset()
     data_loader = DummyLoader()
     data_transformation = DummyTransformation()
-    model = DummyModel()
     task = DummyTask()
+    embedding = DummyEmbedding()
+    model = BaseModel(embedding, task)
     evaluator = DummyEvaluator()
     pipeline = (
         PipelineBuilder.with_dataset(dataset)
         .with_loader(data_loader)
         .with_transformation(data_transformation)
         .with_model(model)
-        .with_task(task)
         .with_evaluator(evaluator)
         .build()
     )
