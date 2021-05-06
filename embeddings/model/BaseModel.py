@@ -10,7 +10,9 @@ Output = TypeVar("Output")
 
 
 class BaseModel(Model[Input, Output], Generic[Input, EmbeddingResult, Output]):
-    def __init__(self, embedding: Embedding[Input, EmbeddingResult], task: Task[EmbeddingResult, Output]) -> None:
+    def __init__(
+        self, embedding: Embedding[Input, EmbeddingResult], task: Task[EmbeddingResult, Output]
+    ) -> None:
         self.embedding = embedding
         self.task = task
 

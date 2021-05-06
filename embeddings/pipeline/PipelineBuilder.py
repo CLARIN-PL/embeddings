@@ -51,25 +51,19 @@ class PipelineBuilder(
         self: "PipelineBuilder[Data, LoaderResult, TransformationResult, ModelResult, EvaluationResult]",
         data_loader: DataLoader[Data, CreationLoaderResult],
     ) -> "PipelineBuilder[Data, CreationLoaderResult, TransformationResult, ModelResult, EvaluationResult]":
-        return PipelineBuilder(
-            self.dataset, data_loader, None, self.model, self.evaluator
-        )
+        return PipelineBuilder(self.dataset, data_loader, None, self.model, self.evaluator)
 
     def with_transformation(
         self: "PipelineBuilder[Data, LoaderResult, TransformationResult, ModelResult, EvaluationResult]",
         transformation: Transformation[LoaderResult, CreationTransformationResult],
     ) -> "PipelineBuilder[Data, LoaderResult, CreationTransformationResult, ModelResult, EvaluationResult]":
-        return PipelineBuilder(
-            self.dataset, self.data_loader, transformation, None, self.evaluator
-        )
+        return PipelineBuilder(self.dataset, self.data_loader, transformation, None, self.evaluator)
 
     def with_model(
         self: "PipelineBuilder[Data, LoaderResult, TransformationResult, ModelResult, EvaluationResult]",
         model: Model[TransformationResult, CreationModelResult],
     ) -> "PipelineBuilder[Data, LoaderResult, TransformationResult, CreationModelResult, EvaluationResult]":
-        return PipelineBuilder(
-            self.dataset, self.data_loader, self.transformation, model, None
-        )
+        return PipelineBuilder(self.dataset, self.data_loader, self.transformation, model, None)
 
     def with_evaluator(
         self: "PipelineBuilder[Data, LoaderResult, TransformationResult, ModelResult, EvaluationResult]",
