@@ -1,10 +1,12 @@
 from typing import List, Tuple, Any
 
 import datasets
-from experimental.embeddings.tasks.base_task import BaseTask
+
 from flair.data import Dictionary, Sentence
 from flair.embeddings import TransformerWordEmbeddings
 from flair.models import SequenceTagger
+
+from experimental.embeddings.tasks.base_task import BaseTask
 
 
 def get_labels_from_flair_sentences(

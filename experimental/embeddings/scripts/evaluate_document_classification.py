@@ -1,23 +1,26 @@
-import os
+from pathlib import Path
 from pprint import pprint
 
 import typer
 from flair.embeddings import TransformerDocumentEmbeddings
-from flair.models import TextClassifier
-from flair.trainers import ModelTrainer
 
 from experimental.datasets.hugging_face_dataset import HuggingFaceClassificationDataset
+from experimental.defaults import RESULTS_PATH
+from experimental.embeddings.tasks.text_classification import FlairTextClassification
 
 app = typer.Typer()
 
 
 def run(
-    model: str = typer.Option(...),
-    dataset_name: str = typer.Option("polemo2"),
+    embedding: str = typer.Option(..., help="Hugging Face embedding model name"),
+    dataset_name: str = typer.Option(...),
     input_text_column_name: str = typer.Option("sentence"),
     target_column_name: str = typer.Option("target"),
+    root: str = typer.Option(RESULTS_PATH.joinpath("document_classification")),
 ) -> None:
     pprint(locals())
+    out_dir = Path(root, embedding, dataset_name)
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     dataset = HuggingFaceClassificationDataset(
         dataset_name=dataset_name,
@@ -25,18 +28,15 @@ def run(
         target_column_name=target_column_name,
     )
 
-    flair_dataset = dataset.to_flair_column_corpus()
-    embeddings = TransformerDocumentEmbeddings(model, fine_tune=False)
+    corpus = dataset.to_flair_column_corpus()
+    label_dict = corpus.make_label_dictionary()
 
-    label_dict = flair_dataset.make_label_dictionary()
-    classifier = TextClassifier(embeddings, label_dictionary=label_dict)
-    trainer = ModelTrainer(classifier, flair_dataset, use_tensorboard=True)
-    log = trainer.train(os.path.join("log", "classification"), mini_batch_size=128)
-    # todo: should be flair_dataset.test, but there is a bug
-    #  in test set in polemo2 on huggingface dataset
-    result, loss = classifier.evaluate(flair_dataset.dev)
-    print(result.log_line)
-    print(result.detailed_results)
+    embeddings = TransformerDocumentEmbeddings(embedding, fine_tune=False)
+    classifier = FlairTextClassification(embeddings, label_dict, out_dir)
+    classifier.fit(corpus, max_epochs=100)
+
+    result = classifier.evaluate(corpus.test)
+    pprint(result)
 
 
 typer.run(run)

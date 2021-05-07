@@ -10,6 +10,7 @@ from experimental.defaults import RESULTS_PATH
 from experimental.embeddings.tasks import sequence_tagging as st
 from flair.embeddings import TransformerWordEmbeddings
 
+
 app = typer.Typer()
 
 

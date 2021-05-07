@@ -9,7 +9,7 @@ from datasets import load_dataset, ClassLabel, DatasetDict, Dataset
 from flair.data import Corpus
 
 from flair.datasets import CSVClassificationDataset
-from typing import Optional, Dict
+from typing import Optional, Dict, List, Any
 
 from experimental.data.io import T_path
 from experimental.datasets.base import BaseDataset
@@ -19,7 +19,6 @@ from experimental.utils.loggers import get_logger
 
 
 class HuggingFaceClassificationDataset(BaseDataset):
-    # todo: handle cases where validation subset is not present
     HUGGING_FACE_SUBSETS = ["train", "validation", "test"]
 
     def __init__(
@@ -28,6 +27,7 @@ class HuggingFaceClassificationDataset(BaseDataset):
         input_text_column_name: str,
         target_column_name: str,
         output_path: Optional[T_path] = None,
+        load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         self._logger = get_logger(str(self))
 
@@ -38,6 +38,7 @@ class HuggingFaceClassificationDataset(BaseDataset):
         self.dataset_name = dataset_name
         self.input_text_column_name = input_text_column_name
         self.target_column_name = target_column_name
+        self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
 
         if not all_files_exists(
             path=self.output_path, files=[x + ".csv" for x in self.HUGGING_FACE_SUBSETS]
@@ -50,23 +51,24 @@ class HuggingFaceClassificationDataset(BaseDataset):
     def _preprocess(self) -> Dict[str, CSVClassificationDataset]:
         flair_datasets = {}
 
-        hf_dataset = load_dataset(self.dataset_name)
+        hf_dataset = load_dataset(self.dataset_name, **self.load_dataset_kwargs)
         self._log_info(hf_dataset)
 
-        for subset_name in self.HUGGING_FACE_SUBSETS:
+        for subset_name in hf_dataset.keys():
             self._check_compatibility(hf_dataset[subset_name])
 
         for subset_name in self.HUGGING_FACE_SUBSETS:
-            flair_datasets[subset_name] = self._preprocess_subset(hf_dataset, subset_name)
-
+            if subset_name in hf_dataset.keys():
+                flair_datasets[subset_name] = self._preprocess_subset(hf_dataset, subset_name)
+            else:
+                flair_datasets[subset_name] = None
         return flair_datasets
 
     def _log_info(self, hf_dataset: DatasetDict) -> None:
         self._logger.info(f"Dataset name: {self.dataset_name}")
 
         subsets_info = {
-            subset: pprint.pformat(hf_dataset[subset].info.__dict__)
-            for subset in self.HUGGING_FACE_SUBSETS
+            subset: pprint.pformat(hf_dataset[subset].info.__dict__) for subset in hf_dataset.keys()
         }
         for k, v in groupby(subsets_info.items(), itemgetter(1)):
             self._logger.info(f"Info of {list(map(itemgetter(0), v))}:\n{k}")
@@ -125,6 +127,11 @@ class HuggingFaceClassificationDataset(BaseDataset):
         return flair_datasets
 
     def to_flair_column_corpus(self) -> Corpus:
+        if not self.flair_datasets["train"]:
+            raise ValueError(
+                f"Hugging Face dataset {self.dataset_name} does not have " f"TRAIN subset."
+            )
+
         return Corpus(
             train=self.flair_datasets["train"],
             dev=self.flair_datasets["validation"],
