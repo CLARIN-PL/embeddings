@@ -27,14 +27,14 @@ class StandardPipeline(
         model: Model[TransformationResult, ModelResult],
         evaluator: Evaluator[ModelResult, EvaluationResult],
     ) -> None:
-        self.data_set = data_set
+        self.dataset = data_set
         self.data_loader = data_loader
         self.transformation = transformation
         self.model = model
         self.evaluator = evaluator
 
     def run(self) -> EvaluationResult:
-        loaded_data = self.data_loader.load(self.data_set)
+        loaded_data = self.data_loader.load(self.dataset)
         transformed_data = self.transformation.transform(loaded_data)
         model_result = self.model.model(transformed_data)
         return self.evaluator.evaluate(model_result)
