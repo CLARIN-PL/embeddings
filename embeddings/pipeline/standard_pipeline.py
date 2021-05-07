@@ -1,12 +1,12 @@
 from typing import TypeVar, Generic
 from abc import ABC
-from embeddings.pipeline.Pipeline import Pipeline
-from embeddings.data.Dataset import Dataset
-from embeddings.data.DataLoader import DataLoader
-from embeddings.transformation.Transformation import Transformation
-from embeddings.model.Model import Model
-from embeddings.task.Task import Task
-from embeddings.evaluator.Evaluator import Evaluator
+from embeddings.pipeline.pipeline import Pipeline
+from embeddings.data.dataset import Dataset
+from embeddings.data.data_loader import DataLoader
+from embeddings.transformation.transformation import Transformation
+from embeddings.model.model import Model
+from embeddings.task.task import Task
+from embeddings.evaluator.evaluator import Evaluator
 
 EvaluationResult = TypeVar("EvaluationResult")
 Data = TypeVar("Data")

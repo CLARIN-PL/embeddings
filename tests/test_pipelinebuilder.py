@@ -1,12 +1,12 @@
 from typing import List
-from embeddings.pipeline.PipelineBuilder import PipelineBuilder
-from embeddings.data.Dataset import Dataset
-from embeddings.data.DataLoader import DataLoader, Input, Output
-from embeddings.transformation.Transformation import Transformation
-from embeddings.model.BaseModel import BaseModel
-from embeddings.embedding.Embedding import Embedding
-from embeddings.task.Task import Task
-from embeddings.evaluator.Evaluator import Evaluator
+from embeddings.pipeline.pipeline_builder import PipelineBuilder
+from embeddings.data.dataset import Dataset
+from embeddings.data.data_loader import DataLoader, Input, Output
+from embeddings.transformation.transformation import Transformation
+from embeddings.model.base_model import BaseModel
+from embeddings.embedding.embedding import Embedding
+from embeddings.task.task import Task
+from embeddings.evaluator.evaluator import Evaluator
 
 
 class DummyDataset(Dataset[str]):
