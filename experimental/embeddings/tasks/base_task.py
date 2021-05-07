@@ -1,23 +1,33 @@
 import abc
 from pathlib import Path
-from typing import Dict, Tuple, Any
+from typing import Dict, Tuple, Any, List, Union
 from typing import Optional
 
 import flair
-from flair.data import FlairDataset, Corpus
+import numpy as np
+import torch
+from datasets import Metric
+from flair.data import Corpus
 from flair.trainers import ModelTrainer
-from flair.training_utils import Result
+
+from experimental.data.io import T_path
 
 
 class BaseTask(abc.ABC):
     def __init__(
         self,
         model: flair.nn.Model,
-        output_path: str,
+        output_path: T_path,
+        metrics: Optional[List[Tuple[Metric, Dict[str, Any]]]] = None,
     ):
         self.output_path: Path = Path(output_path)
         self.model: flair.nn.Model = model
         self.trainer: Optional[ModelTrainer] = None
+
+        if metrics is None:
+            metrics = self._get_default_metrics()
+
+        self.metrics = metrics
 
     def fit(
         self,
@@ -35,6 +45,16 @@ class BaseTask(abc.ABC):
         )
         return log
 
-    def evaluate(self, dataset: FlairDataset) -> Tuple[Result, float]:
-        log: Tuple[Result, float] = self.model.evaluate(dataset)
-        return log
+    @abc.abstractmethod
+    def _get_default_metrics(self) -> List[Tuple[Metric, Dict[str, Any]]]:
+        pass
+
+    def compute_metrics(
+        self,
+        y_true: Optional[Union[List[Any], np.ndarray, torch.Tensor]],
+        y_pred: Optional[Union[List[Any], np.ndarray, torch.Tensor]],
+    ) -> List[Optional[Dict[Any, Any]]]:
+        return [
+            metric.compute(references=y_true, predictions=y_pred, **kwargs)
+            for metric, kwargs in self.metrics
+        ]
