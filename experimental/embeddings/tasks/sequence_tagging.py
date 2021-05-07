@@ -1,7 +1,7 @@
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Dict
 
 import datasets
-
+from datasets import Metric
 from flair.data import Dictionary, Sentence
 from flair.embeddings import TransformerWordEmbeddings
 from flair.models import SequenceTagger
@@ -37,10 +37,7 @@ class FlairSequenceTagger(BaseTask):
         output_path: str,
         use_crf: bool = True,
     ):
-        self.model_hparams = {
-            "hidden_size": hidden_dim,
-            "use_crf": use_crf,
-        }
+        self.model_hparams = {"hidden_size": hidden_dim, "use_crf": use_crf}
         model = SequenceTagger(
             embeddings=embeddings,
             tag_dictionary=tag_dictionary,
@@ -48,6 +45,9 @@ class FlairSequenceTagger(BaseTask):
             **self.model_hparams
         )
         super().__init__(model, output_path)
+
+    def _get_default_metrics(self) -> List[Tuple[Metric, Dict[str, Any]]]:
+        raise NotImplementedError
 
     def evaluate(self, sentences: List[Sentence]) -> Any:
         self.model.predict(sentences, label_name="prediction")
