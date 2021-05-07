@@ -13,7 +13,7 @@ app = typer.Typer()
 
 def run(
     model: str = typer.Option(...),
-    dataset_name: str = typer.Option("polemo2"),
+    dataset_name: str = typer.Option(...),
     input_text_column_name: str = typer.Option("sentence"),
     target_column_name: str = typer.Option("target"),
 ) -> None:
@@ -32,9 +32,9 @@ def run(
     classifier = TextClassifier(embeddings, label_dictionary=label_dict)
     trainer = ModelTrainer(classifier, flair_dataset, use_tensorboard=True)
     log = trainer.train(os.path.join("log", "classification"), mini_batch_size=128)
-    # todo: should be flair_dataset.test, but there is a bug
-    #  in test set in polemo2 on huggingface dataset
-    result, loss = classifier.evaluate(flair_dataset.dev)
+
+    print("TEST evaluation:")
+    result, loss = classifier.evaluate(flair_dataset.test)
     print(result.log_line)
     print(result.detailed_results)
 
