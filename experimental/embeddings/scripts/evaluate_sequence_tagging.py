@@ -1,51 +1,17 @@
-import argparse
 import pickle
-
-import flair
-import torch
-from flair.embeddings import TransformerWordEmbeddings
+from pathlib import Path
+from typing import Optional
 
 import experimental.datasets.utils.misc
+import flair
+import torch
+import typer
 from experimental.defaults import RESULTS_PATH
 from experimental.embeddings.tasks import sequence_tagging as st
-from pathlib import Path
+from flair.embeddings import TransformerWordEmbeddings
 
 
-def get_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "-d", "--device", help="Device for Flair e.g. cpu", type=str, required=True, default=None
-    )
-    parser.add_argument(
-        "-e",
-        "--embedding",
-        help="Hugging Face embedding model name",
-        type=str,
-        required=True,
-    )
-    parser.add_argument(
-        "-ds",
-        "--dataset",
-        help="Dataset name",
-        type=str,
-        required=True,
-    )
-    parser.add_argument(
-        "--dataset_url",
-        help="Dataset download url",
-        type=str,
-        required=False,
-    )
-    parser.add_argument(
-        "-r",
-        "--root",
-        help="Root directory for output files",
-        type=str,
-        required=False,
-        default=RESULTS_PATH.joinpath("tagging"),
-    )
-    return parser.parse_args()
+app = typer.Typer()
 
 
 def setup(device: str) -> None:
@@ -53,21 +19,31 @@ def setup(device: str) -> None:
     flair.set_seed(441)
 
 
-def evaluate_sequence_tagging() -> None:
-    args = get_args()
-    setup(args.device)
+def evaluate_sequence_tagging(
+    embedding: str = typer.Option(..., help="Huggingface embedding model name"),
+    dataset_name: str = typer.Option(..., help="Dataset name"),
+    dataset_url: Optional[str] = typer.Option(None, help="Dataset download url"),
+    root: str = typer.Option(
+        RESULTS_PATH.joinpath("tagging"),
+        help="Root directory for output files",
+    ),
+    device: str = typer.Option("cpu", help="Device for Flair e.g. cpu"),
+) -> None:
+    setup(device)
 
-    out_dir = Path(args.root, args.embedding, args.dataset)
+    out_dir = Path(root, embedding, dataset_name)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    ds_args = {"url": args.dataset_url} if args.dataset_url else {}
-    dataset_cls = experimental.datasets.utils.misc.get_dataset_cls(args.dataset)
+    ds_args = {"url": dataset_url} if dataset_url else {}
+    dataset_cls = experimental.datasets.utils.misc.get_dataset_cls(dataset_name)
     dataset = dataset_cls(**ds_args)
     corpus = dataset.to_flair_column_corpus()
     tag_dictionary = corpus.make_tag_dictionary(tag_type="tag")
 
+    test_sentences = corpus.test.sentences.copy()
+
     print("Loading embeddings...")
-    embeddings = TransformerWordEmbeddings(args.embedding)
+    embeddings = TransformerWordEmbeddings(embedding)
 
     print("Training model...")
     tagger = st.FlairSequenceTagger(
@@ -78,10 +54,11 @@ def evaluate_sequence_tagging() -> None:
     )
 
     training_log = tagger.fit(corpus)
+    evaluation_log = tagger.evaluate(test_sentences)
     with out_dir.joinpath("results.pkl").open(mode="wb") as f:
-        pickle.dump(obj=training_log, file=f)
+        pickle.dump(obj={"training_log": training_log, "evaluation_log": evaluation_log}, file=f)
 
     print("Done!", training_log)
 
 
-evaluate_sequence_tagging()
+typer.run(evaluate_sequence_tagging)
