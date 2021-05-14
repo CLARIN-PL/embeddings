@@ -4,7 +4,7 @@ from typing import Union, Any
 from embeddings.data.dataset import Data, Dataset
 
 
-class HuggingFaceDataset(Dataset[Data]):
+class HuggingFaceDataset(Dataset[str]):
     def __init__(self, dataset: Union[str, Path], **load_dataset_kwargs: Any):
         super().__init__()
         self.dataset = dataset

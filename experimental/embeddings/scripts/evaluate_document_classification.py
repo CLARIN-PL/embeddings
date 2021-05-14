@@ -4,38 +4,41 @@ from pprint import pprint
 import typer
 from flair.embeddings import TransformerDocumentEmbeddings
 
-from experimental.datasets.hugging_face_dataset import HuggingFaceClassificationDataset
+from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
+from embeddings.data.hugging_face_dataset import HuggingFaceDataset
+from embeddings.embedding.flair_embedding import FlairTransformerDocumentEmbedding
+from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
+from embeddings.model.flair_model import FlairModel
+from embeddings.pipeline.standard_pipeline import StandardPipeline
+from embeddings.task.flair_task import FlairTextClassification
+from embeddings.transformation.flair_transformations import ToFlairCorpusTransformation
 from experimental.defaults import RESULTS_PATH
-from experimental.embeddings.tasks.text_classification import FlairTextClassification
 
 app = typer.Typer()
 
 
 def run(
-    embedding: str = typer.Option(..., help="Hugging Face embedding model name"),
+    embedding_name: str = typer.Option(..., help="Hugging Face embedding model name or path."),
     dataset_name: str = typer.Option(...),
     input_text_column_name: str = typer.Option("sentence"),
     target_column_name: str = typer.Option("target"),
     root: str = typer.Option(RESULTS_PATH.joinpath("document_classification")),
 ) -> None:
     pprint(locals())
-    out_dir = Path(root, embedding, dataset_name)
-    out_dir.mkdir(parents=True, exist_ok=True)
 
-    dataset = HuggingFaceClassificationDataset(
-        dataset_name=dataset_name,
-        input_text_column_name=input_text_column_name,
-        target_column_name=target_column_name,
-    )
+    output_path = Path(root, embedding_name, dataset_name)
+    output_path.mkdir(parents=True, exist_ok=True)
 
-    corpus = dataset.to_flair_column_corpus()
-    label_dict = corpus.make_label_dictionary()
+    dataset = HuggingFaceDataset(dataset_name)
+    data_loader = HuggingFaceDataLoader()
+    transformation = ToFlairCorpusTransformation(input_text_column_name, target_column_name)
+    embedding = FlairTransformerDocumentEmbedding(embedding_name)
+    task = FlairTextClassification(output_path)
+    model = FlairModel(embedding, task)
+    evaluator = TextClassificationEvaluator()
 
-    embeddings = TransformerDocumentEmbeddings(embedding, fine_tune=False)
-    classifier = FlairTextClassification(embeddings, label_dict, out_dir)
-    classifier.fit(corpus, max_epochs=100)
-
-    result = classifier.evaluate(corpus.test)
+    pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)
+    result = pipeline.run()
     pprint(result)
 
 
