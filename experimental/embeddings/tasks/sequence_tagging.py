@@ -2,7 +2,7 @@ from typing import List, Tuple, Dict, Any
 
 import datasets
 from datasets import Metric
-from flair.data import Sentence
+from flair.data import Sentence, Dictionary
 from flair.embeddings import TransformerWordEmbeddings
 from flair.models import SequenceTagger
 
