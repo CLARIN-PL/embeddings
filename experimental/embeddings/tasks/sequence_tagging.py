@@ -47,7 +47,7 @@ class FlairSequenceTagger(BaseTask):
         super().__init__(model, output_path)
 
     def _get_default_metrics(self) -> List[Tuple[Metric, Dict[str, Any]]]:
-        raise NotImplementedError
+        return None
 
     def evaluate(self, sentences: List[Sentence]) -> Any:
         self.model.predict(sentences, label_name="prediction")
