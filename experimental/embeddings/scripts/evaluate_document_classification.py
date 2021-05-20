@@ -2,7 +2,6 @@ from pathlib import Path
 from pprint import pprint
 
 import typer
-from flair.embeddings import TransformerDocumentEmbeddings
 
 from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
 from embeddings.data.hugging_face_dataset import HuggingFaceDataset
