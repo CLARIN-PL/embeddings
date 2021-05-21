@@ -5,7 +5,7 @@ from flair.data import Corpus
 
 from embeddings.embedding.flair_embedding import FlairEmbedding
 from embeddings.model.model import Model
-from embeddings.task.flair_task import FlairTask
+from embeddings.task.flair.flair_task import FlairTask
 
 
 class FlairModel(Model[Corpus, Dict[str, np.ndarray]]):

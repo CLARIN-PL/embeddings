@@ -9,7 +9,7 @@ from embeddings.embedding.flair_embedding import FlairTransformerDocumentEmbeddi
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
-from embeddings.task.flair_task import FlairTextClassification
+from embeddings.task.flair.text_classification import TextClassification
 from embeddings.transformation.flair.classification_corpus_transformation import (
     ClassificationCorpusTransformation,
 )
@@ -34,7 +34,7 @@ def run(
     data_loader = HuggingFaceDataLoader()
     transformation = ClassificationCorpusTransformation(input_text_column_name, target_column_name)
     embedding = FlairTransformerDocumentEmbedding(embedding_name)
-    task = FlairTextClassification(output_path)
+    task = TextClassification(output_path)
     model = FlairModel(embedding, task)
     evaluator = TextClassificationEvaluator()
 
