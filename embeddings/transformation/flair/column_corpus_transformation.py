@@ -40,11 +40,11 @@ class ColumnCorpusTransformation(CorpusTransformation):
             )
 
     def _is_input_sequence_of_strings(self, dataset: datasets.Dataset) -> bool:
-        if not isinstance(dataset.features[self.input_text_column_name], datasets.Sequence):
+        if not isinstance(dataset.features[self.input_column_name], datasets.Sequence):
             return False
-        elif not isinstance(dataset.features[self.input_text_column_name].feature, datasets.Value):
+        elif not isinstance(dataset.features[self.input_column_name].feature, datasets.Value):
             return False
-        elif dataset.features[self.input_text_column_name].feature.dtype != "string":
+        elif dataset.features[self.input_column_name].feature.dtype != "string":
             return False
         else:
             return True
@@ -59,7 +59,7 @@ class ColumnCorpusTransformation(CorpusTransformation):
 
     def _save_to_conll(self, dataset: datasets.Dataset, output_path: Path) -> Dict[int, str]:
         with open(output_path, "w") as f:
-            for tokens, tags in zip(dataset[self.input_text_column_name], dataset["named_target"]):
+            for tokens, tags in zip(dataset[self.input_column_name], dataset["named_target"]):
                 assert len(tokens) == len(tags)
                 for token, tag in zip(tokens, tags):
                     f.write(f"{token}\t{tag}\n")

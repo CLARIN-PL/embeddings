@@ -20,19 +20,19 @@ app = typer.Typer()
 
 def run(
     embedding_name: str = typer.Option(..., help="Hugging Face embedding model name or path."),
-    dataset_name: str = typer.Option(...),
-    input_text_column_name: str = typer.Option("sentence"),
+    dataset_name: str = typer.Option(..., help="Hugging Face dataset name."),
+    input_column_name: str = typer.Option("sentence"),
     target_column_name: str = typer.Option("target"),
     root: str = typer.Option(RESULTS_PATH.joinpath("document_classification")),
 ) -> None:
-    pprint(locals())
+    typer.echo(locals())
 
     output_path = Path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
     dataset = HuggingFaceDataset(dataset_name)
     data_loader = HuggingFaceDataLoader()
-    transformation = ClassificationCorpusTransformation(input_text_column_name, target_column_name)
+    transformation = ClassificationCorpusTransformation(input_column_name, target_column_name)
     embedding = FlairTransformerDocumentEmbedding(embedding_name)
     task = TextClassification(output_path)
     model = FlairModel(embedding, task)
@@ -40,7 +40,7 @@ def run(
 
     pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)
     result = pipeline.run()
-    pprint(result)
+    typer.echo(result)
 
 
 typer.run(run)

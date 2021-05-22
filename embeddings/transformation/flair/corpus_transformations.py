@@ -18,14 +18,14 @@ class CorpusTransformation(Transformation[datasets.DatasetDict, Corpus]):
 
     def __init__(
         self,
-        input_text_column_name: str,
+        input_column_name: str,
         target_column_name: str,
         datasets_path: Path = DATASET_PATH,
     ):
         super().__init__()
 
         self.datasets_cache_path = datasets_path
-        self.input_text_column_name = input_text_column_name
+        self.input_column_name = input_column_name
         self.target_column_name = target_column_name
 
     def transform(self, data: datasets.DatasetDict) -> Corpus:
@@ -79,7 +79,7 @@ class CorpusTransformation(Transformation[datasets.DatasetDict, Corpus]):
         self._logger.info(f"Schemas:\t{hf_datadict}")
 
     def _check_compatibility(self, dataset: datasets.Dataset) -> None:
-        self._check_column_in_dataset(dataset, self.input_text_column_name)
+        self._check_column_in_dataset(dataset, self.input_column_name)
         self._check_column_in_dataset(dataset, self.target_column_name)
         self._check_task(dataset)
 

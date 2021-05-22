@@ -21,7 +21,7 @@ class ClassificationCorpusTransformation(CorpusTransformation):
         )
 
         column_name_map = {
-            hf_datadict[subset_name].column_names.index(self.input_text_column_name): "text",
+            hf_datadict[subset_name].column_names.index(self.input_column_name): "text",
             hf_datadict[subset_name].column_names.index("named_target"): "label",
         }
 
