@@ -58,7 +58,7 @@ class ColumnCorpusTransformation(CorpusTransformation):
             return True
 
     def _save_to_conll(self, dataset: datasets.Dataset, output_path: Path) -> Dict[int, str]:
-        with open(output_path, "w") as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             for tokens, tags in zip(dataset[self.input_column_name], dataset["named_target"]):
                 assert len(tokens) == len(tags)
                 for token, tag in zip(tokens, tags):
