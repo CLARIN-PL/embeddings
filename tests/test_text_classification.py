@@ -8,11 +8,10 @@ from embeddings.embedding.flair_embedding import FlairTransformerDocumentEmbeddi
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
-from embeddings.task.flair_task import FlairTextClassification
-from embeddings.transformation.flair_transformations import (
-    ToFlairCorpusTransformation,
-    DownsampleFlairCorpusTransformation,
-)
+from embeddings.task.flair.text_classification import TextClassification
+from embeddings.transformation.flair.corpus_transformations import DownsampleFlairCorpusTransformation
+from embeddings.transformation.flair.classification_corpus_transformation import ClassificationCorpusTransformation
+
 from embeddings.transformation.transformation import Transformations
 from experimental.defaults import RESULTS_PATH
 from flair.data import Corpus
@@ -32,12 +31,12 @@ def text_classification_pipeline() -> StandardPipeline[
     data_loader = HuggingFaceDataLoader()
     transformation = Transformations(
         [
-            ToFlairCorpusTransformation("text", "target"),
+            ClassificationCorpusTransformation("text", "target"),
             DownsampleFlairCorpusTransformation(percentage=0.01),
         ]
     )
     embedding = FlairTransformerDocumentEmbedding("allegro/herbert-base-cased")
-    task = FlairTextClassification(RESULTS_PATH, task_train_kwargs={"max_epochs": 1})
+    task = TextClassification(RESULTS_PATH, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(embedding, task)
     evaluator = TextClassificationEvaluator()
     pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)
