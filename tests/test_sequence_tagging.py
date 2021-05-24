@@ -1,4 +1,5 @@
-from typing import Dict, List, Any
+from tempfile import TemporaryDirectory
+from typing import Dict, List, Any, Tuple
 
 import datasets
 import numpy as np
@@ -15,13 +16,15 @@ from embeddings.transformation.flair.corpus_transformations import (
     DownsampleFlairCorpusTransformation,
 )
 from embeddings.transformation.transformation import Transformations
-from experimental.defaults import RESULTS_PATH
 from flair.data import Corpus
 
 
 @pytest.fixture  # type: ignore
-def sequence_tagging_pipeline() -> StandardPipeline[
-    str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]
+def sequence_tagging_pipeline(
+    result_path: "TemporaryDirectory[str]",
+) -> Tuple[
+    StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]],
+    "TemporaryDirectory[str]",
 ]:
     dataset = HuggingFaceDataset("clarin-pl/nkjp-pos")
     data_loader = HuggingFaceDataLoader()
@@ -32,18 +35,22 @@ def sequence_tagging_pipeline() -> StandardPipeline[
         ]
     )
     embedding = FlairTransformerWordEmbedding("allegro/herbert-base-cased")
-    task = SequenceTagging(RESULTS_PATH, hidden_size=256, task_train_kwargs={"max_epochs": 1})
+    task = SequenceTagging(result_path.name, hidden_size=256, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(embedding, task)
     evaluator = SequenceTaggingEvaluator()
 
     pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)
-    return pipeline
+    return pipeline, result_path
 
 
 def test_sequence_tagging_pipeline(
-    sequence_tagging_pipeline: StandardPipeline[
-        str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]
+    sequence_tagging_pipeline: Tuple[
+        StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]],
+        "TemporaryDirectory[str]",
     ]
 ) -> None:
-    result = sequence_tagging_pipeline.run()
+    pipeline, path = sequence_tagging_pipeline
+    result = pipeline.run()
+    path.cleanup()
+
     assert 0 <= result[0]["overall_f1"] <= 1

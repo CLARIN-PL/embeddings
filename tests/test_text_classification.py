@@ -1,4 +1,6 @@
-from typing import Dict, List, Any
+from tempfile import TemporaryDirectory
+from typing import Dict, List, Any, Tuple
+
 import datasets
 import numpy as np
 import pytest
@@ -9,21 +11,22 @@ from embeddings.evaluator.text_classification_evaluator import TextClassificatio
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
 from embeddings.task.flair.text_classification import TextClassification
-from embeddings.transformation.flair.corpus_transformations import (
-    DownsampleFlairCorpusTransformation,
-)
 from embeddings.transformation.flair.classification_corpus_transformation import (
     ClassificationCorpusTransformation,
 )
-
+from embeddings.transformation.flair.corpus_transformations import (
+    DownsampleFlairCorpusTransformation,
+)
 from embeddings.transformation.transformation import Transformations
-from experimental.defaults import RESULTS_PATH
 from flair.data import Corpus
 
 
 @pytest.fixture  # type: ignore
-def text_classification_pipeline() -> StandardPipeline[
-    str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]
+def text_classification_pipeline(
+    result_path: "TemporaryDirectory[str]",
+) -> Tuple[
+    StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]],
+    "TemporaryDirectory[str]",
 ]:
     dataset = HuggingFaceDataset(
         "clarin-pl/polemo2-official",
@@ -40,17 +43,21 @@ def text_classification_pipeline() -> StandardPipeline[
         ]
     )
     embedding = FlairTransformerDocumentEmbedding("allegro/herbert-base-cased")
-    task = TextClassification(RESULTS_PATH, task_train_kwargs={"max_epochs": 1})
+    task = TextClassification(result_path.name, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(embedding, task)
     evaluator = TextClassificationEvaluator()
     pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)
-    return pipeline
+    return pipeline, result_path
 
 
 def test_text_classification_pipeline(
-    text_classification_pipeline: StandardPipeline[
-        str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]
+    text_classification_pipeline: Tuple[
+        StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]],
+        "TemporaryDirectory[str]",
     ]
 ) -> None:
-    result = text_classification_pipeline.run()
+    pipeline, path = text_classification_pipeline
+    result = pipeline.run()
+    path.cleanup()
+
     assert 0 <= result[1]["f1"] <= 1
