@@ -1,8 +1,6 @@
-from pathlib import Path
-from pprint import pprint
-
-import typer
-from flair.embeddings import TransformerDocumentEmbeddings
+from typing import Dict, List, Any
+import datasets
+import numpy as np
 import pytest
 from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
 from embeddings.data.hugging_face_dataset import HuggingFaceDataset
@@ -11,17 +9,19 @@ from embeddings.evaluator.text_classification_evaluator import TextClassificatio
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
 from embeddings.task.flair_task import FlairTextClassification
-from embeddings.transformation.transformation import Transformations
 from embeddings.transformation.flair_transformations import (
     ToFlairCorpusTransformation,
     DownsampleFlairCorpusTransformation,
 )
+from embeddings.transformation.transformation import Transformations
 from experimental.defaults import RESULTS_PATH
-import numpy as np
+from flair.data import Corpus
 
 
-@pytest.fixture
-def text_classification_pipeline() -> StandardPipeline:
+@pytest.fixture  # type: ignore
+def text_classification_pipeline() -> StandardPipeline[
+    str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]
+]:
     dataset = HuggingFaceDataset(
         "clarin-pl/polemo2-official",
         train_domains=["reviews"],
@@ -44,6 +44,10 @@ def text_classification_pipeline() -> StandardPipeline:
     return pipeline
 
 
-def test_text_classification_pipeline(text_classification_pipeline: StandardPipeline) -> None:
+def test_text_classification_pipeline(
+    text_classification_pipeline: StandardPipeline[
+        str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]
+    ]
+) -> None:
     result = text_classification_pipeline.run()
     assert 0 < result[0]["accuracy"] < 1

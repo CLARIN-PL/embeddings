@@ -20,11 +20,11 @@ class Transformation(ABC, Generic[Input, Output]):
         pass
 
 
-class Transformations(Transformation[Input, Output]):
-    def __init__(self, transformations: List[Transformation[Input, Output]]):
+class Transformations(Transformation[Any, Any]):
+    def __init__(self, transformations: List[Transformation[Any, Any]]):
         self.transformations = transformations
 
-    def transform(self, data: Input) -> Any:
+    def transform(self, data: Any) -> Any:
         for transformation in self.transformations:
             data = transformation.transform(data)
 
