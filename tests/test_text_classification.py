@@ -9,8 +9,12 @@ from embeddings.evaluator.text_classification_evaluator import TextClassificatio
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
 from embeddings.task.flair.text_classification import TextClassification
-from embeddings.transformation.flair.corpus_transformations import DownsampleFlairCorpusTransformation
-from embeddings.transformation.flair.classification_corpus_transformation import ClassificationCorpusTransformation
+from embeddings.transformation.flair.corpus_transformations import (
+    DownsampleFlairCorpusTransformation,
+)
+from embeddings.transformation.flair.classification_corpus_transformation import (
+    ClassificationCorpusTransformation,
+)
 
 from embeddings.transformation.transformation import Transformations
 from experimental.defaults import RESULTS_PATH
