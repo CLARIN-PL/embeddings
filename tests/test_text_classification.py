@@ -50,4 +50,4 @@ def test_text_classification_pipeline(
     ]
 ) -> None:
     result = text_classification_pipeline.run()
-    assert 0 < result[0]["accuracy"] < 1
+    assert 0 <= result[1]["f1"] <= 1
