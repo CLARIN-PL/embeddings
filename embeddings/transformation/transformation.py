@@ -1,5 +1,5 @@
 import abc
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, List, Any
 from abc import ABC
 
 from embeddings.utils.loggers import get_logger
@@ -18,3 +18,14 @@ class Transformation(ABC, Generic[Input, Output]):
     @abc.abstractmethod
     def transform(self, data: Input) -> Output:
         pass
+
+
+class Transformations(Generic[Input, Output]):
+    def __init__(self, transformations: List[Transformations[Input, Output]]):
+        self.transformations = transformations
+
+    def transform(self, data: Input) -> Any:
+        for transformation in self.transformations:
+            data = transformation.transform(data)
+
+        return data
