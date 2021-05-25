@@ -33,7 +33,7 @@ If you see something like Poetry `1.1.5` then you are ready to use Poetry.
 poetry install
 ```
 
-# Run examples tasks
+# Run example tasks
 
 ```bash
 cd .\examples
