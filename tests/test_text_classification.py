@@ -17,7 +17,6 @@ from embeddings.transformation.flair.classification_corpus_transformation import
 from embeddings.transformation.flair.corpus_transformations import (
     DownsampleFlairCorpusTransformation,
 )
-from embeddings.transformation.transformation import Transformations
 from flair.data import Corpus
 
 
@@ -36,11 +35,8 @@ def text_classification_pipeline(
         text_cfg="sentence",
     )
     data_loader = HuggingFaceDataLoader()
-    transformation = Transformations(
-        [
-            ClassificationCorpusTransformation("text", "target"),
-            DownsampleFlairCorpusTransformation(percentage=0.01),
-        ]
+    transformation = ClassificationCorpusTransformation("text", "target").then(
+        DownsampleFlairCorpusTransformation(percentage=0.01)
     )
     embedding = FlairTransformerDocumentEmbedding("allegro/herbert-base-cased")
     task = TextClassification(result_path.name, task_train_kwargs={"max_epochs": 1})

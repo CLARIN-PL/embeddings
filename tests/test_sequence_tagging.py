@@ -15,7 +15,6 @@ from embeddings.transformation.flair.column_corpus_transformation import ColumnC
 from embeddings.transformation.flair.corpus_transformations import (
     DownsampleFlairCorpusTransformation,
 )
-from embeddings.transformation.transformation import Transformations
 from flair.data import Corpus
 
 
@@ -28,11 +27,8 @@ def sequence_tagging_pipeline(
 ]:
     dataset = HuggingFaceDataset("clarin-pl/nkjp-pos")
     data_loader = HuggingFaceDataLoader()
-    transformation = Transformations(
-        [
-            ColumnCorpusTransformation("tokens", "pos_tags"),
-            DownsampleFlairCorpusTransformation(percentage=0.0025),
-        ]
+    transformation = ColumnCorpusTransformation("tokens", "pos_tags").then(
+        DownsampleFlairCorpusTransformation(percentage=0.0025)
     )
     embedding = FlairTransformerWordEmbedding("allegro/herbert-base-cased")
     task = SequenceTagging(result_path.name, hidden_size=256, task_train_kwargs={"max_epochs": 1})
