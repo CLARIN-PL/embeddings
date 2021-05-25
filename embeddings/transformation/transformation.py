@@ -1,11 +1,12 @@
 import abc
 from typing import TypeVar, Generic, List, Any
 from abc import ABC
-
 from embeddings.utils.loggers import get_logger
 
 Input = TypeVar("Input")
 Output = TypeVar("Output")
+NewOutput = TypeVar("NewOutput")
+OutputInternal = TypeVar("OutputInternal")
 
 
 class Transformation(ABC, Generic[Input, Output]):
@@ -19,13 +20,23 @@ class Transformation(ABC, Generic[Input, Output]):
     def transform(self, data: Input) -> Output:
         pass
 
+    def then(
+        self, right: "Transformation[Output, NewOutput]"
+    ) -> "Transformation[Input, NewOutput]":
+        return CombainedTransformations(self, right)
 
-class Transformations(Transformation[Any, Any]):
-    def __init__(self, transformations: List[Transformation[Any, Any]]):
-        self.transformations = transformations
 
-    def transform(self, data: Any) -> Any:
-        for transformation in self.transformations:
-            data = transformation.transform(data)
+class CombainedTransformations(
+    Transformation[Input, Output], Generic[Input, Output, OutputInternal]
+):
+    def __init__(
+        self,
+        left: Transformation[Input, OutputInternal],
+        right: Transformation[OutputInternal, Output],
+    ) -> None:
+        self.left = left
+        self.right = right
 
-        return data
+    def transform(self, data: Input) -> Output:
+        intermidiate = self.left.transform(data)
+        return self.right.transform(intermidiate)
