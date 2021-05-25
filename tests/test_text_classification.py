@@ -2,6 +2,7 @@ from tempfile import TemporaryDirectory
 from typing import Dict, List, Any, Tuple
 
 import datasets
+import flair
 import numpy as np
 import pytest
 from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
@@ -50,10 +51,11 @@ def test_text_classification_pipeline(
     text_classification_pipeline: Tuple[
         StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]],
         "TemporaryDirectory[str]",
-    ]
+    ],
 ) -> None:
+    flair.set_seed(441)
     pipeline, path = text_classification_pipeline
     result = pipeline.run()
     path.cleanup()
 
-    assert 0 <= result[1]["f1"] <= 1
+    np.testing.assert_almost_equal(result[1]["f1"], 0.4)
