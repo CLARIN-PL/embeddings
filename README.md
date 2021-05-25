@@ -1,13 +1,17 @@
+# Embeddings
+
+State-of-the-art Text Representations for Natural Language Processing tasks, an initial version of library focus on the Polish Language
+
 # Installation
 
 ## Install poetry
 
-### osx / linux / bash on windows
+### OSX / Linux / bash on Windows
 ```bash
 curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -`
 ```
 
-### windows powershell install instructions
+### Windows Powershell
 
 ```bash
 (Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py -UseBasicParsing).Content | python -
@@ -18,7 +22,7 @@ You only need to install Poetry once. It will automatically pick up the current 
 Finally, open a new shell and type the following:
 
 ```bash
-poetry --version`
+poetry --version
 ```
 
 If you see something like Poetry `1.1.5` then you are ready to use Poetry.
@@ -31,6 +35,16 @@ poetry install
 
 # Run examples tasks
 
+```bash
+cd .\examples
+```
+
 ## Run classification task
 
+```python
+python evaluate_document_classification.py --embedding-name allegro/herbert-base-cased --dataset-name clarin-pl/polemo2-official --input-column-name text --target-column-name target
+```
+
 ## Run sequence tagging task
+
+to be announced
