@@ -5,7 +5,7 @@ State-of-the-art Text Representations for Natural Language Processing tasks, an 
 # Installation
 
 ```bash
-pip install embeddings
+pip install clarinpl-embeddings
 ```
 
 # Run example tasks
