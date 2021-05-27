@@ -10,7 +10,10 @@ import datasets
 from flair.data import Corpus, FlairDataset
 
 from embeddings.transformation.transformation import Transformation
+from embeddings.utils.loggers import get_logger
 from experimental.defaults import DATASET_PATH
+
+_logger = get_logger(__name__)
 
 
 class CorpusTransformation(Transformation[datasets.DatasetDict, Corpus]):
@@ -69,14 +72,15 @@ class CorpusTransformation(Transformation[datasets.DatasetDict, Corpus]):
     ) -> FlairDataset:
         pass
 
-    def _log_info(self, hf_datadict: datasets.DatasetDict) -> None:
+    @staticmethod
+    def _log_info(hf_datadict: datasets.DatasetDict) -> None:
         subsets_info = {
             subset: pprint.pformat(hf_datadict[subset].info.__dict__)
             for subset in hf_datadict.keys()
         }
         for k, v in groupby(subsets_info.items(), itemgetter(1)):
-            self._logger.info(f"Info of {list(map(itemgetter(0), v))}:\n{k}")
-        self._logger.info(f"Schemas:\t{hf_datadict}")
+            _logger.info(f"Info of {list(map(itemgetter(0), v))}:\n{k}")
+        _logger.info(f"Schemas:\t{hf_datadict}")
 
     def _check_compatibility(self, dataset: datasets.Dataset) -> None:
         self._check_column_in_dataset(dataset, self.input_column_name)
