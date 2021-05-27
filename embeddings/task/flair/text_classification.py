@@ -19,7 +19,7 @@ class TextClassification(FlairTask):
         super().__init__(output_path, task_train_kwargs)
         self.task_model_kwargs = task_model_kwargs if task_model_kwargs else {}
 
-    def build_task_model(self, embedding: FlairEmbedding, y_dictionary: Any) -> None:
+    def build_task_model(self, embedding: FlairEmbedding, y_dictionary: Dictionary) -> None:
         self.model = TextClassifier(
             document_embeddings=embedding.model,
             label_dictionary=y_dictionary,
@@ -45,7 +45,7 @@ class TextClassification(FlairTask):
             raise self.MODEL_UNDEFINED_EXCEPTION
 
     @staticmethod
-    def get_y(data: List[Sentence], y_type: str, y_dictionary: Any) -> np.ndarray:
+    def get_y(data: List[Sentence], y_type: str, y_dictionary: Dictionary) -> np.ndarray:
         labels = [sentence.get_labels(y_type) for sentence in data]
         labels = [[label.value for label in sentence] for sentence in labels]
         labels = [y_dictionary.get_idx_for_item(labels[0]) for labels in labels]

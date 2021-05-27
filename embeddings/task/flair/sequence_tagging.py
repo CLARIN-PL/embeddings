@@ -21,7 +21,7 @@ class SequenceTagging(FlairTask):
         self.hidden_size = hidden_size
         self.task_model_kwargs = task_model_kwargs if task_model_kwargs else {}
 
-    def build_task_model(self, embedding: FlairEmbedding, y_dictionary: Any) -> None:
+    def build_task_model(self, embedding: FlairEmbedding, y_dictionary: Dictionary) -> None:
         self.model = SequenceTagger(
             hidden_size=self.hidden_size,
             embeddings=embedding.model,
@@ -49,7 +49,7 @@ class SequenceTagging(FlairTask):
             raise self.MODEL_UNDEFINED_EXCEPTION
 
     @staticmethod
-    def get_y(data: List[Sentence], y_type: str, y_dictionary: Any) -> np.ndarray:
+    def get_y(data: List[Sentence], y_type: str, y_dictionary: Dictionary) -> np.ndarray:
         y = []
         for sent in data:
             sent_y = []

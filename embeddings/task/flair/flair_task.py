@@ -83,7 +83,7 @@ class FlairTask(Task[Corpus, Dict[str, np.ndarray]]):
 
     @staticmethod
     @abc.abstractmethod
-    def get_y(data: List[Sentence], y_type: str, y_dictionary: Any) -> np.ndarray:
+    def get_y(data: List[Sentence], y_type: str, y_dictionary: Dictionary) -> np.ndarray:
         pass
 
     @staticmethod
