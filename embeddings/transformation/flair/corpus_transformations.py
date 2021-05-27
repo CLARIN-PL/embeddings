@@ -54,7 +54,7 @@ class CorpusTransformation(Transformation[datasets.DatasetDict, Corpus]):
         for subset_name in hf_datadict.keys():
             self._check_compatibility(hf_datadict[subset_name])
 
-        for subset_name in self.HUGGING_FACE_SUBSETS:
+        for subset_name in CorpusTransformation.HUGGING_FACE_SUBSETS:
             if subset_name in hf_datadict.keys():
                 flair_datasets[subset_name] = self._preprocess_subset(
                     hf_datadict, subset_name, output_path
