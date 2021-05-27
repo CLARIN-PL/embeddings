@@ -15,9 +15,10 @@ class ColumnCorpusTransformation(CorpusTransformation):
 
         hf_datadict[subset_name] = hf_datadict[subset_name].map(
             lambda row: {
-                "named_target": [tag_map[tag_idx] for tag_idx in row[self.target_column_name]]
+                self.target_column_name: [
+                    tag_map[tag_idx] for tag_idx in row[self.target_column_name]
+                ]
             },
-            remove_columns=[self.target_column_name],
         )
 
         column_format = self._save_to_conll(
@@ -59,7 +60,9 @@ class ColumnCorpusTransformation(CorpusTransformation):
 
     def _save_to_conll(self, dataset: datasets.Dataset, output_path: Path) -> Dict[int, str]:
         with open(output_path, "w", encoding="utf-8") as f:
-            for tokens, tags in zip(dataset[self.input_column_name], dataset["named_target"]):
+            for tokens, tags in zip(
+                dataset[self.input_column_name], dataset[self.target_column_name]
+            ):
                 assert len(tokens) == len(tags)
                 for token, tag in zip(tokens, tags):
                     f.write(f"{token}\t{tag}\n")

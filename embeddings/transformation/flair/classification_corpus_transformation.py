@@ -12,8 +12,7 @@ class ClassificationCorpusTransformation(CorpusTransformation):
     ) -> CSVClassificationDataset:
         label_map = hf_datadict[subset_name].features[self.target_column_name].names
         hf_datadict[subset_name] = hf_datadict[subset_name].map(
-            lambda row: {"named_target": label_map[row[self.target_column_name]]},
-            remove_columns=[self.target_column_name],
+            lambda row: {self.target_column_name: label_map[row[self.target_column_name]]},
         )
 
         hf_datadict[subset_name].to_csv(
@@ -22,7 +21,7 @@ class ClassificationCorpusTransformation(CorpusTransformation):
 
         column_name_map = {
             hf_datadict[subset_name].column_names.index(self.input_column_name): "text",
-            hf_datadict[subset_name].column_names.index("named_target"): "label",
+            hf_datadict[subset_name].column_names.index(self.target_column_name): "label",
         }
 
         return CSVClassificationDataset(output_path.joinpath(f"{subset_name}.csv"), column_name_map)
