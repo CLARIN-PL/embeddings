@@ -1,5 +1,5 @@
 from pathlib import Path
-from pprint import pprint
+import pprint
 
 import typer
 
@@ -17,14 +17,22 @@ app = typer.Typer()
 
 
 def run(
-    embedding_name: str = typer.Option(..., help="Hugging Face embedding model name or path."),
-    dataset_name: str = typer.Option(..., help="Hugging Face dataset name."),
-    input_column_name: str = typer.Option(...),
-    target_column_name: str = typer.Option(...),
-    root: str = typer.Option(RESULTS_PATH.joinpath("document_classification")),
-    hidden_size: int = typer.Option(..., help="Number of hidden states in RNN."),
+    embedding_name: str = typer.Option(
+        "allegro/herbert-base-cased", help="Hugging Face embedding model name or path."
+    ),
+    dataset_name: str = typer.Option(
+        "clarin-pl/nkjp-pos", help="Hugging Face dataset name or path."
+    ),
+    input_column_name: str = typer.Option(
+        "tokens", help="Column name that contains text to classify."
+    ),
+    target_column_name: str = typer.Option(
+        "pos_tags", help="Column name that contains tag labels for sequence tagging."
+    ),
+    root: str = typer.Option(RESULTS_PATH.joinpath("sequence_tagging")),
+    hidden_size: int = typer.Option(256, help="Number of hidden states in RNN."),
 ) -> None:
-    pprint(locals())
+    typer.echo(pprint.pformat(locals()))
 
     output_path = Path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -33,13 +41,13 @@ def run(
     data_loader = HuggingFaceDataLoader()
     transformation = ColumnCorpusTransformation(input_column_name, target_column_name)
     embedding = FlairTransformerWordEmbedding(embedding_name)
-    task = SequenceTagging(output_path, hidden_size=256)
+    task = SequenceTagging(output_path, hidden_size=hidden_size)
     model = FlairModel(embedding, task)
     evaluator = SequenceTaggingEvaluator()
 
     pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)
     result = pipeline.run()
-    typer.echo(result)
+    typer.echo(pprint.pformat(result))
 
 
 typer.run(run)
