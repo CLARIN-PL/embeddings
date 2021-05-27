@@ -10,7 +10,9 @@ from embeddings.evaluator.sequence_tagging_evaluator import SequenceTaggingEvalu
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
 from embeddings.task.flair.sequence_tagging import SequenceTagging
-from embeddings.transformation.flair.column_corpus_transformation import ColumnCorpusTransformation
+from embeddings.transformation.flair_transformation.column_corpus_transformation import (
+    ColumnCorpusTransformation,
+)
 from experimental.defaults import RESULTS_PATH
 
 app = typer.Typer()

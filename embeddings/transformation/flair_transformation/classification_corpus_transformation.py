@@ -3,7 +3,9 @@ from pathlib import Path
 import datasets
 from flair.datasets import CSVClassificationDataset
 
-from embeddings.transformation.flair.corpus_transformations import CorpusTransformation
+from embeddings.transformation.flair_transformation.corpus_transformations import (
+    CorpusTransformation,
+)
 
 
 class ClassificationCorpusTransformation(CorpusTransformation):

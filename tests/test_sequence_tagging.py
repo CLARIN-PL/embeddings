@@ -5,6 +5,8 @@ import datasets
 import flair
 import numpy as np
 import pytest
+from flair.data import Corpus
+
 from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
 from embeddings.data.hugging_face_dataset import HuggingFaceDataset
 from embeddings.embedding.flair_embedding import FlairTransformerWordEmbedding
@@ -12,11 +14,12 @@ from embeddings.evaluator.sequence_tagging_evaluator import SequenceTaggingEvalu
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
 from embeddings.task.flair.sequence_tagging import SequenceTagging
-from embeddings.transformation.flair.column_corpus_transformation import ColumnCorpusTransformation
-from embeddings.transformation.flair.corpus_transformations import (
+from embeddings.transformation.flair_transformation.column_corpus_transformation import (
+    ColumnCorpusTransformation,
+)
+from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
     DownsampleFlairCorpusTransformation,
 )
-from flair.data import Corpus
 
 
 @pytest.fixture  # type: ignore
