@@ -16,10 +16,10 @@ class Transformation(ABC, Generic[Input, Output]):
     def then(
         self, right: "Transformation[Output, NewOutput]"
     ) -> "Transformation[Input, NewOutput]":
-        return CombainedTransformations(self, right)
+        return CombinedTransformations(self, right)
 
 
-class CombainedTransformations(
+class CombinedTransformations(
     Transformation[Input, Output], Generic[Input, Output, OutputInternal]
 ):
     def __init__(
@@ -31,5 +31,5 @@ class CombainedTransformations(
         self.right = right
 
     def transform(self, data: Input) -> Output:
-        intermidiate = self.left.transform(data)
-        return self.right.transform(intermidiate)
+        intermediate = self.left.transform(data)
+        return self.right.transform(intermediate)
