@@ -1,3 +1,9 @@
+from typing import Dict, Any
+
+import datasets
+import numpy as np
+from flair.data import Corpus
+
 from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
 from embeddings.data.hugging_face_dataset import HuggingFaceDataset
 from embeddings.embedding.flair_embedding import FlairTransformerDocumentEmbedding
@@ -11,7 +17,9 @@ from embeddings.transformation.flair_transformation.classification_corpus_transf
 from experimental.data.io import T_path
 
 
-class HuggingFaceClassificationPipeline(StandardPipeline):
+class HuggingFaceClassificationPipeline(
+    StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]]
+):
     def __init__(
         self,
         embedding_name: str,

@@ -12,6 +12,7 @@ from embeddings.data.hugging_face_dataset import HuggingFaceDataset
 from embeddings.embedding.flair_embedding import FlairTransformerDocumentEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
+from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
 from embeddings.pipeline.standard_pipeline import StandardPipeline
 from embeddings.task.flair_task.text_classification import TextClassification
 from embeddings.transformation.flair_transformation.classification_corpus_transformation import (
@@ -26,7 +27,7 @@ from embeddings.transformation.flair_transformation.downsample_corpus_transforma
 def text_classification_pipeline(
     result_path: "TemporaryDirectory[str]",
 ) -> Tuple[
-    StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]],
+    StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
     "TemporaryDirectory[str]",
 ]:
     dataset = HuggingFaceDataset(
@@ -50,7 +51,7 @@ def text_classification_pipeline(
 
 def test_text_classification_pipeline(
     text_classification_pipeline: Tuple[
-        StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]],
+        StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
         "TemporaryDirectory[str]",
     ],
 ) -> None:
@@ -59,4 +60,4 @@ def test_text_classification_pipeline(
     result = pipeline.run()
     path.cleanup()
 
-    np.testing.assert_almost_equal(result[1]["f1"], 0.4)
+    np.testing.assert_almost_equal(result["f1"]["f1"], 0.4)

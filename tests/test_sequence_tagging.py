@@ -26,7 +26,7 @@ from embeddings.transformation.flair_transformation.downsample_corpus_transforma
 def sequence_tagging_pipeline(
     result_path: "TemporaryDirectory[str]",
 ) -> Tuple[
-    StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]],
+    StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
     "TemporaryDirectory[str]",
 ]:
     dataset = HuggingFaceDataset("clarin-pl/nkjp-pos")
@@ -45,7 +45,7 @@ def sequence_tagging_pipeline(
 
 def test_sequence_tagging_pipeline(
     sequence_tagging_pipeline: Tuple[
-        StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], List[Any]],
+        StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
         "TemporaryDirectory[str]",
     ],
 ) -> None:
@@ -54,4 +54,4 @@ def test_sequence_tagging_pipeline(
     result = pipeline.run()
     path.cleanup()
 
-    np.testing.assert_almost_equal(result[0]["overall_f1"], 0.023668639053254437)
+    np.testing.assert_almost_equal(result['seqeval']["overall_f1"], 0.023668639053254437)
