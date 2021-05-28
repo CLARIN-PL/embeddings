@@ -5,7 +5,7 @@ import typer
 
 from embeddings.evaluator.sequence_tagging_evaluator import SequenceTaggingEvaluator
 from embeddings.pipeline.hugging_face_sequence_tagging import HuggingFaceSequenceTaggingPipeline
-from experimental.defaults import RESULTS_PATH
+from embeddings.defaults import RESULTS_PATH
 
 app = typer.Typer()
 

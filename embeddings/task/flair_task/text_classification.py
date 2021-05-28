@@ -6,7 +6,7 @@ from flair.models import TextClassifier
 
 from embeddings.embedding.flair_embedding import FlairEmbedding
 from embeddings.task.flair_task.flair_task import FlairTask
-from experimental.data.io import T_path
+from embeddings.data.io import T_path
 
 
 class TextClassification(FlairTask):

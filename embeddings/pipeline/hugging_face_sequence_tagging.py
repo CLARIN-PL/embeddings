@@ -14,7 +14,7 @@ from embeddings.task.flair_task.sequence_tagging import SequenceTagging
 from embeddings.transformation.flair_transformation.column_corpus_transformation import (
     ColumnCorpusTransformation,
 )
-from experimental.data.io import T_path
+from embeddings.data.io import T_path
 
 
 class HuggingFaceSequenceTaggingPipeline(

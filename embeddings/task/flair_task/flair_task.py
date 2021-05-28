@@ -9,8 +9,8 @@ from flair.trainers import ModelTrainer
 
 from embeddings.embedding.flair_embedding import FlairEmbedding
 from embeddings.task.task import Task
-from experimental.data.io import T_path
-from experimental.defaults import RESULTS_PATH
+from embeddings.data.io import T_path
+from embeddings.defaults import RESULTS_PATH
 
 
 class FlairTask(Task[Corpus, Dict[str, np.ndarray]]):

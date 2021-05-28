@@ -14,7 +14,7 @@ from embeddings.task.flair_task.text_classification import TextClassification
 from embeddings.transformation.flair_transformation.classification_corpus_transformation import (
     ClassificationCorpusTransformation,
 )
-from experimental.data.io import T_path
+from embeddings.data.io import T_path
 
 
 class HuggingFaceClassificationPipeline(

@@ -11,7 +11,7 @@ from flair.data import Corpus, FlairDataset
 
 from embeddings.transformation.transformation import Transformation
 from embeddings.utils.loggers import get_logger
-from experimental.defaults import DATASET_PATH
+from embeddings.defaults import DATASET_PATH
 
 _logger = get_logger(__name__)
 

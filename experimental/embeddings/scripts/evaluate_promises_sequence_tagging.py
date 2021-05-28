@@ -1,4 +1,3 @@
-import pickle
 from pathlib import Path
 from typing import Optional
 
@@ -6,7 +5,7 @@ import experimental.datasets.utils.misc
 import flair
 import torch
 import typer
-from experimental.defaults import RESULTS_PATH
+from embeddings.defaults import RESULTS_PATH
 from flair.embeddings import TransformerWordEmbeddings
 
 

@@ -4,7 +4,7 @@ from pathlib import Path
 import typer
 
 from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
-from experimental.defaults import RESULTS_PATH
+from embeddings.defaults import RESULTS_PATH
 
 app = typer.Typer()
 
