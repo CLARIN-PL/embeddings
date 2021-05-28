@@ -1,12 +1,11 @@
 from typing import TypeVar, Generic
-from abc import ABC
-from embeddings.pipeline.pipeline import Pipeline
-from embeddings.data.dataset import Dataset
+
 from embeddings.data.data_loader import DataLoader
-from embeddings.transformation.transformation import Transformation
-from embeddings.model.model import Model
-from embeddings.task.task import Task
+from embeddings.data.dataset import Dataset
 from embeddings.evaluator.evaluator import Evaluator
+from embeddings.model.model import Model
+from embeddings.pipeline.pipeline import Pipeline
+from embeddings.transformation.transformation import Transformation
 
 EvaluationResult = TypeVar("EvaluationResult")
 Data = TypeVar("Data")
@@ -21,13 +20,13 @@ class StandardPipeline(
 ):
     def __init__(
         self,
-        data_set: Dataset[Data],
+        dataset: Dataset[Data],
         data_loader: DataLoader[Data, LoaderResult],
         transformation: Transformation[LoaderResult, TransformationResult],
         model: Model[TransformationResult, ModelResult],
         evaluator: Evaluator[ModelResult, EvaluationResult],
     ) -> None:
-        self.dataset = data_set
+        self.dataset = dataset
         self.data_loader = data_loader
         self.transformation = transformation
         self.model = model

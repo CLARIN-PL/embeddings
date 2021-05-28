@@ -13,7 +13,7 @@ from embeddings.embedding.flair_embedding import FlairTransformerDocumentEmbeddi
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
-from embeddings.task.flair.text_classification import TextClassification
+from embeddings.task.flair_task.text_classification import TextClassification
 from embeddings.transformation.flair_transformation.classification_corpus_transformation import (
     ClassificationCorpusTransformation,
 )

@@ -1,18 +1,10 @@
-from pathlib import Path
 import pprint
+from pathlib import Path
 
 import typer
 
-from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
-from embeddings.data.hugging_face_dataset import HuggingFaceDataset
-from embeddings.embedding.flair_embedding import FlairTransformerWordEmbedding
 from embeddings.evaluator.sequence_tagging_evaluator import SequenceTaggingEvaluator
-from embeddings.model.flair_model import FlairModel
-from embeddings.pipeline.standard_pipeline import StandardPipeline
-from embeddings.task.flair.sequence_tagging import SequenceTagging
-from embeddings.transformation.flair_transformation.column_corpus_transformation import (
-    ColumnCorpusTransformation,
-)
+from embeddings.pipeline.hugging_face_sequence_tagging import HuggingFaceSequenceTaggingPipeline
 from experimental.defaults import RESULTS_PATH
 
 app = typer.Typer()
@@ -39,15 +31,16 @@ def run(
     output_path = Path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    dataset = HuggingFaceDataset(dataset_name)
-    data_loader = HuggingFaceDataLoader()
-    transformation = ColumnCorpusTransformation(input_column_name, target_column_name)
-    embedding = FlairTransformerWordEmbedding(embedding_name)
-    task = SequenceTagging(output_path, hidden_size=hidden_size)
-    model = FlairModel(embedding, task)
     evaluator = SequenceTaggingEvaluator()
 
-    pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)
+    pipeline = HuggingFaceSequenceTaggingPipeline(
+        embedding_name,
+        dataset_name,
+        input_column_name,
+        target_column_name,
+        output_path,
+        hidden_size,
+    )
     result = pipeline.run()
     typer.echo(pprint.pformat(result))
 

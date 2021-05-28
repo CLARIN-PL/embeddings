@@ -13,7 +13,7 @@ from embeddings.embedding.flair_embedding import FlairTransformerWordEmbedding
 from embeddings.evaluator.sequence_tagging_evaluator import SequenceTaggingEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
-from embeddings.task.flair.sequence_tagging import SequenceTagging
+from embeddings.task.flair_task.sequence_tagging import SequenceTagging
 from embeddings.transformation.flair_transformation.column_corpus_transformation import (
     ColumnCorpusTransformation,
 )
