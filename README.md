@@ -16,7 +16,7 @@ cd .\examples
 
 ## Run classification task
 
-```python
+```bash
 python evaluate_document_classification.py --embedding-name allegro/herbert-base-cased --dataset-name clarin-pl/polemo2-official --input-column-name text --target-column-name target
 ```
 
