@@ -13,22 +13,24 @@ We use many of the HuggingFace concepts such as models (https://huggingface.co/m
 ## HuggingFace-based pipeline
 
 ```python
+from pathlib import Path
+
 from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
 from embeddings.data.hugging_face_dataset import HuggingFaceDataset
 from embeddings.embedding.flair_embedding import FlairTransformerDocumentEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
-from embeddings.task.flair.text_classification import TextClassification
-from embeddings.transformation.flair.classification_corpus_transformation import (
+from embeddings.task.flair_task.text_classification import TextClassification
+from embeddings.transformation.flair_transformation.classification_corpus_transformation import (
     ClassificationCorpusTransformation,
 )
 
-dataset = HuggingFaceDataset(dataset_name)
+dataset = HuggingFaceDataset("clarin-pl/polemo2-official")
 data_loader = HuggingFaceDataLoader()
-transformation = ClassificationCorpusTransformation(input_column_name, target_column_name)
-embedding = FlairTransformerDocumentEmbedding(embedding_name)
-task = TextClassification(output_path)
+transformation = ClassificationCorpusTransformation("text", "target")
+embedding = FlairTransformerDocumentEmbedding("allegro/herbert-base-cased")
+task = TextClassification(Path("."))
 model = FlairModel(embedding, task)
 evaluator = TextClassificationEvaluator()
 
