@@ -34,11 +34,7 @@ def main(
         for line in tqdm.tqdm(f, desc="read file..."):
             line = line.strip()
             # TODO: please verify min and max len of sentences
-            if (
-                len(line) >= 10
-                and len(line.split()) <= 200
-                and n_sentences >= start_sentence
-            ):
+            if len(line) >= 10 and len(line.split()) <= 200 and n_sentences >= start_sentence:
                 train_sentences.append(line)
 
             if n_sentences >= end_sentence:
