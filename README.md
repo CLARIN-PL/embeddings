@@ -1,5 +1,3 @@
-# TREF - Text Representation Evaluation Framework
-
 State-of-the-art Text Representations for Natural Language Processing tasks, an initial version of library focus on the Polish Language
 
 # Installation
