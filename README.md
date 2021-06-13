@@ -6,25 +6,9 @@ State-of-the-art Text Representations for Natural Language Processing tasks, an 
 pip install clarinpl-embeddings
 ```
 
-# Run example tasks
+# Conventions
 
-```bash
-cd .\examples
-```
-
-## Run classification task
-
-```bash
-python evaluate_document_classification.py --embedding-name allegro/herbert-base-cased --dataset-name clarin-pl/polemo2-official --input-column-name text --target-column-name target
-```
-
-## Run sequence tagging task
-
-to be announced
-
-# Conventions 
-
-We use many of the HuggingFace concepts such as models (https://huggingface.co/models) or  datasets (https://huggingface.co/datasets) to make our library as easy to use as it is possible. We want to enable users to create, customise, test, and execute NLP/NLU/SLU tasks in the fastest possible manner.  
+We use many of the HuggingFace concepts such as models (https://huggingface.co/models) or  datasets (https://huggingface.co/datasets) to make our library as easy to use as it is possible. We want to enable users to create, customise, test, and execute NLP/NLU/SLU tasks in the fastest possible manner.
 
 ## HuggingFace-based pipeline
 
@@ -51,3 +35,20 @@ evaluator = TextClassificationEvaluator()
 pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)
 result = pipeline.run()
 ```
+
+# Run example tasks
+
+```bash
+cd .\examples
+```
+
+## Run classification task
+
+```bash
+python evaluate_document_classification.py --embedding-name allegro/herbert-base-cased --dataset-name clarin-pl/polemo2-official --input-column-name text --target-column-name target
+```
+
+## Run sequence tagging task
+
+to be announced
+
