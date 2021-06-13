@@ -52,5 +52,9 @@ python evaluate_document_classification.py --embedding-name allegro/herbert-base
 
 ## Run sequence tagging task
 
-to be announced
+The example with default language model and datasets. 
+
+```bash
+python evaluate_sequence_tagging.py
+```
 
