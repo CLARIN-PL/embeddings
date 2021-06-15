@@ -1,5 +1,5 @@
 from tempfile import TemporaryDirectory
-from typing import Dict, List, Any, Tuple
+from typing import Dict, Any, Tuple
 
 import datasets
 import flair
@@ -54,4 +54,4 @@ def test_sequence_tagging_pipeline(
     result = pipeline.run()
     path.cleanup()
 
-    np.testing.assert_almost_equal(result["seqeval"]["overall_f1"], 0.023668639053254437)
+    np.testing.assert_almost_equal(result["seqeval"]["overall_f1"], 0.14788732394366197)
