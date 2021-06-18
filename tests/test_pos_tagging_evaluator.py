@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import  Dict, Union, List
+from typing import Dict, Union, List
 
 import pytest
 from embeddings.evaluator.sequence_tagging_evaluator import SequenceTaggingEvaluator
@@ -25,11 +25,13 @@ def data() -> Dict[str, List[List[str]]]:
 @pytest.fixture  # type: ignore
 def sklearn_metrics(data: Dict[str, List[List[str]]]) -> Dict[str, Union[Dict[str, float], float]]:
     out_dict = {}
-    out_dict.update(classification_report(
-        list(chain.from_iterable(data["y_true"])),
-        list(chain.from_iterable(data["y_pred"])),
-        output_dict=True,
-    ))
+    out_dict.update(
+        classification_report(
+            list(chain.from_iterable(data["y_true"])),
+            list(chain.from_iterable(data["y_pred"])),
+            output_dict=True,
+        )
+    )
     prfs = precision_recall_fscore_support(
         list(chain.from_iterable(data["y_true"])),
         list(chain.from_iterable(data["y_pred"])),
