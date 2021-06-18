@@ -7,7 +7,9 @@ from embeddings.evaluator.metrics_evaluator import MetricsEvaluator
 from itertools import chain
 
 
-class SequenceTaggingEvaluator(MetricsEvaluator):
+class BILOUSequenceTaggingEvaluator(MetricsEvaluator):
+    ALLOWED_TAG_PREFIXES = {"B-", "I-", "L-", "O", "U-"}
+
     def __init__(self, seqeval_args: Optional[Dict[str, Any]] = None):
         super().__init__()
         self.seqeval_args = seqeval_args if seqeval_args else self._get_seqeval_kwargs()
@@ -30,8 +32,10 @@ class SequenceTaggingEvaluator(MetricsEvaluator):
     def preprocess_tags(
         self, input_arr: List[Union[List[str], np.ndarray]]
     ) -> List[Union[List[str], np.ndarray]]:
-        tags = np.unique(list(chain.from_iterable(input_arr))).tolist()
-        if not all([tag.startswith(("B-", "I-", "L-", "O", "U-", "E-", "S-")) for tag in tags]):
+        tags = set(chain.from_iterable(input_arr))
+        tag_prefixes = set(it[0:2] for it in tags)
+
+        if len(tag_prefixes.difference(self.ALLOWED_TAG_PREFIXES)) > 0:
             return self._convert_single_tag_to_bilou_scheme(input_arr)
 
         return input_arr
