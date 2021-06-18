@@ -4,7 +4,7 @@ from typing import Dict
 import datasets
 from flair.datasets import ColumnDataset
 
-from embeddings.transformation.flair_transformation.corpus_transformations import (
+from embeddings.transformation.flair_transformation.corpus_transformation import (
     CorpusTransformation,
 )
 

@@ -3,7 +3,7 @@ from pathlib import Path
 import datasets
 from flair.datasets import CSVClassificationDataset
 
-from embeddings.transformation.flair_transformation.corpus_transformations import (
+from embeddings.transformation.flair_transformation.corpus_transformation import (
     CorpusTransformation,
 )
 
