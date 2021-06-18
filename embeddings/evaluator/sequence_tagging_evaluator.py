@@ -1,55 +1,34 @@
-from typing import List, Tuple, Dict, Any, Optional, Union
+from typing import List, Tuple, Dict, Any, Union
 
+import datasets
 import numpy as np
-from datasets import Metric, load_metric
 
 from embeddings.evaluator.metrics_evaluator import MetricsEvaluator
-from itertools import chain
+from embeddings.metrics import metrics
+from embeddings.metrics.pos import POSTaggingMetric
 
 
-class BILOUSequenceTaggingEvaluator(MetricsEvaluator):
-    ALLOWED_TAG_PREFIXES = {"B-", "I-", "L-", "O", "U-"}
-
-    def __init__(self, seqeval_args: Optional[Dict[str, Any]] = None):
-        super().__init__()
-        self.seqeval_args = seqeval_args if seqeval_args else self._get_seqeval_kwargs()
-
-    def _get_seqeval_kwargs(self) -> Dict[str, Any]:
-        return {"suffix": None, "scheme": "BILOU", "mode": "strict"}
-
+class SequenceTaggingEvaluator(MetricsEvaluator):
     @property
-    def metrics(self) -> List[Tuple[Metric, Dict[str, Any]]]:
+    def metrics(self) -> List[Tuple[datasets.Metric, Dict[str, Any]]]:
         return [
-            (load_metric("seqeval"), self.seqeval_args),
+            (datasets.load_metric("seqeval"), {}),
         ]
 
-    @staticmethod
-    def _convert_single_tag_to_bilou_scheme(
-        input_arr: List[Union[List[str], np.ndarray]]
-    ) -> List[List[str]]:
-        return [[f"U-{tag}" for tag in tags] for tags in input_arr]
 
-    def preprocess_tags(
-        self, input_arr: List[Union[List[str], np.ndarray]]
-    ) -> List[Union[List[str], np.ndarray]]:
-        tags = set(chain.from_iterable(input_arr))
-        tag_prefixes = set(it[0:2] for it in tags)
-
-        if len(tag_prefixes.difference(self.ALLOWED_TAG_PREFIXES)) > 0:
-            return self._convert_single_tag_to_bilou_scheme(input_arr)
-
-        return input_arr
-
-    def evaluate(self, data: Dict[str, np.ndarray]) -> Dict[str, Any]:
-        return {
-            metric.name: metric.compute(
-                references=data["y_true"]
-                if metric.name != "seqeval"
-                else self.preprocess_tags(data["y_true"]),
-                predictions=data["y_pred"]
-                if metric.name != "seqeval"
-                else self.preprocess_tags(data["y_pred"]),
-                **kwargs,
-            )
-            for metric, kwargs in self.metrics
-        }
+class POSTaggingEvaluator(MetricsEvaluator):
+    @property
+    def metrics(
+        self,
+    ) -> List[
+        Tuple[
+            Union[
+                datasets.Metric,
+                metrics.Metric[
+                    Union[np.ndarray, List[Union[np.ndarray, List[str]]]], Dict[str, Any]
+                ],
+            ],
+            Dict[str, Any],
+        ]
+    ]:
+        return [(POSTaggingMetric(), {})]

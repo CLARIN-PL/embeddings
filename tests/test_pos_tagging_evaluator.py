@@ -2,7 +2,7 @@ from itertools import chain
 from typing import Dict, Union, List
 
 import pytest
-from embeddings.evaluator.sequence_tagging_evaluator import BILOUSequenceTaggingEvaluator
+from embeddings.evaluator.sequence_tagging_evaluator import POSTaggingEvaluator
 from sklearn.metrics import classification_report, precision_recall_fscore_support
 
 
@@ -62,8 +62,8 @@ def sklearn_metrics(data: Dict[str, List[List[str]]]) -> Dict[str, Union[Dict[st
 
 @pytest.fixture  # type: ignore
 def seqeval_metrics(data: Dict[str, List[List[str]]]) -> Dict[str, Union[Dict[str, float], float]]:
-    evaluator = BILOUSequenceTaggingEvaluator()
-    out = evaluator.evaluate(data)["seqeval"]
+    evaluator = POSTaggingEvaluator()
+    out = evaluator.evaluate(data)["POSTaggingMetric"]
     assert isinstance(out, dict)
     return out
 
