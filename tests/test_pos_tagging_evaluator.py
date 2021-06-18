@@ -10,14 +10,14 @@ from sklearn.metrics import classification_report, precision_recall_fscore_suppo
 def data() -> Dict[str, List[List[str]]]:
     return {
         "y_true": [
-            ["XD", "XDD", "XD"],
-            ["XDD", "XDDDD", "XD", "XDDD"],
-            ["XDDDD", "XDD", "XDDD", "XD"],
+            ["VB", "RB", "VB"],
+            ["RB", "JJ", "VB", "NN"],
+            ["JJ", "RB", "NN", "VB"],
         ],
         "y_pred": [
-            ["XDD", "XD", "XD"],
-            ["XDDD", "XDDD", "XD", "XDDD"],
-            ["XDDDD", "XDD", "XDD", "XD"],
+            ["RB", "VB", "VB"],
+            ["NN", "NN", "VB", "NN"],
+            ["JJ", "RB", "RB", "VB"],
         ],
     }
 
