@@ -5,5 +5,5 @@ Data = TypeVar("Data")
 
 
 class Dataset(ABC, Generic[Data]):
-    def __init__(self) -> None:
-        pass
+    def __repr__(self) -> str:
+        return type(self).__name__

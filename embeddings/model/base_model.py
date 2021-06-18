@@ -1,8 +1,8 @@
 import abc
 from typing import TypeVar, Generic
-from embeddings.model.Model import Model
-from embeddings.task.Task import Task
-from embeddings.embedding.Embedding import Embedding
+from embeddings.model.model import Model
+from embeddings.task.task import Task
+from embeddings.embedding.embedding import Embedding
 
 Input = TypeVar("Input")
 EmbeddingResult = TypeVar("EmbeddingResult")

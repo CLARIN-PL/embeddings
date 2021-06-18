@@ -30,6 +30,7 @@ Pillow = "^8.2.0"
 tensorboard = "^2.4.1"
 typer = "^0.3.2"
 spacy = "^3.0.0"
+seqeval = "^1.2.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

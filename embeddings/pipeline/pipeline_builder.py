@@ -1,15 +1,14 @@
-from typing import TypeVar, Generic
 from abc import ABC
-from embeddings.pipeline.Pipeline import Pipeline
-from embeddings.pipeline.StandardPipeline import StandardPipeline
-from embeddings.data.Dataset import Dataset
-from embeddings.data.DataLoader import DataLoader
-from embeddings.transformation.Transformation import Transformation
-from embeddings.model.Model import Model
-from embeddings.task.Task import Task
-from embeddings.evaluator.Evaluator import Evaluator
 from typing import Optional
-from copy import deepcopy
+from typing import TypeVar, Generic
+
+from embeddings.data.data_loader import DataLoader
+from embeddings.data.dataset import Dataset
+from embeddings.evaluator.evaluator import Evaluator
+from embeddings.model.model import Model
+from embeddings.pipeline.pipeline import Pipeline
+from embeddings.pipeline.standard_pipeline import StandardPipeline
+from embeddings.transformation.transformation import Transformation
 
 Data = TypeVar("Data")
 CreationData = TypeVar("CreationData")

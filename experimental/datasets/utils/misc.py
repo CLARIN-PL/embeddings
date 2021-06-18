@@ -8,7 +8,7 @@ import requests
 from sklearn.model_selection import train_test_split
 from tqdm.auto import tqdm
 
-from experimental.data.io import T_path
+from embeddings.data.io import T_path
 
 
 def split_train_test_dev(data: List[Any]) -> Dict[str, List[Any]]:
