@@ -21,14 +21,6 @@ class POSTaggingEvaluator(MetricsEvaluator):
     def metrics(
         self,
     ) -> List[
-        Tuple[
-            Union[
-                datasets.Metric,
-                metrics.Metric[
-                    Union[np.ndarray, List[Union[np.ndarray, List[str]]]], Dict[str, Any]
-                ],
-            ],
-            Dict[str, Any],
-        ]
+        Tuple[Union[datasets.Metric, metrics.Metric[np.ndarray, Dict[str, Any]]], Dict[str, Any]]
     ]:
         return [(POSTaggingMetric(), {})]

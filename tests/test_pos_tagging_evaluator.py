@@ -1,29 +1,34 @@
 from itertools import chain
-from typing import Dict, Union, List
+from typing import Dict, Union
 
+import numpy as np
 import pytest
 from embeddings.evaluator.sequence_tagging_evaluator import POSTaggingEvaluator
 from sklearn.metrics import classification_report, precision_recall_fscore_support
 
 
 @pytest.fixture  # type: ignore
-def data() -> Dict[str, List[List[str]]]:
+def data() -> Dict[str, np.ndarray]:
     return {
-        "y_true": [
-            ["VB", "RB", "VB"],
-            ["RB", "JJ", "VB", "NN"],
-            ["JJ", "RB", "NN", "VB"],
-        ],
-        "y_pred": [
-            ["RB", "VB", "VB"],
-            ["NN", "NN", "VB", "NN"],
-            ["JJ", "RB", "RB", "VB"],
-        ],
+        "y_true": np.array(
+            [
+                ["VB", "RB", "VB"],
+                ["RB", "JJ", "VB", "NN"],
+                ["JJ", "RB", "NN", "VB"],
+            ]
+        ),
+        "y_pred": np.array(
+            [
+                ["RB", "VB", "VB"],
+                ["NN", "NN", "VB", "NN"],
+                ["JJ", "RB", "RB", "VB"],
+            ]
+        ),
     }
 
 
 @pytest.fixture  # type: ignore
-def sklearn_metrics(data: Dict[str, List[List[str]]]) -> Dict[str, Union[Dict[str, float], float]]:
+def sklearn_metrics(data: Dict[str, np.ndarray]) -> Dict[str, Union[Dict[str, float], float]]:
     out_dict = {}
     out_dict.update(
         classification_report(
@@ -61,7 +66,7 @@ def sklearn_metrics(data: Dict[str, List[List[str]]]) -> Dict[str, Union[Dict[st
 
 
 @pytest.fixture  # type: ignore
-def seqeval_metrics(data: Dict[str, List[List[str]]]) -> Dict[str, Union[Dict[str, float], float]]:
+def seqeval_metrics(data: Dict[str, np.ndarray]) -> Dict[str, Union[Dict[str, float], float]]:
     evaluator = POSTaggingEvaluator()
     out = evaluator.evaluate(data)["POSTaggingMetric"]
     assert isinstance(out, dict)

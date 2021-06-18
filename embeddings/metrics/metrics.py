@@ -13,6 +13,10 @@ class Metric(ABC, Generic[Input, Output]):
     def __repr__(self) -> str:
         return type(self).__name__
 
+    @property
+    def name(self) -> str:
+        return repr(self)
+
     @abc.abstractmethod
     def compute(self, predictions: Input, references: Input) -> Output:
         pass
