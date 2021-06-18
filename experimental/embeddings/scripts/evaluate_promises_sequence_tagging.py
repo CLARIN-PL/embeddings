@@ -1,4 +1,3 @@
-import pickle
 from pathlib import Path
 from typing import Optional
 
@@ -6,8 +5,7 @@ import experimental.datasets.utils.misc
 import flair
 import torch
 import typer
-from experimental.defaults import RESULTS_PATH
-from experimental.embeddings.tasks import sequence_tagging as st
+from embeddings.defaults import RESULTS_PATH
 from flair.embeddings import TransformerWordEmbeddings
 
 
@@ -46,19 +44,19 @@ def evaluate_sequence_tagging(
     embeddings = TransformerWordEmbeddings(embedding)
 
     print("Training model...")
-    tagger = st.FlairSequenceTagger(
-        embeddings=embeddings,
-        hidden_dim=256,
-        tag_dictionary=tag_dictionary,
-        output_path=str(out_dir),
-    )
-
-    training_log = tagger.fit(corpus)
-    evaluation_log = tagger.evaluate(test_sentences)
-    with out_dir.joinpath("results.pkl").open(mode="wb") as f:
-        pickle.dump(obj={"training_log": training_log, "evaluation_log": evaluation_log}, file=f)
-
-    print("Done!", training_log)
+    # tagger = FlairSequenceTagger(
+    #     embeddings=embeddings,
+    #     hidden_dim=256,
+    #     tag_dictionary=tag_dictionary,
+    #     output_path=str(out_dir),
+    # )
+    #
+    # training_log = tagger.fit(corpus)
+    # evaluation_log = tagger.evaluate(test_sentences)
+    # with out_dir.joinpath("results.pkl").open(mode="wb") as f:
+    #     pickle.dump(obj={"training_log": training_log, "evaluation_log": evaluation_log}, file=f)
+    #
+    # print("Done!", training_log)
 
 
 typer.run(evaluate_sequence_tagging)

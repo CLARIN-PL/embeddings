@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional
 
 import srsly
-from experimental.data.io import T_path
+from embeddings.data.io import T_path
 from experimental.datasets.base import BaseDataset
 from experimental.datasets.utils.converters import convert_spacy_jsonl_to_connl_bilou
 from experimental.datasets.utils.misc import (

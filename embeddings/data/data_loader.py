@@ -1,15 +1,13 @@
 import abc
 from typing import TypeVar, Generic
 from abc import ABC
+from embeddings.data.dataset import Dataset
 
 Input = TypeVar("Input")
 Output = TypeVar("Output")
 
 
-class Transformation(ABC, Generic[Input, Output]):
-    def __init__(self) -> None:
-        pass
-
+class DataLoader(ABC, Generic[Input, Output]):
     @abc.abstractmethod
-    def transform(self, data: Input) -> Output:
+    def load(self, dataset: Dataset[Input]) -> Output:
         pass
