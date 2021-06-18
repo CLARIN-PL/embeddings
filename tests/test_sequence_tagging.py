@@ -54,4 +54,4 @@ def test_sequence_tagging_pipeline(
     result = pipeline.run()
     path.cleanup()
 
-    np.testing.assert_almost_equal(result["seqeval"]["overall_f1"], 0.14788732394366197)
+    np.testing.assert_almost_equal(result["POSTaggingMetric"]["overall_f1"], 0.14788732394366197)
