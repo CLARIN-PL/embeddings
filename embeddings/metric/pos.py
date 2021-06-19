@@ -1,13 +1,13 @@
 from itertools import chain
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any
 
 import numpy as np
 from datasets import load_metric
 
-from embeddings.metrics import metrics
+from embeddings.metric import metric
 
 
-class POSTaggingMetric(metrics.Metric[np.ndarray, Dict[str, Any]]):
+class POSTaggingMetric(metric.Metric[np.ndarray, Dict[str, Any]]):
     ALLOWED_TAG_PREFIXES = {"U-"}
 
     @property
