@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoModel, AutoTokenizer
 
 
 def main() -> None:
@@ -6,7 +6,7 @@ def main() -> None:
     model = AutoModel.from_pretrained("clarin-pl/roberta-polish-kgr10")
 
     encoded_input = tokenizer.encode("Zażółć gęślą jaźń", return_tensors="pt")
-    outputs = model(encoded_input)
+    model(encoded_input)
 
 
 if __name__ == "__main__":

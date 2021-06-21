@@ -9,9 +9,9 @@ from typing import Dict
 import datasets
 from flair.data import Corpus, FlairDataset
 
+from embeddings.defaults import DATASET_PATH
 from embeddings.transformation.transformation import Transformation
 from embeddings.utils.loggers import get_logger
-from embeddings.defaults import DATASET_PATH
 
 _logger = get_logger(__name__)
 
@@ -40,7 +40,7 @@ class CorpusTransformation(Transformation[datasets.DatasetDict, Corpus]):
     @staticmethod
     def _to_flair_corpus(flair_datasets: Dict[str, FlairDataset]) -> Corpus:
         if not flair_datasets["train"]:
-            raise ValueError(f"Hugging Face dataset does not contain TRAIN subset.")
+            raise ValueError("Hugging Face dataset does not contain TRAIN subset.")
 
         return Corpus(
             train=flair_datasets["train"],

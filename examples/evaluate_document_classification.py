@@ -3,8 +3,8 @@ from pathlib import Path
 
 import typer
 
-from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
 from embeddings.defaults import RESULTS_PATH
+from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
 
 app = typer.Typer()
 

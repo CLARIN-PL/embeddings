@@ -1,6 +1,7 @@
 import abc
-from typing import TypeVar, Generic
 from abc import ABC
+from typing import Generic, TypeVar
+
 from embeddings.data.dataset import Dataset
 
 Input = TypeVar("Input")

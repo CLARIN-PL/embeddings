@@ -1,5 +1,5 @@
 from tempfile import TemporaryDirectory
-from typing import Dict, List, Any, Tuple
+from typing import Any, Dict, Tuple
 
 import datasets
 import flair

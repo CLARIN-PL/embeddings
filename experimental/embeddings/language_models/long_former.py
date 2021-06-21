@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer, AutoModel, AutoConfig
+from transformers import AutoConfig, AutoModel, AutoTokenizer
 
 MODEL = "clarin-pl/long-former-polish"
 

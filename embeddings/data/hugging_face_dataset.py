@@ -1,7 +1,7 @@
 from pathlib import Path
-from typing import Union, Any
+from typing import Any, Union
 
-from embeddings.data.dataset import Data, Dataset
+from embeddings.data.dataset import Dataset
 
 
 class HuggingFaceDataset(Dataset[str]):
