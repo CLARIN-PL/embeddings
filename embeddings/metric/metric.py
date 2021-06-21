@@ -14,5 +14,5 @@ class Metric(ABC, Generic[Input, Output]):
         return self._name
 
     @abc.abstractmethod
-    def evaluate(self, y_pred: Input, y_true: Input, **kwargs: Any) -> Output:
+    def compute(self, y_pred: Input, y_true: Input, **kwargs: Any) -> Output:
         pass
