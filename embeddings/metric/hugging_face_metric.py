@@ -24,7 +24,7 @@ class HuggingFaceMetric(Metric[HF_metric_input, Dict[Any, Any]]):
         self.compute_kwargs = {} if compute_kwargs is None else compute_kwargs
 
     def compute(
-        self, y_pred: Optional[HF_metric_input], y_true: Optional[HF_metric_input], **kwargs: Any
+        self, y_true: Optional[HF_metric_input], y_pred: Optional[HF_metric_input], **kwargs: Any
     ) -> Dict[Any, Any]:
         result = self.metric.compute(
             references=y_true, predictions=y_pred, **self.compute_kwargs, **kwargs
