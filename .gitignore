@@ -132,3 +132,6 @@ dmypy.json
 
 # Scripts output directory
 resources/
+
+# compiled site
+webpage/public
