@@ -7,7 +7,7 @@ from datasets import load_metric
 from embeddings.metric import metric
 
 
-class POSTaggingSeqevalMetric(metric.Metric[np.ndarray, Dict[str, Any]]):
+class _POSTaggingSeqevalMetric(metric.Metric[np.ndarray, Dict[str, Any]]):
     ALLOWED_TAG_PREFIXES = {"U-"}
 
     def __init__(self) -> None:
@@ -26,7 +26,7 @@ class POSTaggingSeqevalMetric(metric.Metric[np.ndarray, Dict[str, Any]]):
     def _have_tags_unit_prefix(tags: np.ndarray) -> bool:
         unique_tags = set(chain.from_iterable(tags))
         tag_prefixes = set(it[0:2] for it in unique_tags)
-        return len(tag_prefixes.difference(POSTaggingSeqevalMetric.ALLOWED_TAG_PREFIXES)) < 1
+        return len(tag_prefixes.difference(_POSTaggingSeqevalMetric.ALLOWED_TAG_PREFIXES)) < 1
 
     def compute(self, y_true: np.ndarray, y_pred: np.ndarray, **kwargs: Any) -> Dict[str, Any]:
         seqeval = load_metric("seqeval")
@@ -39,3 +39,17 @@ class POSTaggingSeqevalMetric(metric.Metric[np.ndarray, Dict[str, Any]]):
         outs = seqeval.compute(references=y_true, predictions=y_pred, **self._seqeval_args)
         assert isinstance(outs, Dict)
         return outs
+
+
+class POSTaggingSeqevalMetric:  # ktagowski: Temporal Wrapper to handle y_true, y_pred params
+    def __init__(self) -> None:
+        self.metric: _POSTaggingSeqevalMetric = _POSTaggingSeqevalMetric()
+
+    @property
+    def name(self) -> str:
+        return type(self).__name__
+
+    def compute(
+        self, predictions: np.ndarray, references: np.ndarray, **kwargs: Any
+    ) -> Dict[str, Any]:
+        return self.metric.compute(y_true=references, y_pred=predictions, **kwargs)
