@@ -2,7 +2,7 @@ import importlib
 import zipfile
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import List, Any, Dict, Tuple, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 from sklearn.model_selection import train_test_split

@@ -2,7 +2,7 @@ import abc
 from typing import Any, List
 
 from flair.data import Sentence
-from flair.embeddings import TransformerWordEmbeddings, TransformerDocumentEmbeddings
+from flair.embeddings import TransformerDocumentEmbeddings, TransformerWordEmbeddings
 from flair.embeddings.base import Embeddings
 
 from embeddings.embedding.embedding import Embedding

@@ -1,12 +1,11 @@
 import abc
-from typing import TypeVar, Generic
-from abc import ABC
+from typing import Generic, TypeVar
 
 Input = TypeVar("Input")
 Output = TypeVar("Output")
 
 
-class Model(ABC, Generic[Input, Output]):
+class Model(abc.ABC, Generic[Input, Output]):
     def __init__(self) -> None:
         pass
 

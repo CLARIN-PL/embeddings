@@ -1,6 +1,6 @@
 import abc
-from typing import TypeVar, Generic, Any
 from abc import ABC
+from typing import Any, Generic, TypeVar
 
 Input = TypeVar("Input")
 Output = TypeVar("Output")

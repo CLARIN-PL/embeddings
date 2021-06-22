@@ -1,5 +1,5 @@
 import abc
-from typing import List, Tuple, Dict, Any
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 from datasets import Metric

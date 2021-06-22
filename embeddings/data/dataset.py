@@ -1,5 +1,5 @@
-from typing import TypeVar, Generic
 from abc import ABC
+from typing import Generic, TypeVar
 
 Data = TypeVar("Data")
 

@@ -1,6 +1,5 @@
 from abc import ABC
-from typing import Optional
-from typing import TypeVar, Generic
+from typing import Generic, Optional, TypeVar
 
 from embeddings.data.data_loader import DataLoader
 from embeddings.data.dataset import Dataset

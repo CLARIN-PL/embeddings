@@ -22,7 +22,7 @@ jobs:
       - name: Install deps
         run: poetry install -vv
       - name: Run tests
-        run: poetry run pytest
+        run: poetry run poe test
   lint:
     strategy:
       fail-fast: true
@@ -42,10 +42,8 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install deps
         run: poetry install -vv
-      - name: Check style
-        run: poetry run black --check ./
-      - name: Check types
-        run: poetry run mypy --strict .
+      - name: Check
+        run: poetry run poe check
   publish:
     needs:
       - tests
