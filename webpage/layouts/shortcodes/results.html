@@ -1,0 +1,47 @@
+
+{{ $fields := slice }}
+{{ range $.Site.Data.results }}
+   {{ range $k, $v := . }}
+      {{ $fields = $fields | append $k }}
+   {{ end }}
+{{ end }}
+{{ $fields :=  $fields | uniq }}
+
+<div>
+   <table id="data-table">
+   <thead>
+      <tr>
+         {{ range $field := $fields }}
+            <th>
+               {{ $field |
+                  replaceRE "(^[^A-Z0-9]*|[A-Z0-9]*)([A-Z0-9][^A-Z]+|$)" " ${1} $2" |
+                  replaceRE "( ?)([0-9]+)( ?)" " $2 " |
+                     humanize  }}
+            </th>
+         {{ end }}
+         </tr>
+   </thead>
+   {{ range $result := $.Site.Data.results }}
+      <tr>
+         {{ range $field := $fields }}
+            <td>
+               {{ index $result  $field }}
+            </td>
+         {{ end }}
+         </tr>
+   {{end}}
+   </table>
+
+
+
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.9.3/js/tabulator.min.js" integrity="sha512-N/WbW5rCM/O+/QpzuqYXkInRdSfFu6txbJcbQioBywGXDiF1XCJY2LXVKIGjNFUMS4P79mtf9pDu5ViXaa+BnA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.9.3/css/bootstrap/tabulator_bootstrap4.min.css" integrity="sha512-pXZ8FsuOBAyDmJ3OWob4V2UgZWQ8zs8f99MrNv0sBG8VLzuucajpzJ3BIiVNzTpfIYgzWGUq0QPJ3Y/9Gr4h7Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+   <script>
+      var table = new Tabulator("#data-table", {
+         layout:"fitColumns",
+      });
+      table.setColumns(table.getColumnDefinitions().map(c => {c.headerFilter=true; return c}))
+   </script>
+
+</div>
