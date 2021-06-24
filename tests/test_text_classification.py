@@ -59,4 +59,4 @@ def test_text_classification_pipeline(
     result = pipeline.run()
     path.cleanup()
 
-    np.testing.assert_almost_equal(result["f1"]["f1"], 0.4)
+    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.4)
