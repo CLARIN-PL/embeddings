@@ -56,7 +56,7 @@ class SequenceTagging(FlairTask):
             for token in sent:
                 sent_y.append(token.get_tag(y_type).value)
             y.append(sent_y)
-        return np.array(y)
+        return np.array(y, dtype=object)
 
     @staticmethod
     def remove_labels_from_data(data: List[Sentence], y_type: str) -> None:

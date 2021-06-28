@@ -16,14 +16,16 @@ def data() -> Dict[str, np.ndarray]:
                 ["VB", "RB", "VB"],
                 ["RB", "JJ", "VB", "NN"],
                 ["JJ", "RB", "NN", "VB"],
-            ]
+            ],
+            dtype=object,
         ),
         "y_pred": np.array(
             [
                 ["RB", "VB", "VB"],
                 ["NN", "NN", "VB", "NN"],
                 ["JJ", "RB", "RB", "VB"],
-            ]
+            ],
+            dtype=object,
         ),
     }
 
