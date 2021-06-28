@@ -69,7 +69,7 @@ def sklearn_metrics(data: Dict[str, np.ndarray]) -> Dict[str, Union[Dict[str, fl
 @pytest.fixture  # type: ignore
 def seqeval_metrics(data: Dict[str, np.ndarray]) -> Dict[str, Union[Dict[str, float], float]]:
     evaluator = POSTaggingEvaluator()
-    out = evaluator.evaluate(data)["POSTaggingSeqevalMetric"]
+    out = evaluator.evaluate(data)["POSTaggingSeqeval"]
     assert isinstance(out, dict)
     return out
 
