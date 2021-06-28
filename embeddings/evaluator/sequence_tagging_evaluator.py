@@ -6,6 +6,7 @@ import torch
 from embeddings.evaluator.metrics_evaluator import MetricsEvaluator
 from embeddings.metric.hugging_face_metric import HuggingFaceMetric
 from embeddings.metric.metric import Metric
+from embeddings.metric.pos_metric import POSTaggingSeqevalMetric
 
 
 class SequenceTaggingEvaluator(MetricsEvaluator):
@@ -22,5 +23,7 @@ class POSTaggingEvaluator(MetricsEvaluator):
     @property
     def metrics(
         self,
-    ) -> List[Tuple[POSTaggingSeqevalMetric, Dict[str, Any]]]:
-        return [(POSTaggingSeqevalMetric(), {})]
+    ) -> Sequence[POSTaggingSeqevalMetric]:
+        return [
+            POSTaggingSeqevalMetric(),
+        ]
