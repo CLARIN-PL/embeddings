@@ -31,8 +31,6 @@ def run(
     output_path = Path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    evaluator = POSTaggingEvaluator()
-
     pipeline = HuggingFaceSequenceTaggingPipeline(
         embedding_name,
         dataset_name,
