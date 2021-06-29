@@ -4,7 +4,7 @@ from pathlib import Path
 import typer
 
 from embeddings.defaults import RESULTS_PATH
-from embeddings.pipeline.hugging_face_sequence_tagging import HuggingFaceSequenceTaggingPipeline
+from embeddings.pipeline.hugging_face_POS_tagging import HuggingFacePOSTaggingPipeline
 
 app = typer.Typer()
 
@@ -20,9 +20,9 @@ def run(
         "tokens", help="Column name that contains text to classify."
     ),
     target_column_name: str = typer.Option(
-        "pos_tags", help="Column name that contains tag labels for sequence tagging."
+        "pos_tags", help="Column name that contains tag labels for POS tagging."
     ),
-    root: str = typer.Option(RESULTS_PATH.joinpath("sequence_tagging")),
+    root: str = typer.Option(RESULTS_PATH.joinpath("pos_tagging")),
     hidden_size: int = typer.Option(256, help="Number of hidden states in RNN."),
 ) -> None:
     typer.echo(pprint.pformat(locals()))
@@ -30,7 +30,7 @@ def run(
     output_path = Path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    pipeline = HuggingFaceSequenceTaggingPipeline(
+    pipeline = HuggingFacePOSTaggingPipeline(
         embedding_name,
         dataset_name,
         input_column_name,
