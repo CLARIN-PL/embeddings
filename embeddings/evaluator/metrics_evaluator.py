@@ -18,5 +18,6 @@ class MetricsEvaluator(Evaluator[Dict[str, np.ndarray], Dict[str, Any]]):
 
     def evaluate(self, data: Dict[str, np.ndarray]) -> Dict[str, Any]:
         return {
-            str(metric): metric.compute(data["y_true"], data["y_pred"]) for metric in self.metrics
+            str(metric): metric.compute(y_true=data["y_true"], y_pred=data["y_pred"])
+            for metric in self.metrics
         }
