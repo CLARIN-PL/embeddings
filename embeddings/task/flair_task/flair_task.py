@@ -1,16 +1,16 @@
 import abc
 from pathlib import Path
-from typing import Any, Dict, Optional, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import flair
 import numpy as np
-from flair.data import Sentence, Corpus, Dictionary
+from flair.data import Corpus, Dictionary, Sentence
 from flair.trainers import ModelTrainer
 
-from embeddings.embedding.flair_embedding import FlairEmbedding
-from embeddings.task.task import Task
 from embeddings.data.io import T_path
 from embeddings.defaults import RESULTS_PATH
+from embeddings.embedding.flair_embedding import FlairEmbedding
+from embeddings.task.task import Task
 
 
 class FlairTask(Task[Corpus, Dict[str, np.ndarray]]):

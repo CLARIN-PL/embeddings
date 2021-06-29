@@ -3,9 +3,9 @@ from pathlib import Path
 
 import typer
 
-from embeddings.evaluator.sequence_tagging_evaluator import SequenceTaggingEvaluator
-from embeddings.pipeline.hugging_face_sequence_tagging import HuggingFaceSequenceTaggingPipeline
 from embeddings.defaults import RESULTS_PATH
+from embeddings.evaluator.sequence_tagging_evaluator import POSTaggingEvaluator
+from embeddings.pipeline.hugging_face_sequence_tagging import HuggingFaceSequenceTaggingPipeline
 
 app = typer.Typer()
 
@@ -31,7 +31,7 @@ def run(
     output_path = Path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    evaluator = SequenceTaggingEvaluator()
+    evaluator = POSTaggingEvaluator()
 
     pipeline = HuggingFaceSequenceTaggingPipeline(
         embedding_name,

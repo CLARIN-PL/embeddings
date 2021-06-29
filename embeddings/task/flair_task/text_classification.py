@@ -1,12 +1,12 @@
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, List, Optional
 
 import numpy as np
-from flair.data import Sentence, Corpus, Dictionary
+from flair.data import Corpus, Dictionary, Sentence
 from flair.models import TextClassifier
 
+from embeddings.data.io import T_path
 from embeddings.embedding.flair_embedding import FlairEmbedding
 from embeddings.task.flair_task.flair_task import FlairTask
-from embeddings.data.io import T_path
 
 
 class TextClassification(FlairTask):

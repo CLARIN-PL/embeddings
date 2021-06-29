@@ -2,16 +2,17 @@ from pathlib import Path
 from typing import Optional
 
 import srsly
+from flair.datasets import ColumnCorpus
+from spacy.lang import pl
+
 from embeddings.data.io import T_path
 from experimental.datasets.base import BaseDataset
 from experimental.datasets.utils.converters import convert_spacy_jsonl_to_connl_bilou
 from experimental.datasets.utils.misc import (
-    split_train_test_dev,
     DatasetDownloader,
     all_files_exists,
+    split_train_test_dev,
 )
-from flair.datasets import ColumnCorpus
-from spacy.lang import pl
 
 
 class PromisesElectionsPLDataset(BaseDataset):

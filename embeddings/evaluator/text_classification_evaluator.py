@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, Any
+from typing import Any, Dict, List, Tuple
 
 from datasets import Metric, load_metric
 
