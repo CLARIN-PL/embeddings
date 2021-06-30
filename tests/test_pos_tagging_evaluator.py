@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from sklearn.metrics import classification_report, precision_recall_fscore_support
 
-from embeddings.evaluator.sequence_tagging_evaluator import POSTaggingEvaluator
+from embeddings.evaluator.sequence_labeling_evaluator import POSTaggingEvaluator
 
 
 @pytest.fixture  # type: ignore

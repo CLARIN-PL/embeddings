@@ -10,10 +10,10 @@ from flair.data import Corpus
 from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
 from embeddings.data.hugging_face_dataset import HuggingFaceDataset
 from embeddings.embedding.flair_embedding import FlairTransformerWordEmbedding
-from embeddings.evaluator.sequence_tagging_evaluator import POSTaggingEvaluator
+from embeddings.evaluator.sequence_labeling_evaluator import POSTaggingEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
-from embeddings.task.flair_task.sequence_tagging import SequenceTagging
+from embeddings.task.flair_task.sequence_labeling import SequenceLabeling
 from embeddings.transformation.flair_transformation.column_corpus_transformation import (
     ColumnCorpusTransformation,
 )
@@ -23,7 +23,7 @@ from embeddings.transformation.flair_transformation.downsample_corpus_transforma
 
 
 @pytest.fixture  # type: ignore
-def sequence_tagging_pipeline(
+def sequence_labeling_pipeline(
     result_path: "TemporaryDirectory[str]",
 ) -> Tuple[
     StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
@@ -35,7 +35,7 @@ def sequence_tagging_pipeline(
         DownsampleFlairCorpusTransformation(percentage=0.001)
     )
     embedding = FlairTransformerWordEmbedding("allegro/herbert-base-cased")
-    task = SequenceTagging(result_path.name, hidden_size=256, task_train_kwargs={"max_epochs": 1})
+    task = SequenceLabeling(result_path.name, hidden_size=256, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(embedding, task)
     evaluator = POSTaggingEvaluator()
 
@@ -43,14 +43,14 @@ def sequence_tagging_pipeline(
     return pipeline, result_path
 
 
-def test_sequence_tagging_pipeline(
-    sequence_tagging_pipeline: Tuple[
+def test_sequence_labeling_pipeline(
+    sequence_labeling_pipeline: Tuple[
         StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
         "TemporaryDirectory[str]",
     ],
 ) -> None:
     flair.set_seed(441)
-    pipeline, path = sequence_tagging_pipeline
+    pipeline, path = sequence_labeling_pipeline
     result = pipeline.run()
     path.cleanup()
 

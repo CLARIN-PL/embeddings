@@ -9,7 +9,7 @@ from embeddings.embedding.flair_embedding import FlairEmbedding
 from embeddings.task.flair_task.flair_task import FlairTask
 
 
-class SequenceTagging(FlairTask):
+class SequenceLabeling(FlairTask):
     def __init__(
         self,
         output_path: T_path,

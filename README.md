@@ -50,7 +50,7 @@ cd .\examples
 python evaluate_document_classification.py --embedding-name allegro/herbert-base-cased --dataset-name clarin-pl/polemo2-official --input-column-name text --target-column-name target
 ```
 
-## Run sequence tagging task
+## Run sequence labeling task
 
 The example with default language model and datasets. 
 

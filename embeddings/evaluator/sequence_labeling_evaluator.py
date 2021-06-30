@@ -9,7 +9,7 @@ from embeddings.metric.metric import Metric
 from embeddings.metric.pos_metric import POSTaggingSeqevalMetric
 
 
-class SequenceTaggingEvaluator(MetricsEvaluator):
+class SequenceLabelingEvaluator(MetricsEvaluator):
     @property
     def metrics(
         self,
