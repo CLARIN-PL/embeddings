@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from sklearn.metrics import classification_report, precision_recall_fscore_support
 
-from embeddings.evaluator.sequence_tagging_evaluator import POSTaggingEvaluator
+from embeddings.evaluator.sequence_labeling_evaluator import POSTaggingEvaluator
 
 
 @pytest.fixture  # type: ignore
@@ -16,14 +16,16 @@ def data() -> Dict[str, np.ndarray]:
                 ["VB", "RB", "VB"],
                 ["RB", "JJ", "VB", "NN"],
                 ["JJ", "RB", "NN", "VB"],
-            ]
+            ],
+            dtype=object,
         ),
         "y_pred": np.array(
             [
                 ["RB", "VB", "VB"],
                 ["NN", "NN", "VB", "NN"],
                 ["JJ", "RB", "RB", "VB"],
-            ]
+            ],
+            dtype=object,
         ),
     }
 
@@ -69,7 +71,7 @@ def sklearn_metrics(data: Dict[str, np.ndarray]) -> Dict[str, Union[Dict[str, fl
 @pytest.fixture  # type: ignore
 def seqeval_metrics(data: Dict[str, np.ndarray]) -> Dict[str, Union[Dict[str, float], float]]:
     evaluator = POSTaggingEvaluator()
-    out = evaluator.evaluate(data)["POSTaggingSeqevalMetric"]
+    out = evaluator.evaluate(data)["POSTaggingSeqeval"]
     assert isinstance(out, dict)
     return out
 

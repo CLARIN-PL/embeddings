@@ -34,4 +34,7 @@ class HuggingFaceMetric(Metric[HF_metric_input, Dict[Any, Any]]):
 
     def __str__(self) -> str:
         compute_kwargs_str = "__".join(f"{k}_{v}" for k, v in self.compute_kwargs.items())
-        return f"{super().__str__()}__{compute_kwargs_str}"
+        if compute_kwargs_str:
+            return f"{super().__str__()}__{compute_kwargs_str}"
+        else:
+            return super().__str__()
