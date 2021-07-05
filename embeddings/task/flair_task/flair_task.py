@@ -26,15 +26,6 @@ class FlairTask(Task[Corpus, Dict[str, np.ndarray]]):
         self.output_path: Path = Path(output_path)
         self.task_train_kwargs = task_train_kwargs if task_train_kwargs else {}
 
-    def task(self, data: Corpus) -> Dict[str, np.ndarray]:
-        if not self.model:
-            raise self.MODEL_UNDEFINED_EXCEPTION
-
-        self.fit(data)
-        y_pred, _ = self.predict(data.test)
-        y_true = self.get_y(data.test, self.y_type, self.y_dictionary)
-        return {"y_true": y_true, "y_pred": y_pred}
-
     def fit(
         self,
         corpus: Corpus,
@@ -61,6 +52,15 @@ class FlairTask(Task[Corpus, Dict[str, np.ndarray]]):
         y_pred = self.get_y(data, y_type="predicted", y_dictionary=self.y_dictionary)
         self.remove_labels_from_data(data, "predicted")
         return y_pred, loss
+
+    def fit_predict(self, data: Corpus) -> Dict[str, np.ndarray]:
+        if not self.model:
+            raise self.MODEL_UNDEFINED_EXCEPTION
+
+        self.fit(data)
+        y_pred, _ = self.predict(data.test)
+        y_true = self.get_y(data.test, self.y_type, self.y_dictionary)
+        return {"y_true": y_true, "y_pred": y_pred}
 
     @property
     @abc.abstractmethod

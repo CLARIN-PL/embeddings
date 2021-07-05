@@ -35,5 +35,5 @@ class StandardPipeline(
     def run(self) -> EvaluationResult:
         loaded_data = self.data_loader.load(self.dataset)
         transformed_data = self.transformation.transform(loaded_data)
-        model_result = self.model.model(transformed_data)
+        model_result = self.model.execute(transformed_data)
         return self.evaluator.evaluate(model_result)

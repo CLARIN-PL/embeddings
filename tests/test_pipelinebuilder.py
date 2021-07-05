@@ -30,7 +30,7 @@ class DummyEmbedding(Embedding[int, float]):
 
 
 class DummyTask(Task[float, int]):
-    def task(self, data: Input) -> Output:
+    def fit_predict(self, data: Input) -> Output:
         pass
 
 

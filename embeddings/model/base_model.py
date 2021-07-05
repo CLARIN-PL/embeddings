@@ -16,6 +16,6 @@ class BaseModel(Model[Input, Output], Generic[Input, EmbeddingResult, Output]):
         self.embedding = embedding
         self.task = task
 
-    def model(self, data: Input) -> Output:
+    def execute(self, data: Input) -> Output:
         embedded = self.embedding.embed(data)
-        return self.task.task(embedded)
+        return self.task.fit_predict(embedded)
