@@ -24,10 +24,10 @@ from embeddings.transformation.flair_transformation.pair_classification_corpus_t
 
 @pytest.fixture  # type: ignore
 def text_pair_classification_pipeline(
-    result_path: TemporaryDirectory[str],
+    result_path: "TemporaryDirectory[str]",
 ) -> Tuple[
     StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
-    TemporaryDirectory[str],
+    "TemporaryDirectory[str]",
 ]:
     dataset = HuggingFaceDataset("clarin-pl/cst-wikinews")
     data_loader = HuggingFaceDataLoader()
@@ -45,7 +45,7 @@ def text_pair_classification_pipeline(
 def test_text_pair_classification_pipeline(
     text_pair_classification_pipeline: Tuple[
         StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
-        TemporaryDirectory[str],
+        "TemporaryDirectory[str]",
     ],
 ) -> None:
     flair.set_seed(441)
