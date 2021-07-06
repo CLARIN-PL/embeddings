@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import datasets
 import numpy as np
@@ -28,6 +28,8 @@ class HuggingFaceSequenceLabelingPipeline(
         target_column_name: str,
         output_path: T_path,
         hidden_size: int,
+        evaluation_mode: str = "conll",
+        tagging_scheme: Optional[str] = None,
     ):
         dataset = HuggingFaceDataset(dataset_name)
         data_loader = HuggingFaceDataLoader()
@@ -35,5 +37,7 @@ class HuggingFaceSequenceLabelingPipeline(
         embedding = FlairTransformerWordEmbedding(embedding_name)
         task = SequenceLabeling(output_path, hidden_size=hidden_size)
         model = FlairModel(embedding, task)
-        evaluator = SequenceLabelingEvaluator()
+        evaluator = SequenceLabelingEvaluator(
+            evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
+        )
         super().__init__(dataset, data_loader, transformation, model, evaluator)
