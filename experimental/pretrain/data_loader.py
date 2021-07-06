@@ -1,10 +1,9 @@
 import linecache
-from dataclasses import dataclass
-from typing import Dict, List
-
 import torch
+from dataclasses import dataclass
 from torch.utils.data.dataset import Dataset
 from transformers import DataCollatorForLanguageModeling
+from typing import Dict, List
 
 
 @dataclass

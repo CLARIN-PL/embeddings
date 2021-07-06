@@ -1,11 +1,11 @@
+import click
 import logging
 from pathlib import Path
-
-import click
-from data_loader import DataCollatorForLazyLanguageModeling, LazyLineByLineTextDataset
 from torch.utils.tensorboard import SummaryWriter
 from transformers import RobertaForMaskedLM, XLMTokenizer
 from transformers import Trainer, TrainingArguments
+
+from data_loader import DataCollatorForLazyLanguageModeling, LazyLineByLineTextDataset
 
 logging.basicConfig(
     filename=f"language_model_domain_pretrain.log",
