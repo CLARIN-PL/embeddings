@@ -1,12 +1,23 @@
+<<<<<<< HEAD
 import click
 import logging
 from pathlib import Path
+=======
+import logging
+from pathlib import Path
+
+import click
+from data_loader import DataCollatorForLazyLanguageModeling, LazyLineByLineTextDataset
+>>>>>>> lm-domain-pretrain
 from torch.utils.tensorboard import SummaryWriter
 from transformers import RobertaForMaskedLM, XLMTokenizer
 from transformers import Trainer, TrainingArguments
 
+<<<<<<< HEAD
 from data_loader import DataCollatorForLazyLanguageModeling, LazyLineByLineTextDataset
 
+=======
+>>>>>>> lm-domain-pretrain
 logging.basicConfig(
     filename=f"language_model_domain_pretrain.log",
     filemode="a",
