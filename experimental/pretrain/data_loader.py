@@ -1,18 +1,10 @@
 import linecache
-<<<<<<< HEAD
-import torch
-from dataclasses import dataclass
-from torch.utils.data.dataset import Dataset
-from transformers import DataCollatorForLanguageModeling
-from typing import Dict, List
-=======
 from dataclasses import dataclass
 from typing import Dict, List
 
 import torch
 from torch.utils.data.dataset import Dataset
 from transformers import DataCollatorForLanguageModeling
->>>>>>> lm-domain-pretrain
 
 
 @dataclass

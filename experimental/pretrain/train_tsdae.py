@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import click
-import tqdm
-from pathlib import Path
-from sentence_transformers import SentenceTransformer, datasets, losses, models
-from torch.utils.data import DataLoader
-from typing import Union
-=======
 from pathlib import Path
 from typing import Union
 
@@ -13,7 +5,6 @@ import click
 import tqdm
 from sentence_transformers import SentenceTransformer, datasets, losses, models
 from torch.utils.data import DataLoader
->>>>>>> lm-domain-pretrain
 
 
 @click.command()
