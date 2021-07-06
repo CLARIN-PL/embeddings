@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Sequence, Union
+from typing import Any, Dict, List, Optional, Sequence, Set, Union
 
 import numpy as np
 import torch
@@ -10,6 +10,8 @@ from embeddings.metric.unit_seqeval_metric import UnitSeqevalMetric
 
 
 class SequenceLabelingEvaluator(MetricsEvaluator):
+    SEQEVAL_EVALUATION_MODES: Set[str] = {"conll", "strict"}
+
     def __init__(
         self, evaluation_mode: str = "conll", tagging_scheme: Optional[str] = None
     ) -> None:
@@ -19,7 +21,7 @@ class SequenceLabelingEvaluator(MetricsEvaluator):
     def _get_metric(
         self, evaluation_mode: str, tagging_scheme: Optional[str] = None
     ) -> Union[HuggingFaceMetric, UnitSeqevalMetric]:
-        if evaluation_mode in {"conll", "strict"}:
+        if evaluation_mode in SequenceLabelingEvaluator.SEQEVAL_EVALUATION_MODES:
             if evaluation_mode == "strict" and not tagging_scheme:
                 raise ValueError("Tagging scheme must be set, when using strict evaluation mode!")
             return HuggingFaceMetric(
