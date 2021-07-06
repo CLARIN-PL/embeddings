@@ -58,5 +58,7 @@ def test_text_classification_pipeline(
     pipeline, path = text_classification_pipeline
     result = pipeline.run()
     path.cleanup()
-
+    np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.6666666)
     np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.4)
+    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.3333333)
+    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.5)
