@@ -1,3 +1,4 @@
+from pprint import pprint
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple
 
@@ -52,7 +53,8 @@ def test_text_pair_classification_pipeline(
     pipeline, path = text_pair_classification_pipeline
     result = pipeline.run()
     path.cleanup()
-    np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.0263157)
-    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.0090909)
-    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.0053475)
-    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.0303030)
+    pprint(result)
+    np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.0789473)
+    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.0547785)
+    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.0958230)
+    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.1212121)
