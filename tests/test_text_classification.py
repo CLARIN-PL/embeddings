@@ -22,7 +22,7 @@ from embeddings.transformation.flair_transformation.downsample_corpus_transforma
 )
 
 
-@pytest.fixture  # type: ignore
+@pytest.fixture
 def text_classification_pipeline(
     result_path: "TemporaryDirectory[str]",
 ) -> Tuple[

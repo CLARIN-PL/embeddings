@@ -135,3 +135,6 @@ resources/
 
 # compiled site
 webpage/public
+
+#excluding pyenv
+!.python-version

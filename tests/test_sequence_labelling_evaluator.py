@@ -8,7 +8,7 @@ from sklearn.metrics import classification_report, precision_recall_fscore_suppo
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 
 
-@pytest.fixture  # type: ignore
+@pytest.fixture
 def data() -> Dict[str, np.ndarray]:
     return {
         "y_true": np.array(
@@ -30,7 +30,7 @@ def data() -> Dict[str, np.ndarray]:
     }
 
 
-@pytest.fixture  # type: ignore
+@pytest.fixture
 def ner_data() -> Dict[str, np.ndarray]:
     return {
         "y_true": np.array(
@@ -50,7 +50,7 @@ def ner_data() -> Dict[str, np.ndarray]:
     }
 
 
-@pytest.fixture  # type: ignore
+@pytest.fixture
 def sklearn_metrics(data: Dict[str, np.ndarray]) -> Dict[str, Union[Dict[str, float], float]]:
     out_dict = {}
     out_dict.update(
@@ -88,7 +88,7 @@ def sklearn_metrics(data: Dict[str, np.ndarray]) -> Dict[str, Union[Dict[str, fl
     return out_dict
 
 
-@pytest.fixture  # type: ignore
+@pytest.fixture
 def seqeval_metrics(data: Dict[str, np.ndarray]) -> Dict[str, Union[Dict[str, float], float]]:
     evaluator = SequenceLabelingEvaluator(evaluation_mode="unit")
     out = evaluator.evaluate(data)["UnitSeqeval"]

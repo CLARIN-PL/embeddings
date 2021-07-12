@@ -4,11 +4,11 @@ on: pull_request
 jobs:
   tests:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        python-version: [3.8]
-        poetry-version: [1.1.5]
-        os: [ubuntu-20.04, macos-latest, windows-latest]
+        python-version: [ 3.9.6 ]
+        poetry-version: [ 1.1.5 ]
+        os: [ ubuntu-20.04, macos-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -25,11 +25,11 @@ jobs:
         run: poetry run poe test
   lint:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        python-version: [3.8]
-        poetry-version: [1.1.5]
-        os: [ubuntu-20.04]
+        python-version: [ 3.9.6 ]
+        poetry-version: [ 1.1.5 ]
+        os: [ ubuntu-20.04 ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -50,11 +50,11 @@ jobs:
       - lint
     environment: Test deployment
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        python-version: [ 3.8 ]
+        python-version: [ 3.9.6 ]
         poetry-version: [ 1.1.5 ]
-        os: [ ubuntu-20.04]
+        os: [ ubuntu-20.04 ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2

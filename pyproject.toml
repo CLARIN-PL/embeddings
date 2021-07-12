@@ -2,7 +2,7 @@
 name = "clarinpl-embeddings"
 version = "0.0.1"
 description = ""
-license="MIT"
+license = "MIT"
 authors = [
     "Roman Bartusiak <riomus@gmail.com>",
     "Łukasz Augustyniak <luk.augustyniak@gmail.com>",
@@ -18,37 +18,42 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
-transformers = "^4.4.2"
-torch = "^1.8.0"
-flair = "^0.8.0"
-requests = "^2.25.1"
-scikit-learn = "^0.24.1"
-srsly = "^2.4.0"
+python = "3.9.6"
+transformers = "4.8.2"
+torch = "1.9.0"
+flair = "0.8.0"
+requests = "2.25.1"
+scikit-learn = "0.24.1"
+srsly = "2.4.1"
 datasets = "1.6.1"
-Pillow = "^8.2.0"
-tensorboard = "^2.4.1"
-typer = "^0.3.2"
-spacy = "^3.0.0"
-seqeval = "^1.2.2"
+Pillow = "8.2.0"
+tensorboard = "2.4.1"
+typer = "0.3.2"
+spacy = "3.1.0"
+seqeval = "1.2.2"
+numpy = "1.19.5"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
-mypy = "^0.812"
-black = "^20.8b1"
-typing-extensions = "^3.7.4"
-isort = {version = "^5.9.1", extras = ["pyproject"]}
+pytest = "6.2.4"
+mypy = "0.910"
+black = "21.6b0"
+typing-extensions = "3.7.4"
+isort = { version = "5.9.1", extras = ["pyproject"] }
 pyflakes = "2.3.1"
-poethepoet = "^0.10.0"
+poethepoet = "0.10.0"
+types-requests = "2.25.0"
 
 [tool.poe.tasks]
 black = "black --check ./"
 isort = "isort .  -c"
+black_fix = "black ./"
+isort_fix = "isort . "
 pyflakes = "pyflakes ."
-mypy  = "mypy --strict ."
+mypy = "mypy --strict ."
 test = "pytest"
-check       =  ["black", "isort", "mypy",  "pyflakes"]
-all         = ["check", "test"]
+check = ["black", "isort", "mypy", "pyflakes"]
+fix = ["black_fix", "isort_fix"]
+all = ["check", "test"]
 
 [tool.poetry.extras]
 developer = ["black", "mypy", "typing-extensions"]
