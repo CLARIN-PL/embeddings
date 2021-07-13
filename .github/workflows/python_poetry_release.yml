@@ -5,11 +5,11 @@ jobs:
   publish:
     environment: Deployment
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        python-version: [ 3.8 ]
+        python-version: [ 3.9.6 ]
         poetry-version: [ 1.1.5 ]
-        os: [ ubuntu-20.04]
+        os: [ ubuntu-20.04 ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -25,7 +25,7 @@ jobs:
       - name: Install deps
         run: poetry install -vv
       - name: Build and publish
-        run:  |
+        run: |
           poetry version "$(git describe --tags --abbrev=0)"
           poetry build
           poetry publish --username __token__ --password ${{ secrets.PYPI_API_TOKEN }}
