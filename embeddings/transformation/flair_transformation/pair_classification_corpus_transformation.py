@@ -1,7 +1,9 @@
+import warnings
 from pathlib import Path
 from typing import Tuple
 
 import datasets
+import flair
 from flair.datasets import DataPairDataset
 
 from embeddings.defaults import DATASET_PATH
@@ -25,6 +27,13 @@ class PairClassificationCorpusTransformation(ClassificationCorpusTransformation)
     ) -> DataPairDataset:
         csv_path = output_path.joinpath(f"{subset_name}.csv")
         self._save_to_csv(hf_datadict, subset_name, csv_path)
+
+        if flair.__version__ != "0.8":
+            warnings.warn(
+                f"Implementation of {type(self).__name__} could be deprecated due to "
+                f"new flair release.",
+                DeprecationWarning,
+            )
 
         columns = [
             hf_datadict[subset_name].column_names.index(self.input_column_name),
