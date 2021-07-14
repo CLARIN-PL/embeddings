@@ -62,10 +62,7 @@ developer = ["black", "mypy", "typing-extensions"]
 requires = ["poetry>=1.1.5"]
 build-backend = "poetry.masonry.api"
 
-[mypy]
-python_version = 3.8
-
-[pytest]
+[tool.pytest.ini_options]
 testpaths = "tests"
 
 [tool.black]
