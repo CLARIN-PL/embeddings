@@ -23,7 +23,7 @@ from embeddings.transformation.flair_transformation.pair_classification_corpus_t
 )
 
 
-@pytest.fixture  # type: ignore
+@pytest.fixture
 def text_pair_classification_pipeline(
     result_path: "TemporaryDirectory[str]",
 ) -> Tuple[
