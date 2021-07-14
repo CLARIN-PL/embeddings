@@ -4,7 +4,7 @@ from typing import Tuple
 
 import datasets
 import flair
-from flair.datasets import DataPairDataset
+from flair.datasets import CSVClassificationDataset, DataPairDataset
 
 from embeddings.defaults import DATASET_PATH
 from embeddings.transformation.flair_transformation.classification_corpus_transformation import (
@@ -34,7 +34,13 @@ class PairClassificationCorpusTransformation(ClassificationCorpusTransformation)
                 f"new flair release.",
                 DeprecationWarning,
             )
+        # todo: change that function call for _to_csv_classification_dataset after a new flair
+        #  release for code coherence
+        return self._to_data_pair_dataset(hf_datadict, subset_name, output_path)
 
+    def _to_data_pair_dataset(
+        self, hf_datadict: datasets.DatasetDict, subset_name: str, output_path: Path
+    ) -> DataPairDataset:
         columns = [
             hf_datadict[subset_name].column_names.index(self.input_column_name),
             hf_datadict[subset_name].column_names.index(self.pair_column_name),
@@ -45,15 +51,22 @@ class PairClassificationCorpusTransformation(ClassificationCorpusTransformation)
             output_path.joinpath(f"{subset_name}.csv"), columns=columns, separator=","
         )
 
-        # todo: uncomment that after a new flair release for code coherence
-        # column_name_map = {
-        #     hf_datadict[subset_name].column_names.index(self.input_column_name): "text",
-        #     hf_datadict[subset_name].column_names.index(self.pair_column_name): "pair",
-        #     hf_datadict[subset_name].column_names.index(self.target_column_name): "label",
-        # }
-        #
-        # return CSVClassificationDataset(output_path.joinpath(f"{subset_name}.csv"),
-        #                                 column_name_map)
+    def _to_csv_classification_dataset(
+        self, hf_datadict: datasets.DatasetDict, subset_name: str, output_path: Path
+    ) -> CSVClassificationDataset:
+        if flair.__version__ == "0.8":
+            raise NotImplementedError(
+                f"Usage of {CSVClassificationDataset.__name__} for pair "
+                f"classification is not possible for flair 0.8."
+            )
+
+        column_name_map = {
+            hf_datadict[subset_name].column_names.index(self.input_column_name): "text",
+            hf_datadict[subset_name].column_names.index(self.pair_column_name): "pair",
+            hf_datadict[subset_name].column_names.index(self.target_column_name): "label",
+        }
+
+        return CSVClassificationDataset(output_path.joinpath(f"{subset_name}.csv"), column_name_map)
 
     def _check_compatibility(self, dataset: datasets.Dataset) -> None:
         super()._check_compatibility(dataset)
