@@ -25,6 +25,7 @@ class FlairTask(Task[Corpus, Dict[str, np.ndarray]]):
         self.model: Optional[flair.nn.Model] = None
         self.output_path: Path = Path(output_path)
         self.task_train_kwargs = task_train_kwargs if task_train_kwargs else {}
+        self.trainer: Optional[ModelTrainer] = None
 
     def fit(
         self,
