@@ -10,5 +10,4 @@ class JsonPersister(ResultsPersister[Dict[str, Any]]):
         self.path = path
 
     def persist(self, result: Dict[str, Any], **kwargs: Any) -> None:
-        with open(self.path, "w") as json_file:
-            json_file.write(srsly.json_dumps(result))
+        srsly.write_json(self.path, result)
