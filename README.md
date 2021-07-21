@@ -6,11 +6,42 @@ State-of-the-art Text Representations for Natural Language Processing tasks, an 
 pip install clarinpl-embeddings
 ```
 
+# Example
+
+Text-classification using with polemo2 dataset and transformer-based embeddings
+
+```python
+from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
+
+pipeline = HuggingFaceClassificationPipeline(
+    dataset_name="clarin-pl/polemo2-official",
+    embedding_name="allegro/herbert-base-cased",
+    input_column_name="text",
+    target_column_name="target",
+    output_path="."
+)
+
+print(pipeline.run())
+
+```
+
 # Conventions
 
 We use many of the HuggingFace concepts such as models (https://huggingface.co/models) or  datasets (https://huggingface.co/datasets) to make our library as easy to use as it is possible. We want to enable users to create, customise, test, and execute NLP/NLU/SLU tasks in the fastest possible manner.
 
-## HuggingFace-based pipeline
+
+# Pipelines
+
+We share predefined pipelines together for common NLP tasks with corresponding scripts
+
+| Task | Class | Script |
+| ---- | ---- | ---- |
+| Text classification | [HuggingFaceClassificationPipeline](embeddings/pipeline/hugging_face_classification.py) | [examples/evaluate_document_classification.py](examples/evaluate_document_classification.py) |
+| Sequence labelling | [HuggingFaceSequenceLabelingPipeline](embeddings.pipeline.hugging_face_sequence_labeling) | [examples/evaluate_sequence_labelling.py](examples/evaluate_sequence_labelling.py) |
+| Sequence Pair Classification | [HuggingFacePairClassificationPipeline](embeddings.pipeline.hugging_face_pair_classification.py)| [examples/evaluate_document_pair_classification.py](examples/evaluate_document_pair_classification.py) |
+
+ 
+## Writing custom HuggingFace-based pipeline
 
 ```python
 from pathlib import Path
@@ -38,7 +69,7 @@ pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluat
 result = pipeline.run()
 ```
 
-# Run example tasks
+# Running tasks scripts
 
 ```bash
 cd .\examples
@@ -47,7 +78,12 @@ cd .\examples
 ## Run classification task
 
 ```bash
-python evaluate_document_classification.py --embedding-name allegro/herbert-base-cased --dataset-name clarin-pl/polemo2-official --input-column-name text --target-column-name target
+python evaluate_document_classification.py \
+    --embedding-name allegro/herbert-base-cased \
+    --dataset-name clarin-pl/polemo2-official \
+    --input-column-name text \
+    --target-column-name target
+
 ```
 
 ## Run sequence labeling task
@@ -57,4 +93,3 @@ The example with default language model and datasets.
 ```bash
 python evaluate_sequence_tagging.py
 ```
-
