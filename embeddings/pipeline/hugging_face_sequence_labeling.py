@@ -30,12 +30,19 @@ class HuggingFaceSequenceLabelingPipeline(
         hidden_size: int,
         evaluation_mode: str = "conll",
         tagging_scheme: Optional[str] = None,
+        task_model_kwargs: Optional[Dict[str, Any]] = None,
+        task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = HuggingFaceDataset(dataset_name)
         data_loader = HuggingFaceDataLoader()
         transformation = ColumnCorpusTransformation(input_column_name, target_column_name)
         embedding = FlairTransformerWordEmbedding(embedding_name)
-        task = SequenceLabeling(output_path, hidden_size=hidden_size)
+        task = SequenceLabeling(
+            output_path,
+            hidden_size=hidden_size,
+            task_model_kwargs=task_model_kwargs,
+            task_train_kwargs=task_train_kwargs,
+        )
         model = FlairModel(embedding, task)
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme

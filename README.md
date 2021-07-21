@@ -36,9 +36,9 @@ We share predefined pipelines together for common NLP tasks with corresponding s
 
 | Task | Class | Script |
 | ---- | ---- | ---- |
-| Text classification | [HuggingFaceClassificationPipeline](embeddings/pipeline/hugging_face_classification.py) | [examples/evaluate_document_classification.py](examples/evaluate_document_classification.py) |
-| Sequence labelling | [HuggingFaceSequenceLabelingPipeline](embeddings.pipeline.hugging_face_sequence_labeling) | [examples/evaluate_sequence_labelling.py](examples/evaluate_sequence_labelling.py) |
-| Sequence Pair Classification | [HuggingFacePairClassificationPipeline](embeddings.pipeline.hugging_face_pair_classification.py)| [examples/evaluate_document_pair_classification.py](examples/evaluate_document_pair_classification.py) |
+| Text classification | [HuggingFaceClassificationPipeline](embeddings/pipeline/hugging_face_classification.py) | [evaluate_document_classification.py](examples/evaluate_document_classification.py) |
+| Sequence labelling | [HuggingFaceSequenceLabelingPipeline](embeddings.pipeline.hugging_face_sequence_labeling) | [evaluate_sequence_labelling.py](examples/evaluate_sequence_labelling.py) |
+| Sequence Pair Classification | [HuggingFacePairClassificationPipeline](embeddings.pipeline.hugging_face_pair_classification.py)| [evaluate_document_pair_classification.py](examples/evaluate_document_pair_classification.py) |
 
  
 ## Writing custom HuggingFace-based pipeline
@@ -92,4 +92,35 @@ The example with default language model and datasets.
 
 ```bash
 python evaluate_sequence_tagging.py
+```
+
+# Passing task model and task training parameters to pre-defiend pipelines
+
+Model and training parameters can be controlled via `task_model_kwargs` and 
+`task_train_kwargs` parameters. 
+
+## Example with `polemo2` dataset.   
+
+```python
+from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
+
+pipeline = HuggingFaceClassificationPipeline(
+    dataset_name="clarin-pl/polemo2-official",
+    embedding_name="allegro/herbert-base-cased",
+    input_column_name="text",
+    target_column_name="target",
+    output_path=".",
+    task_model_kwargs={
+        "loss_weights": {
+            "plus": 2.0,
+            "minus": 2.0
+        }
+    },
+    task_train_kwargs={
+        "learning_rate": 0.01,
+        "max_epochs": 20
+    },
+)
+
+print(pipeline.run())
 ```
