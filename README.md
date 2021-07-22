@@ -119,7 +119,7 @@ pipeline = HuggingFaceClassificationPipeline(
     task_train_kwargs={
         "learning_rate": 0.01,
         "max_epochs": 20
-    },
+    }
 )
 
 print(pipeline.run())
