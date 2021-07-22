@@ -8,7 +8,7 @@ pip install clarinpl-embeddings
 
 # Example
 
-Text-classification using with polemo2 dataset and transformer-based embeddings
+Text-classification with polemo2 dataset and transformer-based embeddings
 
 ```python
 from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
