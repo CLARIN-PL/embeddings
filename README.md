@@ -94,7 +94,7 @@ The example with default language model and datasets.
 python evaluate_sequence_tagging.py
 ```
 
-# Passing task model and task training parameters to predefiend pipelines
+# Passing task model and task training parameters to predefined pipelines
 
 Model and training parameters can be controlled via `task_model_kwargs` and 
 `task_train_kwargs` parameters. 
