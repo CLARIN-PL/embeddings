@@ -38,7 +38,7 @@ We share predefined pipelines for common NLP tasks with corresponding scripts.
 | ---- | ---- | ---- |
 | Text classification | [HuggingFaceClassificationPipeline](embeddings/pipeline/hugging_face_classification.py) | [evaluate_document_classification.py](examples/evaluate_document_classification.py) |
 | Sequence labelling | [HuggingFaceSequenceLabelingPipeline](embeddings/pipeline/hugging_face_sequence_labeling.py) | [evaluate_sequence_labelling.py](examples/evaluate_sequence_labelling.py) |
-| Sequence Pair Classification | [HuggingFacePairClassificationPipeline](embeddings/pipeline/hugging_face_pair_classification.py)| [evaluate_document_pair_classification.py](examples/evaluate_document_pair_classification.py) |
+| Sequence pair classification | [HuggingFacePairClassificationPipeline](embeddings/pipeline/hugging_face_pair_classification.py)| [evaluate_document_pair_classification.py](examples/evaluate_document_pair_classification.py) |
 
  
 ## Writing custom HuggingFace-based pipeline
