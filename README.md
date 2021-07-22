@@ -88,7 +88,7 @@ python evaluate_document_classification.py \
 
 ## Run sequence labeling task
 
-The example with default language model and datasets. 
+The example with default language model and dataset. 
 
 ```bash
 python evaluate_sequence_tagging.py
