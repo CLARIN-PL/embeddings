@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import datasets
 import numpy as np
@@ -27,6 +27,8 @@ class HuggingFacePairClassificationPipeline(
         input_columns_names_pair: Tuple[str, str],
         target_column_name: str,
         output_path: T_path,
+        task_model_kwargs: Optional[Dict[str, Any]] = None,
+        task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = HuggingFaceDataset(dataset_name)
         data_loader = HuggingFaceDataLoader()
@@ -34,7 +36,11 @@ class HuggingFacePairClassificationPipeline(
             input_columns_names_pair, target_column_name
         )
         embedding = FlairTransformerDocumentEmbedding(embedding_name)
-        task = TextPairClassification(output_path)
+        task = TextPairClassification(
+            output_path,
+            task_model_kwargs=task_model_kwargs,
+            task_train_kwargs=task_train_kwargs,
+        )
         model = FlairModel(embedding, task)
         evaluator = TextClassificationEvaluator()
         super().__init__(dataset, data_loader, transformation, model, evaluator)
