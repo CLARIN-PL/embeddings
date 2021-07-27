@@ -37,9 +37,21 @@ class StaticModelHubConfig:
 
 
 @dataclass
-class KGR10FastTextConfig(StaticModelHubConfig):
+class SingleFileConfig(StaticModelHubConfig):
+    model_name: str
+
+    @property
+    def cached_model(self) -> str:
+        url: str = self._get_file_hf_hub_url(self.model_name)
+        path: str = cached_download(url)
+        return path
+
+
+@dataclass
+class KGR10FastTextConfig(SingleFileConfig):
     method: Optional[Literal["cbow", "skipgram"]] = None
     dimension: Optional[Literal[100, 300]] = None
+    model_name: str = field(default=f"kgr10.plain.{method}.dim{dimension}.neg10.bin", init=False)
     repo_id: str = field(default="clarin-pl/fastText-kgr10", init=False)
 
     def __post_init__(self) -> None:
@@ -49,14 +61,7 @@ class KGR10FastTextConfig(StaticModelHubConfig):
         if not self.dimension:
             self.dimension = self.default_config["dimension"]
 
-    @property
-    def model_name(self) -> str:
-        return f"kgr10.plain.{self.method}.dim{self.dimension}.neg10.bin"
-
-    @property
-    def cached_model(self) -> str:
-        url: str = self._get_file_hf_hub_url(self.model_name)
-        return url
+        self.model_name = f"kgr10.plain.{self.method}.dim{self.dimension}.neg10.bin"
 
 
 class FlairFastTextEmbedding(FlairEmbedding):
@@ -65,8 +70,9 @@ class FlairFastTextEmbedding(FlairEmbedding):
 
 
 class KGR10FastTextEmbedding(FlairFastTextEmbedding):
-    def __init__(self, config: KGR10FastTextConfig, **load_model_kwargs: Any):
+    def __init__(self, config: SingleFileConfig, **load_model_kwargs: Any):
         super().__init__(config.cached_model, **load_model_kwargs)
+        self.config = config
 
     @staticmethod
     def get_config(config: dict[str, Any]) -> KGR10FastTextConfig:
