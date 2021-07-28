@@ -14,13 +14,13 @@ from embeddings.utils.utils import import_from_string
 
 
 @dataclass
-class KGR10FastTextTestConfig(SingleFileConfig):
+class DummyFastTextConfig(SingleFileConfig):
     repo_id: str = field(default="clarin-pl/fastText-kgr10", init=False)
     model_name: str = field(default="test/dummy.model.bin", init=False)
 
 
 def test_fasttext_embeddings_equal() -> None:
-    config = KGR10FastTextTestConfig()
+    config = DummyFastTextConfig()
     cls: Type[KGR10FastTextEmbedding] = import_from_string(config.type_reference)
     embedding = cls(config)
 
