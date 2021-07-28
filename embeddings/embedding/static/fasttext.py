@@ -1,50 +1,12 @@
+from abc import ABC
 from dataclasses import dataclass, field
 from typing import Any, Literal, Optional
 
-import srsly
 from flair.embeddings import FastTextEmbeddings
-from huggingface_hub import cached_download, hf_hub_url
 
 from embeddings.embedding.flair_embedding import FlairEmbedding
-
-
-@dataclass
-class StaticModelHubConfig:
-    repo_id: str
-
-    @property
-    def type_reference(self) -> str:
-        if isinstance(reference := self._load_hub_json("module.json")["type"], str):
-            return reference
-        else:
-            raise ValueError(f"Wrong format of import reference {reference}.")
-
-    @property
-    def default_config(self) -> dict[str, Any]:
-        if isinstance(config := self._load_hub_json("default_config.json"), dict):
-            return config
-        else:
-            raise ValueError(f"Wrong format of default config {config}.")
-
-    def _load_hub_json(self, filename: str) -> Any:
-        url = self._get_file_hf_hub_url(filename)
-        path = cached_download(url)
-        return srsly.read_json(path)
-
-    def _get_file_hf_hub_url(self, filename: str) -> str:
-        url: str = hf_hub_url(self.repo_id, filename=filename)
-        return url
-
-
-@dataclass
-class SingleFileConfig(StaticModelHubConfig):
-    model_name: str
-
-    @property
-    def cached_model(self) -> str:
-        url: str = self._get_file_hf_hub_url(self.model_name)
-        path: str = cached_download(url)
-        return path
+from embeddings.embedding.static.config import SingleFileConfig, StaticModelHubConfig
+from embeddings.embedding.static.word import StaticWordEmbedding
 
 
 @dataclass
@@ -64,22 +26,25 @@ class KGR10FastTextConfig(SingleFileConfig):
         self.model_name = f"kgr10.plain.{self.method}.dim{self.dimension}.neg10.bin"
 
 
+class SingleFileEmbedding(StaticWordEmbedding, ABC):
+    def __init__(self, config: SingleFileConfig, **load_model_kwargs: Any):
+        super().__init__(config.cached_model, **load_model_kwargs)
+        self.config = config
+
+
 class FlairFastTextEmbedding(FlairEmbedding):
     def _get_model(self) -> FastTextEmbeddings:
         return FastTextEmbeddings(self.name, **self.load_model_kwargs)
 
 
-class KGR10FastTextEmbedding(FlairFastTextEmbedding):
-    def __init__(self, config: SingleFileConfig, **load_model_kwargs: Any):
-        super().__init__(config.cached_model, **load_model_kwargs)
-        self.config = config
+class KGR10FastTextEmbedding(SingleFileEmbedding, FlairFastTextEmbedding):
+    @staticmethod
+    def get_config(**kwargs: Any) -> KGR10FastTextConfig:
+        return KGR10FastTextConfig(**kwargs)
 
     @staticmethod
-    def get_config(config: dict[str, Any]) -> KGR10FastTextConfig:
-        return KGR10FastTextConfig(**config)
-
-    @staticmethod
-    def from_config(config: StaticModelHubConfig) -> "KGR10FastTextEmbedding":
-        if isinstance(config, StaticModelHubConfig):
-            config = KGR10FastTextEmbedding.get_config(config.default_config)
+    def from_default_config(
+        config: StaticModelHubConfig, **kwargs: Any
+    ) -> "KGR10FastTextEmbedding":
+        config = KGR10FastTextEmbedding.get_config(**config.default_config)
         return KGR10FastTextEmbedding(config)
