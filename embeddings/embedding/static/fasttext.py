@@ -39,6 +39,12 @@ class FlairFastTextEmbedding(FlairEmbedding):
 
 class KGR10FastTextEmbedding(SingleFileEmbedding, FlairFastTextEmbedding):
     @staticmethod
+    def from_config(config: StaticModelHubConfig, **kwargs: Any) -> "KGR10FastTextEmbedding":
+        if not isinstance(config, KGR10FastTextConfig):
+            raise ValueError(f"Wrong config type {type(config)}, expected {KGR10FastTextConfig}.")
+        return KGR10FastTextEmbedding(config)
+
+    @staticmethod
     def get_config(**kwargs: Any) -> KGR10FastTextConfig:
         return KGR10FastTextConfig(**kwargs)
 
