@@ -10,7 +10,7 @@ class StaticModelHubConfig:
     repo_id: str
 
     @property
-    def type_reference(self) -> str:
+    def model_type_reference(self) -> str:
         if isinstance(reference := self._load_hub_json("module.json")["type"], str):
             return reference
         else:
