@@ -1,26 +1,23 @@
-from dataclasses import dataclass, field
 from typing import Type
 
+import pytest
 import torch
 from flair.data import Sentence
 from torch.testing import assert_close as assert_close
 
-from embeddings.embedding.static.config import SingleFileConfig
 from embeddings.embedding.static.fasttext import KGR10FastTextConfig, KGR10FastTextEmbedding
+from embeddings.embedding.static.word import AutoStaticWordEmbedding
 from embeddings.utils.utils import import_from_string
 
 
-@dataclass
-class DummyFastTextConfig(SingleFileConfig):
-    repo_id: str = field(default="clarin-pl/fastText-kgr10", init=False)
-    model_name: str = field(default="test/dummy.model.bin", init=False)
+@pytest.fixture
+def dummy_fasttext_config() -> KGR10FastTextConfig:
+    config = KGR10FastTextConfig()
+    config.model_name = "test/dummy.model.bin"
+    return config
 
 
-def test_fasttext_embeddings_equal() -> None:
-    config = DummyFastTextConfig()
-    cls: Type[KGR10FastTextEmbedding] = import_from_string(config.type_reference)
-    embedding = cls(config)
-
+def assert_close_embedding(embedding: KGR10FastTextEmbedding) -> None:
     sentence = Sentence("że Urban humor życie")
     embedding.embed([sentence])
 
@@ -56,6 +53,32 @@ def test_fasttext_embeddings_equal() -> None:
     )
 
 
+def test_fasttext_embeddings_equal(dummy_fasttext_config: KGR10FastTextConfig) -> None:
+    config = dummy_fasttext_config
+    cls: Type[KGR10FastTextEmbedding] = import_from_string(config.model_type_reference)
+    embedding = cls(config)
+    assert_close_embedding(embedding)
+
+
 def test_krg10_fasttext_default_config() -> None:
     config = KGR10FastTextConfig()
     assert config.model_name == "kgr10.plain.skipgram.dim300.neg10.bin"
+
+
+def test_init_kgr10_fasttext_from_config(dummy_fasttext_config: KGR10FastTextConfig) -> None:
+    config = dummy_fasttext_config
+    embedding = KGR10FastTextEmbedding.from_config(config)
+    assert_close_embedding(embedding)
+
+
+def test_automodel_passing_both_args(dummy_fasttext_config: KGR10FastTextConfig) -> None:
+    config = dummy_fasttext_config
+    with pytest.raises(ValueError):
+        AutoStaticWordEmbedding.from_hub(repo_id="test", config=config)
+
+
+def test_automodel_fast_text(dummy_fasttext_config: KGR10FastTextConfig) -> None:
+    config = dummy_fasttext_config
+    embedding = AutoStaticWordEmbedding.from_hub(config=config)
+    assert isinstance(embedding, KGR10FastTextEmbedding)
+    assert_close_embedding(embedding)
