@@ -3,6 +3,7 @@ from typing import Any
 
 import srsly
 from huggingface_hub import cached_download, hf_hub_url
+from requests import HTTPError
 
 
 @dataclass
@@ -25,7 +26,12 @@ class StaticModelHubConfig:
 
     def _load_hub_json(self, filename: str) -> Any:
         url = self._get_file_hf_hub_url(filename)
-        path = cached_download(url)
+        try:
+            path = cached_download(url)
+        except HTTPError:
+            raise EnvironmentError(
+                "Repository not found or wrong format of a given model (module.json not found)."
+            )
         return srsly.read_json(path)
 
     def _get_file_hf_hub_url(self, filename: str) -> str:
