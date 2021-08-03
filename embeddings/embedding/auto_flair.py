@@ -5,7 +5,7 @@ from embeddings.embedding.static.config import StaticModelHubConfig
 from embeddings.embedding.static.word import AutoStaticWordEmbedding
 
 
-class AutoWordEmbedding:
+class AutoFlairWordEmbedding:
     @staticmethod
     def from_hub(
         repo_id: Optional[str] = None,
