@@ -18,7 +18,7 @@ def test_automodel_transformer() -> None:
 
 def test_automodel_error_repo_not_found() -> None:
     with pytest.raises(EnvironmentError):
-        AutoWordEmbedding.from_hub(repo_id="repo_name_that_dont_exist")
+        AutoWordEmbedding.from_hub(repo_id="name_of_repo_that_does_not_exist")
 
 
 def test_automodel_error_wrong_format() -> None:
