@@ -5,7 +5,6 @@ import torch
 from flair.data import Sentence
 from torch.testing import assert_close as assert_close
 
-from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
 from embeddings.embedding.static.fasttext import KGR10FastTextConfig, KGR10FastTextEmbedding
 from embeddings.embedding.static.word import AutoStaticWordEmbedding
 from embeddings.utils.utils import import_from_string
@@ -36,24 +35,23 @@ def test_init_kgr10_fasttext_from_config(dummy_fasttext_config: KGR10FastTextCon
     assert_close_embedding(embedding)
 
 
-def test_automodel_passing_both_args(dummy_fasttext_config: KGR10FastTextConfig) -> None:
-    config = dummy_fasttext_config
-    with pytest.raises(ValueError):
-        AutoStaticWordEmbedding.from_hub(repo_id="test", config=config)
-
-
 def test_static_automodel_fast_text(dummy_fasttext_config: KGR10FastTextConfig) -> None:
     config = dummy_fasttext_config
-    embedding = AutoStaticWordEmbedding.from_hub(config=config)
+    embedding = AutoStaticWordEmbedding.from_config(config=config)
     assert isinstance(embedding, KGR10FastTextEmbedding)
     assert_close_embedding(embedding)
 
 
-def test_automodel_fast_text(dummy_fasttext_config: KGR10FastTextConfig) -> None:
-    config = dummy_fasttext_config
-    embedding = AutoFlairWordEmbedding.from_hub(config=config)
-    assert isinstance(embedding, KGR10FastTextEmbedding)
-    assert_close_embedding(embedding)
+def test_static_automodel_error_repo_not_found() -> None:
+    with pytest.raises(EnvironmentError):
+        AutoStaticWordEmbedding.from_default_config(repo_id="name_of_repo_that_does_not_exist")
+
+
+def test_static_automodel_error_wrong_format() -> None:
+    with pytest.raises(EnvironmentError):
+        AutoStaticWordEmbedding.from_default_config(
+            repo_id="sentence-transformers/average_word_embeddings_glove.6B.300d"
+        )
 
 
 def assert_close_embedding(embedding: KGR10FastTextEmbedding) -> None:
