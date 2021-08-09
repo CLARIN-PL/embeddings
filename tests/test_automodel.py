@@ -1,12 +1,9 @@
-from unittest.mock import MagicMock
-
 import pytest
 from flair.embeddings import TransformerWordEmbeddings
 from transformers import BertModel
 
 from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
 from embeddings.embedding.flair_embedding import FlairTransformerWordEmbedding
-from embeddings.embedding.static.config import StaticModelHubConfig
 
 
 def test_automodel_transformer() -> None:
@@ -26,9 +23,3 @@ def test_automodel_error_wrong_format() -> None:
         AutoFlairWordEmbedding.from_hub(
             repo_id="sentence-transformers/average_word_embeddings_glove.6B.300d"
         )
-
-
-def test_automodel_fast_text_error() -> None:
-    config = MagicMock(spec=StaticModelHubConfig)
-    with pytest.raises(ValueError):
-        AutoFlairWordEmbedding.from_hub(repo_id="repo_name", config=config)

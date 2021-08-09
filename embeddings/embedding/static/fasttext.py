@@ -45,12 +45,12 @@ class KGR10FastTextEmbedding(SingleFileEmbedding, FlairFastTextEmbedding):
         return KGR10FastTextEmbedding(config)
 
     @staticmethod
-    def get_config(**kwargs: Any) -> KGR10FastTextConfig:
-        return KGR10FastTextConfig(**kwargs)
-
-    @staticmethod
     def from_default_config(
         config: StaticModelHubConfig, **kwargs: Any
     ) -> "KGR10FastTextEmbedding":
         config = KGR10FastTextEmbedding.get_config(**config.default_config)
         return KGR10FastTextEmbedding(config)
+
+    @staticmethod
+    def get_config(**kwargs: Any) -> KGR10FastTextConfig:
+        return KGR10FastTextConfig(**kwargs)
