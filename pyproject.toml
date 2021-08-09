@@ -49,7 +49,7 @@ isort = "isort .  -c"
 black_fix = "black ./"
 isort_fix = "isort . "
 pyflakes = "pyflakes ."
-mypy = "mypy --strict ."
+mypy = "mypy ."
 test = "pytest"
 check = ["black", "isort", "mypy", "pyflakes"]
 fix = ["black_fix", "isort_fix"]
@@ -62,10 +62,7 @@ developer = ["black", "mypy", "typing-extensions"]
 requires = ["poetry>=1.1.5"]
 build-backend = "poetry.masonry.api"
 
-[mypy]
-python_version = 3.8
-
-[pytest]
+[tool.pytest.ini_options]
 testpaths = "tests"
 
 [tool.black]
@@ -73,6 +70,28 @@ line-length = 100
 
 [tool.isort]
 line_length = 100
-known_first_party = 'embeddings'
+known_first_party = "embeddings"
 known_third_party = ["click", "pytest"]
 profile = "black"
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+
+[[tool.mypy.overrides]]
+module = [
+    "datasets",
+    "flair.*",
+    "numpy",
+    "sklearn.*",
+    "srsly",
+    "tqdm.*",
+    "transformers"
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "spacy.*",
+]
+implicit_reexport = true
