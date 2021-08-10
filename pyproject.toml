@@ -15,7 +15,6 @@ packages = [
     { include = "embeddings" },
     { include = "experimental/**/*.py" },
     { include = "embeddings/**/*.py" },
-    { include = "py.typed" },
 ]
 
 [tool.poetry.dependencies]
