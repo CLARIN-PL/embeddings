@@ -94,6 +94,19 @@ The example with default language model and dataset.
 python evaluate_sequence_tagging.py
 ```
 
+# Compatible datasets
+There are several datasets available in the huggingface repository that are 
+compatible with our pipeline.
+
+| dataset name               	| task type                                 	| input_column_name(s)       	| target_column_name  	| url                                                        	|
+|----------------------------	|-------------------------------------------	|----------------------------	|---------------------	|------------------------------------------------------------	|
+| nkjp-ner                   	| classification (named entity recognition) 	| sentence                   	| target              	| https://huggingface.co/datasets/nkjp-ner                   	|
+| clarin-pl/polemo2-official 	| classification                            	| text                       	| target              	| https://huggingface.co/datasets/clarin-pl/polemo2-official 	|
+| cdsc<br>(cdsc-e)*             | pair classification                       	| (sentence_A, sentence_B)   	| entailment_judgment 	| https://huggingface.co/datasets/cdsc                       	|
+| dyk**                        	| question answering, pair classification   	| (question, answer)           	| target              	| https://huggingface.co/datasets/dyk                        	|
+| psc**                        	| text summarization, pair classification   	| (extract_text, summary_text) 	| label               	| https://huggingface.co/datasets/psc                        	|
+*to load the dataset pass name='cdsc-e' in load_dataset_kwargs: HuggingFaceDataset("cdsc", name="cdsc-e")   
+**only pair classification task is supported for now 
 # Passing task model and task training parameters to predefined pipelines
 
 Model and training parameters can be controlled via `task_model_kwargs` and 
