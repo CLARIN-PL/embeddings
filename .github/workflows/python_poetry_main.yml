@@ -24,6 +24,8 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install deps
         run: poetry install -vv
+      - name: Install extras
+        run: poetry install -E pymagnitude
       - name: Run tests
         run: poetry run poe test
   lint:
