@@ -42,18 +42,6 @@ def test_static_automodel_fast_text(dummy_fasttext_config: KGR10FastTextConfig) 
     assert_close_embedding(embedding)
 
 
-def test_static_automodel_error_repo_not_found() -> None:
-    with pytest.raises(EnvironmentError):
-        AutoStaticWordEmbedding.from_default_config(repo_id="name_of_repo_that_does_not_exist")
-
-
-def test_static_automodel_error_wrong_format() -> None:
-    with pytest.raises(EnvironmentError):
-        AutoStaticWordEmbedding.from_default_config(
-            repo_id="sentence-transformers/average_word_embeddings_glove.6B.300d"
-        )
-
-
 def assert_close_embedding(embedding: KGR10FastTextEmbedding) -> None:
     sentence = Sentence("Polska należy do Unii Europejskiej.")
     embedding.embed([sentence])
