@@ -1,12 +1,12 @@
 from dataclasses import dataclass, field
 from typing import Any, Literal, Optional
 
-from embeddings.embedding.static.config import GensimFileConfig, StaticModelHubConfig
+from embeddings.embedding.static.config import SingleFileConfig, StaticModelHubConfig
 from embeddings.embedding.static.embedding import SingleFileEmbedding, StandardStaticWordEmbedding
 
 
 @dataclass
-class KGR10Word2VecConfig(GensimFileConfig):
+class KGR10Word2VecConfig(SingleFileConfig):
     method: Optional[Literal["cbow", "skipgram"]] = None
     hs: Optional[bool] = None
     mwe: Optional[bool] = None
@@ -17,17 +17,16 @@ class KGR10Word2VecConfig(GensimFileConfig):
         if not self.method:
             self.method = self.default_config["method"]
 
-        if self.hs is None:
+        if not self.hs:
             self.hs = self.default_config["hs"]
 
-        if self.mwe is None:
+        if not self.mwe:
             self.mwe = self.default_config["mwe"]
 
         sampling = "hs" if self.hs else "ns"
         ngrams = "mwe" if self.mwe else "plain"
 
         self.model_name = f"{self.method}.v300.m8.{sampling}.{ngrams}.w2v.gensim"
-        self.ensure_model_accessible(self.model_name)
 
 
 class KGR10Word2VecEmbedding(SingleFileEmbedding, StandardStaticWordEmbedding):

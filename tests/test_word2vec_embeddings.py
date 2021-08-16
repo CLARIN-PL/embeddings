@@ -5,7 +5,6 @@ import torch
 from flair.data import Sentence
 from torch.testing import assert_close
 
-from embeddings.embedding.static.word import AutoStaticWordEmbedding
 from embeddings.embedding.static.word2vec import KGR10Word2VecConfig, KGR10Word2VecEmbedding
 from embeddings.utils.utils import import_from_string
 
@@ -26,24 +25,6 @@ def test_word2vec_embeddings_equal(dummy_word2vec_config: KGR10Word2VecConfig) -
     cls: Type[KGR10Word2VecEmbedding] = import_from_string(config.model_type_reference)
     embedding = cls(config)
     assert_close_embedding(embedding)
-
-
-def test_init_kgr10_word2vec_from_config(dummy_word2vec_config: KGR10Word2VecConfig) -> None:
-    config = dummy_word2vec_config
-    embedding = KGR10Word2VecEmbedding.from_config(config)
-    assert_close_embedding(embedding)
-
-
-def test_static_automodel_word2vec(dummy_word2vec_config: KGR10Word2VecConfig) -> None:
-    config = dummy_word2vec_config
-    embedding = AutoStaticWordEmbedding.from_config(config=config)
-    assert isinstance(embedding, KGR10Word2VecEmbedding)
-    assert_close_embedding(embedding)
-
-
-def test_not_available_config() -> None:
-    with pytest.raises(ValueError):
-        KGR10Word2VecConfig(method="cbow", hs=False)
 
 
 def assert_close_embedding(embedding: KGR10Word2VecEmbedding) -> None:
