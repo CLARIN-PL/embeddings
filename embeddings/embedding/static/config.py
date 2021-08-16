@@ -5,6 +5,10 @@ import srsly
 from huggingface_hub import cached_download, hf_hub_url
 from requests import HTTPError
 
+from embeddings.utils.loggers import get_logger
+
+_logger = get_logger(__name__)
+
 
 @dataclass
 class StaticModelHubConfig:
@@ -47,4 +51,23 @@ class SingleFileConfig(StaticModelHubConfig):
     def cached_model(self) -> str:
         url: str = self._get_file_hf_hub_url(self.model_name)
         path: str = cached_download(url)
+        return path
+
+
+@dataclass
+class GensimFileConfig(SingleFileConfig):
+    model_name: str
+
+    @property
+    def cached_model(self) -> str:
+        url: str = self._get_file_hf_hub_url(self.model_name)
+        path: str = cached_download(url)
+
+        npy_vectors_url: str = self._get_file_hf_hub_url(f"{self.model_name}.vectors.npy")
+
+        try:
+            cached_download(npy_vectors_url, force_filename=f"{path}.vectors.npy")
+        except HTTPError:
+            _logger.info(f"{self.model_name}.vectors.npy not found, skipping it.")
+
         return path
