@@ -29,9 +29,10 @@ datasets = "1.6.1"
 Pillow = "8.2.0"
 tensorboard = "2.4.1"
 typer = "0.3.2"
-spacy = "3.1.0"
 seqeval = "1.2.2"
 numpy = "1.19.5"
+pymagnitude = { version="0.1.143", optional=true}
+
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.4"
@@ -57,6 +58,7 @@ all = ["check", "test"]
 
 [tool.poetry.extras]
 developer = ["black", "mypy", "typing-extensions"]
+pymagnitude = ["pymagnitude"]
 
 [build-system]
 requires = ["poetry>=1.1.5"]
@@ -88,6 +90,10 @@ module = [
     "tqdm.*",
     "transformers",
     "huggingface_hub",
+    "pymagnitude",
+    "spacy.*",
+    "spacy",
+    "appdirs",
 ]
 ignore_missing_imports = true
 
