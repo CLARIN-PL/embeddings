@@ -106,8 +106,9 @@ compatible with our pipeline.
 | dyk**                        	| question answering, pair classification   	| (question, answer)           	| target              	| https://huggingface.co/datasets/dyk                        	|
 | psc**                        	| text summarization, pair classification   	| (extract_text, summary_text) 	| label               	| https://huggingface.co/datasets/psc                        	|
 <br />
-*to load the dataset pass name='cdsc-e' in load_dataset_kwargs: HuggingFaceDataset("cdsc", name="cdsc-e")   
-**only pair classification task is supported for now 
+<sup>*to load the dataset pass name='cdsc-e' in load_dataset_kwargs: HuggingFaceDataset("cdsc", name="cdsc-e")</sup><br />
+<sup>**only pair classification task is supported for now</sup>
+
 # Passing task model and task training parameters to predefined pipelines
 
 Model and training parameters can be controlled via `task_model_kwargs` and 
