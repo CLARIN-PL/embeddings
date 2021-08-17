@@ -10,5 +10,5 @@ class Model(abc.ABC, Generic[Input, Output]):
         pass
 
     @abc.abstractmethod
-    def model(self, data: Input) -> Output:
+    def execute(self, data: Input) -> Output:
         pass

@@ -6,7 +6,7 @@ import numpy as np
 from embeddings.metric.hugging_face_metric import HuggingFaceMetric
 
 
-class POSTaggingSeqevalMetric(HuggingFaceMetric):
+class UnitSeqevalMetric(HuggingFaceMetric):
     ALLOWED_TAG_PREFIXES = {"U-"}
 
     def __init__(self) -> None:
@@ -22,7 +22,7 @@ class POSTaggingSeqevalMetric(HuggingFaceMetric):
     def _have_tags_unit_prefix(tags: np.ndarray) -> bool:
         unique_tags = set(chain.from_iterable(tags))
         tag_prefixes = set(it[0:2] for it in unique_tags)
-        return not tag_prefixes.difference(POSTaggingSeqevalMetric.ALLOWED_TAG_PREFIXES)
+        return not tag_prefixes.difference(UnitSeqevalMetric.ALLOWED_TAG_PREFIXES)
 
     def compute(self, y_true: np.ndarray, y_pred: np.ndarray, **kwargs: Any) -> Dict[str, Any]:
         if not self._have_tags_unit_prefix(y_pred):
@@ -33,4 +33,4 @@ class POSTaggingSeqevalMetric(HuggingFaceMetric):
         return super().compute(y_true=y_true, y_pred=y_pred, **kwargs)
 
     def __str__(self) -> str:
-        return "POSTaggingSeqeval"
+        return "UnitSeqeval"

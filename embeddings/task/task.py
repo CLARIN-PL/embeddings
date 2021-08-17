@@ -11,5 +11,5 @@ class Task(ABC, Generic[Input, Output]):
         pass
 
     @abc.abstractmethod
-    def task(self, data: Input) -> Output:
+    def fit_predict(self, data: Input) -> Output:
         pass
