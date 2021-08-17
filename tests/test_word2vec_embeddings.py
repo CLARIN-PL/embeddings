@@ -41,6 +41,11 @@ def test_static_automodel_word2vec(dummy_word2vec_config: KGR10Word2VecConfig) -
     assert_close_embedding(embedding)
 
 
+def test_not_available_config() -> None:
+    with pytest.raises(ValueError):
+        KGR10Word2VecConfig(method="cbow", hs=False)
+
+
 def assert_close_embedding(embedding: KGR10Word2VecEmbedding) -> None:
     sentence = Sentence("Nie zmniejszyło mienności. Wietnam.")
     embedding.embed([sentence])
