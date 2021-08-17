@@ -94,6 +94,21 @@ The example with default language model and dataset.
 python evaluate_sequence_tagging.py
 ```
 
+# Compatible datasets
+There are several datasets available in the huggingface repository that are 
+compatible with our pipeline.
+
+| dataset name               	| task type                                 	| input_column_name(s)       	| target_column_name  	| description                                                        	|
+|----------------------------	|-------------------------------------------	|----------------------------	|---------------------	|------------------------------------------------------------	        |
+| [nkjp-ner](https://huggingface.co/datasets/nkjp-ner)                   	| classification (named entity recognition) 	| sentence                   	| target              	| The manually annotated 1-million word subcorpus of the National Corpus of Polish.                 	   |
+| [clarin-pl/polemo2-official](https://huggingface.co/datasets/clarin-pl/polemo2-official ) 	| classification  (sentiment analysis)          | text      | target              	| A corpus of consumer reviews from 4 domains: medicine, hotels, products and school.	               |
+| [cdsc<br>(cdsc-e)*](https://huggingface.co/datasets/cdsc)             | textual entailment, pair classification           | (sentence_A, sentence_B)   	| entailment_judgment 	| The polish sentence pairs which are human-annotated for semantic relatedness and entailment.          |
+| [dyk**](https://huggingface.co/datasets/dyk)                        	| question answering, pair classification   	    | (question, answer)           	| target              	| The Did You Know (pol. Czy wiesz?) dataset consists of human-annotated question-answer pairs         |
+| [psc**](https://huggingface.co/datasets/psc)                        	| text summarization, pair classification   	    | (extract_text, summary_text) 	| label               	| The Polish Summaries Corpus contains news articles and their summaries.                        	   |
+<br />
+<sup>*to load the dataset pass name='cdsc-e' in load_dataset_kwargs: HuggingFaceDataset("cdsc", name="cdsc-e")</sup><br />
+<sup>**only pair classification task is supported for now</sup>
+
 # Passing task model and task training parameters to predefined pipelines
 
 Model and training parameters can be controlled via `task_model_kwargs` and 
