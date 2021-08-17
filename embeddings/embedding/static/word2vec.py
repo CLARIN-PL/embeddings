@@ -17,10 +17,10 @@ class KGR10Word2VecConfig(GensimFileConfig):
         if not self.method:
             self.method = self.default_config["method"]
 
-        if not self.hs:
+        if self.hs is None:
             self.hs = self.default_config["hs"]
 
-        if not self.mwe:
+        if self.mwe is None:
             self.mwe = self.default_config["mwe"]
 
         sampling = "hs" if self.hs else "ns"
