@@ -1,6 +1,6 @@
 import abc
 from abc import ABC
-from typing import Any, List, Union
+from typing import Any, List
 
 from flair.data import Sentence
 from flair.embeddings import (
@@ -46,21 +46,29 @@ class FlairTransformerDocumentEmbedding(FlairTransformerEmbedding):
         return TransformerDocumentEmbeddings(self.name, **self.load_model_kwargs)
 
 
-class FlairDocumentPoolEmbedding(Embedding[List[Sentence], List[Sentence]]):
+class FlairDocumentPoolEmbedding(FlairEmbedding):
     def __init__(
         self,
-        embeddings: Union[FlairEmbedding, List[FlairEmbedding]],
+        word_embedding: FlairEmbedding,
         pooling: str = "mean",
         **kwargs: Any,
     ):
-        super().__init__()
-        embeddings = [embeddings] if isinstance(embeddings, FlairEmbedding) else embeddings
-        embeddings = [e.model for e in embeddings]
-        for e in embeddings:
-            if not isinstance(e, TokenEmbeddings):
-                raise ValueError(f"{object.__repr__(e)} is not an instance of {TokenEmbeddings}.")
-        self.model = DocumentPoolEmbeddings(embeddings, pooling=pooling, **kwargs)
+        if not isinstance(word_embedding.model, TokenEmbeddings):
+            raise ValueError(
+                f"{object.__repr__(word_embedding.model)} is not an instance of {TokenEmbeddings}."
+            )
+
+        self.word_embedding = word_embedding
+        self.pooling = pooling
+        self.kwargs = kwargs
+
+        super().__init__(f"{word_embedding.name} (pooling: {pooling}")
 
     def embed(self, data: List[Sentence]) -> List[Sentence]:
         self.model.embed(data)
         return data
+
+    def _get_model(self) -> Embeddings:
+        return DocumentPoolEmbeddings(
+            [self.word_embedding.model], pooling=self.pooling, **self.kwargs
+        )

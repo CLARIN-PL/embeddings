@@ -17,7 +17,7 @@ def dummy_fasttext_config() -> KGR10FastTextConfig:
     return config
 
 
-def test_fasttext_embeddings_equal(dummy_fasttext_config: KGR10FastTextConfig) -> None:
+def test_fasttext_embeddings_close(dummy_fasttext_config: KGR10FastTextConfig) -> None:
     config = dummy_fasttext_config
     cls: Type[KGR10FastTextEmbedding] = import_from_string(config.model_type_reference)
     embedding = cls(config)
@@ -40,6 +40,13 @@ def test_static_automodel_fast_text(dummy_fasttext_config: KGR10FastTextConfig) 
     embedding = AutoStaticWordEmbedding.from_config(config=config)
     assert isinstance(embedding, KGR10FastTextEmbedding)
     assert_close_embedding(embedding)
+
+
+# def test_static_automodel_fast_text(dummy_fasttext_config: KGR10FastTextConfig) -> None:
+#     config = dummy_fasttext_config
+#     embedding = AutoStaticWordEmbedding.from_config(config=config)
+#     assert isinstance(embedding, KGR10FastTextEmbedding)
+#     assert_close_embedding(embedding)
 
 
 def assert_close_embedding(embedding: KGR10FastTextEmbedding) -> None:
