@@ -5,7 +5,7 @@ import torch
 from flair.data import Sentence
 from torch.testing import assert_close
 
-from embeddings.embedding.static.word import AutoStaticWordEmbedding
+from embeddings.embedding.static.embedding import AutoStaticWordEmbedding
 from embeddings.embedding.static.word2vec import KGR10Word2VecConfig, KGR10Word2VecEmbedding
 from embeddings.utils.utils import import_from_string
 

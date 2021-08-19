@@ -5,8 +5,8 @@ import torch
 from flair.data import Sentence
 from torch.testing import assert_close as assert_close
 
+from embeddings.embedding.static.embedding import AutoStaticWordEmbedding
 from embeddings.embedding.static.fasttext import KGR10FastTextConfig, KGR10FastTextEmbedding
-from embeddings.embedding.static.word import AutoStaticWordEmbedding
 from embeddings.utils.utils import import_from_string
 
 

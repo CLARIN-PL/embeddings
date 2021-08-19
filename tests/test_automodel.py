@@ -13,7 +13,7 @@ from embeddings.embedding.flair_embedding import (
     FlairTransformerDocumentEmbedding,
     FlairTransformerWordEmbedding,
 )
-from embeddings.embedding.static.word import AutoStaticWordEmbedding
+from embeddings.embedding.static.embedding import AutoStaticWordEmbedding
 
 
 def test_automodel_word_transformer() -> None:
