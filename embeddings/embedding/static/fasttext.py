@@ -23,6 +23,7 @@ class KGR10FastTextConfig(SingleFileConfig):
             self.dimension = self.default_config["dimension"]
 
         self.model_name = f"kgr10.plain.{self.method}.dim{self.dimension}.neg10.bin"
+        self.ensure_model_accessible(self.model_name)
 
 
 class FlairFastTextEmbedding(FlairEmbedding):

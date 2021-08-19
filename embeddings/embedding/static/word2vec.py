@@ -27,12 +27,7 @@ class KGR10Word2VecConfig(GensimFileConfig):
         ngrams = "mwe" if self.mwe else "plain"
 
         self.model_name = f"{self.method}.v300.m8.{sampling}.{ngrams}.w2v.gensim"
-
-        if not self.file_accessible(self.model_name):
-            raise ValueError(
-                f"Model for the given configuration is not accessible. Change config."
-                f"\nUrl: {self._get_file_hf_hub_url(self.model_name)}"
-            )
+        self.ensure_model_accessible(self.model_name)
 
 
 class KGR10Word2VecEmbedding(SingleFileEmbedding, StandardStaticWordEmbedding):

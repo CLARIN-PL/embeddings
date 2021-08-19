@@ -62,6 +62,13 @@ class SingleFileConfig(StaticModelHubConfig):
         path: str = cached_download(url)
         return path
 
+    def ensure_model_accessible(self, filename: str) -> None:
+        if not self.file_accessible(filename):
+            raise ValueError(
+                f"Model for the given configuration is not accessible. Change config."
+                f"\nUrl: {self._get_file_hf_hub_url(filename)}"
+            )
+
 
 @dataclass
 class GensimFileConfig(SingleFileConfig):
