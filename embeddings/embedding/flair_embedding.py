@@ -58,7 +58,7 @@ class FlairDocumentPoolEmbedding(Embedding[List[Sentence], List[Sentence]]):
         embeddings = [e.model for e in embeddings]
         for e in embeddings:
             if not isinstance(e, TokenEmbeddings):
-                raise ValueError(f"{e} is not an instance of {TokenEmbeddings}.")
+                raise ValueError(f"{object.__repr__(e)} is not an instance of {TokenEmbeddings}.")
         self.model = DocumentPoolEmbeddings(embeddings, pooling=pooling, **kwargs)
 
     def embed(self, data: List[Sentence]) -> List[Sentence]:
