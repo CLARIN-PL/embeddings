@@ -1,4 +1,3 @@
-from abc import ABC
 from dataclasses import dataclass, field
 from typing import Any, Literal, Optional
 
@@ -6,14 +5,14 @@ from flair.embeddings import FastTextEmbeddings
 
 from embeddings.embedding.flair_embedding import FlairEmbedding
 from embeddings.embedding.static.config import SingleFileConfig, StaticModelHubConfig
-from embeddings.embedding.static.word import StaticWordEmbedding
+from embeddings.embedding.static.embedding import SingleFileEmbedding
 
 
 @dataclass
 class KGR10FastTextConfig(SingleFileConfig):
     method: Optional[Literal["cbow", "skipgram"]] = None
     dimension: Optional[Literal[100, 300]] = None
-    model_name: str = field(default=f"kgr10.plain.{method}.dim{dimension}.neg10.bin", init=False)
+    model_name: str = field(init=False)
     repo_id: str = field(default="clarin-pl/fastText-kgr10", init=False)
 
     def __post_init__(self) -> None:
@@ -24,12 +23,7 @@ class KGR10FastTextConfig(SingleFileConfig):
             self.dimension = self.default_config["dimension"]
 
         self.model_name = f"kgr10.plain.{self.method}.dim{self.dimension}.neg10.bin"
-
-
-class SingleFileEmbedding(StaticWordEmbedding, ABC):
-    def __init__(self, config: SingleFileConfig, **load_model_kwargs: Any):
-        super().__init__(config.cached_model, **load_model_kwargs)
-        self.config = config
+        self.ensure_model_accessible(self.model_name)
 
 
 class FlairFastTextEmbedding(FlairEmbedding):
