@@ -10,7 +10,7 @@ from flair.data import Corpus
 
 from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
 from embeddings.data.hugging_face_dataset import HuggingFaceDataset
-from embeddings.embedding.flair_embedding import FlairTransformerDocumentEmbedding
+from embeddings.embedding.auto_flair import AutoFlairDocumentEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -35,7 +35,7 @@ def text_pair_classification_pipeline(
     transformation = PairClassificationCorpusTransformation(
         ("sentence_1", "sentence_2"), "label"
     ).then(DownsampleFlairCorpusTransformation(percentage=0.1))
-    embedding = FlairTransformerDocumentEmbedding("allegro/herbert-base-cased")
+    embedding = AutoFlairDocumentEmbedding.from_hub("allegro/herbert-base-cased")
     task = TextPairClassification(result_path.name, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(embedding, task)
     evaluator = TextClassificationEvaluator()

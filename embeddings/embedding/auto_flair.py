@@ -10,6 +10,9 @@ from embeddings.embedding.static.embedding import (
     AutoStaticDocumentEmbedding,
     AutoStaticWordEmbedding,
 )
+from embeddings.utils.loggers import get_logger
+
+_logger = get_logger(__name__)
 
 
 class AutoFlairEmbedding(ABC):
@@ -24,6 +27,13 @@ class AutoFlairEmbedding(ABC):
         """
         pass
 
+    @staticmethod
+    def _log_info_static(repo_id: str) -> None:
+        _logger.info(
+            f"{repo_id} not compatible with Transformers, trying to initialise as "
+            f"static embedding."
+        )
+
 
 class AutoFlairWordEmbedding(AutoFlairEmbedding):
     @staticmethod
@@ -31,6 +41,7 @@ class AutoFlairWordEmbedding(AutoFlairEmbedding):
         try:
             return FlairTransformerWordEmbedding(repo_id, **kwargs)
         except EnvironmentError:
+            AutoFlairWordEmbedding._log_info_static(repo_id)
             return AutoStaticWordEmbedding.from_default_config(repo_id, **kwargs)
 
 
@@ -43,4 +54,5 @@ class AutoFlairDocumentEmbedding(AutoFlairEmbedding):
         try:
             return FlairTransformerDocumentEmbedding(repo_id, **kwargs)
         except EnvironmentError:
+            AutoFlairDocumentEmbedding._log_info_static(repo_id)
             return AutoStaticDocumentEmbedding.from_default_config(repo_id, **kwargs)
