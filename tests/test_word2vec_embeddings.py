@@ -46,6 +46,14 @@ def test_not_available_config() -> None:
         KGR10Word2VecConfig(method="cbow", hs=False)
 
 
+def test_available_config_model_1() -> None:
+    KGR10Word2VecConfig(method="cbow", hs=True, dimension=300, mwe=True)
+
+
+def test_available_config_model_2() -> None:
+    KGR10Word2VecConfig(method="skipgram", hs=False, dimension=300, mwe=True)
+
+
 def assert_close_embedding(embedding: KGR10Word2VecEmbedding) -> None:
     sentence = Sentence("Nie zmniejszyło mienności. Wietnam.")
     embedding.embed([sentence])

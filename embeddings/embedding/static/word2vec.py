@@ -8,6 +8,7 @@ from embeddings.embedding.static.embedding import SingleFileEmbedding, StandardS
 @dataclass
 class KGR10Word2VecConfig(GensimFileConfig):
     method: Optional[Literal["cbow", "skipgram"]] = None
+    dimension: Optional[Literal[100, 300]] = None
     hs: Optional[bool] = None
     mwe: Optional[bool] = None
     model_name: str = field(init=False)
@@ -16,6 +17,9 @@ class KGR10Word2VecConfig(GensimFileConfig):
     def __post_init__(self) -> None:
         if not self.method:
             self.method = self.default_config["method"]
+
+        if not self.dimension:
+            self.dimension = self.default_config["dimension"]
 
         if self.hs is None:
             self.hs = self.default_config["hs"]
@@ -26,7 +30,7 @@ class KGR10Word2VecConfig(GensimFileConfig):
         sampling = "hs" if self.hs else "ns"
         ngrams = "mwe" if self.mwe else "plain"
 
-        self.model_name = f"{self.method}.v300.m8.{sampling}.{ngrams}.w2v.gensim"
+        self.model_name = f"{self.method}.v{self.dimension}.m8.{sampling}.{ngrams}.w2v.gensim"
 
         if not self.file_accessible(self.model_name):
             raise ValueError(
