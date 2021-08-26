@@ -24,6 +24,12 @@ class KGR10FastTextConfig(SingleFileConfig):
 
         self.model_name = f"kgr10.plain.{self.method}.dim{self.dimension}.neg10.bin"
 
+        if not self.file_accessible(self.model_name):
+            raise ValueError(
+                f"Model for the given configuration is not accessible. Change config."
+                f"\nUrl: {self._get_file_hf_hub_url(self.model_name)}"
+            )
+
 
 class FlairFastTextEmbedding(FlairEmbedding):
     def _get_model(self) -> FastTextEmbeddings:
