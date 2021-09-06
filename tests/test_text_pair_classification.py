@@ -53,8 +53,7 @@ def test_text_pair_classification_pipeline(
     pipeline, path = text_pair_classification_pipeline
     result = pipeline.run()
     path.cleanup()
-    pprint(result)
     np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.0789473)
-    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.0547785)
-    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.0958230)
-    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.1212121)
+    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.0133037)
+    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.0071770)
+    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.0909090)

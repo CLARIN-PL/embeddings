@@ -79,7 +79,7 @@ def test_pos_tagging_pipeline(
     result = pipeline.run()
     path.cleanup()
 
-    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.14788732394366197)
+    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.2464788)
 
 
 def test_ner_tagging_pipeline(
