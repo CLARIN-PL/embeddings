@@ -10,13 +10,6 @@ from embeddings.embedding.static.word2vec import KGR10Word2VecConfig, KGR10Word2
 from embeddings.utils.utils import import_from_string
 
 
-@pytest.fixture
-def dummy_word2vec_config() -> KGR10Word2VecConfig:
-    config = KGR10Word2VecConfig()
-    config.model_name = "test/dummy.model.gensim"
-    return config
-
-
 def test_default_config() -> None:
     assert KGR10Word2VecConfig().model_name == "cbow.v300.m8.hs.mwe.w2v.gensim"
 
