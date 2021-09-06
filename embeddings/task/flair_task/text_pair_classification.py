@@ -21,5 +21,6 @@ class TextPairClassification(TextClassification):
         self.model = TextPairClassifier(
             document_embeddings=embedding.model,
             label_dictionary=y_dictionary,
+            label_type="class",
             **self.task_model_kwargs
         )

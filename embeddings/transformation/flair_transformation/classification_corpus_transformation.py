@@ -18,7 +18,7 @@ class ClassificationCorpusTransformation(CorpusTransformation):
             hf_datadict[subset_name].column_names.index(self.input_column_name): "text",
             hf_datadict[subset_name].column_names.index(self.target_column_name): "label",
         }
-        return CSVClassificationDataset(csv_path, column_name_map)
+        return CSVClassificationDataset(csv_path, column_name_map, label_type="class")
 
     def _save_to_csv(
         self, hf_datadict: datasets.DatasetDict, subset_name: str, csv_path: Path

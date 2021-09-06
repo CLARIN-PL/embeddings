@@ -23,6 +23,7 @@ class TextClassification(FlairTask):
         self.model = TextClassifier(
             document_embeddings=embedding.model,
             label_dictionary=y_dictionary,
+            label_type="class",
             **self.task_model_kwargs
         )
 

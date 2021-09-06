@@ -24,7 +24,7 @@ class PairClassificationCorpusTransformation(ClassificationCorpusTransformation)
 
     def _preprocess_subset(
         self, hf_datadict: datasets.DatasetDict, subset_name: str, output_path: Path
-    ) -> DataPairDataset:
+    ) -> CSVClassificationDataset:
         csv_path = output_path.joinpath(f"{subset_name}.csv")
         self._save_to_csv(hf_datadict, subset_name, csv_path)
 
@@ -36,7 +36,7 @@ class PairClassificationCorpusTransformation(ClassificationCorpusTransformation)
             )
         # todo: change that function call for _to_csv_classification_dataset after a new flair
         #  release for code coherence
-        return self._to_data_pair_dataset(hf_datadict, subset_name, output_path)
+        return self._to_csv_classification_dataset(hf_datadict, subset_name, output_path)
 
     def _to_data_pair_dataset(
         self, hf_datadict: datasets.DatasetDict, subset_name: str, output_path: Path
@@ -66,7 +66,8 @@ class PairClassificationCorpusTransformation(ClassificationCorpusTransformation)
             hf_datadict[subset_name].column_names.index(self.target_column_name): "label",
         }
 
-        return CSVClassificationDataset(output_path.joinpath(f"{subset_name}.csv"), column_name_map)
+        return CSVClassificationDataset(output_path.joinpath(f"{subset_name}.csv"), column_name_map,
+                                        label_type="class")
 
     def _check_compatibility(self, dataset: datasets.Dataset) -> None:
         super()._check_compatibility(dataset)
