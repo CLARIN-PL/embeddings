@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 
 import appdirs
 import requests
+from flair.data import Sentence
 from numpy import ndarray
 from pymagnitude import Magnitude
 
@@ -28,6 +29,9 @@ class MagnitudeEmbedding(Embedding[List[str], ndarray]):
     def embed(self, data: List[str]) -> ndarray:
         return cast(ndarray, self.model.query(data))
 
+    def to_flair(self) -> "MagnitudeFlairConnector":
+        return MagnitudeFlairConnector(self)
+
 
 class AutoMagnitude:
     @staticmethod
@@ -47,3 +51,17 @@ class AutoMagnitude:
             result = requests.get(url, allow_redirects=True)
             open(model_file, "wb+").write(result.content)
             return MagnitudeEmbedding(MagnitudeConfig(model_file))
+
+
+class MagnitudeFlairConnector(Embedding[List[Sentence], List[Sentence]]):
+    def __init__(self, to_wrap: MagnitudeEmbedding) -> None:
+        self.to_wrap = to_wrap
+
+    def embed(self, data: List[Sentence]) -> List[Sentence]:
+        sentences_plain_text = [sentence.to_plain_string() for sentence in data]
+
+        embeddings = super().embed(sentences_plain_text)
+        for sentence, embedding in zip(data, embeddings):
+            sentence.set_embedding(self.__class__.__name__, embedding)
+
+        return data
