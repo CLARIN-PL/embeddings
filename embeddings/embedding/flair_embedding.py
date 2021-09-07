@@ -4,11 +4,12 @@ from typing import Any, List
 
 from flair.data import Sentence
 from flair.embeddings import (
+    DocumentCNNEmbeddings,
     DocumentPoolEmbeddings,
+    DocumentRNNEmbeddings,
     TokenEmbeddings,
     TransformerDocumentEmbeddings,
     TransformerWordEmbeddings,
-    DocumentRNNEmbeddings,
 )
 from flair.embeddings.base import Embeddings
 
@@ -64,10 +65,10 @@ class FlairDocumentPoolEmbedding(FlairAggregationEmbedding):
         pooling: str = "mean",
         **load_model_kwargs: Any,
     ):
+        self.pooling = pooling
         super().__init__(
             f"{pooling}-pooling({word_embedding.name})", word_embedding, **load_model_kwargs
         )
-        self.pooling = pooling
 
     def _get_model(self) -> Embeddings:
         return DocumentPoolEmbeddings(
@@ -81,3 +82,11 @@ class FlairDocumentRNNEmbeddings(FlairAggregationEmbedding):
 
     def _get_model(self) -> Embeddings:
         return DocumentRNNEmbeddings([self.word_embedding.model], **self.load_model_kwargs)
+
+
+class FlairDocumentCNNEmbeddings(FlairAggregationEmbedding):
+    def __init__(self, word_embedding: FlairEmbedding, **load_model_kwargs: Any):
+        super().__init__(f"CNN({word_embedding.name})", word_embedding, **load_model_kwargs)
+
+    def _get_model(self) -> Embeddings:
+        return DocumentCNNEmbeddings([self.word_embedding.model], **self.load_model_kwargs)

@@ -15,13 +15,6 @@ from embeddings.embedding.static.fasttext import KGR10FastTextConfig, KGR10FastT
 from embeddings.utils.utils import import_from_string
 
 
-@pytest.fixture
-def dummy_fasttext_config() -> KGR10FastTextConfig:
-    config = KGR10FastTextConfig()
-    config.model_name = "test/dummy.model.bin"
-    return config
-
-
 def test_fasttext_embeddings_close(dummy_fasttext_config: KGR10FastTextConfig) -> None:
     config = dummy_fasttext_config
     cls: Type[KGR10FastTextEmbedding] = import_from_string(config.model_type_reference)
