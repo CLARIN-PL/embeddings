@@ -15,6 +15,9 @@ from embeddings.task.flair_task.sequence_labeling import SequenceLabeling
 from embeddings.transformation.flair_transformation.column_corpus_transformation import (
     ColumnCorpusTransformation,
 )
+from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
+    DownsampleFlairCorpusTransformation,
+)  # TODO: Remove. Temporary for testing
 
 
 class HuggingFaceSequenceLabelingPipeline(
@@ -35,7 +38,9 @@ class HuggingFaceSequenceLabelingPipeline(
     ):
         dataset = HuggingFaceDataset(dataset_name)
         data_loader = HuggingFaceDataLoader()
-        transformation = ColumnCorpusTransformation(input_column_name, target_column_name)
+        transformation = ColumnCorpusTransformation(input_column_name, target_column_name).then(
+            DownsampleFlairCorpusTransformation(percentage=0.02)
+        )  # TODO: Remove. Temporary for testing
         embedding = FlairTransformerWordEmbedding(embedding_name)
         task = SequenceLabeling(
             output_path,
