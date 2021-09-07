@@ -8,7 +8,7 @@ def main():
         sampler=optuna.samplers.TPESampler(seed=441),
         pruner=optuna.pruners.MedianPruner(n_warmup_steps=10),
     )
-    study.optimize(objective, n_trials=10, timeout=600)
+    study.optimize(objective, n_trials=20)
     print(study.trials_dataframe())
 
 

@@ -33,7 +33,9 @@ def get_sequence_labeling_configspace(
             "learning_rate", low=0.001, high=0.1,
         ),
         "mini_batch_size": trial.suggest_int("mini_batch_size", low=16, high=256, step=16),
-        "max_epochs": trial.suggest_int("epochs", low=1, high=5, step=1)
+        "max_epochs": trial.suggest_int("epochs", low=1, high=5, step=1),
+        "param_selection_mode": True,
+        "save_final_model": False
     }
     return hidden_size, task_model_kwargs, task_train_kwargs
 
