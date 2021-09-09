@@ -2,6 +2,8 @@ import abc
 from abc import ABC
 from typing import Generic, TypeVar
 
+from embeddings.utils.flair_corpus_persister import FlairCorpusPersister
+
 Input = TypeVar("Input")
 Output = TypeVar("Output")
 NewOutput = TypeVar("NewOutput")
@@ -18,6 +20,11 @@ class Transformation(ABC, Generic[Input, Output]):
     ) -> "Transformation[Input, NewOutput]":
         return CombinedTransformations(self, right)
 
+    def persisting(
+        self, persister: FlairCorpusPersister[Output]
+    ) -> "Transformation[Input, Output]":
+        return PersistingTransformation(self, persister)
+
 
 class CombinedTransformations(
     Transformation[Input, Output], Generic[Input, Output, OutputInternal]
@@ -33,3 +40,18 @@ class CombinedTransformations(
     def transform(self, data: Input) -> Output:
         intermediate = self.left.transform(data)
         return self.right.transform(intermediate)
+
+
+class PersistingTransformation(Transformation[Input, Output]):
+    def __init__(
+        self,
+        base_transformation: Transformation[Input, Output],
+        persister: FlairCorpusPersister[Output],
+    ):
+        self.base_transformation = base_transformation
+        self.persister = persister
+
+    def transform(self, data: Input) -> Output:
+        result = self.base_transformation.transform(data)
+        self.persister.persist(result)
+        return result
