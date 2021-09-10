@@ -9,7 +9,7 @@ from flair.data import Corpus
 
 from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
 from embeddings.data.hugging_face_dataset import HuggingFaceDataset
-from embeddings.embedding.flair_embedding import FlairTransformerWordEmbedding
+from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -34,7 +34,7 @@ def pos_tagging_pipeline(
     transformation = ColumnCorpusTransformation("tokens", "pos_tags").then(
         DownsampleFlairCorpusTransformation(percentage=0.001)
     )
-    embedding = FlairTransformerWordEmbedding("allegro/herbert-base-cased")
+    embedding = AutoFlairWordEmbedding.from_hub("allegro/herbert-base-cased")
     task = SequenceLabeling(result_path.name, hidden_size=256, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(embedding, task)
     evaluator = SequenceLabelingEvaluator(evaluation_mode="unit")
@@ -55,7 +55,7 @@ def ner_tagging_pipeline(
     transformation = ColumnCorpusTransformation("tokens", "ner").then(
         DownsampleFlairCorpusTransformation(percentage=0.005)
     )
-    embedding = FlairTransformerWordEmbedding("allegro/herbert-base-cased")
+    embedding = AutoFlairWordEmbedding.from_hub("allegro/herbert-base-cased")
     task = SequenceLabeling(
         result_path.name,
         hidden_size=256,
@@ -79,7 +79,7 @@ def test_pos_tagging_pipeline(
     result = pipeline.run()
     path.cleanup()
 
-    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.14788732394366197)
+    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.2464788)
 
 
 def test_ner_tagging_pipeline(

@@ -7,7 +7,7 @@ from flair.data import Corpus
 from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
 from embeddings.data.hugging_face_dataset import HuggingFaceDataset
 from embeddings.data.io import T_path
-from embeddings.embedding.flair_embedding import FlairTransformerDocumentEmbedding
+from embeddings.embedding.auto_flair import AutoFlairDocumentEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -33,7 +33,7 @@ class HuggingFaceClassificationPipeline(
         dataset = HuggingFaceDataset(dataset_name)
         data_loader = HuggingFaceDataLoader()
         transformation = ClassificationCorpusTransformation(input_column_name, target_column_name)
-        embedding = FlairTransformerDocumentEmbedding(embedding_name)
+        embedding = AutoFlairDocumentEmbedding.from_hub(embedding_name)
         task = TextClassification(
             output_path, task_model_kwargs=task_model_kwargs, task_train_kwargs=task_train_kwargs
         )

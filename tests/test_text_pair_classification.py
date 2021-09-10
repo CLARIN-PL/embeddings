@@ -1,4 +1,3 @@
-from pprint import pprint
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple
 
@@ -10,7 +9,7 @@ from flair.data import Corpus
 
 from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
 from embeddings.data.hugging_face_dataset import HuggingFaceDataset
-from embeddings.embedding.flair_embedding import FlairTransformerDocumentEmbedding
+from embeddings.embedding.auto_flair import AutoFlairDocumentEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -35,7 +34,7 @@ def text_pair_classification_pipeline(
     transformation = PairClassificationCorpusTransformation(
         ("sentence_1", "sentence_2"), "label"
     ).then(DownsampleFlairCorpusTransformation(percentage=0.1))
-    embedding = FlairTransformerDocumentEmbedding("allegro/herbert-base-cased")
+    embedding = AutoFlairDocumentEmbedding.from_hub("allegro/herbert-base-cased")
     task = TextPairClassification(result_path.name, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(embedding, task)
     evaluator = TextClassificationEvaluator()
@@ -53,8 +52,7 @@ def test_text_pair_classification_pipeline(
     pipeline, path = text_pair_classification_pipeline
     result = pipeline.run()
     path.cleanup()
-    pprint(result)
     np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.0789473)
-    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.0547785)
-    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.0958230)
-    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.1212121)
+    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.0133037)
+    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.0071770)
+    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.0909090)

@@ -7,7 +7,7 @@ from flair.data import Corpus
 from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
 from embeddings.data.hugging_face_dataset import HuggingFaceDataset
 from embeddings.data.io import T_path
-from embeddings.embedding.flair_embedding import FlairTransformerWordEmbedding
+from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -36,7 +36,7 @@ class HuggingFaceSequenceLabelingPipeline(
         dataset = HuggingFaceDataset(dataset_name)
         data_loader = HuggingFaceDataLoader()
         transformation = ColumnCorpusTransformation(input_column_name, target_column_name)
-        embedding = FlairTransformerWordEmbedding(embedding_name)
+        embedding = AutoFlairWordEmbedding.from_hub(embedding_name)
         task = SequenceLabeling(
             output_path,
             hidden_size=hidden_size,

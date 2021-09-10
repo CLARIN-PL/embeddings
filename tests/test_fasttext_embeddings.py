@@ -3,25 +3,23 @@ from typing import Type
 import pytest
 import torch
 from flair.data import Sentence
+from flair.embeddings import FastTextEmbeddings, StackedEmbeddings
 from torch.testing import assert_close as assert_close
 
+from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
+from embeddings.embedding.static.embedding import (
+    AutoStaticDocumentEmbedding,
+    AutoStaticWordEmbedding,
+)
 from embeddings.embedding.static.fasttext import KGR10FastTextConfig, KGR10FastTextEmbedding
-from embeddings.embedding.static.word import AutoStaticWordEmbedding
 from embeddings.utils.utils import import_from_string
 
 
-@pytest.fixture
-def dummy_fasttext_config() -> KGR10FastTextConfig:
-    config = KGR10FastTextConfig()
-    config.model_name = "test/dummy.model.bin"
-    return config
-
-
-def test_fasttext_embeddings_equal(dummy_fasttext_config: KGR10FastTextConfig) -> None:
+def test_fasttext_embeddings_close(dummy_fasttext_config: KGR10FastTextConfig) -> None:
     config = dummy_fasttext_config
     cls: Type[KGR10FastTextEmbedding] = import_from_string(config.model_type_reference)
     embedding = cls(config)
-    assert_close_embedding(embedding)
+    assert_close_embedding_word(embedding)
 
 
 def test_krg10_fasttext_default_config() -> None:
@@ -32,17 +30,46 @@ def test_krg10_fasttext_default_config() -> None:
 def test_init_kgr10_fasttext_from_config(dummy_fasttext_config: KGR10FastTextConfig) -> None:
     config = dummy_fasttext_config
     embedding = KGR10FastTextEmbedding.from_config(config)
-    assert_close_embedding(embedding)
+    assert_close_embedding_word(embedding)
 
 
-def test_static_automodel_fast_text(dummy_fasttext_config: KGR10FastTextConfig) -> None:
+def test_static_automodel_word_fast_text(dummy_fasttext_config: KGR10FastTextConfig) -> None:
     config = dummy_fasttext_config
     embedding = AutoStaticWordEmbedding.from_config(config=config)
     assert isinstance(embedding, KGR10FastTextEmbedding)
-    assert_close_embedding(embedding)
+    assert_close_embedding_word(embedding)
 
 
-def assert_close_embedding(embedding: KGR10FastTextEmbedding) -> None:
+@pytest.fixture
+def automodel_document_fast_text(
+    dummy_fasttext_config: KGR10FastTextConfig,
+) -> FlairDocumentPoolEmbedding:
+    config = dummy_fasttext_config
+    return AutoStaticDocumentEmbedding.from_config(config=config)
+
+
+def test_static_automodel_document_fast_text_structure(
+    automodel_document_fast_text: KGR10FastTextEmbedding,
+) -> None:
+    embedding = automodel_document_fast_text
+    assert isinstance(embedding, FlairDocumentPoolEmbedding)
+    assert isinstance(embedding.word_embedding, KGR10FastTextEmbedding)
+    assert isinstance(embedding.model.embeddings, StackedEmbeddings)
+    assert len(embedding.model.embeddings.embeddings) == 1
+    assert isinstance(embedding.model.embeddings.embeddings[0], FastTextEmbeddings)
+
+
+def test_static_automodel_document_fast_text_close(
+    automodel_document_fast_text: KGR10FastTextEmbedding,
+) -> None:
+    embedding = automodel_document_fast_text
+    assert_close_embedding_word(embedding, assert_doc_embedding_empty=False)
+    assert_close_embedding_document(embedding)
+
+
+def assert_close_embedding_word(
+    embedding: KGR10FastTextEmbedding, assert_doc_embedding_empty: bool = True
+) -> None:
     sentence = Sentence("Polska należy do Unii Europejskiej.")
     embedding.embed([sentence])
 
@@ -75,6 +102,38 @@ def assert_close_embedding(embedding: KGR10FastTextEmbedding) -> None:
     torch.testing.assert_close(
         tokens_embeddings.std(dim=1),
         torch.Tensor([0.0045, 0.0029, 0.0036, 0.0019, 0.0020, 0.0058]),
+        atol=1e-4,
+        rtol=0,
+    )
+
+    if assert_doc_embedding_empty:
+        assert sentence.embedding.shape == (0,)
+
+
+def assert_close_embedding_document(embedding: KGR10FastTextEmbedding) -> None:
+    sentence = Sentence("Polska należy do Unii Europejskiej.")
+    embedding.embed([sentence])
+
+    document_embedding = sentence.embedding
+    assert document_embedding.shape == (100,)
+
+    assert_close(
+        document_embedding[:5].clone(),
+        torch.Tensor([0.0014, 0.0036, 0.0026, -0.0029, 0.0054]),
+        atol=1e-4,
+        rtol=0,
+    )
+
+    torch.testing.assert_close(
+        document_embedding.mean().item(),
+        0.0005,
+        atol=1e-4,
+        rtol=0,
+    )
+
+    torch.testing.assert_close(
+        document_embedding.std().item(),
+        0.0023,
         atol=1e-4,
         rtol=0,
     )
