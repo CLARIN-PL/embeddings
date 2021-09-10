@@ -7,8 +7,8 @@ import numpy as np
 import pytest
 from flair.data import Corpus
 
-from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
-from embeddings.data.hugging_face_dataset import HuggingFaceDataset
+from embeddings.data.data_loader import HuggingFaceDataLoader
+from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.embedding.flair_embedding import FlairTransformerDocumentEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel

@@ -4,8 +4,8 @@ import datasets
 import numpy as np
 from flair.data import Corpus
 
-from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
-from embeddings.data.hugging_face_dataset import HuggingFaceDataset
+from embeddings.data.data_loader import HuggingFaceDataLoader
+from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.data.io import T_path
 from embeddings.embedding.flair_embedding import FlairTransformerWordEmbedding
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
