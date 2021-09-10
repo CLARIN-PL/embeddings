@@ -1,3 +1,4 @@
+from pprint import pprint
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple
 
@@ -7,8 +8,8 @@ import numpy as np
 import pytest
 from flair.data import Corpus
 
-from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
-from embeddings.data.hugging_face_dataset import HuggingFaceDataset
+from embeddings.data.data_loader import HuggingFaceDataLoader
+from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.embedding.auto_flair import AutoFlairDocumentEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel

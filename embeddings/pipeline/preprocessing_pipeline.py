@@ -3,10 +3,8 @@ from typing import Generic, Tuple
 import datasets
 from flair.data import Corpus
 
-from embeddings.data.data_loader import DataLoader
-from embeddings.data.dataset import Data, Dataset
-from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
-from embeddings.data.hugging_face_dataset import HuggingFaceDataset
+from embeddings.data.data_loader import DataLoader, HuggingFaceDataLoader
+from embeddings.data.dataset import Data, Dataset, HuggingFaceDataset
 from embeddings.pipeline.pipeline import Pipeline
 from embeddings.pipeline.standard_pipeline import LoaderResult, TransformationResult
 from embeddings.transformation.flair_transformation.classification_corpus_transformation import (
