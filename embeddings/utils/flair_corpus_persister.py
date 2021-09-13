@@ -34,7 +34,13 @@ class FlairConllPersister(FlairCorpusPersister[SequenceLabellingCorpus]):
                 output_path = self.path.joinpath(f"{subset_name}.tsv")
                 self._save_conll(data_subset, output_path)
             except AttributeError:
-                _logger.info(f"{subset_name} dataset not found in the Corpus")
+                _logger.info(
+                    f"Exception occured when persisting data: {subset_name} dataset not found in the Corpus"
+                )
+            except TypeError:
+                _logger.info(
+                    f"Exception occured when persisting data: {subset_name} dataset is None"
+                )
 
     @staticmethod
     def _save_conll(data: ColumnDataset, filepath: Path) -> None:
