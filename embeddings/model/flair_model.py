@@ -14,8 +14,8 @@ class FlairModel(Model[Corpus, Dict[str, np.ndarray]]):
         self.embedding = embedding
         self.task = task
 
-    def execute(self, data: Corpus) -> Dict[str, np.ndarray]:
+    def execute(self, data: Corpus, predict_subset: str = 'test') -> Dict[str, np.ndarray]:
         self.task.build_task_model(
             embedding=self.embedding, y_dictionary=self.task.make_y_dictionary(data)
         )
-        return self.task.fit_predict(data)
+        return self.task.fit_predict(data, predict_subset)
