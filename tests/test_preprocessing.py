@@ -62,9 +62,9 @@ def task_train_kwargs() -> Dict[str, int]:
 def sequence_labelling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
-    ner_dataset_name,
-    ner_input_column_name,
-    ner_target_column_name,
+    ner_dataset_name: str,
+    ner_input_column_name: str,
+    ner_target_column_name: str,
 ) -> PreprocessingPipeline[str, datasets.DatasetDict, Corpus]:
     dataset = HuggingFaceDataset(ner_dataset_name)
     data_loader = HuggingFaceDataLoader()
@@ -83,7 +83,7 @@ def sequence_labelling_preprocessing_pipeline(
 def sequence_labelling_evaluation_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
-    ner_dataset_name,
+    ner_dataset_name: str,
     hidden_size: int,
     task_train_kwargs: Dict[str, int],
 ) -> ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]]:
@@ -108,7 +108,7 @@ def sequence_labelling_evaluation_pipeline(
 def test_sequence_labelling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
-    ner_dataset_name,
+    ner_dataset_name: str,
     hidden_size: int,
     task_train_kwargs: Dict[str, int],
     sequence_labelling_preprocessing_pipeline: StandardPipeline[
