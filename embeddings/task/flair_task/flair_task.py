@@ -54,7 +54,7 @@ class FlairTask(Task[Corpus, Dict[str, np.ndarray]]):
         self.remove_labels_from_data(data, "predicted")
         return y_pred, loss
 
-    def fit_predict(self, data: Corpus, predict_subset: str = 'test') -> Dict[str, np.ndarray]:
+    def fit_predict(self, data: Corpus, predict_subset: str = "test") -> Dict[str, np.ndarray]:
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
 
