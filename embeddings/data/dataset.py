@@ -11,8 +11,10 @@ class Dataset(ABC, Generic[Data]):
 
 
 class LocalDataset(Dataset[str]):
-    def __init__(self, path: str):
-        self.dataset = path
+    def __init__(self, dataset: Union[str, Path], **load_dataset_kwargs: Any):
+        super().__init__()
+        self.dataset = dataset
+        self.load_dataset_kwargs = load_dataset_kwargs
 
 
 class HuggingFaceDataset(Dataset[str]):
