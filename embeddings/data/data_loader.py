@@ -55,5 +55,5 @@ class ConllFlairCorpusDataLoader(DataLoader[str, Corpus]):
             train=flair_datasets["train"],
             dev=flair_datasets["dev"],
             test=flair_datasets["test"],
-            **dataset.load_dataset_kwargs,
+            sample_missing_splits=False,
         )
