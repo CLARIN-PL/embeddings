@@ -72,8 +72,8 @@ class FlairTextClassificationEvaluationPipeline(
             task_model_kwargs=task_model_kwargs,
         )
         model = FlairModel(embedding=embedding, task=task)
-        evaluator = TextClassificationEvaluator()
-        if persist_path:
+        evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = TextClassificationEvaluator()
+        if persist_path is not None:
             evaluator = evaluator.persisting(JsonPersister(persist_path))
         super().__init__(dataset, data_loader, model, evaluator)
 
@@ -102,7 +102,7 @@ class FlairTextPairClassificationEvaluationPipeline(
             task_model_kwargs=task_model_kwargs,
         )
         model = FlairModel(embedding=embedding, task=task)
-        evaluator = TextClassificationEvaluator()
+        evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = TextClassificationEvaluator()
         if persist_path:
             evaluator = evaluator.persisting(JsonPersister(persist_path))
         super().__init__(dataset, data_loader, model, evaluator)
@@ -136,7 +136,7 @@ class FlairSequenceLabellingEvaluationPipeline(
             task_model_kwargs=task_model_kwargs,
         )
         model = FlairModel(embedding=embedding, task=task)
-        evaluator = SequenceLabelingEvaluator(
+        evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         )
         if persist_path:
