@@ -52,7 +52,7 @@ class CorpusTransformation(Transformation[datasets.DatasetDict, Corpus]):
             train=flair_datasets["train"],
             dev=flair_datasets["validation"],
             test=flair_datasets["test"],
-            sample_missing_splits=self.sample_missing_splits
+            sample_missing_splits=self.sample_missing_splits,
         )
 
     def _preprocess(
