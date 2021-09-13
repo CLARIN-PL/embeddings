@@ -57,9 +57,9 @@ class FlairTextClassificationEvaluationPipeline(
         embedding_name: str,
         fine_tune_embeddings: bool,
         output_path: str,
-        task_train_kwargs: Dict[str, Any],
-        task_model_kwargs: Dict[str, Any],
-        persist_path: str,
+        persist_path: Optional[str] = None,
+        task_model_kwargs: Optional[Dict[str, Any]] = None,
+        task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = LocalDataset(dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
@@ -72,7 +72,9 @@ class FlairTextClassificationEvaluationPipeline(
             task_model_kwargs=task_model_kwargs,
         )
         model = FlairModel(embedding=embedding, task=task)
-        evaluator = TextClassificationEvaluator().persisting(JsonPersister(persist_path))
+        evaluator = TextClassificationEvaluator()
+        if persist_path:
+            evaluator = evaluator.persisting(JsonPersister(persist_path))
         super().__init__(dataset, data_loader, model, evaluator)
 
 
@@ -85,9 +87,9 @@ class FlairTextPairClassificationEvaluationPipeline(
         embedding_name: str,
         fine_tune_embeddings: bool,
         output_path: str,
-        task_train_kwargs: Dict[str, Any],
-        task_model_kwargs: Dict[str, Any],
-        persist_path: str,
+        persist_path: Optional[str] = None,
+        task_model_kwargs: Optional[Dict[str, Any]] = None,
+        task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = LocalDataset(dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
@@ -100,7 +102,9 @@ class FlairTextPairClassificationEvaluationPipeline(
             task_model_kwargs=task_model_kwargs,
         )
         model = FlairModel(embedding=embedding, task=task)
-        evaluator = TextClassificationEvaluator().persisting(JsonPersister(persist_path))
+        evaluator = TextClassificationEvaluator()
+        if persist_path:
+            evaluator = evaluator.persisting(JsonPersister(persist_path))
         super().__init__(dataset, data_loader, model, evaluator)
 
 
@@ -114,9 +118,9 @@ class FlairSequenceLabellingEvaluationPipeline(
         fine_tune_embeddings: bool,
         output_path: str,
         hidden_size: int,
-        persist_path: str,
         evaluation_mode: str = "conll",
         tagging_scheme: Optional[str] = None,
+        persist_path: Optional[str] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
@@ -134,5 +138,7 @@ class FlairSequenceLabellingEvaluationPipeline(
         model = FlairModel(embedding=embedding, task=task)
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
-        ).persisting(JsonPersister(persist_path))
+        )
+        if persist_path:
+            evaluator = evaluator.persisting(JsonPersister(persist_path))
         super().__init__(dataset, data_loader, model, evaluator)
