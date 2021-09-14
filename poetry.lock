@@ -147,7 +147,8 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 name = "cycler"
 version = "0.10.0"
 description = "Composable style cycles"
-category = "main"
+categAssertionError: Definition of alembic.runtime.migration.EnvironmentContext is unexpectedly incomplete
+ory = "main"
 optional = false
 python-versions = "*"
 

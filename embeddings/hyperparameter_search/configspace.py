@@ -10,25 +10,19 @@ Parameter = Union[SearchableParameter, ConstantParameter]
 
 
 class AbstractConfigSpace(abc.ABC):
-    def _suggest_optuna_param(
-        self, trial: optuna.trial.Trial, param_name: str
-    ) -> Tuple[str, Union[None, float, int, str, bool]]:
-        param: SearchableParameter = self.__getattribute__(param_name)
-        return param.name, trial._suggest(name=param.name, distribution=param.distribution)
-
-    def _get_const_param(self, param_name: str) -> Tuple[str, Union[None, float, int, str, bool]]:
-        const_param: ConstantParameter = self.__getattribute__(param_name)
-        return const_param.name, const_param.value
-
     def _parse_parameter(
         self, param_name: str, trial: optuna.trial.Trial
     ) -> Tuple[str, Union[None, float, int, str, bool]]:
-        if self.__annotations__[param_name] is SearchableParameter:
-            return self._suggest_optuna_param(trial=trial, param_name=param_name)
-        elif self.__annotations__[param_name] is ConstantParameter:
-            return self._get_const_param(param_name=param_name)
+        param: Parameter = self.__getattribute__(param_name)
+        if isinstance(param, SearchableParameter):
+            return param.name, trial._suggest(name=param.name, distribution=param.distribution)
+        elif isinstance(param, ConstantParameter):
+            return param.name, param.value
         else:
-            raise ValueError(f"Parameter type {self.__annotations__[param_name]} is not suported")
+            raise ValueError(
+                f"Parameter type {type(param)} is not suported! "
+                "Supported types are: SearchableParameter and ConstantParameter"
+            )
 
     def _map_parameters(
         self, trial: optuna.trial.Trial, parameters_types: Dict[str, Any]
