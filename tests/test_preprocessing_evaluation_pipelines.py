@@ -1,4 +1,3 @@
-import random
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict
@@ -25,8 +24,6 @@ from embeddings.transformation.flair_transformation.downsample_corpus_transforma
 )
 from embeddings.utils.flair_corpus_persister import FlairConllPersister
 
-random.seed(141)
-
 
 @pytest.fixture
 def embedding_name() -> str:
@@ -36,16 +33,6 @@ def embedding_name() -> str:
 @pytest.fixture
 def ner_dataset_name() -> str:
     return "clarin-pl/kpwr-ner"
-
-
-@pytest.fixture
-def ner_input_column_name() -> str:
-    return "tokens"
-
-
-@pytest.fixture
-def ner_target_column_name() -> str:
-    return "ner"
 
 
 @pytest.fixture
@@ -63,13 +50,11 @@ def sequence_labelling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
     ner_dataset_name: str,
-    ner_input_column_name: str,
-    ner_target_column_name: str,
 ) -> PreprocessingPipeline[str, datasets.DatasetDict, Corpus]:
     dataset = HuggingFaceDataset(ner_dataset_name)
     data_loader = HuggingFaceDataLoader()
     transformation = (
-        ColumnCorpusTransformation(ner_input_column_name, ner_target_column_name)
+        ColumnCorpusTransformation("tokens", "ner")
         .then(DownsampleFlairCorpusTransformation(percentage=0.005))
         .persisting(FlairConllPersister(result_path.name))
     )
@@ -127,7 +112,7 @@ def test_sequence_labelling_preprocessing_pipeline(
     result = evaluation_pipeline.run()
 
     np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.28888888888888886
+        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.20634920634920634
     )
     np.testing.assert_almost_equal(result["seqeval__mode_None__scheme_None"]["overall_f1"], 0)
 
