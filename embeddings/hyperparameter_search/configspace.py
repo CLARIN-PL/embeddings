@@ -6,7 +6,7 @@ import optuna
 
 from embeddings.hyperparameter_search.parameters import ConstantParameter, SearchableParameter
 
-ConfigSpaceOutput = TypeVar("ConfigSpaceOutput")
+Parameter = Union[SearchableParameter, ConstantParameter]
 
 
 class AbstractConfigSpace(abc.ABC):
@@ -16,21 +16,27 @@ class AbstractConfigSpace(abc.ABC):
         param: SearchableParameter = self.__getattribute__(param_name)
         return param.name, trial._suggest(name=param.name, distribution=param.distribution)
 
+    def _get_const_param(self, param_name: str) -> Tuple[str, Union[None, float, int, str, bool]]:
+        const_param: ConstantParameter = self.__getattribute__(param_name)
+        return const_param.name, const_param.value
+
+    def _parse_parameter(
+        self, param_name: str, trial: optuna.trial.Trial
+    ) -> Tuple[str, Union[None, float, int, str, bool]]:
+        if self.__annotations__[param_name] is SearchableParameter:
+            return self._suggest_optuna_param(trial=trial, param_name=param_name)
+        elif self.__annotations__[param_name] is ConstantParameter:
+            return self._get_const_param(param_name=param_name)
+        else:
+            raise ValueError(f"Parameter type {self.__annotations__[param_name]} is not suported")
+
     def _map_parameters(
         self, trial: optuna.trial.Trial, parameters_types: Dict[str, Any]
     ) -> Dict[str, Union[None, float, int, str, bool]]:
         parameters: Dict[str, Union[None, float, int, str, bool]] = {}
         for param_name, param_type in parameters_types.items():
-            if param_type is SearchableParameter:
-                parameters.update([self._suggest_optuna_param(trial=trial, param_name=param_name)])
+            parameters.update([self._parse_parameter(trial=trial, param_name=param_name)])
 
-            elif param_type is ConstantParameter:
-                const_param: ConstantParameter = self.__getattribute__(param_name)
-                parameters[const_param.name] = const_param.value
-            else:
-                raise ValueError(
-                    "ConfigSpace class should not contain other attributes other than SearchableParameter or ConstantParameter"
-                )
         return parameters
 
     @abc.abstractmethod
@@ -42,46 +48,46 @@ class AbstractConfigSpace(abc.ABC):
 
 @dataclass
 class SequenceLabelingConfigSpace(AbstractConfigSpace):
-    hidden_size: SearchableParameter = SearchableParameter(
+    hidden_size: Parameter = SearchableParameter(
         name="hidden_size", type="int_uniform", low=128, high=2048, step=128
     )
-    use_rnn: SearchableParameter = SearchableParameter(
+    use_rnn: Parameter = SearchableParameter(
         name="use_rnn", type="categorical", choices=[True, False]
     )
-    rnn_type: SearchableParameter = SearchableParameter(
+    rnn_type: Parameter = SearchableParameter(
         name="rnn_type", type="categorical", choices=["LSTM", "GRU"]
     )
-    rnn_layers: SearchableParameter = SearchableParameter(
+    rnn_layers: Parameter = SearchableParameter(
         name="rnn_layers", type="int_uniform", low=1, high=3, step=1
     )
-    dropout: SearchableParameter = SearchableParameter(
+    dropout: Parameter = SearchableParameter(
         name="dropout", type="discrete_uniform", low=0.0, high=0.5, q=0.05
     )
-    word_dropout: SearchableParameter = SearchableParameter(
+    word_dropout: Parameter = SearchableParameter(
         name="word_dropout", type="discrete_uniform", low=0.0, high=0.5, q=0.05
     )
-    locked_dropout: SearchableParameter = SearchableParameter(
+    locked_dropout: Parameter = SearchableParameter(
         name="locked_dropout", type="discrete_uniform", low=0.0, high=0.5, q=0.05
     )
-    reproject_embeddings: SearchableParameter = SearchableParameter(
+    reproject_embeddings: Parameter = SearchableParameter(
         name="reproject_embeddings", type="categorical", choices=[True, False]
     )
-    use_crf: SearchableParameter = SearchableParameter(
+    use_crf: Parameter = SearchableParameter(
         name="use_crf", type="categorical", choices=[True, False]
     )
-    learning_rate: SearchableParameter = SearchableParameter(
+    learning_rate: Parameter = SearchableParameter(
         name="learning_rate", type="log_uniform", low=1e-4, high=1e-1
     )
-    mini_batch_size: SearchableParameter = SearchableParameter(
+    mini_batch_size: Parameter = SearchableParameter(
         name="mini_batch_size", type="log_int_uniform", low=16, high=256, step=1
     )
-    max_epochs: SearchableParameter = SearchableParameter(
+    max_epochs: Parameter = SearchableParameter(
         name="max_epochs", type="int_uniform", low=1, high=5, step=1
     )
-    param_selection_mode: ConstantParameter = field(
+    param_selection_mode: Parameter = field(
         init=False, default=ConstantParameter(name="param_selection_mode", value=True)
     )
-    save_final_model: ConstantParameter = field(
+    save_final_model: Parameter = field(
         init=False, default=ConstantParameter(name="save_final_model", value=False)
     )
 
@@ -90,11 +96,12 @@ class SequenceLabelingConfigSpace(AbstractConfigSpace):
     ) -> Dict[str, Union[None, float, int, str, bool]]:
         parameters = {}
 
-        use_rnn_name, use_rnn_val = self._suggest_optuna_param(trial=trial, param_name="use_rnn")
+        use_rnn_name, use_rnn_val = self._parse_parameter(trial=trial, param_name="use_rnn")
         parameters[use_rnn_name] = use_rnn_val
+
         if use_rnn_val:
             for rnn_param in ("rnn_layers", "rnn_type"):
-                parameters.update([self._suggest_optuna_param(trial=trial, param_name=rnn_param)])
+                parameters.update([self._parse_parameter(trial=trial, param_name=rnn_param)])
 
         parameters.update(
             self._map_parameters(
