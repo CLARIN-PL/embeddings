@@ -11,7 +11,7 @@ from embeddings.utils.loggers import get_logger
 Input = TypeVar("Input")
 ClassificationCorpus = TypeVar("ClassificationCorpus")
 PairClassificationCorpus = TypeVar("PairClassificationCorpus")
-SequenceLabellingCorpus = TypeVar("SequenceLabellingCorpus")
+SequenceLabelingCorpus = TypeVar("SequenceLabelingCorpus")
 
 _logger = get_logger(__name__)
 
@@ -22,11 +22,11 @@ class FlairCorpusPersister(ABC, Generic[Input]):
         pass
 
 
-class FlairConllPersister(FlairCorpusPersister[SequenceLabellingCorpus]):
+class FlairConllPersister(FlairCorpusPersister[SequenceLabelingCorpus]):
     def __init__(self, path: str):
         self.path = Path(path)
 
-    def persist(self, data: SequenceLabellingCorpus) -> None:
+    def persist(self, data: SequenceLabelingCorpus) -> None:
         subset_names = ["train", "dev", "test"]
         for subset_name in subset_names:
             try:

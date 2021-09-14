@@ -75,7 +75,7 @@ class FlairTextPairClassificationPreprocessingPipeline(
         super().__init__(dataset, data_loader, transformation)
 
 
-class FlairSequenceLabellingPreprocessingPipeline(
+class FlairSequenceLabelingPreprocessingPipeline(
     PreprocessingPipeline[str, datasets.DatasetDict, Corpus]
 ):
     def __init__(

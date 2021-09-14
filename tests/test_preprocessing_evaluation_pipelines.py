@@ -11,7 +11,7 @@ from flair.data import Corpus
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.pipeline.evaluation_pipeline import (
-    FlairSequenceLabellingEvaluationPipeline,
+    FlairSequenceLabelingEvaluationPipeline,
     ModelEvaluationPipeline,
 )
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
@@ -46,7 +46,7 @@ def task_train_kwargs() -> Dict[str, int]:
 
 
 @pytest.fixture
-def sequence_labelling_preprocessing_pipeline(
+def sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
     ner_dataset_name: str,
@@ -65,7 +65,7 @@ def sequence_labelling_preprocessing_pipeline(
 
 
 @pytest.fixture
-def sequence_labelling_evaluation_pipeline(
+def sequence_labeling_evaluation_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
     ner_dataset_name: str,
@@ -78,7 +78,7 @@ def sequence_labelling_evaluation_pipeline(
     output_path = Path(result_path.name, ner_dataset_name, embedding_name)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    pipeline = FlairSequenceLabellingEvaluationPipeline(
+    pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,
         output_path=result_path.name,
         fine_tune_embeddings=False,
@@ -90,25 +90,25 @@ def sequence_labelling_evaluation_pipeline(
     return pipeline
 
 
-def test_sequence_labelling_preprocessing_pipeline(
+def test_sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
     ner_dataset_name: str,
     hidden_size: int,
     task_train_kwargs: Dict[str, int],
-    sequence_labelling_preprocessing_pipeline: StandardPipeline[
+    sequence_labeling_preprocessing_pipeline: StandardPipeline[
         str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]
     ],
-    sequence_labelling_evaluation_pipeline: ModelEvaluationPipeline[
+    sequence_labeling_evaluation_pipeline: ModelEvaluationPipeline[
         str, Corpus, Dict[str, np.ndarray], Dict[str, Any]
     ],
 ) -> None:
     flair.set_seed(441)
 
-    preprocessing_pipeline = sequence_labelling_preprocessing_pipeline
+    preprocessing_pipeline = sequence_labeling_preprocessing_pipeline
     _ = preprocessing_pipeline.run()
 
-    evaluation_pipeline = sequence_labelling_evaluation_pipeline
+    evaluation_pipeline = sequence_labeling_evaluation_pipeline
     result = evaluation_pipeline.run()
 
     np.testing.assert_almost_equal(

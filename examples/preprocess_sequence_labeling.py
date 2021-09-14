@@ -4,7 +4,7 @@ from pathlib import Path
 import typer
 
 from embeddings.defaults import DATASET_PATH
-from embeddings.pipeline.preprocessing_pipeline import FlairSequenceLabellingPreprocessingPipeline
+from embeddings.pipeline.preprocessing_pipeline import FlairSequenceLabelingPreprocessingPipeline
 
 app = typer.Typer()
 
@@ -29,7 +29,7 @@ def run(
     output_path = Path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    pipeline = FlairSequenceLabellingPreprocessingPipeline(
+    pipeline = FlairSequenceLabelingPreprocessingPipeline(
         dataset_name=dataset_name,
         input_column_name=input_column_name,
         target_column_name=target_column_name,

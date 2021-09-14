@@ -108,7 +108,7 @@ class FlairTextPairClassificationEvaluationPipeline(
         super().__init__(dataset, data_loader, model, evaluator)
 
 
-class FlairSequenceLabellingEvaluationPipeline(
+class FlairSequenceLabelingEvaluationPipeline(
     ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]]
 ):
     def __init__(
