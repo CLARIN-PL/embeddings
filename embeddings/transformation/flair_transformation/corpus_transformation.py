@@ -24,21 +24,27 @@ class CorpusTransformation(Transformation[datasets.DatasetDict, Corpus]):
         input_column_name: str,
         target_column_name: str,
         datasets_path: Path = DATASET_PATH,
+        sample_missing_splits: bool = True,
+        ignore_test_subset: bool = False,
     ):
         super().__init__()
 
         self.datasets_cache_path = datasets_path
         self.input_column_name = input_column_name
         self.target_column_name = target_column_name
+        self.sample_missing_splits = sample_missing_splits
+        self.ignore_test_subset = ignore_test_subset
 
     def transform(self, data: datasets.DatasetDict) -> Corpus:
         with tempfile.TemporaryDirectory() as tmp_dir_path:
             output_path = Path(tmp_dir_path)
             flair_datasets = self._preprocess(data, output_path)
-        return self._to_flair_corpus(flair_datasets)
+        corpus = self._to_flair_corpus(flair_datasets)
+        if self.ignore_test_subset:
+            corpus = Corpus(train=corpus.train, dev=corpus.dev, sample_missing_splits=False)
+        return corpus
 
-    @staticmethod
-    def _to_flair_corpus(flair_datasets: Dict[str, FlairDataset]) -> Corpus:
+    def _to_flair_corpus(self, flair_datasets: Dict[str, FlairDataset]) -> Corpus:
         if not flair_datasets["train"]:
             raise ValueError("Hugging Face dataset does not contain TRAIN subset.")
 
@@ -46,6 +52,7 @@ class CorpusTransformation(Transformation[datasets.DatasetDict, Corpus]):
             train=flair_datasets["train"],
             dev=flair_datasets["validation"],
             test=flair_datasets["test"],
+            sample_missing_splits=self.sample_missing_splits,
         )
 
     def _preprocess(

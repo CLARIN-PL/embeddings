@@ -1,8 +1,21 @@
+import json
 from typing import Any, Dict
 
-import srsly
+import numpy as np
 
 from embeddings.utils.results_persister import ResultsPersister
+
+
+class JsonEncoder(json.JSONEncoder):
+    def default(self, obj: Any) -> Any:
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(JsonEncoder, self).default(obj)
 
 
 class JsonPersister(ResultsPersister[Dict[str, Any]]):
@@ -10,4 +23,5 @@ class JsonPersister(ResultsPersister[Dict[str, Any]]):
         self.path = path
 
     def persist(self, result: Dict[str, Any], **kwargs: Any) -> None:
-        srsly.write_json(self.path, result)
+        with open(self.path, "w") as f:
+            json.dump(result, f, cls=JsonEncoder, indent=2)
