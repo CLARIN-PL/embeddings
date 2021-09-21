@@ -1,10 +1,11 @@
 import abc
 from dataclasses import dataclass, field
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, Final, Tuple, Union
 
 import optuna
 
 from embeddings.hyperparameter_search.parameters import ConstantParameter, SearchableParameter
+from embeddings.utils.utils import PrimitiveTypes
 
 Parameter = Union[SearchableParameter, ConstantParameter]
 
@@ -108,3 +109,36 @@ class SequenceLabelingConfigSpace(AbstractConfigSpace):
             )
         )
         return parameters
+
+    @staticmethod
+    def parse_parameters(
+        parameters: Dict[str, PrimitiveTypes]
+    ) -> Tuple[int, Dict[str, PrimitiveTypes], Dict[str, PrimitiveTypes]]:
+        hidden_size = parameters.pop("hidden_size")
+        assert isinstance(hidden_size, int)
+        task_model_keys: Final = {
+            "use_rnn",
+            "dropout",
+            "word_dropout",
+            "locked_dropout",
+            "reproject_embeddings",
+            "use_crf",
+            "rnn_layers",
+            "rnn_type",
+        }
+        task_train_keys: Final = {
+            "learning_rate",
+            "mini_batch_size",
+            "max_epochs",
+            "param_selection_mode",
+            "save_final_model",
+        }
+
+        task_model_kwargs = {k: parameters.pop(k) for k in task_model_keys if k in parameters}
+        task_train_kwargs = {k: parameters.pop(k) for k in task_train_keys if k in parameters}
+
+        if len(parameters):
+            raise ValueError(
+                f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
+            )
+        return hidden_size, task_model_kwargs, task_train_kwargs

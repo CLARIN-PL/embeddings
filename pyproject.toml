@@ -89,6 +89,7 @@ module = [
     "tqdm.*",
     "transformers",
     "huggingface_hub",
+    "pandas"
 ]
 ignore_missing_imports = true
 
