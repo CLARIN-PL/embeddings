@@ -55,15 +55,15 @@ class FlairTextClassificationPreprocessingPipeline(
         ignore_test_subset: bool = False,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = HuggingFaceDataset(dataset_name, load_dataset_kwargs=load_dataset_kwargs)
+        dataset = HuggingFaceDataset(dataset=dataset_name, load_dataset_kwargs=load_dataset_kwargs)
         data_loader = HuggingFaceDataLoader()
         transformation = ClassificationCorpusTransformation(
-            input_column_name,
-            target_column_name,
-            datasets_path,
-            sample_missing_splits,
-            ignore_test_subset,
-        ).persisting(FlairPicklePersister(persist_path))
+            input_column_name=input_column_name,
+            target_column_name=target_column_name,
+            datasets_path=datasets_path,
+            sample_missing_splits=sample_missing_splits,
+            ignore_test_subset=ignore_test_subset,
+        ).persisting(FlairPicklePersister(path=persist_path))
         super().__init__(dataset, data_loader, transformation)
 
 
@@ -81,15 +81,15 @@ class FlairTextPairClassificationPreprocessingPipeline(
         ignore_test_subset: bool = False,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = HuggingFaceDataset(dataset_name, load_dataset_kwargs=load_dataset_kwargs)
+        dataset = HuggingFaceDataset(dataset=dataset_name, load_dataset_kwargs=load_dataset_kwargs)
         data_loader = HuggingFaceDataLoader()
         transformation = PairClassificationCorpusTransformation(
-            input_column_names,
-            target_column_name,
-            datasets_path,
-            sample_missing_splits,
-            ignore_test_subset,
-        ).persisting(FlairPicklePersister(persist_path))
+            input_columns_names_pair=input_column_names,
+            target_column_name=target_column_name,
+            datasets_path=datasets_path,
+            sample_missing_splits=sample_missing_splits,
+            ignore_test_subset=ignore_test_subset,
+        ).persisting(FlairPicklePersister(path=persist_path))
         super().__init__(dataset, data_loader, transformation)
 
 
@@ -107,13 +107,13 @@ class FlairSequenceLabelingPreprocessingPipeline(
         ignore_test_subset: bool = False,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = HuggingFaceDataset(dataset_name, load_dataset_kwargs=load_dataset_kwargs)
+        dataset = HuggingFaceDataset(dataset=dataset_name, load_dataset_kwargs=load_dataset_kwargs)
         data_loader = HuggingFaceDataLoader()
         transformation = ColumnCorpusTransformation(
-            input_column_name,
-            target_column_name,
-            datasets_path,
-            sample_missing_splits,
-            ignore_test_subset,
-        ).persisting(FlairConllPersister(persist_path))
+            input_column_name=input_column_name,
+            target_column_name=target_column_name,
+            datasets_path=datasets_path,
+            sample_missing_splits=sample_missing_splits,
+            ignore_test_subset=ignore_test_subset,
+        ).persisting(FlairConllPersister(path=persist_path))
         super().__init__(dataset, data_loader, transformation)

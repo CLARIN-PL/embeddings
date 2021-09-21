@@ -62,7 +62,7 @@ class FlairTextClassificationEvaluationPipeline(
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = LocalDataset(dataset_path)
+        dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
         embedding = FlairTransformerDocumentEmbedding(
             name=embedding_name, fine_tune=fine_tune_embeddings
@@ -75,7 +75,7 @@ class FlairTextClassificationEvaluationPipeline(
         model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
         evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = TextClassificationEvaluator()
         if persist_path is not None:
-            evaluator = evaluator.persisting(JsonPersister(persist_path))
+            evaluator = evaluator.persisting(JsonPersister(path=persist_path))
         super().__init__(dataset, data_loader, model, evaluator)
 
 
@@ -93,7 +93,7 @@ class FlairTextPairClassificationEvaluationPipeline(
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = LocalDataset(dataset_path)
+        dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
         embedding = FlairTransformerDocumentEmbedding(
             name=embedding_name, fine_tune=fine_tune_embeddings
@@ -106,7 +106,7 @@ class FlairTextPairClassificationEvaluationPipeline(
         model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
         evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = TextClassificationEvaluator()
         if persist_path:
-            evaluator = evaluator.persisting(JsonPersister(persist_path))
+            evaluator = evaluator.persisting(JsonPersister(path=persist_path))
         super().__init__(dataset, data_loader, model, evaluator)
 
 
@@ -127,7 +127,7 @@ class FlairSequenceLabelingEvaluationPipeline(
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = LocalDataset(dataset_path)
+        dataset = LocalDataset(dataset=dataset_path)
         data_loader = ConllFlairCorpusDataLoader()
         embedding = FlairTransformerWordEmbedding(
             name=embedding_name, fine_tune=fine_tune_embeddings
@@ -143,5 +143,5 @@ class FlairSequenceLabelingEvaluationPipeline(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         )
         if persist_path:
-            evaluator = evaluator.persisting(JsonPersister(persist_path))
+            evaluator = evaluator.persisting(JsonPersister(path=persist_path))
         super().__init__(dataset, data_loader, model, evaluator)
