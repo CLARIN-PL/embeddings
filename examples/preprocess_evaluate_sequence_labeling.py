@@ -1,10 +1,7 @@
 import pprint
-import tempfile
 from pathlib import Path
 from typing import Optional
 
-import flair
-import torch
 import typer
 
 from embeddings.defaults import DATASET_PATH, RESULTS_PATH

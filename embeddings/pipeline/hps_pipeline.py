@@ -1,5 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
+from typing import Type
 
 import datasets
 import optuna
@@ -25,11 +26,16 @@ class OptimizedFlairSequenceLabelingPipeline:
     config_space: SequenceLabelingConfigSpace = SequenceLabelingConfigSpace()
     seed: int = 441
     n_warmup_steps: int = 10
-    pruner: optuna.pruners.BasePruner = optuna.pruners.MedianPruner
-    sampler: optuna.samplers.BaseSampler = optuna.samplers.TPESampler
     n_trials: int = 20
+    pruner: Type[optuna.pruners.MedianPruner] = field(
+        init=False, default=optuna.pruners.MedianPruner
+    )
+    sampler: Type[optuna.samplers.TPESampler] = field(
+        init=False, default=optuna.samplers.TPESampler
+    )
+    dataset_path: "TemporaryDirectory[str]" = field(init=False, default=TemporaryDirectory())
 
-    def objective(self, trial: optuna.trial.Trial, dataset_path: str) -> float:
+    def objective(self, trial: optuna.trial.Trial) -> float:
         parameters = self.config_space.sample_parameters(trial=trial)
         hidden_size, task_model_kwargs, task_train_kwargs = self.config_space.parse_parameters(
             parameters
@@ -37,7 +43,7 @@ class OptimizedFlairSequenceLabelingPipeline:
 
         tmp_dir = TemporaryDirectory()
         pipeline = FlairSequenceLabelingEvaluationPipeline(
-            dataset_path=dataset_path,
+            dataset_path=self.dataset_path.name,
             hidden_size=hidden_size,
             embedding_name=self.embedding_name,
             evaluation_mode=self.evaluation_mode,
@@ -52,14 +58,13 @@ class OptimizedFlairSequenceLabelingPipeline:
         return metric
 
     def run(self) -> pd.DataFrame:
-        dataset_path: TemporaryDirectory[str] = TemporaryDirectory()
         preprocessing_pipeline: PreprocessingPipeline[
             str, datasets.DatasetDict, Corpus
         ] = FlairSequenceLabelingPreprocessingPipeline(
             dataset_name=self.dataset_name,
             input_column_name=self.input_column_name,
             target_column_name=self.target_column_name,
-            persist_path=dataset_path.name,
+            persist_path=self.dataset_path.name,
         )
         preprocessing_pipeline.run()
         study = optuna.create_study(
@@ -68,5 +73,5 @@ class OptimizedFlairSequenceLabelingPipeline:
             pruner=self.pruner(n_warmup_steps=self.n_warmup_steps),
         )
         study.optimize(self.objective, n_trials=self.n_trials)
-        dataset_path.cleanup()
+        self.dataset_path.cleanup()
         return study.trials_dataframe()
