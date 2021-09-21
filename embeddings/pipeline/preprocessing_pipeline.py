@@ -15,6 +15,9 @@ from embeddings.transformation.flair_transformation.classification_corpus_transf
 from embeddings.transformation.flair_transformation.column_corpus_transformation import (
     ColumnCorpusTransformation,
 )
+from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
+    DownsampleFlairCorpusTransformation,
+)
 from embeddings.transformation.flair_transformation.pair_classification_corpus_transformation import (
     PairClassificationCorpusTransformation,
 )
@@ -109,11 +112,15 @@ class FlairSequenceLabelingPreprocessingPipeline(
     ):
         dataset = HuggingFaceDataset(dataset=dataset_name, load_dataset_kwargs=load_dataset_kwargs)
         data_loader = HuggingFaceDataLoader()
-        transformation = ColumnCorpusTransformation(
-            input_column_name=input_column_name,
-            target_column_name=target_column_name,
-            datasets_path=datasets_path,
-            sample_missing_splits=sample_missing_splits,
-            ignore_test_subset=ignore_test_subset,
-        ).persisting(FlairConllPersister(path=persist_path))
+        transformation = (
+            ColumnCorpusTransformation(
+                input_column_name=input_column_name,
+                target_column_name=target_column_name,
+                datasets_path=datasets_path,
+                sample_missing_splits=sample_missing_splits,
+                ignore_test_subset=ignore_test_subset,
+            )
+            .then(DownsampleFlairCorpusTransformation(percentage=0.01))
+            .persisting(FlairConllPersister(path=persist_path))
+        )  # TODO: Remove after Development phase. For testing purposes
         super().__init__(dataset, data_loader, transformation)
