@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generic, Optional
+from typing import Any, Dict, Generic, Literal, Optional
 
 import numpy as np
 from flair.data import Corpus
@@ -58,6 +58,7 @@ class FlairTextClassificationEvaluationPipeline(
         fine_tune_embeddings: bool,
         output_path: str,
         persist_path: Optional[str] = None,
+        predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
@@ -71,7 +72,7 @@ class FlairTextClassificationEvaluationPipeline(
             task_train_kwargs=task_train_kwargs,
             task_model_kwargs=task_model_kwargs,
         )
-        model = FlairModel(embedding=embedding, task=task)
+        model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
         evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = TextClassificationEvaluator()
         if persist_path is not None:
             evaluator = evaluator.persisting(JsonPersister(persist_path))
@@ -88,6 +89,7 @@ class FlairTextPairClassificationEvaluationPipeline(
         fine_tune_embeddings: bool,
         output_path: str,
         persist_path: Optional[str] = None,
+        predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
@@ -101,7 +103,7 @@ class FlairTextPairClassificationEvaluationPipeline(
             task_train_kwargs=task_train_kwargs,
             task_model_kwargs=task_model_kwargs,
         )
-        model = FlairModel(embedding=embedding, task=task)
+        model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
         evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = TextClassificationEvaluator()
         if persist_path:
             evaluator = evaluator.persisting(JsonPersister(persist_path))
@@ -121,6 +123,7 @@ class FlairSequenceLabelingEvaluationPipeline(
         evaluation_mode: str = "conll",
         tagging_scheme: Optional[str] = None,
         persist_path: Optional[str] = None,
+        predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
@@ -135,7 +138,7 @@ class FlairSequenceLabelingEvaluationPipeline(
             task_train_kwargs=task_train_kwargs,
             task_model_kwargs=task_model_kwargs,
         )
-        model = FlairModel(embedding=embedding, task=task)
+        model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
         evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         )
