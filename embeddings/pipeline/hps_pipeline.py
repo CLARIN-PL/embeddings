@@ -51,6 +51,7 @@ class OptimizedFlairSequenceLabelingPipeline:
             task_model_kwargs=task_model_kwargs,
             task_train_kwargs=task_train_kwargs,
             output_path=tmp_dir.name,
+            predict_subset="dev",
         )
         results = pipeline.run()
         metric = results["seqeval__mode_None__scheme_None"]["overall_f1"]
@@ -65,6 +66,8 @@ class OptimizedFlairSequenceLabelingPipeline:
             input_column_name=self.input_column_name,
             target_column_name=self.target_column_name,
             persist_path=self.dataset_path.name,
+            sample_missing_splits=True,
+            ignore_test_subset=True,
         )
         preprocessing_pipeline.run()
         study = optuna.create_study(
