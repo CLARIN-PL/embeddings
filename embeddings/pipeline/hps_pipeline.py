@@ -1,11 +1,12 @@
 from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
-from typing import Type
+from typing import Dict, Tuple, Type, Union
 
 import datasets
 import optuna
 import pandas as pd
 from flair.data import Corpus
+from optuna import Study
 
 from embeddings.hyperparameter_search.configspace import SequenceLabelingConfigSpace
 from embeddings.pipeline.evaluation_pipeline import FlairSequenceLabelingEvaluationPipeline
@@ -13,6 +14,7 @@ from embeddings.pipeline.preprocessing_pipeline import (
     FlairSequenceLabelingPreprocessingPipeline,
     PreprocessingPipeline,
 )
+from embeddings.utils.utils import PrimitiveTypes
 
 
 @dataclass
@@ -58,7 +60,27 @@ class OptimizedFlairSequenceLabelingPipeline:
         assert isinstance(metric, float)
         return metric
 
-    def run(self) -> pd.DataFrame:
+    def _get_best_params_metadata(
+        self, study: Study
+    ) -> Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]:
+        best_params = study.best_params
+        hidden_size, task_model_kwargs, task_train_kwargs = self.config_space.parse_parameters(
+            best_params
+        )
+        return {
+            "dataset_name": self.dataset_name,
+            "input_column_name": self.input_column_name,
+            "target_column_name": self.target_column_name,
+            "evaluation_mode": self.evaluation_mode,
+            "fine_tune_embeddings": self.fine_tune_embeddings,
+            "hidden_size": hidden_size,
+            "task_model_kwargs": task_model_kwargs,
+            "task_train_kwargs": task_train_kwargs,
+        }
+
+    def run(
+        self,
+    ) -> Tuple[pd.DataFrame, Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]]:
         preprocessing_pipeline: PreprocessingPipeline[
             str, datasets.DatasetDict, Corpus
         ] = FlairSequenceLabelingPreprocessingPipeline(
@@ -70,11 +92,12 @@ class OptimizedFlairSequenceLabelingPipeline:
             ignore_test_subset=True,
         )
         preprocessing_pipeline.run()
-        study = optuna.create_study(
+        study: Study = optuna.create_study(
             direction="maximize",
             sampler=self.sampler(seed=self.seed),
             pruner=self.pruner(n_warmup_steps=self.n_warmup_steps),
         )
         study.optimize(self.objective, n_trials=self.n_trials)
         self.dataset_path.cleanup()
-        return study.trials_dataframe()
+        metadata = self._get_best_params_metadata(study)
+        return study.trials_dataframe(), metadata
