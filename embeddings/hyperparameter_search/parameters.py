@@ -6,9 +6,9 @@ from typing import Generic, Literal, Optional, Sequence, TypeVar, Union, get_arg
 import optuna
 import optuna.distributions
 
+from embeddings.utils.utils import Numeric, PrimitiveTypes
+
 Distribution = TypeVar("Distribution")
-ChoiceType = Union[None, bool, int, float, str]
-Numeric = Union[float, int]
 ParameterTypes = Literal[
     "categorical",
     "uniform",
@@ -22,7 +22,7 @@ ParameterTypes = Literal[
 @dataclass(frozen=True)
 class ConstantParameter:
     name: str
-    value: ChoiceType
+    value: PrimitiveTypes
 
 
 # Type: ignore is due to https://github.com/python/mypy/issues/5374
@@ -35,11 +35,11 @@ class AbstractSearchableParameter(ABC, Generic[Distribution]):
     high: Optional[Numeric] = None
     step: Optional[Numeric] = None
     q: Optional[float] = None
-    choices: Optional[Sequence[ChoiceType]] = None
+    choices: Optional[Sequence[PrimitiveTypes]] = None
 
     @staticmethod
     def _check_additional_params_passed(
-        variables: Sequence[Union[ChoiceType, Sequence[ChoiceType]]]
+        variables: Sequence[Union[PrimitiveTypes, Sequence[PrimitiveTypes]]]
     ) -> None:
         for var in variables:
             assert var is None
@@ -105,7 +105,7 @@ class AbstractSearchableParameter(ABC, Generic[Distribution]):
 
     @staticmethod
     @abc.abstractmethod
-    def get_categorical_distribution(choices: Sequence[ChoiceType]) -> Distribution:
+    def get_categorical_distribution(choices: Sequence[PrimitiveTypes]) -> Distribution:
         pass
 
     @staticmethod
@@ -137,7 +137,7 @@ class AbstractSearchableParameter(ABC, Generic[Distribution]):
 class SearchableParameter(AbstractSearchableParameter[optuna.distributions.BaseDistribution]):
     @staticmethod
     def get_categorical_distribution(
-        choices: Sequence[ChoiceType],
+        choices: Sequence[PrimitiveTypes],
     ) -> optuna.distributions.BaseDistribution:
         return optuna.distributions.CategoricalDistribution(choices=choices)
 
