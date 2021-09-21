@@ -13,7 +13,7 @@ Parameter = Union[SearchableParameter, ConstantParameter]
 class AbstractConfigSpace(abc.ABC):
     def _parse_parameter(
         self, param_name: str, trial: optuna.trial.Trial
-    ) -> Tuple[str, Union[None, float, int, str, bool]]:
+    ) -> Tuple[str, PrimitiveTypes]:
         param: Parameter = self.__getattribute__(param_name)
         if isinstance(param, SearchableParameter):
             return param.name, trial._suggest(name=param.name, distribution=param.distribution)
@@ -27,17 +27,15 @@ class AbstractConfigSpace(abc.ABC):
 
     def _map_parameters(
         self, trial: optuna.trial.Trial, parameters_types: Dict[str, Any]
-    ) -> Dict[str, Union[None, float, int, str, bool]]:
-        parameters: Dict[str, Union[None, float, int, str, bool]] = {}
+    ) -> Dict[str, PrimitiveTypes]:
+        parameters: Dict[str, PrimitiveTypes] = {}
         for param_name, param_type in parameters_types.items():
             parameters.update([self._parse_parameter(trial=trial, param_name=param_name)])
 
         return parameters
 
     @abc.abstractmethod
-    def sample_parameters(
-        self, trial: optuna.trial.Trial
-    ) -> Dict[str, Union[None, float, int, str, bool]]:
+    def sample_parameters(self, trial: optuna.trial.Trial) -> Dict[str, PrimitiveTypes]:
         pass
 
 
@@ -86,9 +84,7 @@ class SequenceLabelingConfigSpace(AbstractConfigSpace):
         init=False, default=ConstantParameter(name="save_final_model", value=False)
     )
 
-    def sample_parameters(
-        self, trial: optuna.trial.Trial
-    ) -> Dict[str, Union[None, float, int, str, bool]]:
+    def sample_parameters(self, trial: optuna.trial.Trial) -> Dict[str, PrimitiveTypes]:
         parameters = {}
 
         use_rnn_name, use_rnn_val = self._parse_parameter(trial=trial, param_name="use_rnn")
