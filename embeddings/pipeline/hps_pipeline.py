@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
 from typing import Dict, Tuple, Type, Union
@@ -36,6 +37,9 @@ class OptimizedFlairSequenceLabelingPipeline:
         init=False, default=optuna.samplers.TPESampler
     )
     dataset_path: "TemporaryDirectory[str]" = field(init=False, default=TemporaryDirectory())
+
+    def __post_init__(self) -> None:
+        logging.getLogger("flair").setLevel(logging.WARNING)
 
     def objective(self, trial: optuna.trial.Trial) -> float:
         parameters = self.config_space.sample_parameters(trial=trial)
@@ -97,7 +101,7 @@ class OptimizedFlairSequenceLabelingPipeline:
             sampler=self.sampler(seed=self.seed),
             pruner=self.pruner(n_warmup_steps=self.n_warmup_steps),
         )
-        study.optimize(self.objective, n_trials=self.n_trials)
+        study.optimize(self.objective, n_trials=self.n_trials, show_progress_bar=True)
         self.dataset_path.cleanup()
         metadata = self._get_best_params_metadata(study)
         return study.trials_dataframe(), metadata
