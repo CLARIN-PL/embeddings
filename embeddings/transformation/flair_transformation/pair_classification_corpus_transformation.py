@@ -16,8 +16,16 @@ class PairClassificationCorpusTransformation(ClassificationCorpusTransformation)
         input_columns_names_pair: Tuple[str, str],
         target_column_name: str,
         datasets_path: Path = DATASET_PATH,
+        sample_missing_splits: bool = True,
+        ignore_test_subset: bool = False,
     ):
-        super().__init__(input_columns_names_pair[0], target_column_name, datasets_path)
+        super().__init__(
+            input_columns_names_pair[0],
+            target_column_name,
+            datasets_path,
+            sample_missing_splits,
+            ignore_test_subset,
+        )
         self.pair_column_name: str = input_columns_names_pair[1]
 
     def _preprocess_subset(
