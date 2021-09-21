@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from tempfile import TemporaryDirectory
 
 import datasets
@@ -13,24 +14,20 @@ from embeddings.pipeline.preprocessing_pipeline import (
 )
 
 
+@dataclass
 class OptimizedFlairSequenceLabelingPipeline:
-    def __init__(
-        self,
-        dataset_name: str,
-        input_column_name: str,
-        target_column_name: str,
-        embedding_name: str,
-        fine_tune_embeddings: bool = False,
-        evaluation_mode: str = "conll",
-        config_space: SequenceLabelingConfigSpace = SequenceLabelingConfigSpace(),
-    ) -> None:
-        self.dataset_name = dataset_name
-        self.input_column_name = input_column_name
-        self.target_column_name = target_column_name
-        self.config_space: SequenceLabelingConfigSpace = config_space
-        self.embedding_name = embedding_name
-        self.fine_tune_embeddings = fine_tune_embeddings
-        self.evaluation_mode = evaluation_mode
+    dataset_name: str
+    input_column_name: str
+    target_column_name: str
+    embedding_name: str
+    fine_tune_embeddings: bool = False
+    evaluation_mode: str = "conll"
+    config_space: SequenceLabelingConfigSpace = SequenceLabelingConfigSpace()
+    seed: int = 441
+    n_warmup_steps: int = 10
+    pruner: optuna.pruners.BasePruner = optuna.pruners.MedianPruner
+    sampler: optuna.samplers.BaseSampler = optuna.samplers.TPESampler
+    n_trials: int = 20
 
     def objective(self, trial: optuna.trial.Trial, dataset_path: str) -> float:
         parameters = self.config_space.sample_parameters(trial=trial)
@@ -67,9 +64,9 @@ class OptimizedFlairSequenceLabelingPipeline:
         preprocessing_pipeline.run()
         study = optuna.create_study(
             direction="maximize",
-            sampler=optuna.samplers.TPESampler(seed=441),
-            pruner=optuna.pruners.MedianPruner(n_warmup_steps=10),
+            sampler=self.sampler(seed=self.seed),
+            pruner=self.pruner(n_warmup_steps=self.n_warmup_steps),
         )
-        study.optimize(self.objective, n_trials=20)
+        study.optimize(self.objective, n_trials=self.n_trials)
         dataset_path.cleanup()
         return study.trials_dataframe()
