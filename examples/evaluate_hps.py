@@ -1,6 +1,7 @@
+from tempfile import TemporaryDirectory
+
 from embeddings.pipeline.hps_pipeline import OptimizedFlairSequenceLabelingPipeline
 from embeddings.pipeline.hugging_face_sequence_labeling import HuggingFaceSequenceLabelingPipeline
-from tempfile import TemporaryDirectory
 
 
 def main() -> None:
