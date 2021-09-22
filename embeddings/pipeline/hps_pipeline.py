@@ -29,7 +29,7 @@ class OptimizedFlairSequenceLabelingPipeline:
     config_space: SequenceLabelingConfigSpace = SequenceLabelingConfigSpace()
     seed: int = 441
     n_warmup_steps: int = 10
-    n_trials: int = 20
+    n_trials: int = 2
     pruner: Type[optuna.pruners.MedianPruner] = field(
         init=False, default=optuna.pruners.MedianPruner
     )
@@ -38,8 +38,13 @@ class OptimizedFlairSequenceLabelingPipeline:
     )
     dataset_path: "TemporaryDirectory[str]" = field(init=False, default=TemporaryDirectory())
 
-    def __post_init__(self) -> None:
+    @staticmethod
+    def _disable_unnecesery_logging() -> None:
         logging.getLogger("flair").setLevel(logging.WARNING)
+
+    @staticmethod
+    def _revert_logging() -> None:
+        logging.getLogger("flair").setLevel(logging.INFO)
 
     def objective(self, trial: optuna.trial.Trial) -> float:
         parameters = self.config_space.sample_parameters(trial=trial)
@@ -72,6 +77,7 @@ class OptimizedFlairSequenceLabelingPipeline:
             best_params
         )
         return {
+            "embedding_name": self.embedding_name,
             "dataset_name": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
@@ -85,6 +91,7 @@ class OptimizedFlairSequenceLabelingPipeline:
     def run(
         self,
     ) -> Tuple[pd.DataFrame, Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]]:
+        self._disable_unnecesery_logging()
         preprocessing_pipeline: PreprocessingPipeline[
             str, datasets.DatasetDict, Corpus
         ] = FlairSequenceLabelingPreprocessingPipeline(
@@ -104,4 +111,5 @@ class OptimizedFlairSequenceLabelingPipeline:
         study.optimize(self.objective, n_trials=self.n_trials, show_progress_bar=True)
         self.dataset_path.cleanup()
         metadata = self._get_best_params_metadata(study)
+        self._revert_logging()
         return study.trials_dataframe(), metadata
