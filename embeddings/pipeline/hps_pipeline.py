@@ -4,7 +4,7 @@ import pathlib
 from abc import ABC
 from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
-from typing import Dict, Tuple, Type, Union
+from typing import Any, Dict, Generic, Optional, Tuple, Type, TypedDict, TypeVar, Union
 
 import optuna
 import pandas as pd
@@ -18,10 +18,23 @@ from embeddings.pipeline.preprocessing_pipeline import (
     PreprocessingPipeline,
 )
 from embeddings.pipeline.standard_pipeline import LoaderResult, TransformationResult
-from embeddings.utils.utils import PrimitiveTypes
+
+Metadata = TypeVar("Metadata")
 
 
-class OptimizedPipeline(ABC):
+class SequenceLabelingMetadata(TypedDict):
+    embedding_name: str
+    dataset_name: str
+    input_column_name: str
+    target_column_name: str
+    hidden_size: int
+    evaluation_mode: str
+    task_model_kwargs: Optional[Dict[str, Any]]
+    task_train_kwargs: Optional[Dict[str, Any]]
+    # fine_tune_embeddings: bool
+
+
+class OptimizedPipeline(ABC, Generic[Metadata]):
     def __init__(
         self,
         preprocessing_pipeline: PreprocessingPipeline[Data, LoaderResult, TransformationResult],
@@ -47,14 +60,12 @@ class OptimizedPipeline(ABC):
         pass
 
     @abc.abstractmethod
-    def _get_best_params_metadata(
-        self, study: Study
-    ) -> Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]:
+    def _get_best_params_metadata(self, study: Study) -> Metadata:
         pass
 
     def run(
         self,
-    ) -> Tuple[pd.DataFrame, Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]]:
+    ) -> Tuple[pd.DataFrame, Metadata]:
         self._pre_run_hook()
         self.preprocessing_pipeline.run()
         study: Study = optuna.create_study(
@@ -67,12 +78,12 @@ class OptimizedPipeline(ABC):
         if isinstance(self.dataset_path, TemporaryDirectory):
             self.dataset_path.cleanup()
 
-        metadata = self._get_best_params_metadata(study)
+        metadata: Metadata = self._get_best_params_metadata(study)
         self._post_run_hook()
         return study.trials_dataframe(), metadata
 
 
-class FlairOptimizedPipeline(OptimizedPipeline):
+class FlairOptimizedPipeline(OptimizedPipeline[Metadata]):
     def _pre_run_hook(self) -> None:
         logging.getLogger("flair").setLevel(logging.WARNING)
 
@@ -81,7 +92,7 @@ class FlairOptimizedPipeline(OptimizedPipeline):
 
 
 @dataclass
-class OptimizedFlairSequenceLabelingPipeline(FlairOptimizedPipeline):
+class OptimizedFlairSequenceLabelingPipeline(FlairOptimizedPipeline[SequenceLabelingMetadata]):
     dataset_name: str
     input_column_name: str
     target_column_name: str
@@ -139,21 +150,21 @@ class OptimizedFlairSequenceLabelingPipeline(FlairOptimizedPipeline):
         assert isinstance(metric, float)
         return metric
 
-    def _get_best_params_metadata(
-        self, study: Study
-    ) -> Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]:
+    def _get_best_params_metadata(self, study: Study) -> SequenceLabelingMetadata:
         best_params = study.best_params
         hidden_size, task_model_kwargs, task_train_kwargs = self.config_space.parse_parameters(
             best_params
         )
-        return {
+
+        metadata: SequenceLabelingMetadata = {
             "embedding_name": self.embedding_name,
             "dataset_name": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
             "evaluation_mode": self.evaluation_mode,
-            "fine_tune_embeddings": self.fine_tune_embeddings,
+            # "fine_tune_embeddings": self.fine_tune_embeddings,
             "hidden_size": hidden_size,
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
         }
+        return metadata
