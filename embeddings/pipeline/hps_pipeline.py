@@ -1,25 +1,87 @@
+import abc
 import logging
+import pathlib
+from abc import ABC
 from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
 from typing import Dict, Tuple, Type, Union
 
-import datasets
 import optuna
 import pandas as pd
-from flair.data import Corpus
 from optuna import Study
 
+from embeddings.data.dataset import Data
 from embeddings.hyperparameter_search.configspace import SequenceLabelingConfigSpace
 from embeddings.pipeline.evaluation_pipeline import FlairSequenceLabelingEvaluationPipeline
 from embeddings.pipeline.preprocessing_pipeline import (
     FlairSequenceLabelingPreprocessingPipeline,
     PreprocessingPipeline,
 )
+from embeddings.pipeline.standard_pipeline import LoaderResult, TransformationResult
 from embeddings.utils.utils import PrimitiveTypes
 
 
+class OptimizedPipeline(ABC):
+    def __init__(
+        self,
+        preprocessing_pipeline: PreprocessingPipeline[Data, LoaderResult, TransformationResult],
+        pruner: optuna.pruners.BasePruner,
+        sampler: optuna.samplers.BaseSampler,
+        n_trials: int,
+        dataset_path: Union[str, pathlib.Path, "TemporaryDirectory[str]"],
+    ):
+        self.preprocessing_pipeline = preprocessing_pipeline
+        self.pruner: optuna.pruners.BasePruner = pruner
+        self.sampler: optuna.samplers.BaseSampler = sampler
+        self.n_trials: int = n_trials
+        self.dataset_path = dataset_path
+
+    def _pre_run_hook(self) -> None:
+        pass
+
+    def _post_run_hook(self) -> None:
+        pass
+
+    @abc.abstractmethod
+    def objective(self, trial: optuna.trial.Trial) -> float:
+        pass
+
+    @abc.abstractmethod
+    def _get_best_params_metadata(
+        self, study: Study
+    ) -> Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]:
+        pass
+
+    def run(
+        self,
+    ) -> Tuple[pd.DataFrame, Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]]:
+        self._pre_run_hook()
+        self.preprocessing_pipeline.run()
+        study: Study = optuna.create_study(
+            direction="maximize",
+            sampler=self.sampler,
+            pruner=self.pruner,
+        )
+        study.optimize(self.objective, n_trials=self.n_trials, show_progress_bar=True)
+
+        if isinstance(self.dataset_path, TemporaryDirectory):
+            self.dataset_path.cleanup()
+
+        metadata = self._get_best_params_metadata(study)
+        self._post_run_hook()
+        return study.trials_dataframe(), metadata
+
+
+class FlairOptimizedPipeline(OptimizedPipeline):
+    def _pre_run_hook(self) -> None:
+        logging.getLogger("flair").setLevel(logging.WARNING)
+
+    def _post_run_hook(self) -> None:
+        logging.getLogger("flair").setLevel(logging.INFO)
+
+
 @dataclass
-class OptimizedFlairSequenceLabelingPipeline:
+class OptimizedFlairSequenceLabelingPipeline(FlairOptimizedPipeline):
     dataset_name: str
     input_column_name: str
     target_column_name: str
@@ -30,21 +92,29 @@ class OptimizedFlairSequenceLabelingPipeline:
     seed: int = 441
     n_warmup_steps: int = 10
     n_trials: int = 2
-    pruner: Type[optuna.pruners.MedianPruner] = field(
+    pruner_cls: Type[optuna.pruners.MedianPruner] = field(
         init=False, default=optuna.pruners.MedianPruner
     )
-    sampler: Type[optuna.samplers.TPESampler] = field(
+    sampler_cls: Type[optuna.samplers.TPESampler] = field(
         init=False, default=optuna.samplers.TPESampler
     )
     dataset_path: "TemporaryDirectory[str]" = field(init=False, default=TemporaryDirectory())
 
-    @staticmethod
-    def _disable_unnecesery_logging() -> None:
-        logging.getLogger("flair").setLevel(logging.WARNING)
-
-    @staticmethod
-    def _revert_logging() -> None:
-        logging.getLogger("flair").setLevel(logging.INFO)
+    def __post_init__(self) -> None:
+        super().__init__(
+            preprocessing_pipeline=FlairSequenceLabelingPreprocessingPipeline(
+                dataset_name=self.dataset_name,
+                input_column_name=self.input_column_name,
+                target_column_name=self.target_column_name,
+                persist_path=self.dataset_path.name,
+                sample_missing_splits=True,
+                ignore_test_subset=True,
+            ),
+            pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
+            sampler=self.sampler_cls(seed=self.seed),
+            n_trials=self.n_trials,
+            dataset_path=self.dataset_path,
+        )
 
     def objective(self, trial: optuna.trial.Trial) -> float:
         parameters = self.config_space.sample_parameters(trial=trial)
@@ -87,29 +157,3 @@ class OptimizedFlairSequenceLabelingPipeline:
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
         }
-
-    def run(
-        self,
-    ) -> Tuple[pd.DataFrame, Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]]:
-        self._disable_unnecesery_logging()
-        preprocessing_pipeline: PreprocessingPipeline[
-            str, datasets.DatasetDict, Corpus
-        ] = FlairSequenceLabelingPreprocessingPipeline(
-            dataset_name=self.dataset_name,
-            input_column_name=self.input_column_name,
-            target_column_name=self.target_column_name,
-            persist_path=self.dataset_path.name,
-            sample_missing_splits=True,
-            ignore_test_subset=True,
-        )
-        preprocessing_pipeline.run()
-        study: Study = optuna.create_study(
-            direction="maximize",
-            sampler=self.sampler(seed=self.seed),
-            pruner=self.pruner(n_warmup_steps=self.n_warmup_steps),
-        )
-        study.optimize(self.objective, n_trials=self.n_trials, show_progress_bar=True)
-        self.dataset_path.cleanup()
-        metadata = self._get_best_params_metadata(study)
-        self._revert_logging()
-        return study.trials_dataframe(), metadata
