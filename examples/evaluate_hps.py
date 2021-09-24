@@ -5,12 +5,12 @@ from embeddings.pipeline.hugging_face_sequence_labeling import HuggingFaceSequen
 
 
 def main() -> None:
-    hps_pipeline: OptimizedFlairSequenceLabelingPipeline = OptimizedFlairSequenceLabelingPipeline(
+    hps_pipeline = OptimizedFlairSequenceLabelingPipeline(
         dataset_name="clarin-pl/kpwr-ner",
         embedding_name="clarin-pl/roberta-polish-kgr10",
         input_column_name="tokens",
         target_column_name="ner",
-    )
+    ).persisting(best_params_path="best_params.yaml", log_path="hps_log.pickle")
     df, metadata = hps_pipeline.run()
     output_path = TemporaryDirectory()
     metadata["output_path"] = output_path.name
