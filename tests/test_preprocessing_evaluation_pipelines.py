@@ -22,6 +22,9 @@ from embeddings.transformation.flair_transformation.column_corpus_transformation
 from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
     DownsampleFlairCorpusTransformation,
 )
+from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
+    SampleSplitsFlairCorpusTransformation,
+)
 from embeddings.utils.flair_corpus_persister import FlairConllPersister
 
 
@@ -56,6 +59,7 @@ def sequence_labeling_preprocessing_pipeline(
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
         .then(DownsampleFlairCorpusTransformation(percentage=0.005))
+        .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, test_fraction=0.1, seed=441))
         .persisting(FlairConllPersister(result_path.name))
     )
     pipeline = PreprocessingPipeline(
@@ -112,7 +116,7 @@ def test_sequence_labeling_preprocessing_pipeline(
     result = evaluation_pipeline.run()
 
     np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.20634920634920634
+        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.8023255
     )
     np.testing.assert_almost_equal(result["seqeval__mode_None__scheme_None"]["overall_f1"], 0)
 

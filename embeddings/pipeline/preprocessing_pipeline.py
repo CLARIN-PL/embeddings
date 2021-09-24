@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, Generic, Optional, Tuple
+from typing import Any, Dict, Generic, Optional, Tuple, Union
 
 import datasets
 from flair.data import Corpus
@@ -18,8 +18,14 @@ from embeddings.transformation.flair_transformation.column_corpus_transformation
 from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
     DownsampleFlairCorpusTransformation,
 )
+from embeddings.transformation.flair_transformation.drop_subset_corpus_transformation import (
+    DropSubsetFlairCorpusTransformation,
+)
 from embeddings.transformation.flair_transformation.pair_classification_corpus_transformation import (
     PairClassificationCorpusTransformation,
+)
+from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
+    SampleSplitsFlairCorpusTransformation,
 )
 from embeddings.transformation.transformation import Transformation
 from embeddings.utils.flair_corpus_persister import FlairConllPersister, FlairPicklePersister
@@ -54,24 +60,26 @@ class FlairTextClassificationPreprocessingPipeline(
         input_column_name: str,
         target_column_name: str,
         datasets_path: Path = DATASET_PATH,
-        sample_missing_splits: bool = True,
+        sample_missing_splits: Tuple[float, float] = (0.1, 0.1),
         ignore_test_subset: bool = False,
+        seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = HuggingFaceDataset(dataset=dataset_name, load_dataset_kwargs=load_dataset_kwargs)
         data_loader = HuggingFaceDataLoader()
-        transformation = (
-            ClassificationCorpusTransformation(
-                input_column_name=input_column_name,
-                target_column_name=target_column_name,
-                datasets_path=datasets_path,
-                sample_missing_splits=sample_missing_splits,
-                ignore_test_subset=ignore_test_subset,
-            )
-            .then(DownsampleFlairCorpusTransformation(percentage=0.01))
-            .persisting(FlairPicklePersister(path=persist_path))
-        )
+        transformation: Union[
+            Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
+        ]
+        transformation = ClassificationCorpusTransformation(
+            input_column_name=input_column_name,
+            target_column_name=target_column_name,
+            datasets_path=datasets_path,
+        ).then(SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed))\
+        .then(DownsampleFlairCorpusTransformation(percentage=0.01))
         # TODO: Remove DownsampleFlairCorpusTransformation after Development phase. For testing purposes
+        if ignore_test_subset:
+            transformation = transformation.then(DropSubsetFlairCorpusTransformation(subset="test"))
+        transformation = transformation.persisting(FlairPicklePersister(path=persist_path))
         super().__init__(dataset, data_loader, transformation)
 
 
@@ -85,19 +93,24 @@ class FlairTextPairClassificationPreprocessingPipeline(
         input_column_names: Tuple[str, str],
         target_column_name: str,
         datasets_path: Path = DATASET_PATH,
-        sample_missing_splits: bool = True,
+        sample_missing_splits: Tuple[float, float] = (0.1, 0.1),
         ignore_test_subset: bool = False,
+        seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = HuggingFaceDataset(dataset=dataset_name, load_dataset_kwargs=load_dataset_kwargs)
         data_loader = HuggingFaceDataLoader()
+        transformation: Union[
+            Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
+        ]
         transformation = PairClassificationCorpusTransformation(
             input_columns_names_pair=input_column_names,
             target_column_name=target_column_name,
             datasets_path=datasets_path,
-            sample_missing_splits=sample_missing_splits,
-            ignore_test_subset=ignore_test_subset,
-        ).persisting(FlairPicklePersister(path=persist_path))
+        ).then(SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed))
+        if ignore_test_subset:
+            transformation = transformation.then(DropSubsetFlairCorpusTransformation(subset="test"))
+        transformation = transformation.persisting(FlairPicklePersister(path=persist_path))
         super().__init__(dataset, data_loader, transformation)
 
 
@@ -111,21 +124,26 @@ class FlairSequenceLabelingPreprocessingPipeline(
         input_column_name: str,
         target_column_name: str,
         datasets_path: Path = DATASET_PATH,
-        sample_missing_splits: bool = True,
+        sample_missing_splits: Tuple[float, float] = (0.1, 0.1),
         ignore_test_subset: bool = False,
+        seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = HuggingFaceDataset(dataset=dataset_name, load_dataset_kwargs=load_dataset_kwargs)
         data_loader = HuggingFaceDataLoader()
+        transformation: Union[
+            Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
+        ]
         transformation = (
             ColumnCorpusTransformation(
                 input_column_name=input_column_name,
                 target_column_name=target_column_name,
                 datasets_path=datasets_path,
-                sample_missing_splits=sample_missing_splits,
-                ignore_test_subset=ignore_test_subset,
-            )
+            ).then(SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed))
             .then(DownsampleFlairCorpusTransformation(percentage=0.01))
-            .persisting(FlairConllPersister(path=persist_path))
-        )  # TODO: DownsampleFlairCorpusTransformation Remove after Development phase. For testing purposes
+        )
+        # TODO: Remove after Development phase. For testing purposes
+        if ignore_test_subset:
+            transformation = transformation.then(DropSubsetFlairCorpusTransformation(subset="test"))
+        transformation = transformation.persisting(FlairConllPersister(path=persist_path))
         super().__init__(dataset, data_loader, transformation)

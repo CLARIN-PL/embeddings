@@ -20,6 +20,9 @@ from embeddings.transformation.flair_transformation.column_corpus_transformation
 from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
     DownsampleFlairCorpusTransformation,
 )
+from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
+    SampleSplitsFlairCorpusTransformation,
+)
 
 
 @pytest.fixture
@@ -52,8 +55,10 @@ def ner_tagging_pipeline(
 ]:
     dataset = HuggingFaceDataset("clarin-pl/kpwr-ner")
     data_loader = HuggingFaceDataLoader()
-    transformation = ColumnCorpusTransformation("tokens", "ner").then(
-        DownsampleFlairCorpusTransformation(percentage=0.005)
+    transformation = (
+        ColumnCorpusTransformation("tokens", "ner")
+        .then(DownsampleFlairCorpusTransformation(percentage=0.005))
+        .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, seed=441))
     )
     embedding = AutoFlairWordEmbedding.from_hub("allegro/herbert-base-cased")
     task = SequenceLabeling(
@@ -79,7 +84,7 @@ def test_pos_tagging_pipeline(
     result = pipeline.run()
     path.cleanup()
 
-    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.2464788)
+    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.1526717)
 
 
 def test_ner_tagging_pipeline(
