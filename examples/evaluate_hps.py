@@ -13,7 +13,8 @@ def main() -> None:
     )
     df, metadata = hps_pipeline.run()
     output_path = TemporaryDirectory()
-    pipeline = HuggingFaceSequenceLabelingPipeline(**metadata, output_path=output_path.name)
+    metadata["output_path"] = output_path.name
+    pipeline = HuggingFaceSequenceLabelingPipeline(**metadata)
     print(pipeline.run())
     output_path.cleanup()
 
