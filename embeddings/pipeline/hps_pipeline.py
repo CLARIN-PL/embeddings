@@ -11,6 +11,7 @@ import pandas as pd
 from optuna import Study
 
 from embeddings.data.dataset import Data
+from embeddings.data.io import T_path
 from embeddings.hyperparameter_search.configspace import SequenceLabelingConfigSpace
 from embeddings.pipeline.evaluation_pipeline import FlairSequenceLabelingEvaluationPipeline
 from embeddings.pipeline.pipelines_metadata import (
@@ -22,9 +23,39 @@ from embeddings.pipeline.preprocessing_pipeline import (
     PreprocessingPipeline,
 )
 from embeddings.pipeline.standard_pipeline import LoaderResult, TransformationResult
+from embeddings.utils.hps_persister import HPSResultsPersister
 
 
 class OptimizedPipeline(ABC, Generic[Metadata]):
+    def __init__(self) -> None:
+        pass
+
+    @abc.abstractmethod
+    def run(self) -> Tuple[pd.DataFrame, Metadata]:
+        pass
+
+    def persisting(
+        self, best_params_path: T_path, log_path: T_path
+    ) -> "OptimizedPipeline[Metadata]":
+        return PersistingPipeline(self, best_params_path, log_path)
+
+
+class PersistingPipeline(OptimizedPipeline[Metadata]):
+    def __init__(
+        self, base_pipeline: OptimizedPipeline[Metadata], best_params_path: T_path, log_path: T_path
+    ):
+        self.base_pipeline = base_pipeline
+        self.persister: HPSResultsPersister[Metadata] = HPSResultsPersister(
+            best_params_path=best_params_path, log_path=log_path
+        )
+
+    def run(self) -> Tuple[pd.DataFrame, Metadata]:
+        result = self.base_pipeline.run()
+        self.persister.persist(result)
+        return result
+
+
+class OptunaPipeline(OptimizedPipeline[Metadata]):
     def __init__(
         self,
         preprocessing_pipeline: PreprocessingPipeline[Data, LoaderResult, TransformationResult],
@@ -73,7 +104,7 @@ class OptimizedPipeline(ABC, Generic[Metadata]):
         return study.trials_dataframe(), metadata
 
 
-class FlairOptimizedPipeline(OptimizedPipeline[Metadata]):
+class FlairOptimizedPipeline(OptunaPipeline[Metadata]):
     def _pre_run_hook(self) -> None:
         logging.getLogger("flair").setLevel(logging.WARNING)
 
