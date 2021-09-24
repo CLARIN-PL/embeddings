@@ -4,7 +4,7 @@ import pathlib
 from abc import ABC
 from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Generic, Optional, Tuple, Type, TypedDict, TypeVar, Union
+from typing import Generic, Optional, Tuple, Type, Union
 
 import optuna
 import pandas as pd
@@ -13,25 +13,15 @@ from optuna import Study
 from embeddings.data.dataset import Data
 from embeddings.hyperparameter_search.configspace import SequenceLabelingConfigSpace
 from embeddings.pipeline.evaluation_pipeline import FlairSequenceLabelingEvaluationPipeline
+from embeddings.pipeline.pipelines_metadata import (
+    HuggingFaceSequenceLabelingPipelineMetadata,
+    Metadata,
+)
 from embeddings.pipeline.preprocessing_pipeline import (
     FlairSequenceLabelingPreprocessingPipeline,
     PreprocessingPipeline,
 )
 from embeddings.pipeline.standard_pipeline import LoaderResult, TransformationResult
-
-Metadata = TypeVar("Metadata")
-
-
-class SequenceLabelingMetadata(TypedDict):
-    embedding_name: str
-    dataset_name: str
-    input_column_name: str
-    target_column_name: str
-    hidden_size: int
-    evaluation_mode: str
-    task_model_kwargs: Optional[Dict[str, Any]]
-    task_train_kwargs: Optional[Dict[str, Any]]
-    # fine_tune_embeddings: bool
 
 
 class OptimizedPipeline(ABC, Generic[Metadata]):
@@ -92,13 +82,16 @@ class FlairOptimizedPipeline(OptimizedPipeline[Metadata]):
 
 
 @dataclass
-class OptimizedFlairSequenceLabelingPipeline(FlairOptimizedPipeline[SequenceLabelingMetadata]):
+class OptimizedFlairSequenceLabelingPipeline(
+    FlairOptimizedPipeline[HuggingFaceSequenceLabelingPipelineMetadata]
+):
     dataset_name: str
     input_column_name: str
     target_column_name: str
     embedding_name: str
     fine_tune_embeddings: bool = False
     evaluation_mode: str = "conll"
+    tagging_scheme: Optional[str] = None
     config_space: SequenceLabelingConfigSpace = SequenceLabelingConfigSpace()
     seed: int = 441
     n_warmup_steps: int = 10
@@ -150,13 +143,15 @@ class OptimizedFlairSequenceLabelingPipeline(FlairOptimizedPipeline[SequenceLabe
         assert isinstance(metric, float)
         return metric
 
-    def _get_best_params_metadata(self, study: Study) -> SequenceLabelingMetadata:
+    def _get_best_params_metadata(
+        self, study: Study
+    ) -> HuggingFaceSequenceLabelingPipelineMetadata:
         best_params = study.best_params
         hidden_size, task_model_kwargs, task_train_kwargs = self.config_space.parse_parameters(
             best_params
         )
 
-        metadata: SequenceLabelingMetadata = {
+        metadata: HuggingFaceSequenceLabelingPipelineMetadata = {
             "embedding_name": self.embedding_name,
             "dataset_name": self.dataset_name,
             "input_column_name": self.input_column_name,
@@ -166,5 +161,6 @@ class OptimizedFlairSequenceLabelingPipeline(FlairOptimizedPipeline[SequenceLabe
             "hidden_size": hidden_size,
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
+            "tagging_scheme": self.tagging_scheme,
         }
         return metadata
