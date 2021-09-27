@@ -1,9 +1,9 @@
 import abc
 import logging
-import pathlib
 from abc import ABC
 from dataclasses import dataclass, field
-from tempfile import NamedTemporaryFile, TemporaryDirectory
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Generic, Optional, Tuple, Type, Union
 
 import optuna
@@ -70,7 +70,7 @@ class OptunaPipeline(OptimizedPipeline[Metadata]):
         pruner: optuna.pruners.BasePruner,
         sampler: optuna.samplers.BaseSampler,
         n_trials: int,
-        dataset_path: Union[str, pathlib.Path, "TemporaryDirectory[str]"],
+        dataset_path: Union[str, Path, "TemporaryDirectory[str]"],
     ):
         self.preprocessing_pipeline = preprocessing_pipeline
         self.pruner: optuna.pruners.BasePruner = pruner
@@ -143,16 +143,17 @@ class OptimizedFlairClassificationPipeline(
     FlairOptimizedPipeline[HuggingFaceClassificationPipelineMetadata],
     HuggingFaceOptimizedPipeline[HuggingFaceClassificationPipelineMetadata],
 ):
-    dataset_path: NamedTemporaryFile = field(init=False, default=NamedTemporaryFile())
+    dataset_dir: TemporaryDirectory[str] = field(init=False, default=TemporaryDirectory())
     config_space: FlairModelTrainerConfigSpace = FlairModelTrainerConfigSpace()
 
     def __post_init__(self) -> None:
+        self.dataset_path = Path(self.dataset_dir.name).joinpath("ds.pkl")
         super().__init__(
             preprocessing_pipeline=FlairTextClassificationPreprocessingPipeline(
                 dataset_name=self.dataset_name,
                 input_column_name=self.input_column_name,
                 target_column_name=self.target_column_name,
-                persist_path=self.dataset_path.name,
+                persist_path=str(self.dataset_path),
                 sample_missing_splits=True,
                 ignore_test_subset=True,
             ),
@@ -162,13 +163,17 @@ class OptimizedFlairClassificationPipeline(
             dataset_path=self.dataset_path,
         )
 
+    def _post_run_hook(self) -> None:
+        super()._post_run_hook()
+        self.dataset_dir.cleanup()
+
     def objective(self, trial: optuna.trial.Trial) -> float:
         parameters = self.config_space.sample_parameters(trial=trial)
         task_train_kwargs = self.config_space.parse_parameters(parameters)
 
         tmp_dir = TemporaryDirectory()
         pipeline = FlairTextClassificationEvaluationPipeline(
-            dataset_path=self.dataset_path.name,
+            dataset_path=str(self.dataset_path),
             embedding_name=self.embedding_name,
             task_model_kwargs=None,
             task_train_kwargs=task_train_kwargs,
