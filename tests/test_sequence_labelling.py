@@ -25,6 +25,9 @@ from embeddings.transformation.flair_transformation.split_sample_corpus_transfor
     SampleSplitsFlairCorpusTransformation,
 )
 
+flair.set_seed(441)
+flair.device = torch.device("cpu")  # type: ignore
+
 
 @pytest.fixture
 def pos_tagging_pipeline(
@@ -80,12 +83,11 @@ def test_pos_tagging_pipeline(
         "TemporaryDirectory[str]",
     ],
 ) -> None:
-    flair.set_seed(441)
     pipeline, path = pos_tagging_pipeline
     result = pipeline.run()
     path.cleanup()
 
-    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.1526717)
+    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.1374045)
 
 
 def test_ner_tagging_pipeline(
@@ -95,7 +97,6 @@ def test_ner_tagging_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
-    flair.device = torch.device("cpu")  # type: ignore
     pipeline, path = ner_tagging_pipeline
     result = pipeline.run()
     path.cleanup()
