@@ -6,7 +6,6 @@ import datasets
 import flair
 import numpy as np
 import pytest
-import torch
 from flair.data import Corpus
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
@@ -107,7 +106,6 @@ def test_sequence_labeling_preprocessing_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
-    flair.device = torch.device("cpu")  # type: ignore
     preprocessing_pipeline = sequence_labeling_preprocessing_pipeline
     _ = preprocessing_pipeline.run()
 

@@ -5,7 +5,6 @@ import datasets
 import flair
 import numpy as np
 import pytest
-import torch
 from flair.data import Corpus
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
@@ -24,8 +23,6 @@ from embeddings.transformation.flair_transformation.downsample_corpus_transforma
 from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
     SampleSplitsFlairCorpusTransformation,
 )
-
-flair.device = torch.device("cpu")  # type: ignore
 
 
 @pytest.fixture
