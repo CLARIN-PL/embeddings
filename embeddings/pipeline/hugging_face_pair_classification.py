@@ -15,6 +15,9 @@ from embeddings.task.flair_task.text_pair_classification import TextPairClassifi
 from embeddings.transformation.flair_transformation.pair_classification_corpus_transformation import (
     PairClassificationCorpusTransformation,
 )
+from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
+    SampleSplitsFlairCorpusTransformation,
+)
 
 
 class HuggingFacePairClassificationPipeline(
@@ -27,6 +30,8 @@ class HuggingFacePairClassificationPipeline(
         input_columns_names_pair: Tuple[str, str],
         target_column_name: str,
         output_path: T_path,
+        sample_missing_splits: Tuple[float, float] = (0.1, 0.1),
+        seed: int = 441,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
@@ -34,7 +39,7 @@ class HuggingFacePairClassificationPipeline(
         data_loader = HuggingFaceDataLoader()
         transformation = PairClassificationCorpusTransformation(
             input_columns_names_pair, target_column_name
-        )
+        ).then(SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed))
         embedding = AutoFlairDocumentEmbedding.from_hub(embedding_name)
         task = TextPairClassification(
             output_path,

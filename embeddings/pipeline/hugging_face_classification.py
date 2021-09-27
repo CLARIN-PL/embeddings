@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 import datasets
 import numpy as np
@@ -15,6 +15,9 @@ from embeddings.task.flair_task.text_classification import TextClassification
 from embeddings.transformation.flair_transformation.classification_corpus_transformation import (
     ClassificationCorpusTransformation,
 )
+from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
+    SampleSplitsFlairCorpusTransformation,
+)
 from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
     DownsampleFlairCorpusTransformation,
 )
@@ -30,6 +33,8 @@ class HuggingFaceClassificationPipeline(
         input_column_name: str,
         target_column_name: str,
         output_path: T_path,
+        sample_missing_splits: Tuple[float, float] = (0.1, 0.1),
+        seed: int = 441,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
@@ -37,9 +42,9 @@ class HuggingFaceClassificationPipeline(
         data_loader = HuggingFaceDataLoader()
         transformation = ClassificationCorpusTransformation(
             input_column_name, target_column_name
-        ).then(
-            DownsampleFlairCorpusTransformation(percentage=0.01)
-        )  # TODO: Remove DownsampleFlairCorpusTransformation
+        ).then(SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed))\
+        .then(DownsampleFlairCorpusTransformation(percentage=0.01))
+        # TODO: Remove DownsampleFlairCorpusTransformation
         embedding = AutoFlairDocumentEmbedding.from_hub(embedding_name)
         task = TextClassification(
             output_path, task_model_kwargs=task_model_kwargs, task_train_kwargs=task_train_kwargs
