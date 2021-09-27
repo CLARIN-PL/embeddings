@@ -78,8 +78,6 @@ def sequence_labeling_evaluation_pipeline(
     task_train_kwargs: Dict[str, int],
 ) -> ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]]:
 
-    persist_out_path = Path(result_path.name, ner_dataset_name, f"{embedding_name}.json")
-    persist_out_path.parent.mkdir(parents=True, exist_ok=True)
     output_path = Path(result_path.name, ner_dataset_name, embedding_name)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -89,7 +87,7 @@ def sequence_labeling_evaluation_pipeline(
         fine_tune_embeddings=False,
         hidden_size=hidden_size,
         embedding_name=embedding_name,
-        persist_path=str(persist_out_path),
+        persist_path=None,
         task_train_kwargs=task_train_kwargs,
     )
     return pipeline
