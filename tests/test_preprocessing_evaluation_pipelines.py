@@ -6,6 +6,7 @@ import datasets
 import flair
 import numpy as np
 import pytest
+import torch
 from flair.data import Corpus
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
@@ -108,15 +109,14 @@ def test_sequence_labeling_preprocessing_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
-
+    flair.device = torch.device("cpu")  # type: ignore
     preprocessing_pipeline = sequence_labeling_preprocessing_pipeline
     _ = preprocessing_pipeline.run()
 
     evaluation_pipeline = sequence_labeling_evaluation_pipeline
     result = evaluation_pipeline.run()
-
     np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.8023255
+        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.1280788
     )
     np.testing.assert_almost_equal(result["seqeval__mode_None__scheme_None"]["overall_f1"], 0)
 

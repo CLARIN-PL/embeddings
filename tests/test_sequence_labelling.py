@@ -5,6 +5,7 @@ import datasets
 import flair
 import numpy as np
 import pytest
+import torch
 from flair.data import Corpus
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
@@ -94,6 +95,7 @@ def test_ner_tagging_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
+    flair.device = torch.device("cpu")  # type: ignore
     pipeline, path = ner_tagging_pipeline
     result = pipeline.run()
     path.cleanup()
