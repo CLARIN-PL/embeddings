@@ -60,13 +60,18 @@ class FlairTextClassificationPreprocessingPipeline(
     ):
         dataset = HuggingFaceDataset(dataset=dataset_name, load_dataset_kwargs=load_dataset_kwargs)
         data_loader = HuggingFaceDataLoader()
-        transformation = ClassificationCorpusTransformation(
-            input_column_name=input_column_name,
-            target_column_name=target_column_name,
-            datasets_path=datasets_path,
-            sample_missing_splits=sample_missing_splits,
-            ignore_test_subset=ignore_test_subset,
-        ).persisting(FlairPicklePersister(path=persist_path))
+        transformation = (
+            ClassificationCorpusTransformation(
+                input_column_name=input_column_name,
+                target_column_name=target_column_name,
+                datasets_path=datasets_path,
+                sample_missing_splits=sample_missing_splits,
+                ignore_test_subset=ignore_test_subset,
+            )
+            .then(DownsampleFlairCorpusTransformation(percentage=0.01))
+            .persisting(FlairPicklePersister(path=persist_path))
+        )
+        # TODO: Remove DownsampleFlairCorpusTransformation after Development phase. For testing purposes
         super().__init__(dataset, data_loader, transformation)
 
 
@@ -122,5 +127,5 @@ class FlairSequenceLabelingPreprocessingPipeline(
             )
             .then(DownsampleFlairCorpusTransformation(percentage=0.01))
             .persisting(FlairConllPersister(path=persist_path))
-        )  # TODO: Remove after Development phase. For testing purposes
+        )  # TODO: DownsampleFlairCorpusTransformation Remove after Development phase. For testing purposes
         super().__init__(dataset, data_loader, transformation)
