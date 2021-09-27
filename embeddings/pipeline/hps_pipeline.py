@@ -3,7 +3,7 @@ import logging
 import pathlib
 from abc import ABC
 from dataclasses import dataclass, field
-from tempfile import TemporaryDirectory
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from typing import Generic, Optional, Tuple, Type, Union
 
 import optuna
@@ -12,14 +12,22 @@ from optuna import Study
 
 from embeddings.data.dataset import Data
 from embeddings.data.io import T_path
-from embeddings.hyperparameter_search.configspace import SequenceLabelingConfigSpace
-from embeddings.pipeline.evaluation_pipeline import FlairSequenceLabelingEvaluationPipeline
+from embeddings.hyperparameter_search.configspace import (
+    FlairModelTrainerConfigSpace,
+    SequenceLabelingConfigSpace,
+)
+from embeddings.pipeline.evaluation_pipeline import (
+    FlairSequenceLabelingEvaluationPipeline,
+    FlairTextClassificationEvaluationPipeline,
+)
 from embeddings.pipeline.pipelines_metadata import (
+    HuggingFaceClassificationPipelineMetadata,
     HuggingFaceSequenceLabelingPipelineMetadata,
     Metadata,
 )
 from embeddings.pipeline.preprocessing_pipeline import (
     FlairSequenceLabelingPreprocessingPipeline,
+    FlairTextClassificationPreprocessingPipeline,
     PreprocessingPipeline,
 )
 from embeddings.pipeline.standard_pipeline import LoaderResult, TransformationResult
@@ -36,7 +44,7 @@ class OptimizedPipeline(ABC, Generic[Metadata]):
 
     def persisting(
         self, best_params_path: T_path, log_path: T_path
-    ) -> "OptimizedPipeline[Metadata]":
+    ) -> "PersistingPipeline[Metadata]":
         return PersistingPipeline(self, best_params_path, log_path)
 
 
@@ -104,7 +112,7 @@ class OptunaPipeline(OptimizedPipeline[Metadata]):
         return study.trials_dataframe(), metadata
 
 
-class FlairOptimizedPipeline(OptunaPipeline[Metadata]):
+class FlairOptimizedPipeline(OptunaPipeline[Metadata], ABC):
     def _pre_run_hook(self) -> None:
         logging.getLogger("flair").setLevel(logging.WARNING)
 
@@ -112,27 +120,91 @@ class FlairOptimizedPipeline(OptunaPipeline[Metadata]):
         logging.getLogger("flair").setLevel(logging.INFO)
 
 
-@dataclass
-class OptimizedFlairSequenceLabelingPipeline(
-    FlairOptimizedPipeline[HuggingFaceSequenceLabelingPipelineMetadata]
-):
+@dataclass  # type: ignore
+class HuggingFaceOptimizedPipeline(OptimizedPipeline[Metadata], ABC):
     dataset_name: str
+    embedding_name: str
     input_column_name: str
     target_column_name: str
-    embedding_name: str
-    fine_tune_embeddings: bool = False
-    evaluation_mode: str = "conll"
-    tagging_scheme: Optional[str] = None
-    config_space: SequenceLabelingConfigSpace = SequenceLabelingConfigSpace()
-    seed: int = 441
     n_warmup_steps: int = 10
     n_trials: int = 2
+    seed: int = 441
+    fine_tune_embeddings: bool = False
     pruner_cls: Type[optuna.pruners.MedianPruner] = field(
         init=False, default=optuna.pruners.MedianPruner
     )
     sampler_cls: Type[optuna.samplers.TPESampler] = field(
         init=False, default=optuna.samplers.TPESampler
     )
+
+
+@dataclass
+class OptimizedFlairClassificationPipeline(
+    FlairOptimizedPipeline[HuggingFaceClassificationPipelineMetadata],
+    HuggingFaceOptimizedPipeline[HuggingFaceClassificationPipelineMetadata],
+):
+    dataset_path: NamedTemporaryFile = field(init=False, default=NamedTemporaryFile())
+    config_space: FlairModelTrainerConfigSpace = FlairModelTrainerConfigSpace()
+
+    def __post_init__(self) -> None:
+        super().__init__(
+            preprocessing_pipeline=FlairTextClassificationPreprocessingPipeline(
+                dataset_name=self.dataset_name,
+                input_column_name=self.input_column_name,
+                target_column_name=self.target_column_name,
+                persist_path=self.dataset_path.name,
+                sample_missing_splits=True,
+                ignore_test_subset=True,
+            ),
+            pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
+            sampler=self.sampler_cls(seed=self.seed),
+            n_trials=self.n_trials,
+            dataset_path=self.dataset_path,
+        )
+
+    def objective(self, trial: optuna.trial.Trial) -> float:
+        parameters = self.config_space.sample_parameters(trial=trial)
+        task_train_kwargs = self.config_space.parse_parameters(parameters)
+
+        tmp_dir = TemporaryDirectory()
+        pipeline = FlairTextClassificationEvaluationPipeline(
+            dataset_path=self.dataset_path.name,
+            embedding_name=self.embedding_name,
+            task_model_kwargs=None,
+            task_train_kwargs=task_train_kwargs,
+            output_path=tmp_dir.name,
+            predict_subset="dev",
+            fine_tune_embeddings=self.fine_tune_embeddings,
+        )
+        results = pipeline.run()
+        metric = results["f1__average_macro"]["f1"]
+        assert isinstance(metric, float)
+        return metric
+
+    def _get_best_params_metadata(self, study: Study) -> HuggingFaceClassificationPipelineMetadata:
+        best_params = study.best_params
+        task_train_kwargs = self.config_space.parse_parameters(best_params)
+
+        metadata: HuggingFaceClassificationPipelineMetadata = {
+            "embedding_name": self.embedding_name,
+            "dataset_name": self.dataset_name,
+            "input_column_name": self.input_column_name,
+            "target_column_name": self.target_column_name,
+            # "fine_tune_embeddings": self.fine_tune_embeddings,
+            "task_model_kwargs": None,
+            "task_train_kwargs": task_train_kwargs,
+        }
+        return metadata
+
+
+@dataclass
+class OptimizedFlairSequenceLabelingPipeline(
+    FlairOptimizedPipeline[HuggingFaceSequenceLabelingPipelineMetadata],
+    HuggingFaceOptimizedPipeline[HuggingFaceSequenceLabelingPipelineMetadata],
+):
+    evaluation_mode: str = "conll"
+    tagging_scheme: Optional[str] = None
+    config_space: SequenceLabelingConfigSpace = SequenceLabelingConfigSpace()
     dataset_path: "TemporaryDirectory[str]" = field(init=False, default=TemporaryDirectory())
 
     def __post_init__(self) -> None:

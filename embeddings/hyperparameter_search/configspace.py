@@ -12,7 +12,7 @@ Parameter = Union[SearchableParameter, ConstantParameter]
 ParsedParameters = TypeVar("ParsedParameters")
 
 
-class AbstractConfigSpace(ABC, Generic[ParsedParameters]):
+class ConfigSpace(ABC, Generic[ParsedParameters]):
     def _parse_parameter(
         self, param_name: str, trial: optuna.trial.Trial
     ) -> Tuple[str, PrimitiveTypes]:
@@ -58,7 +58,7 @@ class AbstractConfigSpace(ABC, Generic[ParsedParameters]):
 
 
 @dataclass  # type: ignore
-class AbstractFlairModelTrainerConfigSpace(AbstractConfigSpace[ParsedParameters], ABC):
+class AbstractFlairModelTrainerConfigSpace(ConfigSpace[ParsedParameters], ABC):
     param_selection_mode: Parameter = field(
         init=False, default=ConstantParameter(name="param_selection_mode", value=True)
     )

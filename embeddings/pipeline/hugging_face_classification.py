@@ -15,6 +15,9 @@ from embeddings.task.flair_task.text_classification import TextClassification
 from embeddings.transformation.flair_transformation.classification_corpus_transformation import (
     ClassificationCorpusTransformation,
 )
+from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
+    DownsampleFlairCorpusTransformation,
+)
 
 
 class HuggingFaceClassificationPipeline(
@@ -32,7 +35,11 @@ class HuggingFaceClassificationPipeline(
     ):
         dataset = HuggingFaceDataset(dataset_name)
         data_loader = HuggingFaceDataLoader()
-        transformation = ClassificationCorpusTransformation(input_column_name, target_column_name)
+        transformation = ClassificationCorpusTransformation(
+            input_column_name, target_column_name
+        ).then(
+            DownsampleFlairCorpusTransformation(percentage=0.01)
+        )  # TODO: Remove DownsampleFlairCorpusTransformation
         embedding = AutoFlairDocumentEmbedding.from_hub(embedding_name)
         task = TextClassification(
             output_path, task_model_kwargs=task_model_kwargs, task_train_kwargs=task_train_kwargs
