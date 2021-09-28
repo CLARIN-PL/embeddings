@@ -1,7 +1,7 @@
 import abc
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import Any, Dict, Final, Generic, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, Final, Tuple, Type, TypeVar, Union
 
 import optuna
 
@@ -10,9 +10,10 @@ from embeddings.utils.utils import PrimitiveTypes
 
 Parameter = Union[SearchableParameter, ConstantParameter]
 ParsedParameters = TypeVar("ParsedParameters")
+SampledParameters = Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]
 
 
-class ConfigSpace(ABC, Generic[ParsedParameters]):
+class ConfigSpace(ABC):
     def _parse_parameter(
         self, param_name: str, trial: optuna.trial.Trial
     ) -> Tuple[str, PrimitiveTypes]:
@@ -53,12 +54,12 @@ class ConfigSpace(ABC, Generic[ParsedParameters]):
 
     @staticmethod
     @abc.abstractmethod
-    def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> ParsedParameters:
+    def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
         pass
 
 
 @dataclass  # type: ignore
-class AbstractFlairModelTrainerConfigSpace(ConfigSpace[ParsedParameters], ABC):
+class AbstractFlairModelTrainerConfigSpace(ConfigSpace, ABC):
     param_selection_mode: Parameter = field(
         init=False, default=ConstantParameter(name="param_selection_mode", value=True)
     )
@@ -90,9 +91,9 @@ class AbstractFlairModelTrainerConfigSpace(ConfigSpace[ParsedParameters], ABC):
         return parameters, task_train_kwargs
 
 
-class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace[Dict[str, PrimitiveTypes]]):
+class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
     @staticmethod
-    def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> Dict[str, PrimitiveTypes]:
+    def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
         (
             parameters,
             task_train_kwargs,
@@ -101,15 +102,11 @@ class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace[Dict[str
             raise ValueError(
                 f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
             )
-        return task_train_kwargs
+        return {"task_train_kwargs": task_train_kwargs}
 
 
 @dataclass
-class SequenceLabelingConfigSpace(
-    AbstractFlairModelTrainerConfigSpace[
-        Tuple[int, Dict[str, PrimitiveTypes], Dict[str, PrimitiveTypes]]
-    ]
-):
+class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
     hidden_size: Parameter = SearchableParameter(
         name="hidden_size", type="int_uniform", low=128, high=2048, step=128
     )
@@ -161,9 +158,7 @@ class SequenceLabelingConfigSpace(
         return parameters
 
     @staticmethod
-    def parse_parameters(
-        parameters: Dict[str, PrimitiveTypes]
-    ) -> Tuple[int, Dict[str, PrimitiveTypes], Dict[str, PrimitiveTypes]]:
+    def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
         hidden_size = parameters.pop("hidden_size")
         assert isinstance(hidden_size, int)
         task_model_keys: Final = {
@@ -186,4 +181,11 @@ class SequenceLabelingConfigSpace(
             raise ValueError(
                 f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
             )
-        return hidden_size, task_model_kwargs, task_train_kwargs
+        return {
+            "hidden_size": hidden_size,
+            "task_model_kwargs": task_model_kwargs,
+            "task_train_kwargs": task_train_kwargs,
+        }
+
+
+CS = TypeVar("CS", bound=ConfigSpace)
