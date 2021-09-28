@@ -1,3 +1,4 @@
+# Temporary script for Development Purposes
 from tempfile import TemporaryDirectory
 
 from embeddings.pipeline.hps_pipeline import (
@@ -35,7 +36,15 @@ def main() -> None:
     tc_results = tc_pipeline.run()
     output_path.cleanup()
 
-    print(sl_df, "\n", sl_results, "\n\n", tc_df, "\n", tc_results)
+    print(
+        sl_df,
+        "\n",
+        sl_results,
+        "\n\n",
+        tc_df,
+        "\n",
+        tc_results,
+    )
 
 
 main()

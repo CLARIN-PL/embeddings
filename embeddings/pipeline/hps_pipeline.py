@@ -4,7 +4,7 @@ from abc import ABC
 from dataclasses import dataclass, field
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Generic, Optional, Tuple, Type, Union
+from typing import Dict, Generic, Literal, Optional, Tuple, Type, TypeVar, Union
 
 import optuna
 import pandas as pd
@@ -13,14 +13,20 @@ from optuna import Study
 from embeddings.data.dataset import Data
 from embeddings.data.io import T_path
 from embeddings.hyperparameter_search.configspace import (
+    CS,
     FlairModelTrainerConfigSpace,
+    SampledParameters,
     SequenceLabelingConfigSpace,
 )
 from embeddings.pipeline.evaluation_pipeline import (
     FlairSequenceLabelingEvaluationPipeline,
     FlairTextClassificationEvaluationPipeline,
+    ModelEvaluationPipeline,
 )
 from embeddings.pipeline.pipelines_metadata import (
+    EvaluationMetadata,
+    EvaluationPipelineMetadata,
+    FlairSequenceLabelingEvaluationPipelineMetadata,
     HuggingFaceClassificationPipelineMetadata,
     HuggingFaceSequenceLabelingPipelineMetadata,
     Metadata,
@@ -30,8 +36,11 @@ from embeddings.pipeline.preprocessing_pipeline import (
     FlairTextClassificationPreprocessingPipeline,
     PreprocessingPipeline,
 )
-from embeddings.pipeline.standard_pipeline import LoaderResult, TransformationResult
+from embeddings.pipeline.standard_pipeline import LoaderResult, ModelResult, TransformationResult
 from embeddings.utils.hps_persister import HPSResultsPersister
+from embeddings.utils.utils import PrimitiveTypes
+
+EvaluationResult = TypeVar("EvaluationResult", bound=Dict[str, Dict[str, PrimitiveTypes]])
 
 
 class OptimizedPipeline(ABC, Generic[Metadata]):
@@ -63,34 +72,43 @@ class PersistingPipeline(OptimizedPipeline[Metadata]):
         return result
 
 
-class OptunaPipeline(OptimizedPipeline[Metadata]):
+class OptunaPipeline(OptimizedPipeline[Metadata], Generic[CS, Metadata, EvaluationMetadata]):
     def __init__(
         self,
+        config_space: CS,
         preprocessing_pipeline: PreprocessingPipeline[Data, LoaderResult, TransformationResult],
+        evaluation_pipeline: Type[
+            ModelEvaluationPipeline[Data, LoaderResult, ModelResult, EvaluationResult]
+        ],
         pruner: optuna.pruners.BasePruner,
         sampler: optuna.samplers.BaseSampler,
         n_trials: int,
         dataset_path: Union[str, Path, "TemporaryDirectory[str]"],
+        metric_name: str,
+        metric_key: str,
     ):
         self.preprocessing_pipeline = preprocessing_pipeline
+        self.evaluation_pipeline = evaluation_pipeline
         self.pruner: optuna.pruners.BasePruner = pruner
         self.sampler: optuna.samplers.BaseSampler = sampler
         self.n_trials: int = n_trials
         self.dataset_path = dataset_path
+        self.config_space = config_space
+        self.metric_name = metric_name
+        self.metric_key = metric_key
 
-    def _pre_run_hook(self) -> None:
-        pass
-
-    def _post_run_hook(self) -> None:
+    @abc.abstractmethod
+    def _get_metadata(self, parameters: SampledParameters) -> Metadata:
         pass
 
     @abc.abstractmethod
-    def objective(self, trial: optuna.trial.Trial) -> float:
+    def _get_evaluation_metadata(self, parameters: SampledParameters) -> EvaluationMetadata:
         pass
 
-    @abc.abstractmethod
-    def _get_best_params_metadata(self, study: Study) -> Metadata:
-        pass
+    def get_best_paramaters(self, study: Study) -> Metadata:
+        best_params = study.best_params
+        parsed_params = self.config_space.parse_parameters(best_params)
+        return self._get_metadata(parsed_params)
 
     def run(
         self,
@@ -107,12 +125,21 @@ class OptunaPipeline(OptimizedPipeline[Metadata]):
         if isinstance(self.dataset_path, TemporaryDirectory):
             self.dataset_path.cleanup()
 
-        metadata: Metadata = self._get_best_params_metadata(study)
+        metadata: Metadata = self.get_best_paramaters(study)
         self._post_run_hook()
         return study.trials_dataframe(), metadata
 
+    def objective(self, trial: optuna.trial.Trial) -> float:
+        parameters = self.config_space.sample_parameters(trial=trial)
+        parsed_params = self.config_space.parse_parameters(parameters)
+        args = self._get_evaluation_metadata(parsed_params)
 
-class FlairOptimizedPipeline(OptunaPipeline[Metadata], ABC):
+        pipeline = self.evaluation_pipeline(**args)
+        results = pipeline.run()
+        metric = results[self.metric_name][self.metric_key]
+        assert isinstance(metric, float)
+        return metric
+
     def _pre_run_hook(self) -> None:
         logging.getLogger("flair").setLevel(logging.WARNING)
 
@@ -120,8 +147,8 @@ class FlairOptimizedPipeline(OptunaPipeline[Metadata], ABC):
         logging.getLogger("flair").setLevel(logging.INFO)
 
 
-@dataclass  # type: ignore
-class HuggingFaceOptimizedPipeline(OptimizedPipeline[Metadata], ABC):
+@dataclass
+class HuggingFaceOptimizedPipelineMetadata(ABC):
     dataset_name: str
     embedding_name: str
     input_column_name: str
@@ -140,10 +167,15 @@ class HuggingFaceOptimizedPipeline(OptimizedPipeline[Metadata], ABC):
 
 @dataclass
 class OptimizedFlairClassificationPipeline(
-    FlairOptimizedPipeline[HuggingFaceClassificationPipelineMetadata],
-    HuggingFaceOptimizedPipeline[HuggingFaceClassificationPipelineMetadata],
+    OptunaPipeline[
+        FlairModelTrainerConfigSpace,
+        HuggingFaceClassificationPipelineMetadata,
+        EvaluationPipelineMetadata,
+    ],
+    HuggingFaceOptimizedPipelineMetadata,
 ):
     dataset_dir: TemporaryDirectory[str] = field(init=False, default=TemporaryDirectory())
+    tmp_model_output_dir: TemporaryDirectory[str] = field(init=False, default=TemporaryDirectory())
     config_space: FlairModelTrainerConfigSpace = FlairModelTrainerConfigSpace()
 
     def __post_init__(self) -> None:
@@ -157,62 +189,85 @@ class OptimizedFlairClassificationPipeline(
                 sample_missing_splits=True,
                 ignore_test_subset=True,
             ),
+            evaluation_pipeline=FlairTextClassificationEvaluationPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
             dataset_path=self.dataset_path,
+            metric_name="f1__average_macro",
+            metric_key="f1",
+            config_space=self.config_space,
         )
 
-    def _post_run_hook(self) -> None:
-        super()._post_run_hook()
-        self.dataset_dir.cleanup()
-
-    def objective(self, trial: optuna.trial.Trial) -> float:
-        parameters = self.config_space.sample_parameters(trial=trial)
-        task_train_kwargs = self.config_space.parse_parameters(parameters)
-
-        tmp_dir = TemporaryDirectory()
-        pipeline = FlairTextClassificationEvaluationPipeline(
-            dataset_path=str(self.dataset_path),
-            embedding_name=self.embedding_name,
-            task_model_kwargs=None,
-            task_train_kwargs=task_train_kwargs,
-            output_path=tmp_dir.name,
-            predict_subset="dev",
-            fine_tune_embeddings=self.fine_tune_embeddings,
-        )
-        results = pipeline.run()
-        metric = results["f1__average_macro"]["f1"]
-        assert isinstance(metric, float)
-        return metric
-
-    def _get_best_params_metadata(self, study: Study) -> HuggingFaceClassificationPipelineMetadata:
-        best_params = study.best_params
-        task_train_kwargs = self.config_space.parse_parameters(best_params)
-
+    def _get_metadata(
+        self, parameters: SampledParameters
+    ) -> HuggingFaceClassificationPipelineMetadata:
+        task_train_kwargs = parameters["task_train_kwargs"]
+        assert isinstance(task_train_kwargs, dict)
         metadata: HuggingFaceClassificationPipelineMetadata = {
             "embedding_name": self.embedding_name,
             "dataset_name": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
-            # "fine_tune_embeddings": self.fine_tune_embeddings,
             "task_model_kwargs": None,
             "task_train_kwargs": task_train_kwargs,
         }
         return metadata
 
+    def _get_evaluation_metadata(self, parameters: SampledParameters) -> EvaluationPipelineMetadata:
+        task_train_kwargs = parameters["task_train_kwargs"]
+        assert isinstance(task_train_kwargs, dict)
+        metadata: EvaluationPipelineMetadata = {
+            "embedding_name": self.embedding_name,
+            "dataset_path": str(self.dataset_path),
+            "task_model_kwargs": None,
+            "task_train_kwargs": task_train_kwargs,
+            "persist_path": None,
+            "predict_subset": "dev",
+            "fine_tune_embeddings": False,
+            "output_path": self.tmp_model_output_dir.name,
+        }
+        return metadata
+
+    def _post_run_hook(self) -> None:
+        super()._post_run_hook()
+        self.dataset_dir.cleanup()
+        self.tmp_model_output_dir.cleanup()
+
 
 @dataclass
 class OptimizedFlairSequenceLabelingPipeline(
-    FlairOptimizedPipeline[HuggingFaceSequenceLabelingPipelineMetadata],
-    HuggingFaceOptimizedPipeline[HuggingFaceSequenceLabelingPipelineMetadata],
+    OptunaPipeline[
+        SequenceLabelingConfigSpace,
+        HuggingFaceSequenceLabelingPipelineMetadata,
+        FlairSequenceLabelingEvaluationPipelineMetadata,
+    ],
+    HuggingFaceOptimizedPipelineMetadata,
 ):
-    evaluation_mode: str = "conll"
+    evaluation_mode: Literal["conll", "unit", "strict"] = "conll"
     tagging_scheme: Optional[str] = None
     config_space: SequenceLabelingConfigSpace = SequenceLabelingConfigSpace()
     dataset_path: "TemporaryDirectory[str]" = field(init=False, default=TemporaryDirectory())
+    tmp_model_output_dir: TemporaryDirectory[str] = field(init=False, default=TemporaryDirectory())
+
+    def _get_metric_name(self) -> str:
+        if self.evaluation_mode == "unit":
+            return "UnitSeqeval"
+        elif self.evaluation_mode in {"conll", "strict"}:
+            metric_name = "seqeval"
+            if self.evaluation_mode == "conll":
+                metric_name += "__mode_None"
+            else:
+                metric_name += "__mode_strict"
+
+            metric_name += f"__scheme_{self.tagging_scheme}"
+            return metric_name
+        else:
+            raise ValueError(f"Evaluation Mode {self.evaluation_mode} unsupported.")
 
     def __post_init__(self) -> None:
+        self.metric_name = self._get_metric_name()
+
         super().__init__(
             preprocessing_pipeline=FlairSequenceLabelingPreprocessingPipeline(
                 dataset_name=self.dataset_name,
@@ -222,42 +277,25 @@ class OptimizedFlairSequenceLabelingPipeline(
                 sample_missing_splits=True,
                 ignore_test_subset=True,
             ),
+            config_space=self.config_space,
+            evaluation_pipeline=FlairSequenceLabelingEvaluationPipeline,
+            metric_name=self._get_metric_name(),
+            metric_key="overall_f1",
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
-            dataset_path=self.dataset_path,
-        )
-
-    def objective(self, trial: optuna.trial.Trial) -> float:
-        parameters = self.config_space.sample_parameters(trial=trial)
-        hidden_size, task_model_kwargs, task_train_kwargs = self.config_space.parse_parameters(
-            parameters
-        )
-
-        tmp_dir = TemporaryDirectory()
-        pipeline = FlairSequenceLabelingEvaluationPipeline(
             dataset_path=self.dataset_path.name,
-            hidden_size=hidden_size,
-            embedding_name=self.embedding_name,
-            evaluation_mode=self.evaluation_mode,
-            fine_tune_embeddings=self.fine_tune_embeddings,
-            task_model_kwargs=task_model_kwargs,
-            task_train_kwargs=task_train_kwargs,
-            output_path=tmp_dir.name,
-            predict_subset="dev",
         )
-        results = pipeline.run()
-        metric = results["seqeval__mode_None__scheme_None"]["overall_f1"]
-        assert isinstance(metric, float)
-        return metric
 
-    def _get_best_params_metadata(
-        self, study: Study
+    def _get_metadata(
+        self, parameters: SampledParameters
     ) -> HuggingFaceSequenceLabelingPipelineMetadata:
-        best_params = study.best_params
-        hidden_size, task_model_kwargs, task_train_kwargs = self.config_space.parse_parameters(
-            best_params
-        )
+        task_train_kwargs = parameters["task_train_kwargs"]
+        assert isinstance(task_train_kwargs, dict)
+        task_model_kwargs = parameters["task_model_kwargs"]
+        assert isinstance(task_model_kwargs, dict)
+        hidden_size = parameters["hidden_size"]
+        assert isinstance(hidden_size, int)
 
         metadata: HuggingFaceSequenceLabelingPipelineMetadata = {
             "embedding_name": self.embedding_name,
@@ -269,6 +307,30 @@ class OptimizedFlairSequenceLabelingPipeline(
             "hidden_size": hidden_size,
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
+            "tagging_scheme": self.tagging_scheme,
+        }
+        return metadata
+
+    def _get_evaluation_metadata(
+        self, parameters: SampledParameters
+    ) -> FlairSequenceLabelingEvaluationPipelineMetadata:
+        task_train_kwargs = parameters["task_train_kwargs"]
+        assert isinstance(task_train_kwargs, dict)
+        task_model_kwargs = parameters["task_model_kwargs"]
+        assert isinstance(task_model_kwargs, dict)
+        hidden_size = parameters["hidden_size"]
+        assert isinstance(hidden_size, int)
+        metadata: FlairSequenceLabelingEvaluationPipelineMetadata = {
+            "embedding_name": self.embedding_name,
+            "dataset_path": str(self.dataset_path),
+            "task_model_kwargs": None,
+            "task_train_kwargs": task_train_kwargs,
+            "persist_path": None,
+            "predict_subset": "dev",
+            "fine_tune_embeddings": False,
+            "output_path": self.tmp_model_output_dir.name,
+            "hidden_size": hidden_size,
+            "evaluation_mode": self.evaluation_mode,
             "tagging_scheme": self.tagging_scheme,
         }
         return metadata

@@ -1,8 +1,6 @@
-from typing import Any, Dict, Optional, Tuple, TypedDict, TypeVar
+from typing import Any, Dict, Literal, Optional, Tuple, TypedDict, TypeVar
 
 from embeddings.data.io import T_path
-
-Metadata = TypeVar("Metadata")
 
 
 class PathMetadata(TypedDict, total=False):
@@ -32,3 +30,24 @@ class HuggingFaceSequenceLabelingPipelineMetadata(EmbeddingPipelineMetadata):
     hidden_size: int
     evaluation_mode: str
     tagging_scheme: Optional[str]
+
+
+class EvaluationPipelineMetadata(TypedDict):
+    dataset_path: str
+    embedding_name: str
+    fine_tune_embeddings: bool
+    persist_path: Optional[str]
+    predict_subset: Literal["dev", "test"]
+    task_model_kwargs: Optional[Dict[str, Any]]
+    task_train_kwargs: Optional[Dict[str, Any]]
+    output_path: str
+
+
+class FlairSequenceLabelingEvaluationPipelineMetadata(EvaluationPipelineMetadata):
+    hidden_size: int
+    evaluation_mode: str
+    tagging_scheme: Optional[str]
+
+
+Metadata = TypeVar("Metadata", bound=EmbeddingPipelineMetadata)
+EvaluationMetadata = TypeVar("EvaluationMetadata", bound=EvaluationPipelineMetadata)
