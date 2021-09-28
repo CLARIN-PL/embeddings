@@ -5,6 +5,7 @@ import datasets
 import flair
 import numpy as np
 import pytest
+import torch
 from flair.data import Corpus
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
@@ -57,8 +58,8 @@ def ner_tagging_pipeline(
     data_loader = HuggingFaceDataLoader()
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
-        .then(DownsampleFlairCorpusTransformation(percentage=0.005))
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, seed=441))
+        .then(DownsampleFlairCorpusTransformation(percentage=0.005))
     )
     embedding = AutoFlairWordEmbedding.from_hub("allegro/herbert-base-cased")
     task = SequenceLabeling(
@@ -80,6 +81,7 @@ def test_pos_tagging_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
+    flair.device = torch.device("cpu")  # type: ignore
     pipeline, path = pos_tagging_pipeline
     result = pipeline.run()
     path.cleanup()
@@ -94,6 +96,7 @@ def test_ner_tagging_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
+    flair.device = torch.device("cpu")  # type: ignore
     pipeline, path = ner_tagging_pipeline
     result = pipeline.run()
     path.cleanup()

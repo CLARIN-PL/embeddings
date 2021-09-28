@@ -2,6 +2,8 @@ import pprint
 from pathlib import Path
 from typing import Optional
 
+import flair
+import torch
 import typer
 
 from embeddings.defaults import DATASET_PATH, RESULTS_PATH
@@ -33,6 +35,7 @@ def run(
     ),
 ) -> None:
     typer.echo(pprint.pformat(locals()))
+    flair.device = torch.device("cpu")  # type: ignore
     dataset_path = Path(DATASET_PATH, embedding_name, dataset_name)
     dataset_path.mkdir(parents=True, exist_ok=True)
 
@@ -42,7 +45,7 @@ def run(
         target_column_name=target_column_name,
         persist_path=str(dataset_path),
         sample_missing_splits=(0.1, 0.1),
-        ignore_test_subset=True,
+        ignore_test_subset=False,
     )
     dataset = preprocessing_pipeline.run()
 
@@ -58,7 +61,7 @@ def run(
         hidden_size=hidden_size,
         embedding_name=embedding_name,
         persist_path=str(persist_out_path),
-        predict_subset="dev",
+        predict_subset="test",
         task_train_kwargs={"max_epochs": 1},
     )
 

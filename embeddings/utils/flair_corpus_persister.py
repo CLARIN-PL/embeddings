@@ -2,7 +2,7 @@ import abc
 import pickle
 from abc import ABC
 from pathlib import Path
-from typing import Generic, TypeVar, Union
+from typing import Generic, Optional, TypeVar, Union
 
 from flair.datasets import ColumnDataset
 
@@ -29,16 +29,20 @@ class FlairConllPersister(FlairCorpusPersister[SequenceLabelingCorpus]):
     def persist(self, data: SequenceLabelingCorpus) -> None:
         subset_names = ["train", "dev", "test"]
         for subset_name in subset_names:
-            try:
-                data_subset = getattr(data, subset_name)
+            data_subset = self.get_subset(data, subset_name)
+            if data_subset is not None:
                 output_path = self.path.joinpath(f"{subset_name}.tsv")
                 self._save_conll(data_subset, output_path)
-            except AttributeError:
-                _logger.warning(
-                    f"Warning when persisting data: {subset_name} dataset not found in the Corpus"
-                )
-            except TypeError:
-                _logger.warning(f"Warning when persisting data: {subset_name} dataset is None")
+
+    @staticmethod
+    def get_subset(data: SequenceLabelingCorpus, subset_name: str) -> Optional[ColumnDataset]:
+        try:
+            data_subset = getattr(data, subset_name)
+        except (AttributeError, TypeError):
+            _logger.warning(f"Could not persist {subset_name} data")
+            return None
+        else:
+            return data_subset
 
     @staticmethod
     def _save_conll(data: ColumnDataset, filepath: Path) -> None:

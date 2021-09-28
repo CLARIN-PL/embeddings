@@ -6,6 +6,7 @@ import datasets
 import flair
 import numpy as np
 import pytest
+import torch
 from flair.data import Corpus
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
@@ -58,8 +59,8 @@ def sequence_labeling_preprocessing_pipeline(
     data_loader = HuggingFaceDataLoader()
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
-        .then(DownsampleFlairCorpusTransformation(percentage=0.005))
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, test_fraction=0.1, seed=441))
+        .then(DownsampleFlairCorpusTransformation(percentage=0.005))
         .persisting(FlairConllPersister(result_path.name))
     )
     pipeline = PreprocessingPipeline(
@@ -106,13 +107,13 @@ def test_sequence_labeling_preprocessing_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
-    preprocessing_pipeline = sequence_labeling_preprocessing_pipeline
-    _ = preprocessing_pipeline.run()
+    flair.device = torch.device("cpu")  # type: ignore
 
-    evaluation_pipeline = sequence_labeling_evaluation_pipeline
-    result = evaluation_pipeline.run()
+    sequence_labeling_preprocessing_pipeline.run()
+    result = sequence_labeling_evaluation_pipeline.run()
+
     np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.1280788
+        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.7881773
     )
     np.testing.assert_almost_equal(result["seqeval__mode_None__scheme_None"]["overall_f1"], 0)
 
