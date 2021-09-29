@@ -70,12 +70,15 @@ class FlairTextClassificationPreprocessingPipeline(
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
         ]
-        transformation = ClassificationCorpusTransformation(
-            input_column_name=input_column_name,
-            target_column_name=target_column_name,
-            datasets_path=datasets_path,
-        ).then(SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed))\
-        .then(DownsampleFlairCorpusTransformation(percentage=0.01))
+        transformation = (
+            ClassificationCorpusTransformation(
+                input_column_name=input_column_name,
+                target_column_name=target_column_name,
+                datasets_path=datasets_path,
+            )
+            .then(SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed))
+            .then(DownsampleFlairCorpusTransformation(percentage=0.01))
+        )
         # TODO: Remove DownsampleFlairCorpusTransformation after Development phase. For testing purposes
         if ignore_test_subset:
             transformation = transformation.then(DropSubsetFlairCorpusTransformation(subset="test"))
