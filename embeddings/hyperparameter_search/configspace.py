@@ -32,7 +32,7 @@ class ConfigSpace(ABC):
         self, trial: optuna.trial.Trial, parameters_types: Dict[str, Any]
     ) -> Dict[str, PrimitiveTypes]:
         parameters: Dict[str, PrimitiveTypes] = {}
-        for param_name, param_type in parameters_types.items():
+        for param_name in parameters_types.keys():
             parameters.update([self._parse_parameter(trial=trial, param_name=param_name)])
 
         return parameters
