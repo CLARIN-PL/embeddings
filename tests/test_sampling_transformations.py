@@ -1,3 +1,4 @@
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import datasets
@@ -106,6 +107,7 @@ def test_downsampling(
     downsample_percentage: float,
 ) -> None:
     flair.set_seed(441)
+    Path(result_path.name).mkdir(exist_ok=True)
     expected_train_size = round(len(ner_data["train"]) * downsample_percentage)
     expected_test_size = round(len(ner_data["test"]) * downsample_percentage)
 
@@ -128,6 +130,8 @@ def test_downsampling(
             assert token_transformed.text == token_loaded.text
             assert token_transformed.get_tag("tag") == token_loaded.get_tag("tag")
 
+    result_path.cleanup()
+
 
 def test_split_sampling(
     result_path: "TemporaryDirectory[str]",
@@ -136,6 +140,7 @@ def test_split_sampling(
     split_sample_percentage: float,
 ) -> None:
     flair.set_seed(441)
+    Path(result_path.name).mkdir(exist_ok=True)
     expected_train_size = round(len(ner_data["train"]) * (1 - split_sample_percentage))
     expected_dev_size = round(len(ner_data["train"]) * split_sample_percentage)
     expected_test_size = len(ner_data["test"])
@@ -159,6 +164,8 @@ def test_split_sampling(
             assert token_transformed.text == token_loaded.text
             assert token_transformed.get_tag("tag") == token_loaded.get_tag("tag")
 
+    result_path.cleanup()
+
 
 def test_combined_sampling(
     result_path: "TemporaryDirectory[str]",
@@ -169,6 +176,7 @@ def test_combined_sampling(
     downsample_percentage: float,
 ) -> None:
     flair.set_seed(441)
+    Path(result_path.name).mkdir(exist_ok=True)
     expected_train_size = round(
         len(ner_data["train"]) * (1 - split_sample_percentage) * downsample_percentage
     )
@@ -202,3 +210,5 @@ def test_combined_sampling(
         for token_transformed, token_loaded in zip(sentence_transformed, sentence_loaded):
             assert token_transformed.text == token_loaded.text
             assert token_transformed.get_tag("tag") == token_loaded.get_tag("tag")
+
+    result_path.cleanup()
