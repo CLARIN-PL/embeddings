@@ -155,7 +155,7 @@ class HuggingFaceOptimizedPipelineMetadata(ABC):
     target_column_name: str
     n_warmup_steps: int = 10
     n_trials: int = 2
-    sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = (0.1, None)
+    sample_dev_split_fraction: Optional[float] = 0.1
     seed: int = 441
     fine_tune_embeddings: bool = False
     pruner_cls: Type[optuna.pruners.MedianPruner] = field(
@@ -187,7 +187,7 @@ class OptimizedFlairClassificationPipeline(
                 input_column_name=self.input_column_name,
                 target_column_name=self.target_column_name,
                 persist_path=str(self.dataset_path),
-                sample_missing_splits=self.sample_missing_splits,
+                sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
             ),
             evaluation_pipeline=FlairTextClassificationEvaluationPipeline,
