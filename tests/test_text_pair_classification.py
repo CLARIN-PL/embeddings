@@ -20,6 +20,9 @@ from embeddings.transformation.flair_transformation.downsample_corpus_transforma
 from embeddings.transformation.flair_transformation.pair_classification_corpus_transformation import (
     PairClassificationCorpusTransformation,
 )
+from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
+    SampleSplitsFlairCorpusTransformation,
+)
 
 
 @pytest.fixture
@@ -31,9 +34,11 @@ def text_pair_classification_pipeline(
 ]:
     dataset = HuggingFaceDataset("clarin-pl/cst-wikinews")
     data_loader = HuggingFaceDataLoader()
-    transformation = PairClassificationCorpusTransformation(
-        ("sentence_1", "sentence_2"), "label"
-    ).then(DownsampleFlairCorpusTransformation(percentage=0.1))
+    transformation = (
+        PairClassificationCorpusTransformation(("sentence_1", "sentence_2"), "label")
+        .then(DownsampleFlairCorpusTransformation(percentage=0.1))
+        .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, seed=441))
+    )
     embedding = AutoFlairDocumentEmbedding.from_hub("allegro/herbert-base-cased")
     task = TextPairClassification(result_path.name, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(embedding, task)
@@ -52,7 +57,7 @@ def test_text_pair_classification_pipeline(
     pipeline, path = text_pair_classification_pipeline
     result = pipeline.run()
     path.cleanup()
-    np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.0789473)
-    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.0133037)
-    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.0071770)
-    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.0909090)
+    np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.0769230)
+    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.0158730)
+    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.0085470)
+    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.1111111)

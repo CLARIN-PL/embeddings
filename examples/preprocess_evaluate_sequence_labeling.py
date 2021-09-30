@@ -33,7 +33,6 @@ def run(
     ),
 ) -> None:
     typer.echo(pprint.pformat(locals()))
-
     dataset_path = Path(DATASET_PATH, embedding_name, dataset_name)
     dataset_path.mkdir(parents=True, exist_ok=True)
 
@@ -42,15 +41,15 @@ def run(
         input_column_name=input_column_name,
         target_column_name=target_column_name,
         persist_path=str(dataset_path),
-        sample_missing_splits=True,
-        ignore_test_subset=True,
+        sample_missing_splits=(0.1, 0.1),
+        ignore_test_subset=False,
     )
-    preprocessing_pipeline.run()
+    dataset = preprocessing_pipeline.run()
 
     output_path = Path(RESULTS_PATH, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
     persist_out_path = Path(output_path, f"{embedding_name}.json")
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+    persist_out_path.parent.mkdir(parents=True, exist_ok=True)
 
     evaluation_pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=str(dataset_path),
@@ -59,11 +58,12 @@ def run(
         hidden_size=hidden_size,
         embedding_name=embedding_name,
         persist_path=str(persist_out_path),
-        predict_subset="dev",
+        predict_subset="test",
         task_train_kwargs={"max_epochs": 1},
     )
 
     result = evaluation_pipeline.run()
+    print(result)
 
 
 typer.run(run)

@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple, Union
 
 import datasets
 import numpy as np
@@ -18,6 +18,10 @@ from embeddings.transformation.flair_transformation.column_corpus_transformation
 from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
     DownsampleFlairCorpusTransformation,
 )
+from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
+    SampleSplitsFlairCorpusTransformation,
+)
+from embeddings.transformation.transformation import Transformation
 
 
 class HuggingFaceSequenceLabelingPipeline(
@@ -33,14 +37,23 @@ class HuggingFaceSequenceLabelingPipeline(
         hidden_size: int,
         evaluation_mode: str = "conll",
         tagging_scheme: Optional[str] = None,
+        sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
+        seed: int = 441,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = HuggingFaceDataset(dataset_name)
         data_loader = HuggingFaceDataLoader()
-        transformation = ColumnCorpusTransformation(input_column_name, target_column_name).then(
-            DownsampleFlairCorpusTransformation(percentage=0.01)
-        )  # TODO: Remove after testing
+        transformation: Union[
+            Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
+        ]
+        transformation = ColumnCorpusTransformation(input_column_name, target_column_name)
+        if sample_missing_splits:
+            transformation = transformation.then(
+                SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
+            )
+        transformation = transformation.then(DownsampleFlairCorpusTransformation(percentage=0.01))
+        # TODO: Remove DownsampleFlairCorpusTransformation after Development phase
         embedding = AutoFlairWordEmbedding.from_hub(embedding_name)
         task = SequenceLabeling(
             output_path,
