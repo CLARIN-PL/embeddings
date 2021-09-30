@@ -60,7 +60,7 @@ class FlairTextClassificationPreprocessingPipeline(
         input_column_name: str,
         target_column_name: str,
         datasets_path: Path = DATASET_PATH,
-        sample_missing_splits: Tuple[float, float] = (0.1, 0.1),
+        sample_missing_splits: Optional[Tuple[float, float]] = None,
         ignore_test_subset: bool = False,
         seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
@@ -70,16 +70,17 @@ class FlairTextClassificationPreprocessingPipeline(
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
         ]
-        transformation = (
-            ClassificationCorpusTransformation(
-                input_column_name=input_column_name,
-                target_column_name=target_column_name,
-                datasets_path=datasets_path,
-            )
-            .then(SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed))
-            .then(DownsampleFlairCorpusTransformation(percentage=0.01))
+        transformation = ClassificationCorpusTransformation(
+            input_column_name=input_column_name,
+            target_column_name=target_column_name,
+            datasets_path=datasets_path,
         )
-        # TODO: Remove DownsampleFlairCorpusTransformation after Development phase. For testing purposes
+        if sample_missing_splits:
+            transformation = transformation.then(
+                SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
+            )
+        transformation = transformation.then(DownsampleFlairCorpusTransformation(percentage=0.01))
+        # TODO: Remove DownsampleFlairCorpusTransformation after Development phase
         if ignore_test_subset:
             transformation = transformation.then(DropSubsetFlairCorpusTransformation(subset="test"))
         transformation = transformation.persisting(FlairPicklePersister(path=persist_path))
@@ -96,7 +97,7 @@ class FlairTextPairClassificationPreprocessingPipeline(
         input_column_names: Tuple[str, str],
         target_column_name: str,
         datasets_path: Path = DATASET_PATH,
-        sample_missing_splits: Tuple[float, float] = (0.1, 0.1),
+        sample_missing_splits: Optional[Tuple[float, float]] = None,
         ignore_test_subset: bool = False,
         seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
@@ -110,7 +111,11 @@ class FlairTextPairClassificationPreprocessingPipeline(
             input_columns_names_pair=input_column_names,
             target_column_name=target_column_name,
             datasets_path=datasets_path,
-        ).then(SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed))
+        )
+        if sample_missing_splits:
+            transformation = transformation.then(
+                SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
+            )
         if ignore_test_subset:
             transformation = transformation.then(DropSubsetFlairCorpusTransformation(subset="test"))
         transformation = transformation.persisting(FlairPicklePersister(path=persist_path))
@@ -127,7 +132,7 @@ class FlairSequenceLabelingPreprocessingPipeline(
         input_column_name: str,
         target_column_name: str,
         datasets_path: Path = DATASET_PATH,
-        sample_missing_splits: Tuple[float, float] = (0.1, 0.1),
+        sample_missing_splits: Optional[Tuple[float, float]] = None,
         ignore_test_subset: bool = False,
         seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
@@ -137,16 +142,17 @@ class FlairSequenceLabelingPreprocessingPipeline(
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
         ]
-        transformation = (
-            ColumnCorpusTransformation(
-                input_column_name=input_column_name,
-                target_column_name=target_column_name,
-                datasets_path=datasets_path,
-            )
-            .then(SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed))
-            .then(DownsampleFlairCorpusTransformation(percentage=0.01))
-            # TODO: Remove after Development phase. For testing purposes
+        transformation = ColumnCorpusTransformation(
+            input_column_name=input_column_name,
+            target_column_name=target_column_name,
+            datasets_path=datasets_path,
         )
+        if sample_missing_splits:
+            transformation = transformation.then(
+                SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
+            )
+        transformation = transformation.then(DownsampleFlairCorpusTransformation(percentage=0.01))
+        # TODO: Remove DownsampleFlairCorpusTransformation after Development phase
         if ignore_test_subset:
             transformation = transformation.then(DropSubsetFlairCorpusTransformation(subset="test"))
         transformation = transformation.persisting(FlairConllPersister(path=persist_path))

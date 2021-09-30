@@ -2,8 +2,6 @@ import pprint
 from pathlib import Path
 from typing import Optional
 
-import flair
-import torch
 import typer
 
 from embeddings.defaults import DATASET_PATH, RESULTS_PATH
@@ -35,7 +33,6 @@ def run(
     ),
 ) -> None:
     typer.echo(pprint.pformat(locals()))
-    flair.device = torch.device("cpu")  # type: ignore
     dataset_path = Path(DATASET_PATH, embedding_name, dataset_name)
     dataset_path.mkdir(parents=True, exist_ok=True)
 

@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Union
 
 import datasets
 import numpy as np
@@ -18,6 +18,7 @@ from embeddings.transformation.flair_transformation.pair_classification_corpus_t
 from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
     SampleSplitsFlairCorpusTransformation,
 )
+from embeddings.transformation.transformation import Transformation
 
 
 class HuggingFacePairClassificationPipeline(
@@ -30,16 +31,23 @@ class HuggingFacePairClassificationPipeline(
         input_columns_names_pair: Tuple[str, str],
         target_column_name: str,
         output_path: T_path,
-        sample_missing_splits: Tuple[float, float] = (0.1, 0.1),
+        sample_missing_splits: Optional[Tuple[float, float]] = None,
         seed: int = 441,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = HuggingFaceDataset(dataset_name)
         data_loader = HuggingFaceDataLoader()
+        transformation: Union[
+            Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
+        ]
         transformation = PairClassificationCorpusTransformation(
             input_columns_names_pair, target_column_name
-        ).then(SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed))
+        )
+        if sample_missing_splits:
+            transformation = transformation.then(
+                SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
+            )
         embedding = AutoFlairDocumentEmbedding.from_hub(embedding_name)
         task = TextPairClassification(
             output_path,
