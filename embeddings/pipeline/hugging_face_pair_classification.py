@@ -31,7 +31,7 @@ class HuggingFacePairClassificationPipeline(
         input_columns_names_pair: Tuple[str, str],
         target_column_name: str,
         output_path: T_path,
-        sample_missing_splits: Optional[Tuple[float, float]] = None,
+        sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,

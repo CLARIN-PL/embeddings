@@ -10,15 +10,17 @@ from embeddings.transformation.flair_transformation.corpus_sampling_transformati
 class SampleSplitsFlairCorpusTransformation(CorpusSamplingTransformation):
     def __init__(
         self,
-        dev_fraction: float = 0.2,
-        test_fraction: float = 0.1,
+        dev_fraction: Optional[float] = 0.2,
+        test_fraction: Optional[float] = 0.1,
         seed: int = 441,
     ):
+        dev_fraction = dev_fraction if dev_fraction else 0.0
+        test_fraction = test_fraction if test_fraction else 0.0
         assert 1 > dev_fraction >= 0
         assert 1 > test_fraction >= 0
-        self.dev_fraction = dev_fraction
-        self.test_fraction = test_fraction
-        self.seed = seed
+        self.dev_fraction: float = dev_fraction
+        self.test_fraction: float = test_fraction
+        self.seed: int = seed
 
     def get_held_out_fraction(self, data: Corpus) -> float:
         if data.dev and not data.test:
