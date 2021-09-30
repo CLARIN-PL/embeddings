@@ -6,6 +6,7 @@ import datasets
 import flair
 import numpy as np
 import pytest
+import torch
 from flair.data import Corpus
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
@@ -21,6 +22,9 @@ from embeddings.transformation.flair_transformation.column_corpus_transformation
 )
 from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
     DownsampleFlairCorpusTransformation,
+)
+from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
+    SampleSplitsFlairCorpusTransformation,
 )
 from embeddings.utils.flair_corpus_persister import FlairConllPersister
 
@@ -55,6 +59,7 @@ def sequence_labeling_preprocessing_pipeline(
     data_loader = HuggingFaceDataLoader()
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
+        .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, test_fraction=0.1, seed=441))
         .then(DownsampleFlairCorpusTransformation(percentage=0.005))
         .persisting(FlairConllPersister(result_path.name))
     )
@@ -73,8 +78,6 @@ def sequence_labeling_evaluation_pipeline(
     task_train_kwargs: Dict[str, int],
 ) -> ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]]:
 
-    persist_out_path = Path(result_path.name, ner_dataset_name, f"{embedding_name}.json")
-    persist_out_path.parent.mkdir(parents=True, exist_ok=True)
     output_path = Path(result_path.name, ner_dataset_name, embedding_name)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -84,7 +87,7 @@ def sequence_labeling_evaluation_pipeline(
         fine_tune_embeddings=False,
         hidden_size=hidden_size,
         embedding_name=embedding_name,
-        persist_path=str(persist_out_path),
+        persist_path=None,
         task_train_kwargs=task_train_kwargs,
     )
     return pipeline
@@ -104,15 +107,13 @@ def test_sequence_labeling_preprocessing_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
+    flair.device = torch.device("cpu")  # type: ignore
 
-    preprocessing_pipeline = sequence_labeling_preprocessing_pipeline
-    _ = preprocessing_pipeline.run()
-
-    evaluation_pipeline = sequence_labeling_evaluation_pipeline
-    result = evaluation_pipeline.run()
+    sequence_labeling_preprocessing_pipeline.run()
+    result = sequence_labeling_evaluation_pipeline.run()
 
     np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.20634920634920634
+        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.7881773
     )
     np.testing.assert_almost_equal(result["seqeval__mode_None__scheme_None"]["overall_f1"], 0)
 
