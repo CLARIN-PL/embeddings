@@ -51,17 +51,15 @@ class ConfigSpace(ABC):
 
     def sample_parameters(self, trial: optuna.trial.Trial) -> Dict[str, PrimitiveTypes]:
         task_params, mapped_params_names = self._map_task_specific_parameters(trial)
-        return {
-            **self._map_parameters(
-                parameters_names=[
-                    param_name
-                    for param_name in self._get_annotations().keys()
-                    if param_name not in mapped_params_names
-                ],
-                trial=trial,
-            ),
-            **task_params,
-        }
+        params = self._map_parameters(
+            parameters_names=[
+                param_name
+                for param_name in self._get_annotations().keys()
+                if param_name not in mapped_params_names
+            ],
+            trial=trial,
+        )
+        return {**params, **task_params}
 
     @staticmethod
     @abc.abstractmethod
