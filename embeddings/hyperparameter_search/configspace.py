@@ -1,7 +1,7 @@
 import abc
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import Any, Dict, Final, Tuple, Type, TypeVar, Union
+from typing import Dict, Final, List, Set, Tuple, Type, TypeVar, Union
 
 import optuna
 
@@ -29,13 +29,18 @@ class ConfigSpace(ABC):
             )
 
     def _map_parameters(
-        self, trial: optuna.trial.Trial, parameters_types: Dict[str, Any]
+        self, trial: optuna.trial.Trial, parameters_names: List[str]
     ) -> Dict[str, PrimitiveTypes]:
         parameters: Dict[str, PrimitiveTypes] = {}
-        for param_name in parameters_types.keys():
+        for param_name in parameters_names:
             parameters.update([self._parse_parameter(trial=trial, param_name=param_name)])
 
         return parameters
+
+    def _map_task_specific_parameters(
+        self, trial: optuna.trial.Trial
+    ) -> Tuple[Dict[str, PrimitiveTypes], Set[str]]:
+        pass
 
     @classmethod
     def _get_annotations(cls) -> Dict[str, Type[Parameter]]:
@@ -45,12 +50,23 @@ class ConfigSpace(ABC):
         return annotations
 
     def sample_parameters(self, trial: optuna.trial.Trial) -> Dict[str, PrimitiveTypes]:
-        return self._map_parameters(
-            parameters_types={
-                param_name: param_cfg for param_name, param_cfg in self._get_annotations().items()
-            },
-            trial=trial,
+        parameters = {}
+        task_specific_mapping = self._map_task_specific_parameters(trial)
+        mapped_parameters = set()
+        if task_specific_mapping:
+            parameters.update(task_specific_mapping[0])
+            mapped_parameters = task_specific_mapping[1]
+        parameters.update(
+            self._map_parameters(
+                parameters_names=[
+                    param_name
+                    for param_name in self._get_annotations().keys()
+                    if param_name not in mapped_parameters
+                ],
+                trial=trial,
+            )
         )
+        return parameters
 
     @staticmethod
     @abc.abstractmethod
@@ -135,9 +151,10 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
         name="use_crf", type="categorical", choices=[True, False]
     )
 
-    def sample_parameters(self, trial: optuna.trial.Trial) -> Dict[str, PrimitiveTypes]:
+    def _map_task_specific_parameters(
+        self, trial: optuna.trial.Trial
+    ) -> Tuple[Dict[str, PrimitiveTypes], Set[str]]:
         parameters = {}
-
         use_rnn_name, use_rnn_val = self._parse_parameter(trial=trial, param_name="use_rnn")
         parameters[use_rnn_name] = use_rnn_val
 
@@ -145,17 +162,8 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
             for rnn_param in ("rnn_layers", "rnn_type"):
                 parameters.update([self._parse_parameter(trial=trial, param_name=rnn_param)])
 
-        parameters.update(
-            self._map_parameters(
-                parameters_types={
-                    param_name: param_cfg
-                    for param_name, param_cfg in self._get_annotations().items()
-                    if param_name not in {"rnn_layers", "rnn_type", "use_rnn"}
-                },
-                trial=trial,
-            )
-        )
-        return parameters
+        mapped_parameters: Final[Set[str]] = {"rnn_layers", "rnn_type", "use_rnn"}
+        return parameters, mapped_parameters
 
     @staticmethod
     def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
