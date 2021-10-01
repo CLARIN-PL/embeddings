@@ -40,7 +40,7 @@ class ConfigSpace(ABC):
     def _map_task_specific_parameters(
         self, trial: optuna.trial.Trial
     ) -> Tuple[Dict[str, PrimitiveTypes], Set[str]]:
-        pass
+        return dict(), set()
 
     @classmethod
     def _get_annotations(cls) -> Dict[str, Type[Parameter]]:
@@ -50,23 +50,18 @@ class ConfigSpace(ABC):
         return annotations
 
     def sample_parameters(self, trial: optuna.trial.Trial) -> Dict[str, PrimitiveTypes]:
-        parameters = {}
-        task_specific_mapping = self._map_task_specific_parameters(trial)
-        mapped_parameters = set()
-        if task_specific_mapping:
-            parameters.update(task_specific_mapping[0])
-            mapped_parameters = task_specific_mapping[1]
-        parameters.update(
-            self._map_parameters(
+        task_params, mapped_params_names = self._map_task_specific_parameters(trial)
+        return {
+            **self._map_parameters(
                 parameters_names=[
                     param_name
                     for param_name in self._get_annotations().keys()
-                    if param_name not in mapped_parameters
+                    if param_name not in mapped_params_names
                 ],
                 trial=trial,
-            )
-        )
-        return parameters
+            ),
+            **task_params,
+        }
 
     @staticmethod
     @abc.abstractmethod
