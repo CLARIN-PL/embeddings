@@ -87,13 +87,13 @@ class OptunaPipeline(OptimizedPipeline[Metadata], Generic[CS, Metadata, Evaluati
         metric_name: str,
         metric_key: str,
     ):
+        self.config_space = config_space
         self.preprocessing_pipeline = preprocessing_pipeline
         self.evaluation_pipeline = evaluation_pipeline
-        self.pruner: optuna.pruners.BasePruner = pruner
-        self.sampler: optuna.samplers.BaseSampler = sampler
-        self.n_trials: int = n_trials
+        self.pruner = pruner
+        self.sampler = sampler
+        self.n_trials = n_trials
         self.dataset_path = dataset_path
-        self.config_space = config_space
         self.metric_name = metric_name
         self.metric_key = metric_key
 
@@ -147,8 +147,8 @@ class OptunaPipeline(OptimizedPipeline[Metadata], Generic[CS, Metadata, Evaluati
         logging.getLogger("flair").setLevel(logging.INFO)
 
 
-@dataclass
-class HuggingFaceOptimizedPipelineMetadata(ABC):
+@dataclass  # type: ignore
+class BaseHuggingFaceOptimizedPipeline(ABC):
     dataset_name: str
     embedding_name: str
     input_column_name: str
@@ -165,6 +165,10 @@ class HuggingFaceOptimizedPipelineMetadata(ABC):
         init=False, default=optuna.samplers.TPESampler
     )
 
+    @abc.abstractmethod
+    def __post_init__(self) -> None:
+        pass
+
 
 @dataclass
 class OptimizedFlairClassificationPipeline(
@@ -173,7 +177,7 @@ class OptimizedFlairClassificationPipeline(
         HuggingFaceClassificationPipelineMetadata,
         EvaluationPipelineMetadata,
     ],
-    HuggingFaceOptimizedPipelineMetadata,
+    BaseHuggingFaceOptimizedPipeline,
 ):
     dataset_dir: TemporaryDirectory[str] = field(init=False, default=TemporaryDirectory())
     tmp_model_output_dir: TemporaryDirectory[str] = field(init=False, default=TemporaryDirectory())
@@ -243,7 +247,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         HuggingFaceSequenceLabelingPipelineMetadata,
         FlairSequenceLabelingEvaluationPipelineMetadata,
     ],
-    HuggingFaceOptimizedPipelineMetadata,
+    BaseHuggingFaceOptimizedPipeline,
 ):
     evaluation_mode: Literal["conll", "unit", "strict"] = "conll"
     tagging_scheme: Optional[str] = None
@@ -275,7 +279,7 @@ class OptimizedFlairSequenceLabelingPipeline(
                 input_column_name=self.input_column_name,
                 target_column_name=self.target_column_name,
                 persist_path=self.dataset_path.name,
-                sample_missing_splits=(0.1, 0.0),
+                sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
             ),
             config_space=self.config_space,
