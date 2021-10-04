@@ -1,4 +1,3 @@
-from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple
 
@@ -16,7 +15,6 @@ from embeddings.pipeline.evaluation_pipeline import (
     ModelEvaluationPipeline,
 )
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
-from embeddings.pipeline.standard_pipeline import StandardPipeline
 from embeddings.transformation.flair_transformation.column_corpus_transformation import (
     ColumnCorpusTransformation,
 )
@@ -104,11 +102,12 @@ def test_sequence_labeling_preprocessing_pipeline(
     ner_dataset_name: str,
     hidden_size: int,
     task_train_kwargs: Dict[str, int],
-    sequence_labeling_preprocessing_pipeline: StandardPipeline[
-        str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]
+    sequence_labeling_preprocessing_pipeline: Tuple[
+        PreprocessingPipeline[str, datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"
     ],
-    sequence_labeling_evaluation_pipeline: ModelEvaluationPipeline[
-        str, Corpus, Dict[str, np.ndarray], Dict[str, Any]
+    sequence_labeling_evaluation_pipeline: Tuple[
+        ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
+        "TemporaryDirectory[str]",
     ],
 ) -> None:
     flair.set_seed(441)

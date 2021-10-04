@@ -1,11 +1,10 @@
-from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Tuple
 
 import datasets
 import flair
 import pytest
 from flair.data import Corpus
-from typing import Tuple
 
 from embeddings.data.data_loader import ConllFlairCorpusDataLoader, HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset, LocalDataset
@@ -109,7 +108,9 @@ def ner_combined_other_order_sample_transformation(
 def test_downsampling(
     result_path: "TemporaryDirectory[str]",
     ner_data: datasets.DatasetDict,
-    ner_downsample_transformation: Transformation[datasets.DatasetDict, Corpus],
+    ner_downsample_transformation: Tuple[
+        Transformation[datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"
+    ],
     downsample_percentage: float,
 ) -> None:
     flair.set_seed(441)
@@ -142,7 +143,9 @@ def test_downsampling(
 def test_split_sampling(
     result_path: "TemporaryDirectory[str]",
     ner_data: datasets.DatasetDict,
-    ner_split_sample_transformation: Transformation[datasets.DatasetDict, Corpus],
+    ner_split_sample_transformation: Tuple[
+        Transformation[datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"
+    ],
     split_sample_percentage: float,
 ) -> None:
     flair.set_seed(441)
@@ -177,8 +180,12 @@ def test_split_sampling(
 def test_combined_sampling(
     result_path: "TemporaryDirectory[str]",
     ner_data: datasets.DatasetDict,
-    ner_combined_sample_transformation: Transformation[datasets.DatasetDict, Corpus],
-    ner_combined_other_order_sample_transformation: Transformation[datasets.DatasetDict, Corpus],
+    ner_combined_sample_transformation: Tuple[
+        Transformation[datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"
+    ],
+    ner_combined_other_order_sample_transformation: Tuple[
+        Transformation[datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"
+    ],
     split_sample_percentage: float,
     downsample_percentage: float,
 ) -> None:
