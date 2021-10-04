@@ -11,6 +11,9 @@ from embeddings.data.io import T_path
 from embeddings.defaults import RESULTS_PATH
 from embeddings.embedding.flair_embedding import FlairEmbedding
 from embeddings.task.task import Task
+from embeddings.utils.loggers import get_logger
+
+_logger = get_logger(__name__)
 
 
 class FlairTask(Task[Corpus, Dict[str, np.ndarray]]):
@@ -59,11 +62,18 @@ class FlairTask(Task[Corpus, Dict[str, np.ndarray]]):
     ) -> Dict[str, np.ndarray]:
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
-
+        if data.dev is None:
+            data = self._wrap_missing_dev_subset(data)
         self.fit(data)
         y_pred, _ = self.predict(getattr(data, predict_subset))
         y_true = self.get_y(getattr(data, predict_subset), self.y_type, self.y_dictionary)
         return {"y_true": y_true, "y_pred": y_pred}
+
+    def _wrap_missing_dev_subset(self, data: Corpus) -> Corpus:
+        _logger.warning("Dev subset is missing in the corpus - wrapping with an empty list")
+        self.task_train_kwargs["train_with_dev"] = True
+        data._dev = []
+        return data
 
     @property
     @abc.abstractmethod
