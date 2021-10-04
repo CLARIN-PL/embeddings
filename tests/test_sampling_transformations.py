@@ -5,6 +5,7 @@ import datasets
 import flair
 import pytest
 from flair.data import Corpus
+from typing import Tuple
 
 from embeddings.data.data_loader import ConllFlairCorpusDataLoader, HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset, LocalDataset
@@ -19,6 +20,11 @@ from embeddings.transformation.flair_transformation.split_sample_corpus_transfor
 )
 from embeddings.transformation.transformation import Transformation
 from embeddings.utils.flair_corpus_persister import FlairConllPersister
+
+
+@pytest.fixture
+def result_path() -> "TemporaryDirectory[str]":
+    return TemporaryDirectory()
 
 
 @pytest.fixture
@@ -48,26 +54,26 @@ def ner_data(ner_dataset_name: str) -> datasets.DatasetDict:
 def ner_downsample_transformation(
     result_path: "TemporaryDirectory[str]",
     downsample_percentage: float,
-) -> Transformation[datasets.DatasetDict, Corpus]:
+) -> Tuple[Transformation[datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"]:
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
         .then(DownsampleFlairCorpusTransformation(percentage=downsample_percentage, seed=441))
         .persisting(FlairConllPersister(result_path.name))
     )
-    return transformation
+    return transformation, result_path
 
 
 @pytest.fixture
 def ner_split_sample_transformation(
     result_path: "TemporaryDirectory[str]",
     split_sample_percentage: float,
-) -> Transformation[datasets.DatasetDict, Corpus]:
+) -> Tuple[Transformation[datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"]:
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=split_sample_percentage, seed=441))
         .persisting(FlairConllPersister(result_path.name))
     )
-    return transformation
+    return transformation, result_path
 
 
 @pytest.fixture
@@ -75,14 +81,14 @@ def ner_combined_sample_transformation(
     result_path: "TemporaryDirectory[str]",
     downsample_percentage: float,
     split_sample_percentage: float,
-) -> Transformation[datasets.DatasetDict, Corpus]:
+) -> Tuple[Transformation[datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"]:
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
         .then(DownsampleFlairCorpusTransformation(percentage=downsample_percentage, seed=441))
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=split_sample_percentage, seed=441))
         .persisting(FlairConllPersister(result_path.name))
     )
-    return transformation
+    return transformation, result_path
 
 
 @pytest.fixture
@@ -90,14 +96,14 @@ def ner_combined_other_order_sample_transformation(
     result_path: "TemporaryDirectory[str]",
     downsample_percentage: float,
     split_sample_percentage: float,
-) -> Transformation[datasets.DatasetDict, Corpus]:
+) -> Tuple[Transformation[datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"]:
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=split_sample_percentage, seed=441))
         .then(DownsampleFlairCorpusTransformation(percentage=downsample_percentage, seed=441))
         .persisting(FlairConllPersister(result_path.name))
     )
-    return transformation
+    return transformation, result_path
 
 
 def test_downsampling(
@@ -107,18 +113,18 @@ def test_downsampling(
     downsample_percentage: float,
 ) -> None:
     flair.set_seed(441)
-    Path(result_path.name).mkdir(exist_ok=True)
     expected_train_size = round(len(ner_data["train"]) * downsample_percentage)
     expected_test_size = round(len(ner_data["test"]) * downsample_percentage)
 
-    transformed_data = ner_downsample_transformation.transform(ner_data)
+    transformation, path = ner_downsample_transformation
+    transformed_data = transformation.transform(ner_data)
 
     assert len(transformed_data.train) == expected_train_size
     assert len(transformed_data.test) == expected_test_size
     assert transformed_data.dev is None
 
     data_loader = ConllFlairCorpusDataLoader()
-    dataset = LocalDataset(dataset=result_path.name)
+    dataset = LocalDataset(dataset=path.name)
     loaded_data = data_loader.load(dataset)
 
     assert len(loaded_data.train) == expected_train_size
@@ -130,7 +136,7 @@ def test_downsampling(
             assert token_transformed.text == token_loaded.text
             assert token_transformed.get_tag("tag") == token_loaded.get_tag("tag")
 
-    result_path.cleanup()
+    path.cleanup()
 
 
 def test_split_sampling(
@@ -140,19 +146,20 @@ def test_split_sampling(
     split_sample_percentage: float,
 ) -> None:
     flair.set_seed(441)
-    Path(result_path.name).mkdir(exist_ok=True)
+
     expected_train_size = round(len(ner_data["train"]) * (1 - split_sample_percentage))
     expected_dev_size = round(len(ner_data["train"]) * split_sample_percentage)
     expected_test_size = len(ner_data["test"])
 
-    transformed_data = ner_split_sample_transformation.transform(ner_data)
+    transformation, path = ner_split_sample_transformation
+    transformed_data = transformation.transform(ner_data)
 
     assert len(transformed_data.train) == expected_train_size
     assert len(transformed_data.dev) == expected_dev_size
     assert len(transformed_data.test) == expected_test_size
 
     data_loader = ConllFlairCorpusDataLoader()
-    dataset = LocalDataset(dataset=result_path.name)
+    dataset = LocalDataset(dataset=path.name)
     loaded_data = data_loader.load(dataset)
 
     assert len(loaded_data.train) == expected_train_size
@@ -164,7 +171,7 @@ def test_split_sampling(
             assert token_transformed.text == token_loaded.text
             assert token_transformed.get_tag("tag") == token_loaded.get_tag("tag")
 
-    result_path.cleanup()
+    path.cleanup()
 
 
 def test_combined_sampling(
@@ -176,7 +183,7 @@ def test_combined_sampling(
     downsample_percentage: float,
 ) -> None:
     flair.set_seed(441)
-    Path(result_path.name).mkdir(exist_ok=True)
+
     expected_train_size = round(
         len(ner_data["train"]) * (1 - split_sample_percentage) * downsample_percentage
     )
@@ -185,10 +192,10 @@ def test_combined_sampling(
     )
     expected_test_size = round(len(ner_data["test"]) * downsample_percentage)
 
-    other_transformed_data = ner_combined_other_order_sample_transformation.transform(
-        ner_data.copy()
-    )
-    transformed_data = ner_combined_sample_transformation.transform(ner_data)
+    transformation_other, path_other = ner_combined_other_order_sample_transformation
+    other_transformed_data = transformation_other.transform(ner_data.copy())
+    transformation, path = ner_combined_sample_transformation
+    transformed_data = transformation.transform(ner_data)
 
     assert len(transformed_data.train) == expected_train_size
     assert len(transformed_data.dev) == expected_dev_size
@@ -199,7 +206,7 @@ def test_combined_sampling(
     assert len(transformed_data.test) == len(other_transformed_data.test)
 
     data_loader = ConllFlairCorpusDataLoader()
-    dataset = LocalDataset(dataset=result_path.name)
+    dataset = LocalDataset(dataset=path.name)
     loaded_data = data_loader.load(dataset)
 
     assert len(loaded_data.train) == expected_train_size
@@ -211,4 +218,5 @@ def test_combined_sampling(
             assert token_transformed.text == token_loaded.text
             assert token_transformed.get_tag("tag") == token_loaded.get_tag("tag")
 
-    result_path.cleanup()
+    path.cleanup()
+    path_other.cleanup()

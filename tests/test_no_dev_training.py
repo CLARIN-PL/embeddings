@@ -27,6 +27,11 @@ from embeddings.utils.flair_corpus_persister import FlairConllPersister
 
 
 @pytest.fixture
+def result_path() -> "TemporaryDirectory[str]":
+    return TemporaryDirectory()
+
+
+@pytest.fixture
 def embedding_name() -> str:
     return "allegro/herbert-base-cased"
 
@@ -67,9 +72,6 @@ def sequence_labeling_evaluation_pipeline(
     ner_dataset_name: str,
     default_hidden_size: int,
 ) -> ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]]:
-
-    output_path = Path(result_path.name, ner_dataset_name, embedding_name)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
 
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,

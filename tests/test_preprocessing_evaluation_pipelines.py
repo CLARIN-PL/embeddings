@@ -1,6 +1,6 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 import datasets
 import flair
@@ -30,6 +30,11 @@ from embeddings.utils.flair_corpus_persister import FlairConllPersister
 
 
 @pytest.fixture
+def result_path() -> "TemporaryDirectory[str]":
+    return TemporaryDirectory()
+
+
+@pytest.fixture
 def embedding_name() -> str:
     return "allegro/herbert-base-cased"
 
@@ -54,7 +59,7 @@ def sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
     ner_dataset_name: str,
-) -> PreprocessingPipeline[str, datasets.DatasetDict, Corpus]:
+) -> Tuple[PreprocessingPipeline[str, datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"]:
     dataset = HuggingFaceDataset(ner_dataset_name)
     data_loader = HuggingFaceDataLoader()
     transformation = (
@@ -66,7 +71,7 @@ def sequence_labeling_preprocessing_pipeline(
     pipeline = PreprocessingPipeline(
         dataset=dataset, data_loader=data_loader, transformation=transformation
     )
-    return pipeline
+    return pipeline, result_path
 
 
 @pytest.fixture
@@ -76,10 +81,10 @@ def sequence_labeling_evaluation_pipeline(
     ner_dataset_name: str,
     hidden_size: int,
     task_train_kwargs: Dict[str, int],
-) -> ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]]:
-
-    output_path = Path(result_path.name, ner_dataset_name, embedding_name)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+) -> Tuple[
+    ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
+    "TemporaryDirectory[str]",
+]:
 
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,
@@ -90,7 +95,7 @@ def sequence_labeling_evaluation_pipeline(
         persist_path=None,
         task_train_kwargs=task_train_kwargs,
     )
-    return pipeline
+    return pipeline, result_path
 
 
 def test_sequence_labeling_preprocessing_pipeline(
@@ -109,12 +114,14 @@ def test_sequence_labeling_preprocessing_pipeline(
     flair.set_seed(441)
     flair.device = torch.device("cpu")  # type: ignore
 
-    sequence_labeling_preprocessing_pipeline.run()
-    result = sequence_labeling_evaluation_pipeline.run()
+    preprocessing_pipeline, path = sequence_labeling_preprocessing_pipeline
+    preprocessing_pipeline.run()
+    evaluation_pipeline, _ = sequence_labeling_evaluation_pipeline
+    result = evaluation_pipeline.run()
 
     np.testing.assert_almost_equal(
         result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.7881773
     )
     np.testing.assert_almost_equal(result["seqeval__mode_None__scheme_None"]["overall_f1"], 0)
 
-    result_path.cleanup()
+    path.cleanup()
