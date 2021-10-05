@@ -25,7 +25,7 @@ class ConfigSpace(ABC):
         else:
             raise ValueError(
                 f"Parameter type {type(param)} is not suported! "
-                "Supported types are: SearchableParameter and ConstantParameter"
+                f"Supported types are: {SearchableParameter.__name__} and {ConstantParameter.__name__}"
             )
 
     def _map_parameters(
