@@ -15,8 +15,10 @@ class DownsampleFlairCorpusTransformation(CorpusSamplingTransformation):
         downsample_train: bool = True,
         downsample_dev: bool = True,
         downsample_test: bool = True,
+        stratify: bool = True,
         seed: int = 441,
     ):
+        super().__init__(stratify, seed)
         self.percentage = percentage
         self.downsample_train = downsample_train
         self.downsample_dev = downsample_dev
@@ -32,7 +34,7 @@ class DownsampleFlairCorpusTransformation(CorpusSamplingTransformation):
 
     def _downsample_to_proportion(self, dataset: FlairDataset) -> Subset[FlairDataset]:
         _, downsampled_dataset = self.randomly_split_into_two_datasets(
-            dataset=dataset, fraction_size=self.percentage, random_state=self.seed
+            dataset=dataset, fraction_size=self.percentage
         )
         return downsampled_dataset
 
