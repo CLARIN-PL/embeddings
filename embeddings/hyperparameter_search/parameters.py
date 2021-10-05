@@ -25,8 +25,8 @@ class ConstantParameter:
     value: PrimitiveTypes
 
 
-# Type: ignore is due to https://github.com/python/mypy/issues/5374
-@dataclass  # type:ignore
+# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
+@dataclass  # type: ignore
 class AbstractSearchableParameter(ABC, Generic[Distribution]):
     name: str
     type: ParameterTypes
