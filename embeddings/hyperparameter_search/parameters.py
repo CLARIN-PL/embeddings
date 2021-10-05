@@ -37,70 +37,79 @@ class AbstractSearchableParameter(ABC, Generic[Distribution]):
     q: Optional[float] = None
     choices: Optional[Sequence[PrimitiveTypes]] = None
 
-    @staticmethod
-    def _check_additional_params_passed(
-        variables: Sequence[Union[PrimitiveTypes, Sequence[PrimitiveTypes]]]
-    ) -> None:
-        for var in variables:
-            assert var is None
+    def _check_arguments(self, forbidden_args: Sequence[str], required_args: Sequence[str]) -> None:
+        for variable_name in forbidden_args:
+            var = getattr(self, variable_name)
+            if var:
+                raise TypeError(
+                    f"Argument \"{variable_name}\" cannot be set for SearchableParameter type: \"{self.type}\". "
+                    f"Only {required_args} can be passed as argument for type: \"{self.type}\"."
+                )
 
     def __post_init__(self) -> None:
         if self.type == "categorical":
-            assert self.choices is not None
-            AbstractSearchableParameter._check_additional_params_passed(
-                (self.low, self.high, self.step, self.q)
+            self._check_arguments(
+                forbidden_args=("low", "high", "step", "q"), required_args=("choices")
             )
+            assert isinstance(self.choices, Sequence)
 
             self.distribution = self.get_categorical_distribution(choices=self.choices)
         elif self.type == "uniform":
+            self._check_arguments(
+                forbidden_args=("choices", "step", "q"), required_args=("low", "high")
+            )
             assert isinstance(self.low, float)
             assert isinstance(self.high, float)
-            AbstractSearchableParameter._check_additional_params_passed(
-                (self.choices, self.step, self.q)
-            )
 
             self.distribution = self.get_uniform_distribution(low=self.low, high=self.high)
         elif self.type == "log_uniform":
+            self._check_arguments(
+                forbidden_args=("choices", "step", "q"), required_args=("low", "high")
+            )
             assert isinstance(self.low, float)
             assert isinstance(self.high, float)
-            AbstractSearchableParameter._check_additional_params_passed(
-                (self.choices, self.step, self.q)
-            )
 
             self.distribution = self.get_log_uniform_distribution(
                 low=self.low,
                 high=self.high,
             )
         elif self.type == "discrete_uniform":
+            self._check_arguments(
+                forbidden_args=("choices", "step"), required_args=("low", "high", "q")
+            )
             assert isinstance(self.low, float)
             assert isinstance(self.high, float)
             assert isinstance(self.q, float)
-            AbstractSearchableParameter._check_additional_params_passed((self.choices, self.step))
 
             self.distribution = self.get_discrete_uniform_distribution(
                 low=self.low, high=self.high, q=self.q
             )
 
         elif self.type == "int_uniform":
+            self._check_arguments(
+                forbidden_args=("choices", "q"), required_args=("low", "high", "step")
+            )
             assert isinstance(self.low, int)
             assert isinstance(self.high, int)
             assert isinstance(self.step, int)
-            AbstractSearchableParameter._check_additional_params_passed((self.choices, self.q))
 
             self.distribution = self.get_int_uniform_distribution(
                 low=self.low, high=self.high, step=self.step
             )
         elif self.type == "log_int_uniform":
+            self._check_arguments(
+                forbidden_args=("choices", "q"), required_args=("low", "high", "step")
+            )
             assert isinstance(self.low, int)
             assert isinstance(self.high, int)
             assert isinstance(self.step, int)
-            AbstractSearchableParameter._check_additional_params_passed((self.choices, self.q))
+
             self.distribution = self.get_log_int_uniform_distribution(
                 low=self.low, high=self.high, step=self.step
             )
         else:
             raise ValueError(
-                f"Parameter {self.type} is not supported. Pick one of {get_args(ParameterTypes)}"
+                f"ParameterSearch type: {self.type} is not supported. Pick one of {get_args(ParameterTypes)}"
             )
 
     @staticmethod
