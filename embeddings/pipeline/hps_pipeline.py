@@ -13,7 +13,7 @@ from optuna import Study
 from embeddings.data.dataset import Data
 from embeddings.data.io import T_path
 from embeddings.hyperparameter_search.configspace import (
-    CS,
+    ConfigSpace,
     FlairModelTrainerConfigSpace,
     SampledParameters,
     SequenceLabelingConfigSpace,
@@ -72,10 +72,12 @@ class PersistingPipeline(OptimizedPipeline[Metadata]):
         return result
 
 
-class OptunaPipeline(OptimizedPipeline[Metadata], Generic[CS, Metadata, EvaluationMetadata]):
+class OptunaPipeline(
+    OptimizedPipeline[Metadata], Generic[ConfigSpace, Metadata, EvaluationMetadata]
+):
     def __init__(
         self,
-        config_space: CS,
+        config_space: ConfigSpace,
         preprocessing_pipeline: PreprocessingPipeline[Data, LoaderResult, TransformationResult],
         evaluation_pipeline: Type[
             ModelEvaluationPipeline[Data, LoaderResult, ModelResult, EvaluationResult]
@@ -147,6 +149,7 @@ class OptunaPipeline(OptimizedPipeline[Metadata], Generic[CS, Metadata, Evaluati
         logging.getLogger("flair").setLevel(logging.INFO)
 
 
+# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
 class BaseHuggingFaceOptimizedPipeline(ABC):
     dataset_name: str
@@ -179,8 +182,10 @@ class OptimizedFlairClassificationPipeline(
     ],
     BaseHuggingFaceOptimizedPipeline,
 ):
-    dataset_dir: TemporaryDirectory[str] = field(init=False, default=TemporaryDirectory())
-    tmp_model_output_dir: TemporaryDirectory[str] = field(init=False, default=TemporaryDirectory())
+    dataset_dir: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
+    tmp_model_output_dir: TemporaryDirectory[str] = field(
+        init=False, default_factory=TemporaryDirectory
+    )
     config_space: FlairModelTrainerConfigSpace = FlairModelTrainerConfigSpace()
 
     def __post_init__(self) -> None:
@@ -252,8 +257,10 @@ class OptimizedFlairSequenceLabelingPipeline(
     evaluation_mode: Literal["conll", "unit", "strict"] = "conll"
     tagging_scheme: Optional[str] = None
     config_space: SequenceLabelingConfigSpace = SequenceLabelingConfigSpace()
-    dataset_path: "TemporaryDirectory[str]" = field(init=False, default=TemporaryDirectory())
-    tmp_model_output_dir: TemporaryDirectory[str] = field(init=False, default=TemporaryDirectory())
+    dataset_path: "TemporaryDirectory[str]" = field(init=False, default_factory=TemporaryDirectory)
+    tmp_model_output_dir: TemporaryDirectory[str] = field(
+        init=False, default_factory=TemporaryDirectory
+    )
 
     def _get_metric_name(self) -> str:
         if self.evaluation_mode == "unit":
@@ -261,7 +268,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         elif self.evaluation_mode in {"conll", "strict"}:
             metric_name = "seqeval"
             if self.evaluation_mode == "conll":
-                metric_name += "__mode_None" # todo: deal with None in metric names
+                metric_name += "__mode_None"  # todo: deal with None in metric names
             else:
                 metric_name += "__mode_strict"
 

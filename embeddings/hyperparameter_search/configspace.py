@@ -13,7 +13,7 @@ ParsedParameters = TypeVar("ParsedParameters")
 SampledParameters = Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]
 
 
-class ConfigSpace(ABC):
+class BaseConfigSpace(ABC):
     def _parse_parameter(
         self, param_name: str, trial: optuna.trial.Trial
     ) -> Tuple[str, PrimitiveTypes]:
@@ -67,8 +67,9 @@ class ConfigSpace(ABC):
         pass
 
 
+# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
-class AbstractFlairModelTrainerConfigSpace(ConfigSpace, ABC):
+class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
     param_selection_mode: Parameter = field(
         init=False, default=ConstantParameter(name="param_selection_mode", value=True)
     )
@@ -189,4 +190,4 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
         }
 
 
-CS = TypeVar("CS", bound=ConfigSpace)
+ConfigSpace = TypeVar("ConfigSpace", bound=BaseConfigSpace)
