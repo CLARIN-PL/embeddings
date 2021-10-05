@@ -64,8 +64,6 @@ class SampleSplitsFlairCorpusTransformation(CorpusSamplingTransformation):
         elif data.dev is None and self.dev_fraction > 0:
             data = Corpus(train=train_subset, dev=held_out_subset, test=data.test)
         else:
-            raise ValueError(
-                f"Wrong dev or test split fraction given in {self.__class__.__name__} attributes"
-            )
+            raise ValueError("Unrecognized configuration of dev or test fraction for given Corpus.")
 
         return data
