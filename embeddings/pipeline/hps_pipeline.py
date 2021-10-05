@@ -261,7 +261,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         elif self.evaluation_mode in {"conll", "strict"}:
             metric_name = "seqeval"
             if self.evaluation_mode == "conll":
-                metric_name += "__mode_None"
+                metric_name += "__mode_None" # todo: deal with None in metric names
             else:
                 metric_name += "__mode_strict"
 
