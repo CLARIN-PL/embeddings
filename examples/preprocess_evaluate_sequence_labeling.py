@@ -63,7 +63,7 @@ def run(
     )
 
     result = evaluation_pipeline.run()
-    print(result)
+    typer.echo(pprint.pformat(result))
 
 
 typer.run(run)
