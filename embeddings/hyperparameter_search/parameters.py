@@ -42,8 +42,8 @@ class AbstractSearchableParameter(ABC, Generic[Distribution]):
             var = getattr(self, variable_name)
             if var:
                 raise TypeError(
-                    f"Argument \"{variable_name}\" cannot be set for SearchableParameter type: \"{self.type}\". "
-                    f"Only {required_args} can be passed as argument for type: \"{self.type}\"."
+                    f'Argument "{variable_name}" cannot be set for SearchableParameter type: "{self.type}". '
+                    f'Only {required_args} can be passed as argument for type: "{self.type}".'
                 )
 
     def __post_init__(self) -> None:
