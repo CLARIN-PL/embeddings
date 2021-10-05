@@ -1,7 +1,7 @@
 import abc
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import Generic, Literal, Optional, Sequence, TypeVar, Union, get_args
+from typing import Generic, Literal, Optional, Sequence, TypeVar, get_args
 
 import optuna
 import optuna.distributions
