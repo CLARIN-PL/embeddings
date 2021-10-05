@@ -12,8 +12,10 @@ class SampleSplitsFlairCorpusTransformation(CorpusSamplingTransformation):
         self,
         dev_fraction: Optional[float] = 0.2,
         test_fraction: Optional[float] = 0.1,
+        stratify: bool = True,
         seed: int = 441,
     ):
+        super().__init__(stratify, seed)
         dev_fraction = dev_fraction if dev_fraction else 0.0
         test_fraction = test_fraction if test_fraction else 0.0
         assert 1 > dev_fraction >= 0
@@ -44,7 +46,7 @@ class SampleSplitsFlairCorpusTransformation(CorpusSamplingTransformation):
             return data
 
         train_subset, held_out_subset = self.randomly_split_into_two_datasets(
-            dataset=data.train, fraction_size=held_out_fraction, random_state=self.seed
+            dataset=data.train, fraction_size=held_out_fraction
         )
 
         if (
@@ -56,7 +58,6 @@ class SampleSplitsFlairCorpusTransformation(CorpusSamplingTransformation):
             dev_subset, test_subset = self.randomly_split_into_two_datasets(
                 dataset=held_out_subset,
                 fraction_size=(self.test_fraction / held_out_fraction),
-                random_state=self.seed,
             )
             data = Corpus(train=train_subset, dev=dev_subset, test=test_subset)
         elif data.test is None and self.test_fraction > 0:
