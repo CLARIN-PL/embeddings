@@ -257,7 +257,7 @@ class OptimizedFlairSequenceLabelingPipeline(
     evaluation_mode: Literal["conll", "unit", "strict"] = "conll"
     tagging_scheme: Optional[str] = None
     config_space: SequenceLabelingConfigSpace = SequenceLabelingConfigSpace()
-    dataset_path: "TemporaryDirectory[str]" = field(init=False, default_factory=TemporaryDirectory)
+    dataset_path: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
     tmp_model_output_dir: TemporaryDirectory[str] = field(
         init=False, default_factory=TemporaryDirectory
     )
@@ -296,7 +296,7 @@ class OptimizedFlairSequenceLabelingPipeline(
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
-            dataset_path=self.dataset_path.name,
+            dataset_path=self.dataset_path,
         )
 
     def _get_metadata(
@@ -334,7 +334,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         assert isinstance(hidden_size, int)
         metadata: FlairSequenceLabelingEvaluationPipelineMetadata = {
             "embedding_name": self.embedding_name,
-            "dataset_path": str(self.dataset_path),
+            "dataset_path": self.dataset_path.name,
             "task_model_kwargs": None,
             "task_train_kwargs": task_train_kwargs,
             "persist_path": None,
