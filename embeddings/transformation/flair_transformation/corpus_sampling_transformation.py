@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 from flair.data import Corpus, FlairDataset
 from flair.datasets import CSVClassificationDataset
@@ -14,20 +14,26 @@ class CorpusSamplingTransformation(Transformation[Corpus, Corpus], ABC):
         self.stratify = stratify
         self.seed = seed
 
+    @staticmethod
+    def retrieve_labels(dataset: FlairDataset) -> List[str]:
+        return [sentence.labels[0].value for sentence in dataset]
+
     def randomly_split_into_two_datasets(
         self,
         dataset: Union[FlairDataset, Subset[FlairDataset]],
         fraction_size: float,
     ) -> Tuple[Subset[FlairDataset], Subset[FlairDataset]]:
+
+        labels: Optional[List[str]] = None
         if isinstance(dataset, Subset):
             indices = dataset.indices
+            if self.stratify and isinstance(dataset.dataset, CSVClassificationDataset):
+                labels = self.retrieve_labels(dataset)
             dataset = dataset.dataset
         else:
             indices = range(len(dataset))
-
-        labels = None
-        if self.stratify and isinstance(dataset, CSVClassificationDataset):
-            labels = [sentence.labels[0].value for sentence in dataset]
+            if self.stratify and isinstance(dataset, CSVClassificationDataset):
+                labels = self.retrieve_labels(dataset)
 
         first_indices, second_indices = train_test_split(
             indices, test_size=fraction_size, shuffle=True, random_state=self.seed, stratify=labels

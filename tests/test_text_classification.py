@@ -38,7 +38,7 @@ def text_classification_pipeline(
     )
     data_loader = HuggingFaceDataLoader()
     transformation = ClassificationCorpusTransformation("text", "target").then(
-        DownsampleFlairCorpusTransformation(percentage=0.01)
+        DownsampleFlairCorpusTransformation(percentage=0.01, stratify=False)
     )
     embedding = AutoFlairDocumentEmbedding.from_hub("allegro/herbert-base-cased")
     task = TextClassification(result_path.name, task_train_kwargs={"max_epochs": 1})
