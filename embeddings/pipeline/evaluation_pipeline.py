@@ -9,10 +9,8 @@ from embeddings.data.data_loader import (
     PickleFlairCorpusDataLoader,
 )
 from embeddings.data.dataset import Data, Dataset, LocalDataset
-from embeddings.embedding.flair_embedding import (
-    FlairTransformerDocumentEmbedding,
-    FlairTransformerWordEmbedding,
-)
+from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
+from embeddings.embedding.flair_embedding import FlairTransformerDocumentEmbedding
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
@@ -117,7 +115,6 @@ class FlairSequenceLabelingEvaluationPipeline(
         self,
         dataset_path: str,
         embedding_name: str,
-        fine_tune_embeddings: bool,
         output_path: str,
         hidden_size: int,
         evaluation_mode: str = "conll",
@@ -126,12 +123,11 @@ class FlairSequenceLabelingEvaluationPipeline(
         predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        word_embedding_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = ConllFlairCorpusDataLoader()
-        embedding = FlairTransformerWordEmbedding(
-            name=embedding_name, fine_tune=fine_tune_embeddings
-        )
+        embedding = AutoFlairWordEmbedding.from_hub(embedding_name, kwargs=word_embedding_kwargs)
         task = SequenceLabeling(
             output_path=output_path,
             hidden_size=hidden_size,

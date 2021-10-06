@@ -1,6 +1,9 @@
 # Temporary script for Development Purposes
 from tempfile import TemporaryDirectory
 
+import flair
+import torch
+
 from embeddings.pipeline.hps_pipeline import (
     OptimizedFlairClassificationPipeline,
     OptimizedFlairSequenceLabelingPipeline,
@@ -10,9 +13,9 @@ from embeddings.pipeline.hugging_face_sequence_labeling import HuggingFaceSequen
 
 
 def main() -> None:
+    flair.device = torch.device("cpu")  # TODO: remove after testing
     hps_pipeline = OptimizedFlairSequenceLabelingPipeline(
         dataset_name="clarin-pl/kpwr-ner",
-        embedding_name="clarin-pl/roberta-polish-kgr10",
         input_column_name="tokens",
         target_column_name="ner",
     ).persisting(best_params_path="best_params.yaml", log_path="hps_log.pickle")
@@ -25,7 +28,6 @@ def main() -> None:
 
     tc_hps_pipeline = OptimizedFlairClassificationPipeline(
         dataset_name="clarin-pl/polemo2-official",
-        embedding_name="clarin-pl/roberta-polish-kgr10",
         input_column_name="text",
         target_column_name="target",
     ).persisting(best_params_path="best_prams_tc.yaml", log_path="tc_hps_log.pickle")

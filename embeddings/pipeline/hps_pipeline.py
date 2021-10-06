@@ -153,7 +153,6 @@ class OptunaPipeline(
 @dataclass  # type: ignore
 class BaseHuggingFaceOptimizedPipeline(ABC):
     dataset_name: str
-    embedding_name: str
     input_column_name: str
     target_column_name: str
     n_warmup_steps: int = 10
@@ -214,8 +213,10 @@ class OptimizedFlairClassificationPipeline(
     ) -> HuggingFaceClassificationPipelineMetadata:
         task_train_kwargs = parameters["task_train_kwargs"]
         assert isinstance(task_train_kwargs, dict)
+        embedding_name = parameters["embedding_name"]
+        assert isinstance(embedding_name, str)
         metadata: HuggingFaceClassificationPipelineMetadata = {
-            "embedding_name": self.embedding_name,
+            "embedding_name": embedding_name,
             "dataset_name": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
@@ -227,8 +228,10 @@ class OptimizedFlairClassificationPipeline(
     def _get_evaluation_metadata(self, parameters: SampledParameters) -> EvaluationPipelineMetadata:
         task_train_kwargs = parameters["task_train_kwargs"]
         assert isinstance(task_train_kwargs, dict)
+        embedding_name = parameters["embedding_name"]
+        assert isinstance(embedding_name, str)
         metadata: EvaluationPipelineMetadata = {
-            "embedding_name": self.embedding_name,
+            "embedding_name": embedding_name,
             "dataset_path": str(self.dataset_path),
             "task_model_kwargs": None,
             "task_train_kwargs": task_train_kwargs,
@@ -308,9 +311,11 @@ class OptimizedFlairSequenceLabelingPipeline(
         assert isinstance(task_model_kwargs, dict)
         hidden_size = parameters["hidden_size"]
         assert isinstance(hidden_size, int)
+        embedding_name = parameters["embedding_name"]
+        assert isinstance(embedding_name, str)
 
         metadata: HuggingFaceSequenceLabelingPipelineMetadata = {
-            "embedding_name": self.embedding_name,
+            "embedding_name": embedding_name,
             "dataset_name": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
@@ -332,8 +337,11 @@ class OptimizedFlairSequenceLabelingPipeline(
         assert isinstance(task_model_kwargs, dict)
         hidden_size = parameters["hidden_size"]
         assert isinstance(hidden_size, int)
+        embedding_name = parameters["embedding_name"]
+        assert isinstance(embedding_name, str)
+
         metadata: FlairSequenceLabelingEvaluationPipelineMetadata = {
-            "embedding_name": self.embedding_name,
+            "embedding_name": embedding_name,
             "dataset_path": self.dataset_path.name,
             "task_model_kwargs": None,
             "task_train_kwargs": task_train_kwargs,

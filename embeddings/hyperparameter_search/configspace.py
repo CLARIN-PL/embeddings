@@ -1,7 +1,7 @@
 import abc
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import Dict, Final, List, Set, Tuple, Type, TypeVar, Union
+from typing import Dict, Final, List, Literal, Set, Tuple, Type, TypeVar, Union
 
 import optuna
 
@@ -11,6 +11,7 @@ from embeddings.utils.utils import PrimitiveTypes
 Parameter = Union[SearchableParameter, ConstantParameter]
 ParsedParameters = TypeVar("ParsedParameters")
 SampledParameters = Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]
+ConfigSpace = TypeVar("ConfigSpace", bound="BaseConfigSpace")
 
 
 class BaseConfigSpace(ABC):
@@ -102,8 +103,16 @@ class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
 
 
 class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
+    embedding_name: Parameter = SearchableParameter(
+        name="embedding_name",
+        type="categorical",
+        choices=["allegro/herbert-base-cased"],
+    )
+
     @staticmethod
     def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
+        embedding_name = parameters.pop("embedding_name")
+        assert isinstance(embedding_name, str)
         (
             parameters,
             task_train_kwargs,
@@ -112,11 +121,11 @@ class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
             raise ValueError(
                 f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
             )
-        return {"task_train_kwargs": task_train_kwargs}
+        return {"embedding_name": embedding_name, "task_train_kwargs": task_train_kwargs}
 
 
 @dataclass
-class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
+class SequenceLabelingConfigSpace(FlairModelTrainerConfigSpace):
     hidden_size: Parameter = SearchableParameter(
         name="hidden_size", type="int_uniform", low=128, high=2048, step=128
     )
@@ -161,6 +170,8 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
 
     @staticmethod
     def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
+        embedding_name = parameters.pop("embedding_name")
+        assert isinstance(embedding_name, str)
         hidden_size = parameters.pop("hidden_size")
         assert isinstance(hidden_size, int)
         task_model_keys: Final = {
@@ -184,10 +195,93 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
                 f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
             )
         return {
+            "embedding_name": embedding_name,
             "hidden_size": hidden_size,
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
         }
 
 
-ConfigSpace = TypeVar("ConfigSpace", bound=BaseConfigSpace)
+@dataclass
+class TextClassificationConfigSpace(FlairModelTrainerConfigSpace):
+    _transformer_params: Final[Tuple[str, ...]] = field(
+        init=False, default=("transformer_document_pooling",)
+    )
+    _cnn_params: Final[Tuple[str, ...]] = field(init=False, default=("kernel",))
+    _rnn_params: Final[Tuple[str, ...]] = field(
+        init=False, default=("hidden_size", "rnn_type", "rnn_layers", "bidirectional")
+    )
+    _shared_static_params: Final[Tuple[str, ...]] = field(
+        init=False,
+        default=(
+            "dropout",
+            "word_dropout",
+            "locked_dropout",
+            "reproject_words",
+        ),
+    )
+    transformer_document_pooling: Parameter = SearchableParameter(
+        name="transformer_document_pooling", type="categorical", choices=["cls", "mean", "max"]
+    )
+    static_document_pooling: Parameter = SearchableParameter(
+        name="document_pooling", type="categorical", choices=["CNN", "RNN"]
+    )
+    # TODO: choices to optuna can only take primitives
+    kernel: Parameter = SearchableParameter(
+        name="kernel",
+        type="categorical",
+        choices=[((100, 3), (100, 4), (100, 5)), ((200, 4), (200, 5), (200, 6))],
+    )
+    hidden_size: Parameter = SearchableParameter(
+        name="hidden_size", type="int_uniform", low=128, high=2048, step=128
+    )
+    rnn_type: Parameter = SearchableParameter(
+        name="rnn_type", type="categorical", choices=["LSTM", "GRU"]
+    )
+    rnn_layers: Parameter = SearchableParameter(
+        name="rnn_layers", type="int_uniform", low=1, high=3, step=1
+    )
+    bidirectional: Parameter = SearchableParameter(
+        name="bidirectional", type="categorical", choices=[True, False]
+    )
+    dropout: Parameter = SearchableParameter(
+        name="dropout", type="discrete_uniform", low=0.0, high=0.5, q=0.05
+    )
+    word_dropout: Parameter = SearchableParameter(
+        name="word_dropout", type="discrete_uniform", low=0.0, high=0.5, q=0.05
+    )
+    locked_dropout: Parameter = SearchableParameter(
+        name="locked_dropout", type="discrete_uniform", low=0.0, high=0.5, q=0.05
+    )
+    reproject_words: Parameter = SearchableParameter(
+        name="reproject_words", type="categorical", choices=[True, False]
+    )
+
+    def _map_task_specific_parameters(
+        self, trial: optuna.trial.Trial
+    ) -> Tuple[Dict[str, PrimitiveTypes], Set[str]]:
+
+        parameters = {}
+        # TODO: retrieve embedding type somehow
+        embedding_type: Literal["static", "dynamic"] = ...
+
+        if embedding_type == "dynamic":
+            for param in self._transformer_params:
+                parameters.update([self._parse_parameter(trial=trial, param_name=param)])
+        else:
+            static_document_pooling_name, static_document_pooling_val = self._parse_parameter(
+                trial=trial, param_name="static_document_pooling"
+            )
+            parameters[static_document_pooling_name] = static_document_pooling_val
+
+            if static_document_pooling_val == "CNN":
+                for param in self._cnn_params + self._shared_static_params:
+                    parameters.update([self._parse_parameter(trial=trial, param_name=param)])
+            elif static_document_pooling_val == "RNN":
+                for param in self._rnn_params + self._shared_static_params:
+                    parameters.update([self._parse_parameter(trial=trial, param_name=param)])
+            else:
+                raise ValueError("Static document pooling value not supported")
+
+        mapped_parameters = set(self.__annotations__)
+        return parameters, mapped_parameters

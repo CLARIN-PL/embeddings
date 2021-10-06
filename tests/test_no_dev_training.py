@@ -74,10 +74,9 @@ def sequence_labeling_evaluation_pipeline(
 
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,
-        output_path=result_path.name,
-        fine_tune_embeddings=False,
-        hidden_size=default_hidden_size,
         embedding_name=embedding_name,
+        output_path=result_path.name,
+        hidden_size=default_hidden_size,
         persist_path=None,
         task_train_kwargs={"max_epochs": 1, "mini_batch_size": 32},
     )
