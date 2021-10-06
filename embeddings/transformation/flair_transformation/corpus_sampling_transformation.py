@@ -7,6 +7,9 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import Subset
 
 from embeddings.transformation.transformation import Transformation
+from embeddings.utils.loggers import get_logger
+
+_logger = get_logger(__name__)
 
 
 class CorpusSamplingTransformation(Transformation[Corpus, Corpus], ABC):
@@ -27,13 +30,23 @@ class CorpusSamplingTransformation(Transformation[Corpus, Corpus], ABC):
         labels: Optional[List[str]] = None
         if isinstance(dataset, Subset):
             indices = dataset.indices
-            if self.stratify and isinstance(dataset.dataset, CSVClassificationDataset):
-                labels = self.retrieve_labels(dataset)
+            if self.stratify:
+                if isinstance(dataset.dataset, CSVClassificationDataset):
+                    labels = self.retrieve_labels(dataset)
+                else:
+                    _logger.warning(
+                        "Stratification for datasets other than CSVClassificationDataset not supported yet"
+                    )
             dataset = dataset.dataset
         else:
             indices = range(len(dataset))
-            if self.stratify and isinstance(dataset, CSVClassificationDataset):
-                labels = self.retrieve_labels(dataset)
+            if self.stratify:
+                if isinstance(dataset, CSVClassificationDataset):
+                    labels = self.retrieve_labels(dataset)
+                else:
+                    _logger.warning(
+                        "Stratification for datasets other than CSVClassificationDataset not supported yet"
+                    )
 
         first_indices, second_indices = train_test_split(
             indices, test_size=fraction_size, shuffle=True, random_state=self.seed, stratify=labels
