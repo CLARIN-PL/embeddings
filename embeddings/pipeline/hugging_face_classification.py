@@ -7,7 +7,7 @@ from flair.data import Corpus
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.data.io import T_path
-from embeddings.embedding.auto_flair import AutoFlairDocumentEmbedding
+from embeddings.embedding.auto_flair import AutoFlairDocumentPoolEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -34,11 +34,14 @@ class HuggingFaceClassificationPipeline(
         input_column_name: str,
         target_column_name: str,
         output_path: T_path,
+        document_pooling: str = "FlairDocumentPoolEmbedding",
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        load_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
+        load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
         dataset = HuggingFaceDataset(dataset_name)
         data_loader = HuggingFaceDataLoader()
         transformation: Union[
@@ -51,7 +54,9 @@ class HuggingFaceClassificationPipeline(
             )
         transformation = transformation.then(DownsampleFlairCorpusTransformation(percentage=0.01))
         # TODO: Remove DownsampleFlairCorpusTransformation after Development phase
-        embedding = AutoFlairDocumentEmbedding.from_hub(embedding_name)
+        embedding = AutoFlairDocumentPoolEmbedding.from_hub(
+            repo_id=embedding_name, document_pooling=document_pooling, **load_model_kwargs
+        )
         task = TextClassification(
             output_path, task_model_kwargs=task_model_kwargs, task_train_kwargs=task_train_kwargs
         )

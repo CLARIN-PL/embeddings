@@ -39,6 +39,7 @@ class AbstractSearchableParameter(ABC, Generic[Distribution]):
     step: Optional[Numeric] = None
     q: Optional[float] = None
     choices: Optional[T_choices] = None
+    value: Optional[PrimitiveTypes] = None
 
     def _check_arguments(self, forbidden_args: Sequence[str], required_args: Sequence[str]) -> None:
         for variable_name in forbidden_args:
@@ -151,7 +152,8 @@ class SearchableParameter(AbstractSearchableParameter[optuna.distributions.BaseD
     def get_categorical_distribution(
         choices: T_choices,
     ) -> optuna.distributions.BaseDistribution:
-        return optuna.distributions.CategoricalDistribution(choices=choices)
+        # kernels CNN pooling parameter has tuple of tuples of int type
+        return optuna.distributions.CategoricalDistribution(choices=choices)  # type: ignore
 
     @staticmethod
     def get_uniform_distribution(low: float, high: float) -> optuna.distributions.BaseDistribution:

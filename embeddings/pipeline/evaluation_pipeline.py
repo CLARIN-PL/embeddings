@@ -9,8 +9,7 @@ from embeddings.data.data_loader import (
     PickleFlairCorpusDataLoader,
 )
 from embeddings.data.dataset import Data, Dataset, LocalDataset
-from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
-from embeddings.embedding.flair_embedding import FlairTransformerDocumentEmbedding
+from embeddings.embedding.auto_flair import AutoFlairDocumentPoolEmbedding, AutoFlairWordEmbedding
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
@@ -53,17 +52,19 @@ class FlairTextClassificationEvaluationPipeline(
         self,
         dataset_path: str,
         embedding_name: str,
-        fine_tune_embeddings: bool,
         output_path: str,
+        document_pooling: str = "FlairDocumentPoolEmbedding",
         persist_path: Optional[str] = None,
         predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        load_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
+        load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
-        embedding = FlairTransformerDocumentEmbedding(
-            name=embedding_name, fine_tune=fine_tune_embeddings
+        embedding = AutoFlairDocumentPoolEmbedding.from_hub(
+            repo_id=embedding_name, document_pooling=document_pooling, **load_model_kwargs
         )
         task = TextClassification(
             output_path=output_path,
@@ -84,17 +85,19 @@ class FlairTextPairClassificationEvaluationPipeline(
         self,
         dataset_path: str,
         embedding_name: str,
-        fine_tune_embeddings: bool,
         output_path: str,
+        document_pooling: str = "FlairDocumentPoolEmbedding",
         persist_path: Optional[str] = None,
         predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        load_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
+        load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
-        embedding = FlairTransformerDocumentEmbedding(
-            name=embedding_name, fine_tune=fine_tune_embeddings
+        embedding = AutoFlairDocumentPoolEmbedding.from_hub(
+            repo_id=embedding_name, document_pooling=document_pooling, **load_model_kwargs
         )
         task = TextPairClassification(
             output_path=output_path,

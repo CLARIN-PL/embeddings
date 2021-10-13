@@ -13,7 +13,8 @@ from embeddings.pipeline.hugging_face_sequence_labeling import HuggingFaceSequen
 
 
 def main() -> None:
-    flair.device = torch.device("cpu")  # TODO: remove after testing
+    # TODO: remove after testing
+    flair.device = torch.device("cpu")  # type: ignore
     hps_pipeline = OptimizedFlairSequenceLabelingPipeline(
         dataset_name="clarin-pl/kpwr-ner",
         input_column_name="tokens",

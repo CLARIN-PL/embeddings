@@ -14,26 +14,30 @@ from embeddings.data.dataset import Data
 from embeddings.data.io import T_path
 from embeddings.hyperparameter_search.configspace import (
     ConfigSpace,
-    FlairModelTrainerConfigSpace,
     SampledParameters,
     SequenceLabelingConfigSpace,
+    TextClassificationConfigSpace,
 )
 from embeddings.pipeline.evaluation_pipeline import (
     FlairSequenceLabelingEvaluationPipeline,
     FlairTextClassificationEvaluationPipeline,
+    FlairTextPairClassificationEvaluationPipeline,
     ModelEvaluationPipeline,
 )
 from embeddings.pipeline.pipelines_metadata import (
     EvaluationMetadata,
     EvaluationPipelineMetadata,
+    FlairClassificationEvaluationPipelineMetadata,
     FlairSequenceLabelingEvaluationPipelineMetadata,
     HuggingFaceClassificationPipelineMetadata,
+    HuggingFacePairClassificationPipelineMetadata,
     HuggingFaceSequenceLabelingPipelineMetadata,
     Metadata,
 )
 from embeddings.pipeline.preprocessing_pipeline import (
     FlairSequenceLabelingPreprocessingPipeline,
     FlairTextClassificationPreprocessingPipeline,
+    FlairTextPairClassificationPreprocessingPipeline,
     PreprocessingPipeline,
 )
 from embeddings.pipeline.standard_pipeline import LoaderResult, ModelResult, TransformationResult
@@ -149,17 +153,17 @@ class OptunaPipeline(
         logging.getLogger("flair").setLevel(logging.INFO)
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
-class BaseHuggingFaceOptimizedPipeline(ABC):
+@dataclass
+class _HuggingFaceOptimizedPipelineBase(ABC):
     dataset_name: str
-    input_column_name: str
-    target_column_name: str
+
+
+@dataclass
+class _HuggingFaceOptimizedPipelineDefaultsBase(ABC):
     n_warmup_steps: int = 10
     n_trials: int = 2
     sample_dev_split_fraction: Optional[float] = 0.1
     seed: int = 441
-    fine_tune_embeddings: bool = False
     pruner_cls: Type[optuna.pruners.MedianPruner] = field(
         init=False, default=optuna.pruners.MedianPruner
     )
@@ -167,25 +171,52 @@ class BaseHuggingFaceOptimizedPipeline(ABC):
         init=False, default=optuna.samplers.TPESampler
     )
 
+
+# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
+@dataclass  # type: ignore
+class AbstractHuggingFaceOptimizedPipeline(
+    _HuggingFaceOptimizedPipelineDefaultsBase, _HuggingFaceOptimizedPipelineBase, ABC
+):
     @abc.abstractmethod
     def __post_init__(self) -> None:
         pass
 
 
 @dataclass
-class OptimizedFlairClassificationPipeline(
-    OptunaPipeline[
-        FlairModelTrainerConfigSpace,
-        HuggingFaceClassificationPipelineMetadata,
-        EvaluationPipelineMetadata,
-    ],
-    BaseHuggingFaceOptimizedPipeline,
+class _OptimizedFlairClassificationPipelineBase(_HuggingFaceOptimizedPipelineBase, ABC):
+    input_column_name: str
+    target_column_name: str
+
+
+@dataclass
+class _OptimizedFlairPairClassificationPipelineBase(_HuggingFaceOptimizedPipelineBase, ABC):
+    input_columns_names_pair: Tuple[str, str]
+    target_column_name: str
+
+
+@dataclass
+class _OptimizedFlairClassificationPipelineDefaultsBase(
+    _HuggingFaceOptimizedPipelineDefaultsBase,
+    ABC,
 ):
     dataset_dir: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
     tmp_model_output_dir: TemporaryDirectory[str] = field(
         init=False, default_factory=TemporaryDirectory
     )
-    config_space: FlairModelTrainerConfigSpace = FlairModelTrainerConfigSpace()
+
+
+@dataclass
+class OptimizedFlairClassificationPipeline(
+    OptunaPipeline[
+        TextClassificationConfigSpace,
+        HuggingFaceClassificationPipelineMetadata,
+        EvaluationPipelineMetadata,
+    ],
+    AbstractHuggingFaceOptimizedPipeline,
+    _OptimizedFlairClassificationPipelineDefaultsBase,
+    _OptimizedFlairClassificationPipelineBase,
+):
+    config_space: TextClassificationConfigSpace = TextClassificationConfigSpace()
 
     def __post_init__(self) -> None:
         self.dataset_path = Path(self.dataset_dir.name).joinpath("ds.pkl")
@@ -211,33 +242,46 @@ class OptimizedFlairClassificationPipeline(
     def _get_metadata(
         self, parameters: SampledParameters
     ) -> HuggingFaceClassificationPipelineMetadata:
-        task_train_kwargs = parameters["task_train_kwargs"]
-        assert isinstance(task_train_kwargs, dict)
         embedding_name = parameters["embedding_name"]
         assert isinstance(embedding_name, str)
+        document_pooling = parameters["document_pooling"]
+        assert isinstance(document_pooling, str)
+        task_train_kwargs = parameters["task_train_kwargs"]
+        assert isinstance(task_train_kwargs, dict)
+        load_model_kwargs = parameters["load_model_kwargs"]
+        assert isinstance(load_model_kwargs, dict)
         metadata: HuggingFaceClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
             "dataset_name": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
+            "document_pooling": document_pooling,
             "task_model_kwargs": None,
             "task_train_kwargs": task_train_kwargs,
+            "load_model_kwargs": load_model_kwargs,
         }
         return metadata
 
-    def _get_evaluation_metadata(self, parameters: SampledParameters) -> EvaluationPipelineMetadata:
-        task_train_kwargs = parameters["task_train_kwargs"]
-        assert isinstance(task_train_kwargs, dict)
+    def _get_evaluation_metadata(
+        self, parameters: SampledParameters
+    ) -> FlairClassificationEvaluationPipelineMetadata:
         embedding_name = parameters["embedding_name"]
         assert isinstance(embedding_name, str)
-        metadata: EvaluationPipelineMetadata = {
+        document_pooling = parameters["document_pooling"]
+        assert isinstance(document_pooling, str)
+        task_train_kwargs = parameters["task_train_kwargs"]
+        assert isinstance(task_train_kwargs, dict)
+        load_model_kwargs = parameters["load_model_kwargs"]
+        assert isinstance(load_model_kwargs, dict)
+        metadata: FlairClassificationEvaluationPipelineMetadata = {
             "embedding_name": embedding_name,
             "dataset_path": str(self.dataset_path),
+            "document_pooling": document_pooling,
             "task_model_kwargs": None,
             "task_train_kwargs": task_train_kwargs,
+            "load_model_kwargs": load_model_kwargs,
             "persist_path": None,
             "predict_subset": "dev",
-            "fine_tune_embeddings": False,
             "output_path": self.tmp_model_output_dir.name,
         }
         return metadata
@@ -249,17 +293,111 @@ class OptimizedFlairClassificationPipeline(
 
 
 @dataclass
+class OptimizedFlairPairClassificationPipeline(
+    OptunaPipeline[
+        TextClassificationConfigSpace,
+        HuggingFacePairClassificationPipelineMetadata,
+        EvaluationPipelineMetadata,
+    ],
+    AbstractHuggingFaceOptimizedPipeline,
+    _OptimizedFlairClassificationPipelineDefaultsBase,
+    _OptimizedFlairPairClassificationPipelineBase,
+):
+    config_space: TextClassificationConfigSpace = TextClassificationConfigSpace()
+
+    def __post_init__(self) -> None:
+        self.dataset_path = Path(self.dataset_dir.name).joinpath("ds.pkl")
+        super().__init__(
+            preprocessing_pipeline=FlairTextPairClassificationPreprocessingPipeline(
+                dataset_name=self.dataset_name,
+                input_column_names=self.input_columns_names_pair,
+                target_column_name=self.target_column_name,
+                persist_path=str(self.dataset_path),
+                sample_missing_splits=(self.sample_dev_split_fraction, None),
+                ignore_test_subset=True,
+            ),
+            evaluation_pipeline=FlairTextPairClassificationEvaluationPipeline,
+            pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
+            sampler=self.sampler_cls(seed=self.seed),
+            n_trials=self.n_trials,
+            dataset_path=self.dataset_path,
+            metric_name="f1__average_macro",
+            metric_key="f1",
+            config_space=self.config_space,
+        )
+
+    def _get_metadata(
+        self, parameters: SampledParameters
+    ) -> HuggingFacePairClassificationPipelineMetadata:
+        embedding_name = parameters["embedding_name"]
+        assert isinstance(embedding_name, str)
+        document_pooling = parameters["document_pooling"]
+        assert isinstance(document_pooling, str)
+        task_train_kwargs = parameters["task_train_kwargs"]
+        assert isinstance(task_train_kwargs, dict)
+        load_model_kwargs = parameters["load_model_kwargs"]
+        assert isinstance(load_model_kwargs, dict)
+        metadata: HuggingFacePairClassificationPipelineMetadata = {
+            "embedding_name": embedding_name,
+            "dataset_name": self.dataset_name,
+            "document_pooling": document_pooling,
+            "input_columns_names": self.input_columns_names_pair,
+            "target_column_name": self.target_column_name,
+            "task_model_kwargs": None,
+            "task_train_kwargs": task_train_kwargs,
+            "load_model_kwargs": load_model_kwargs,
+        }
+        return metadata
+
+    def _get_evaluation_metadata(
+        self, parameters: SampledParameters
+    ) -> FlairClassificationEvaluationPipelineMetadata:
+        embedding_name = parameters["embedding_name"]
+        assert isinstance(embedding_name, str)
+        document_pooling = parameters["document_pooling"]
+        assert isinstance(document_pooling, str)
+        task_train_kwargs = parameters["task_train_kwargs"]
+        assert isinstance(task_train_kwargs, dict)
+        load_model_kwargs = parameters["load_model_kwargs"]
+        assert isinstance(load_model_kwargs, dict)
+        metadata: FlairClassificationEvaluationPipelineMetadata = {
+            "embedding_name": embedding_name,
+            "dataset_path": str(self.dataset_path),
+            "document_pooling": document_pooling,
+            "task_model_kwargs": None,
+            "task_train_kwargs": task_train_kwargs,
+            "load_model_kwargs": load_model_kwargs,
+            "persist_path": None,
+            "predict_subset": "dev",
+            "output_path": self.tmp_model_output_dir.name,
+        }
+        return metadata
+
+    def _post_run_hook(self) -> None:
+        super()._post_run_hook()
+        self.dataset_dir.cleanup()
+        self.tmp_model_output_dir.cleanup()
+
+
+@dataclass
+class _OptimizedFlairSequenceLabelingPipelineBase(_HuggingFaceOptimizedPipelineBase, ABC):
+    input_column_name: str
+    target_column_name: str
+
+
+@dataclass
 class OptimizedFlairSequenceLabelingPipeline(
     OptunaPipeline[
         SequenceLabelingConfigSpace,
         HuggingFaceSequenceLabelingPipelineMetadata,
         FlairSequenceLabelingEvaluationPipelineMetadata,
     ],
-    BaseHuggingFaceOptimizedPipeline,
+    AbstractHuggingFaceOptimizedPipeline,
+    _OptimizedFlairSequenceLabelingPipelineBase,
 ):
+    config_space: SequenceLabelingConfigSpace = SequenceLabelingConfigSpace()
     evaluation_mode: Literal["conll", "unit", "strict"] = "conll"
     tagging_scheme: Optional[str] = None
-    config_space: SequenceLabelingConfigSpace = SequenceLabelingConfigSpace()
     dataset_path: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
     tmp_model_output_dir: TemporaryDirectory[str] = field(
         init=False, default_factory=TemporaryDirectory
@@ -347,7 +485,6 @@ class OptimizedFlairSequenceLabelingPipeline(
             "task_train_kwargs": task_train_kwargs,
             "persist_path": None,
             "predict_subset": "dev",
-            "fine_tune_embeddings": False,
             "output_path": self.tmp_model_output_dir.name,
             "hidden_size": hidden_size,
             "evaluation_mode": self.evaluation_mode,

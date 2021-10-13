@@ -17,11 +17,15 @@ class EmbeddingPipelineMetadata(PathMetadata):
 class HuggingFaceClassificationPipelineMetadata(EmbeddingPipelineMetadata):
     input_column_name: str
     target_column_name: str
+    document_pooling: str
+    load_model_kwargs: Optional[Dict[str, Any]]
 
 
 class HuggingFacePairClassificationPipelineMetadata(EmbeddingPipelineMetadata):
-    input_columns_names_pair: Tuple[str, str]
+    input_columns_names: Tuple[str, str]
     target_column_name: str
+    document_pooling: str
+    load_model_kwargs: Optional[Dict[str, Any]]
 
 
 class HuggingFaceSequenceLabelingPipelineMetadata(EmbeddingPipelineMetadata):
@@ -35,7 +39,6 @@ class HuggingFaceSequenceLabelingPipelineMetadata(EmbeddingPipelineMetadata):
 class EvaluationPipelineMetadata(TypedDict):
     dataset_path: str
     embedding_name: str
-    fine_tune_embeddings: bool
     persist_path: Optional[str]
     predict_subset: Literal["dev", "test"]
     task_model_kwargs: Optional[Dict[str, Any]]
@@ -47,6 +50,11 @@ class FlairSequenceLabelingEvaluationPipelineMetadata(EvaluationPipelineMetadata
     hidden_size: int
     evaluation_mode: str
     tagging_scheme: Optional[str]
+
+
+class FlairClassificationEvaluationPipelineMetadata(EvaluationPipelineMetadata):
+    document_pooling: str
+    load_model_kwargs: Optional[Dict[str, Any]]
 
 
 Metadata = TypeVar("Metadata", bound=EmbeddingPipelineMetadata)
