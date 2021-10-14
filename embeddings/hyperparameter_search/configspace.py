@@ -104,10 +104,9 @@ class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
 
 @dataclass
 class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
+    # TODO: fix after testing
     embedding_type: Parameter = SearchableParameter(
-        name="embedding_type",
-        type="categorical",
-        choices=["dynamic", "static"],
+        name="embedding_type", type="categorical", choices=["dynamic"]  # , "static"],
     )
     dynamic_embedding_name: Parameter = SearchableParameter(
         name="embedding_name",
@@ -265,21 +264,21 @@ class SequenceLabelingConfigSpace(FlairModelTrainerConfigSpace):
 
 @dataclass
 class TextClassificationConfigSpace(FlairModelTrainerConfigSpace):
-    dynamic_document_pooling: Parameter = SearchableParameter(
-        name="document_pooling",
+    dynamic_document_embedding: Parameter = SearchableParameter(
+        name="document_embedding",
         type="categorical",
         choices=[
-            "FlairDocumentCNNEmbeddings",
-            "FlairDocumentRNNEmbeddings",
+            # "FlairDocumentCNNEmbeddings",
+            # "FlairDocumentRNNEmbeddings",
             "FlairTransformerDocumentEmbedding",
         ],
     )
-    static_document_pooling: Parameter = SearchableParameter(
-        name="document_pooling",
+    static_document_embedding: Parameter = SearchableParameter(
+        name="document_embedding",
         type="categorical",
         choices=[
-            "FlairDocumentCNNEmbeddings",
-            "FlairDocumentRNNEmbeddings",
+            # "FlairDocumentCNNEmbeddings",
+            # "FlairDocumentRNNEmbeddings",
             "FlairDocumentPoolEmbedding",
         ],
     )
@@ -292,8 +291,9 @@ class TextClassificationConfigSpace(FlairModelTrainerConfigSpace):
     static_fine_tune_mode: Parameter = SearchableParameter(
         name="fine_tune_mode", type="categorical", choices=["none", "linear", "nonlinear"]
     )
+    # TODO: fix after testing
     dynamic_fine_tune: Parameter = SearchableParameter(
-        name="fine_tune", type="categorical", choices=[True, False]
+        name="fine_tune", type="categorical", choices=[False]  # , True]
     )
     # TODO: choices to Optuna can only take primitives; typing error in mypy
     kernels: Parameter = SearchableParameter(
@@ -338,26 +338,26 @@ class TextClassificationConfigSpace(FlairModelTrainerConfigSpace):
 
         embedding_type_param: Parameter = self.__getattribute__("embedding_type")
         if embedding_type_param.value == "dynamic":
-            document_pooling_name, document_pooling_val = self._parse_parameter(
-                trial=trial, param_name="dynamic_document_pooling"
+            document_embedding_name, document_embedding_val = self._parse_parameter(
+                trial=trial, param_name="dynamic_document_embedding"
             )
         else:
-            document_pooling_name, document_pooling_val = self._parse_parameter(
-                trial=trial, param_name="static_document_pooling"
+            document_embedding_name, document_embedding_val = self._parse_parameter(
+                trial=trial, param_name="static_document_embedding"
             )
-        parameters[document_pooling_name] = document_pooling_val
+        parameters[document_embedding_name] = document_embedding_val
         parameter_names: Tuple[str, ...]
-        if document_pooling_val == "FlairDocumentCNNEmbeddings":
+        if document_embedding_val == "FlairDocumentCNNEmbeddings":
             parameter_names = cnn_params + shared_params
-        elif document_pooling_val == "FlairDocumentRNNEmbeddings":
+        elif document_embedding_val == "FlairDocumentRNNEmbeddings":
             parameter_names = rnn_params + shared_params
-        elif document_pooling_val == "FlairTransformerDocumentEmbedding":
+        elif document_embedding_val == "FlairTransformerDocumentEmbedding":
             parameter_names = dynamic_pooling_params
-        elif document_pooling_val == "FlairDocumentPoolEmbedding":
+        elif document_embedding_val == "FlairDocumentPoolEmbedding":
             parameter_names = static_pooling_params
         else:
             raise ValueError(
-                f"{document_pooling_val} not recognized as valid document pooling class."
+                f"{document_embedding_val} not recognized as valid document pooling class."
             )
 
         parameters.update(self._map_parameters(parameters_names=list(parameter_names), trial=trial))
@@ -372,8 +372,8 @@ class TextClassificationConfigSpace(FlairModelTrainerConfigSpace):
         assert isinstance(embedding_name, str)
         embedding_type = parameters.pop("embedding_type")
         assert isinstance(embedding_type, str)
-        document_pooling = parameters.pop("document_pooling")
-        assert isinstance(document_pooling, str)
+        document_embedding = parameters.pop("document_embedding")
+        assert isinstance(document_embedding, str)
 
         load_model_keys: Final = {
             "pooling_strategy",
@@ -402,7 +402,7 @@ class TextClassificationConfigSpace(FlairModelTrainerConfigSpace):
         return {
             "embedding_name": embedding_name,
             "embedding_type": embedding_type,
-            "document_pooling": document_pooling,
+            "document_embedding": document_embedding,
             "task_model_kwargs": {},
             "task_train_kwargs": task_train_kwargs,
             "load_model_kwargs": load_model_kwargs,

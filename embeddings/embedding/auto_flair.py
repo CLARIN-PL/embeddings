@@ -1,9 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Any, Type
+from typing import Any, Final, Type, Union
 
-from embeddings.embedding import flair_embedding
+from embeddings.embedding import flair_embedding as flair_embedding_module
 from embeddings.embedding.flair_embedding import (
-    ALLOWED_FLAIR_DOCUMENT_POOLING_CLASSES,
+    FlairAggregationEmbedding,
+    FlairDocumentCNNEmbeddings,
+    FlairDocumentPoolEmbedding,
+    FlairDocumentRNNEmbeddings,
     FlairEmbedding,
     FlairTransformerDocumentEmbedding,
     FlairTransformerWordEmbedding,
@@ -15,6 +18,15 @@ from embeddings.embedding.static.embedding import (
 from embeddings.utils.loggers import get_logger
 
 _logger = get_logger(__name__)
+
+DocumentEmbedding = Union[FlairAggregationEmbedding, FlairTransformerDocumentEmbedding]
+
+FLAIR_DOCUMENT_EMBEDDING_CLASSES: Final = [
+    FlairDocumentPoolEmbedding,
+    FlairTransformerDocumentEmbedding,
+    FlairDocumentRNNEmbeddings,
+    FlairDocumentCNNEmbeddings,
+]
 
 
 class AutoFlairEmbedding(ABC):
@@ -64,7 +76,7 @@ class AutoFlairDocumentPoolEmbedding(AutoFlairEmbedding):
     @staticmethod
     def from_hub(
         repo_id: str,
-        document_pooling: str = "FlairDocumentPoolEmbedding",
+        document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         *args: Any,
         **kwargs: Any,
     ) -> FlairEmbedding:
@@ -75,15 +87,25 @@ class AutoFlairDocumentPoolEmbedding(AutoFlairEmbedding):
             -'FlairDocumentRNNEmbeddings'
             -'FlairDocumentCNNEmbeddings'
         """
-        if document_pooling not in ALLOWED_FLAIR_DOCUMENT_POOLING_CLASSES:
-            raise ValueError(f"{document_pooling} not recognized as valid document pooling class.")
+        if isinstance(document_embedding_cls, str):
+            try:
+                document_embedding_cls = getattr(flair_embedding_module, document_embedding_cls)
+            except AttributeError:
+                _logger.error(
+                    f"{document_embedding_cls} not recognized as valid document pooling class."
+                )
+                raise
+        assert not isinstance(document_embedding_cls, str)
 
-        document_pooling_cls: Type[FlairEmbedding] = getattr(flair_embedding, document_pooling)
+        if document_embedding_cls not in FLAIR_DOCUMENT_EMBEDDING_CLASSES:
+            raise ValueError(
+                f"{document_embedding_cls} not recognized as valid document pooling class."
+            )
 
-        if document_pooling_cls == FlairTransformerDocumentEmbedding:
-            document_embedding = document_pooling_cls(name=repo_id, **kwargs)
+        if document_embedding_cls == FlairTransformerDocumentEmbedding:
+            document_embedding = document_embedding_cls(name=repo_id, **kwargs)
         else:
-            document_embedding = document_pooling_cls(
+            document_embedding = document_embedding_cls(
                 word_embedding=AutoFlairWordEmbedding.from_hub(repo_id=repo_id), **kwargs
             )
 

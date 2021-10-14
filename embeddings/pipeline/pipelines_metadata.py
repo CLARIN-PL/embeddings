@@ -17,14 +17,14 @@ class EmbeddingPipelineMetadata(PathMetadata):
 class HuggingFaceClassificationPipelineMetadata(EmbeddingPipelineMetadata):
     input_column_name: str
     target_column_name: str
-    document_pooling: str
+    document_embedding_cls: str
     load_model_kwargs: Optional[Dict[str, Any]]
 
 
 class HuggingFacePairClassificationPipelineMetadata(EmbeddingPipelineMetadata):
     input_columns_names: Tuple[str, str]
     target_column_name: str
-    document_pooling: str
+    document_embedding_cls: str
     load_model_kwargs: Optional[Dict[str, Any]]
 
 
@@ -53,7 +53,7 @@ class FlairSequenceLabelingEvaluationPipelineMetadata(EvaluationPipelineMetadata
 
 
 class FlairClassificationEvaluationPipelineMetadata(EvaluationPipelineMetadata):
-    document_pooling: str
+    document_embedding_cls: str
     load_model_kwargs: Optional[Dict[str, Any]]
 
 

@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generic, Literal, Optional
+from typing import Any, Dict, Generic, Literal, Optional, Type, Union
 
 import numpy as np
 from flair.data import Corpus
@@ -9,7 +9,12 @@ from embeddings.data.data_loader import (
     PickleFlairCorpusDataLoader,
 )
 from embeddings.data.dataset import Data, Dataset, LocalDataset
-from embeddings.embedding.auto_flair import AutoFlairDocumentPoolEmbedding, AutoFlairWordEmbedding
+from embeddings.embedding.auto_flair import (
+    AutoFlairDocumentPoolEmbedding,
+    AutoFlairWordEmbedding,
+    DocumentEmbedding,
+)
+from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
@@ -53,7 +58,7 @@ class FlairTextClassificationEvaluationPipeline(
         dataset_path: str,
         embedding_name: str,
         output_path: str,
-        document_pooling: str = "FlairDocumentPoolEmbedding",
+        document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         persist_path: Optional[str] = None,
         predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
@@ -64,7 +69,9 @@ class FlairTextClassificationEvaluationPipeline(
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
         embedding = AutoFlairDocumentPoolEmbedding.from_hub(
-            repo_id=embedding_name, document_pooling=document_pooling, **load_model_kwargs
+            repo_id=embedding_name,
+            document_embedding_cls=document_embedding_cls,
+            **load_model_kwargs
         )
         task = TextClassification(
             output_path=output_path,
@@ -86,7 +93,7 @@ class FlairTextPairClassificationEvaluationPipeline(
         dataset_path: str,
         embedding_name: str,
         output_path: str,
-        document_pooling: str = "FlairDocumentPoolEmbedding",
+        document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         persist_path: Optional[str] = None,
         predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
@@ -97,7 +104,9 @@ class FlairTextPairClassificationEvaluationPipeline(
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
         embedding = AutoFlairDocumentPoolEmbedding.from_hub(
-            repo_id=embedding_name, document_pooling=document_pooling, **load_model_kwargs
+            repo_id=embedding_name,
+            document_embedding_cls=document_embedding_cls,
+            **load_model_kwargs
         )
         task = TextPairClassification(
             output_path=output_path,

@@ -1,6 +1,6 @@
 import abc
 from abc import ABC
-from typing import Any, Final, List
+from typing import Any, List
 
 from flair.data import Sentence
 from flair.embeddings import (
@@ -14,13 +14,6 @@ from flair.embeddings import (
 from flair.embeddings.base import Embeddings
 
 from embeddings.embedding.embedding import Embedding
-
-ALLOWED_FLAIR_DOCUMENT_POOLING_CLASSES: Final = [
-    "FlairDocumentPoolEmbedding",
-    "FlairTransformerDocumentEmbedding",
-    "FlairDocumentRNNEmbeddings",
-    "FlairDocumentCNNEmbeddings",
-]
 
 
 class FlairEmbedding(Embedding[List[Sentence], List[Sentence]]):
