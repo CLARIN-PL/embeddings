@@ -80,7 +80,7 @@ class AutoFlairDocumentPoolEmbedding(AutoFlairEmbedding):
         *args: Any,
         **kwargs: Any,
     ) -> FlairEmbedding:
-        """AutoFlairDocumentEmbedding that allows to specify pooling for the word embeddings.
+        """AutoFlairEmbedding that allows to specify pooling for the word embeddings.
         Available document pooling classes:
             -'FlairDocumentPoolEmbedding'
             -'FlairTransformerDocumentEmbedding'
