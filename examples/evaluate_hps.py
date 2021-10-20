@@ -1,10 +1,8 @@
 # Temporary script for Development Purposes
 from tempfile import TemporaryDirectory
 
-import flair
-import torch
-
-from embeddings.pipeline.hps_pipeline import (
+from embeddings.hyperparameter_search.configspace import SequenceLabelingConfigSpace
+from embeddings.pipeline.flair_hps_pipeline import (
     OptimizedFlairClassificationPipeline,
     OptimizedFlairSequenceLabelingPipeline,
 )
@@ -13,10 +11,10 @@ from embeddings.pipeline.hugging_face_sequence_labeling import HuggingFaceSequen
 
 
 def main() -> None:
-    # TODO: remove after testing
-    flair.device = torch.device("cpu")  # type: ignore
     hps_pipeline = OptimizedFlairSequenceLabelingPipeline(
+        config_space=SequenceLabelingConfigSpace(),
         dataset_name="clarin-pl/kpwr-ner",
+        embedding_name="allegro/herbert-base-cased",
         input_column_name="tokens",
         target_column_name="ner",
     ).persisting(best_params_path="best_params.yaml", log_path="hps_log.pickle")
@@ -29,6 +27,7 @@ def main() -> None:
 
     tc_hps_pipeline = OptimizedFlairClassificationPipeline(
         dataset_name="clarin-pl/polemo2-official",
+        embedding_name="allegro/herbert-base-cased",
         input_column_name="text",
         target_column_name="target",
     ).persisting(best_params_path="best_prams_tc.yaml", log_path="tc_hps_log.pickle")

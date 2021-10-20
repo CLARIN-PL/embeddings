@@ -87,23 +87,25 @@ class AutoFlairDocumentPoolEmbedding(AutoFlairEmbedding):
             -'FlairDocumentRNNEmbeddings'
             -'FlairDocumentCNNEmbeddings'
         """
+        pooling_value_error_msg: Final = (
+            f"{document_embedding_cls} not recognized as valid document pooling class."
+        )
+
         if isinstance(document_embedding_cls, str):
             try:
                 document_embedding_cls = getattr(flair_embedding_module, document_embedding_cls)
             except AttributeError:
-                raise ValueError(f"{document_embedding_cls} not recognized as valid document pooling class.")
+                raise ValueError(pooling_value_error_msg)
         assert not isinstance(document_embedding_cls, str)
 
-        if document_embedding_cls not in FLAIR_DOCUMENT_EMBEDDING_CLASSES:
-            raise ValueError(
-                f"{document_embedding_cls} not recognized as valid document pooling class."
-            )
-
-        if document_embedding_cls == FlairTransformerDocumentEmbedding:
-            document_embedding = document_embedding_cls(name=repo_id, **kwargs)
+        if document_embedding_cls in FLAIR_DOCUMENT_EMBEDDING_CLASSES:
+            if document_embedding_cls == FlairTransformerDocumentEmbedding:
+                document_embedding = document_embedding_cls(name=repo_id, **kwargs)
+            else:
+                document_embedding = document_embedding_cls(
+                    word_embedding=AutoFlairWordEmbedding.from_hub(repo_id=repo_id), **kwargs
+                )
         else:
-            document_embedding = document_embedding_cls(
-                word_embedding=AutoFlairWordEmbedding.from_hub(repo_id=repo_id), **kwargs
-            )
+            raise ValueError(pooling_value_error_msg)
 
         return document_embedding
