@@ -68,8 +68,21 @@ class BaseConfigSpace(ABC):
         return {**params, **task_params}
 
     @staticmethod
+    def _pop_parameters(
+        parameters: Dict[str, PrimitiveTypes], parameters_keys: Set[str]
+    ) -> Dict[str, PrimitiveTypes]:
+        return {k: parameters.pop(k) for k in parameters_keys if k in parameters}
+
+    @staticmethod
     def _check_duplicated_parameters(*parameter_dicts: Any) -> Any:
         assert not functools.reduce(set.intersection, (set(d.keys()) for d in parameter_dicts))
+
+    @staticmethod
+    def _check_unmapped_parameters(parameters: Dict[str, PrimitiveTypes]) -> None:
+        if len(parameters):
+            raise ValueError(
+                f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
+            )
 
     @staticmethod
     @abc.abstractmethod
@@ -118,7 +131,9 @@ class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
             "param_selection_mode",
             "save_final_model",
         }
-        task_train_kwargs = {k: parameters.pop(k) for k in task_train_keys if k in parameters}
+        task_train_kwargs = BaseConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=task_train_keys
+        )
         return parameters, task_train_kwargs
 
 
@@ -129,10 +144,7 @@ class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
             parameters,
             task_train_kwargs,
         ) = FlairModelTrainerConfigSpace._parse_model_trainer_parameters(parameters)
-        if len(parameters):
-            raise ValueError(
-                f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
-            )
+        BaseConfigSpace._check_unmapped_parameters(parameters=parameters)
         return {"task_train_kwargs": task_train_kwargs}
 
 
@@ -190,10 +202,7 @@ class AbstractEmbeddingConfigSpace(AbstractFlairModelTrainerConfigSpace, ABC):
             parameters,
             task_train_kwargs,
         ) = FlairModelTrainerConfigSpace._parse_model_trainer_parameters(parameters)
-        if len(parameters):
-            raise ValueError(
-                f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
-            )
+        BaseConfigSpace._check_unmapped_parameters(parameters=parameters)
         return {
             "embedding_type": embedding_type,
             "embedding_name": embedding_name,
@@ -259,16 +268,14 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
             "rnn_layers",
             "rnn_type",
         }
-
-        task_model_kwargs = {k: parameters.pop(k) for k in task_model_keys if k in parameters}
+        task_model_kwargs = BaseConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=task_model_keys
+        )
         parameters, task_train_kwargs = SequenceLabelingConfigSpace._parse_model_trainer_parameters(
             parameters=parameters
         )
+        BaseConfigSpace._check_unmapped_parameters(parameters=parameters)
 
-        if len(parameters):
-            raise ValueError(
-                f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
-            )
         return {
             "hidden_size": hidden_size,
             "task_model_kwargs": task_model_kwargs,
@@ -299,18 +306,16 @@ class SequenceLabelingEmbeddingConfigSpace(
             "rnn_layers",
             "rnn_type",
         }
-        task_model_kwargs = {k: parameters.pop(k) for k in task_model_keys if k in parameters}
+        task_model_kwargs = BaseConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=task_model_keys
+        )
         (
             parameters,
             task_train_kwargs,
         ) = SequenceLabelingEmbeddingConfigSpace._parse_model_trainer_parameters(
             parameters=parameters
         )
-
-        if len(parameters):
-            raise ValueError(
-                f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
-            )
+        BaseConfigSpace._check_unmapped_parameters(parameters=parameters)
 
         return {
             "embedding_type": embedding_type,
@@ -465,16 +470,15 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
             "locked_dropout",
             "reproject_words",
         }
-        load_model_kwargs = {k: parameters.pop(k) for k in load_model_keys if k in parameters}
+        load_model_kwargs = BaseConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=load_model_keys
+        )
 
         parameters, task_train_kwargs = SequenceLabelingConfigSpace._parse_model_trainer_parameters(
             parameters=parameters
         )
+        BaseConfigSpace._check_unmapped_parameters(parameters=parameters)
 
-        if len(parameters):
-            raise ValueError(
-                f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
-            )
         return {
             "document_embedding": document_embedding,
             "task_model_kwargs": {},
@@ -518,16 +522,15 @@ class TextClassificationEmbeddingConfigSpace(
             "locked_dropout",
             "reproject_words",
         }
-        load_model_kwargs = {k: parameters.pop(k) for k in load_model_keys if k in parameters}
+        load_model_kwargs = BaseConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=load_model_keys
+        )
 
         parameters, task_train_kwargs = SequenceLabelingConfigSpace._parse_model_trainer_parameters(
             parameters=parameters
         )
+        BaseConfigSpace._check_unmapped_parameters(parameters=parameters)
 
-        if len(parameters):
-            raise ValueError(
-                f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
-            )
         return {
             "embedding_type": embedding_type,
             "embedding_name": embedding_name,

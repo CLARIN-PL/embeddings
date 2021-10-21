@@ -331,7 +331,6 @@ class OptimizedFlairSequenceLabelingPipeline(
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
             "evaluation_mode": self.evaluation_mode,
-            # "fine_tune_embeddings": self.fine_tune_embeddings,
             "hidden_size": hidden_size,
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
