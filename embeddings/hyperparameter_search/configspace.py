@@ -1,7 +1,8 @@
 import abc
+import functools
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import Dict, Final, List, Set, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, Final, List, Set, Tuple, Type, TypeVar, Union
 
 import optuna
 
@@ -63,7 +64,12 @@ class BaseConfigSpace(ABC):
             ],
             trial=trial,
         )
+        self._check_duplicated_parameters(params, task_params)
         return {**params, **task_params}
+
+    @staticmethod
+    def _check_duplicated_parameters(*parameter_dicts: Any) -> Any:
+        assert not functools.reduce(set.intersection, (set(d.keys()) for d in parameter_dicts))
 
     @staticmethod
     @abc.abstractmethod
@@ -172,6 +178,7 @@ class AbstractEmbeddingConfigSpace(AbstractFlairModelTrainerConfigSpace, ABC):
             ],
             trial=trial,
         )
+        self._check_duplicated_parameters(params, task_params, embedding_params)
         return {**params, **task_params, **embedding_params}
 
     @staticmethod
