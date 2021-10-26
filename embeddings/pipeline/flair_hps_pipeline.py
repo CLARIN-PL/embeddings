@@ -2,9 +2,10 @@ from abc import ABC
 from dataclasses import dataclass, field
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Dict, Literal, Optional, Tuple
+from typing import Dict, Generic, Literal, Optional, Tuple
 
 from embeddings.hyperparameter_search.configspace import (
+    ConfigSpace,
     SampledParameters,
     SequenceLabelingConfigSpace,
     TextClassificationConfigSpace,
@@ -37,13 +38,21 @@ from embeddings.utils.utils import PrimitiveTypes
 
 
 @dataclass
-class _OptimizedFlairClassificationPipelineBase(_HuggingFaceOptimizedPipelineBase, ABC):
+class _OptimizedFlairClassificationPipelineBase(
+    _HuggingFaceOptimizedPipelineBase[ConfigSpace],
+    ABC,
+    Generic[ConfigSpace],
+):
     input_column_name: str
     target_column_name: str
 
 
 @dataclass
-class _OptimizedFlairPairClassificationPipelineBase(_HuggingFaceOptimizedPipelineBase, ABC):
+class _OptimizedFlairPairClassificationPipelineBase(
+    _HuggingFaceOptimizedPipelineBase[ConfigSpace],
+    ABC,
+    Generic[ConfigSpace],
+):
     input_columns_names_pair: Tuple[str, str]
     target_column_name: str
 
@@ -61,17 +70,16 @@ class _OptimizedFlairClassificationPipelineDefaultsBase(
     @staticmethod
     def _pop_sampled_parameters(
         parameters: SampledParameters,
-        embedding_name: str,
     ) -> Tuple[str, str, Dict[str, PrimitiveTypes], Dict[str, PrimitiveTypes]]:
-        embedding_name_value = parameters.get("embedding_name", embedding_name)
-        assert isinstance(embedding_name_value, str)
+        embedding_name = parameters["embedding_name"]
+        assert isinstance(embedding_name, str)
         document_embedding = parameters["document_embedding"]
         assert isinstance(document_embedding, str)
         task_train_kwargs = parameters["task_train_kwargs"]
         assert isinstance(task_train_kwargs, dict)
         load_model_kwargs = parameters["load_model_kwargs"]
         assert isinstance(load_model_kwargs, dict)
-        return embedding_name_value, document_embedding, task_train_kwargs, load_model_kwargs
+        return embedding_name, document_embedding, task_train_kwargs, load_model_kwargs
 
 
 @dataclass
@@ -81,14 +89,11 @@ class OptimizedFlairClassificationPipeline(
         HuggingFaceClassificationPipelineMetadata,
         EvaluationPipelineMetadata,
     ],
-    AbstractHuggingFaceOptimizedPipeline,
+    AbstractHuggingFaceOptimizedPipeline[TextClassificationConfigSpace],
     _OptimizedFlairClassificationPipelineDefaultsBase,
-    _OptimizedFlairClassificationPipelineBase,
+    _OptimizedFlairClassificationPipelineBase[TextClassificationConfigSpace],
 ):
-    config_space: TextClassificationConfigSpace = TextClassificationConfigSpace()
-
     def __post_init__(self) -> None:
-        self.config_space.set_embedding_parameters(embedding_name=self.embedding_name)
         self.dataset_path = Path(self.dataset_dir.name).joinpath("ds.pkl")
         super().__init__(
             preprocessing_pipeline=FlairTextClassificationPreprocessingPipeline(
@@ -117,13 +122,13 @@ class OptimizedFlairClassificationPipeline(
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
-        ) = self._pop_sampled_parameters(parameters=parameters, embedding_name=self.embedding_name)
+        ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: HuggingFaceClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
+            "document_embedding_cls": document_embedding_cls,
             "dataset_name": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
-            "document_embedding_cls": document_embedding_cls,
             "task_model_kwargs": None,
             "task_train_kwargs": task_train_kwargs,
             "load_model_kwargs": load_model_kwargs,
@@ -138,17 +143,17 @@ class OptimizedFlairClassificationPipeline(
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
-        ) = self._pop_sampled_parameters(parameters=parameters, embedding_name=self.embedding_name)
+        ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: FlairClassificationEvaluationPipelineMetadata = {
             "embedding_name": embedding_name,
-            "dataset_path": str(self.dataset_path),
             "document_embedding_cls": document_embedding_cls,
-            "task_model_kwargs": None,
-            "task_train_kwargs": task_train_kwargs,
-            "load_model_kwargs": load_model_kwargs,
+            "dataset_path": str(self.dataset_path),
             "persist_path": None,
             "predict_subset": "dev",
             "output_path": self.tmp_model_output_dir.name,
+            "task_model_kwargs": None,
+            "task_train_kwargs": task_train_kwargs,
+            "load_model_kwargs": load_model_kwargs,
         }
         return metadata
 
@@ -165,14 +170,11 @@ class OptimizedFlairPairClassificationPipeline(
         HuggingFacePairClassificationPipelineMetadata,
         EvaluationPipelineMetadata,
     ],
-    AbstractHuggingFaceOptimizedPipeline,
+    AbstractHuggingFaceOptimizedPipeline[TextClassificationConfigSpace],
     _OptimizedFlairClassificationPipelineDefaultsBase,
-    _OptimizedFlairPairClassificationPipelineBase,
+    _OptimizedFlairPairClassificationPipelineBase[TextClassificationConfigSpace],
 ):
-    config_space: TextClassificationConfigSpace = TextClassificationConfigSpace()
-
     def __post_init__(self) -> None:
-        self.config_space.set_embedding_parameters(embedding_name=self.embedding_name)
         self.dataset_path = Path(self.dataset_dir.name).joinpath("ds.pkl")
         super().__init__(
             preprocessing_pipeline=FlairTextPairClassificationPreprocessingPipeline(
@@ -201,11 +203,11 @@ class OptimizedFlairPairClassificationPipeline(
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
-        ) = self._pop_sampled_parameters(parameters=parameters, embedding_name=self.embedding_name)
+        ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: HuggingFacePairClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
-            "dataset_name": self.dataset_name,
             "document_embedding_cls": document_embedding_cls,
+            "dataset_name": self.dataset_name,
             "input_columns_names": self.input_columns_names_pair,
             "target_column_name": self.target_column_name,
             "task_model_kwargs": None,
@@ -222,7 +224,7 @@ class OptimizedFlairPairClassificationPipeline(
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
-        ) = self._pop_sampled_parameters(parameters=parameters, embedding_name=self.embedding_name)
+        ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: FlairClassificationEvaluationPipelineMetadata = {
             "embedding_name": embedding_name,
             "dataset_path": str(self.dataset_path),
@@ -243,7 +245,9 @@ class OptimizedFlairPairClassificationPipeline(
 
 
 @dataclass
-class _OptimizedFlairSequenceLabelingPipelineBase(_HuggingFaceOptimizedPipelineBase, ABC):
+class _OptimizedFlairSequenceLabelingPipelineBase(
+    _HuggingFaceOptimizedPipelineBase[ConfigSpace], ABC, Generic[ConfigSpace]
+):
     input_column_name: str
     target_column_name: str
 
@@ -255,10 +259,9 @@ class OptimizedFlairSequenceLabelingPipeline(
         HuggingFaceSequenceLabelingPipelineMetadata,
         FlairSequenceLabelingEvaluationPipelineMetadata,
     ],
-    AbstractHuggingFaceOptimizedPipeline,
-    _OptimizedFlairSequenceLabelingPipelineBase,
+    AbstractHuggingFaceOptimizedPipeline[SequenceLabelingConfigSpace],
+    _OptimizedFlairSequenceLabelingPipelineBase[SequenceLabelingConfigSpace],
 ):
-    config_space: SequenceLabelingConfigSpace = SequenceLabelingConfigSpace()
     evaluation_mode: Literal["conll", "unit", "strict"] = "conll"
     tagging_scheme: Optional[str] = None
     dataset_path: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
@@ -306,7 +309,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         self,
         parameters: SampledParameters,
     ) -> Tuple[str, int, Dict[str, PrimitiveTypes], Dict[str, PrimitiveTypes]]:
-        embedding_name = parameters.get("embedding_name", self.embedding_name)
+        embedding_name = parameters["embedding_name"]
         assert isinstance(embedding_name, str)
         hidden_size = parameters["hidden_size"]
         assert isinstance(hidden_size, int)
@@ -327,14 +330,14 @@ class OptimizedFlairSequenceLabelingPipeline(
         ) = self._pop_sampled_parameters(parameters)
         metadata: HuggingFaceSequenceLabelingPipelineMetadata = {
             "embedding_name": embedding_name,
+            "hidden_size": hidden_size,
             "dataset_name": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
             "evaluation_mode": self.evaluation_mode,
-            "hidden_size": hidden_size,
-            "task_model_kwargs": task_model_kwargs,
-            "task_train_kwargs": task_train_kwargs,
             "tagging_scheme": self.tagging_scheme,
+            "task_train_kwargs": task_train_kwargs,
+            "task_model_kwargs": task_model_kwargs,
         }
         return metadata
 
@@ -350,14 +353,14 @@ class OptimizedFlairSequenceLabelingPipeline(
 
         metadata: FlairSequenceLabelingEvaluationPipelineMetadata = {
             "embedding_name": embedding_name,
+            "hidden_size": hidden_size,
             "dataset_path": self.dataset_path.name,
-            "task_model_kwargs": None,
-            "task_train_kwargs": task_train_kwargs,
             "persist_path": None,
             "predict_subset": "dev",
             "output_path": self.tmp_model_output_dir.name,
-            "hidden_size": hidden_size,
             "evaluation_mode": self.evaluation_mode,
             "tagging_scheme": self.tagging_scheme,
+            "task_train_kwargs": task_train_kwargs,
+            "task_model_kwargs": task_model_kwargs,
         }
         return metadata

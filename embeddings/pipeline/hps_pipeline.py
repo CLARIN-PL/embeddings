@@ -129,9 +129,9 @@ class OptunaPipeline(
 
 
 @dataclass
-class _HuggingFaceOptimizedPipelineBase(ABC):
+class _HuggingFaceOptimizedPipelineBase(ABC, Generic[ConfigSpace]):
     dataset_name: str
-    embedding_name: str
+    config_space: ConfigSpace
 
 
 @dataclass
@@ -151,7 +151,10 @@ class _HuggingFaceOptimizedPipelineDefaultsBase(ABC):
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
 class AbstractHuggingFaceOptimizedPipeline(
-    _HuggingFaceOptimizedPipelineDefaultsBase, _HuggingFaceOptimizedPipelineBase, ABC
+    _HuggingFaceOptimizedPipelineDefaultsBase,
+    _HuggingFaceOptimizedPipelineBase[ConfigSpace],
+    ABC,
+    Generic[ConfigSpace],
 ):
     @abc.abstractmethod
     def __post_init__(self) -> None:
