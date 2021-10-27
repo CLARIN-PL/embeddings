@@ -50,7 +50,7 @@ isort = "isort .  -c"
 black_fix = "black ./"
 isort_fix = "isort . "
 pyflakes = "pyflakes ."
-mypy = "mypy ."
+mypy = "mypy -p embeddings"
 test = "pytest"
 check = ["black", "isort", "mypy", "pyflakes"]
 fix = ["black_fix", "isort_fix"]
@@ -89,6 +89,7 @@ module = [
     "srsly",
     "tqdm.*",
     "transformers",
+    "numpy.random",
     "huggingface_hub",
     "pymagnitude",
     "spacy.*",
