@@ -53,10 +53,9 @@ def run(
 
     evaluation_pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=str(dataset_path),
-        output_path=str(output_path),
-        fine_tune_embeddings=False,
-        hidden_size=hidden_size,
         embedding_name=embedding_name,
+        output_path=str(output_path),
+        hidden_size=hidden_size,
         persist_path=str(persist_out_path),
         predict_subset="test",
         task_train_kwargs={"max_epochs": 1},

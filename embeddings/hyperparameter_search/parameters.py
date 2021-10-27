@@ -1,7 +1,7 @@
 import abc
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import Generic, Literal, Optional, Sequence, TypeVar, get_args
+from typing import Generic, Literal, Optional, Sequence, Tuple, TypeVar, Union, get_args
 
 import optuna
 import optuna.distributions
@@ -17,6 +17,9 @@ ParameterTypes = Literal[
     "int_uniform",
     "log_int_uniform",
 ]
+T_choices = Sequence[
+    Union[PrimitiveTypes, Tuple[Tuple[int, int], ...]]
+]  # second type for CNN kernels
 
 
 @dataclass(frozen=True)
@@ -35,7 +38,8 @@ class AbstractSearchableParameter(ABC, Generic[Distribution]):
     high: Optional[Numeric] = None
     step: Optional[Numeric] = None
     q: Optional[float] = None
-    choices: Optional[Sequence[PrimitiveTypes]] = None
+    choices: Optional[T_choices] = None
+    value: Optional[PrimitiveTypes] = None
 
     def _check_arguments(self, forbidden_args: Sequence[str], required_args: Sequence[str]) -> None:
         for variable_name in forbidden_args:
@@ -114,7 +118,7 @@ class AbstractSearchableParameter(ABC, Generic[Distribution]):
 
     @staticmethod
     @abc.abstractmethod
-    def get_categorical_distribution(choices: Sequence[PrimitiveTypes]) -> Distribution:
+    def get_categorical_distribution(choices: T_choices) -> Distribution:
         pass
 
     @staticmethod
@@ -146,9 +150,10 @@ class AbstractSearchableParameter(ABC, Generic[Distribution]):
 class SearchableParameter(AbstractSearchableParameter[optuna.distributions.BaseDistribution]):
     @staticmethod
     def get_categorical_distribution(
-        choices: Sequence[PrimitiveTypes],
+        choices: T_choices,
     ) -> optuna.distributions.BaseDistribution:
-        return optuna.distributions.CategoricalDistribution(choices=choices)
+        # kernels CNN pooling parameter has tuple of tuples of int type
+        return optuna.distributions.CategoricalDistribution(choices=choices)  # type: ignore
 
     @staticmethod
     def get_uniform_distribution(low: float, high: float) -> optuna.distributions.BaseDistribution:
