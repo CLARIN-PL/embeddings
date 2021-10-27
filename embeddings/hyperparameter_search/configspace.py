@@ -1,4 +1,5 @@
 import abc
+import dataclasses
 import functools
 from abc import ABC
 from dataclasses import InitVar, dataclass, field
@@ -26,6 +27,7 @@ class BaseConfigSpace(ABC):
             param.value = trial._suggest(name=param.name, distribution=param.distribution)
             return param.name, param.value
         elif isinstance(param, ConstantParameter):
+            trial.set_user_attr(param.name, param.value)
             return param.name, param.value
         else:
             raise ValueError(
@@ -48,21 +50,15 @@ class BaseConfigSpace(ABC):
         return dict(), set()
 
     @classmethod
-    def _get_annotations(cls, filter_init_var: bool = True) -> Dict[str, Type[Parameter]]:
-        annotations = {}
-        for c in cls.mro():
-            annotation = getattr(c, "__annotations__", {})
-            if filter_init_var:
-                annotation = {k: v for k, v in annotation.items() if not isinstance(v, InitVar)}
-            annotations.update(annotation)
-        return annotations
+    def _get_fields(cls) -> Dict[str, Type[Parameter]]:
+        return {field_.name: field_.type for field_ in dataclasses.fields(cls)}
 
     def sample_parameters(self, trial: optuna.trial.Trial) -> Dict[str, PrimitiveTypes]:
         task_params, mapped_params_names = self._map_task_specific_parameters(trial)
         params = self._map_parameters(
             parameters_names=[
                 param_name
-                for param_name in self._get_annotations().keys()
+                for param_name in self._get_fields().keys()
                 if param_name not in mapped_params_names
             ],
             trial=trial,

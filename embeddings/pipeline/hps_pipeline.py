@@ -89,7 +89,8 @@ class OptunaPipeline(
 
     def get_best_paramaters(self, study: Study) -> Metadata:
         best_params = study.best_params
-        parsed_params = self.config_space.parse_parameters(best_params)
+        constant_params = study.best_trial.user_attrs
+        parsed_params = self.config_space.parse_parameters(best_params | constant_params)
         return self._get_metadata(parsed_params)
 
     def run(
@@ -137,7 +138,7 @@ class _HuggingFaceOptimizedPipelineBase(ABC, Generic[ConfigSpace]):
 @dataclass
 class _HuggingFaceOptimizedPipelineDefaultsBase(ABC):
     n_warmup_steps: int = 10
-    n_trials: int = 2
+    n_trials: int = 1
     sample_dev_split_fraction: Optional[float] = 0.1
     seed: int = 441
     pruner_cls: Type[optuna.pruners.MedianPruner] = field(
