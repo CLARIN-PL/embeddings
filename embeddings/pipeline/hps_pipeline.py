@@ -138,7 +138,7 @@ class _HuggingFaceOptimizedPipelineBase(ABC, Generic[ConfigSpace]):
 @dataclass
 class _HuggingFaceOptimizedPipelineDefaultsBase(ABC):
     n_warmup_steps: int = 10
-    n_trials: int = 1
+    n_trials: int = 2
     sample_dev_split_fraction: Optional[float] = 0.1
     seed: int = 441
     pruner_cls: Type[optuna.pruners.MedianPruner] = field(
