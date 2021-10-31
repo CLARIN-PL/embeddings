@@ -29,11 +29,11 @@ datasets = "1.6.1"
 Pillow = "8.2.0"
 tensorboard = "2.4.1"
 typer = "0.3.2"
-spacy = "3.1.0"
 seqeval = "1.2.2"
 numpy = "1.19.5"
 optuna = "2.9.1"
 types-PyYAML = "^5.4.10"
+pymagnitude = { version="0.1.143", optional=true}
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.4"
@@ -51,7 +51,7 @@ isort = "isort .  -c"
 black_fix = "black ./"
 isort_fix = "isort . "
 pyflakes = "pyflakes ."
-mypy = "mypy ."
+mypy = "mypy -p embeddings"
 test = "pytest"
 check = ["black", "isort", "mypy", "pyflakes"]
 fix = ["black_fix", "isort_fix"]
@@ -59,6 +59,7 @@ all = ["check", "test"]
 
 [tool.poetry.extras]
 developer = ["black", "mypy", "typing-extensions"]
+pymagnitude = ["pymagnitude"]
 
 [build-system]
 requires = ["poetry>=1.1.5"]
@@ -89,8 +90,13 @@ module = [
     "srsly",
     "tqdm.*",
     "transformers",
+    "numpy.random",
     "huggingface_hub",
     "pandas"
+    "pymagnitude",
+    "spacy.*",
+    "spacy",
+    "appdirs",
 ]
 ignore_missing_imports = true
 
