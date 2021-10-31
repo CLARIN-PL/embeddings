@@ -92,7 +92,7 @@ module = [
     "transformers",
     "numpy.random",
     "huggingface_hub",
-    "pandas"
+    "pandas",
     "pymagnitude",
     "spacy.*",
     "spacy",
