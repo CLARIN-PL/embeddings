@@ -10,6 +10,7 @@ class PathMetadata(TypedDict, total=False):
 class EmbeddingPipelineMetadata(PathMetadata):
     embedding_name: str
     dataset_name: str
+    load_dataset_kwargs: Optional[Dict[str, Any]]
     task_model_kwargs: Optional[Dict[str, Any]]
     task_train_kwargs: Optional[Dict[str, Any]]
 
