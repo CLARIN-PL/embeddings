@@ -4,7 +4,7 @@ from abc import ABC
 from dataclasses import dataclass, field
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Dict, Generic, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar, Union
 
 import optuna
 import pandas as pd
@@ -103,7 +103,9 @@ class OptunaPipeline(
             sampler=self.sampler,
             pruner=self.pruner,
         )
-        study.optimize(self.objective, n_trials=self.n_trials, show_progress_bar=True)
+        study.optimize(
+            self.objective, n_trials=self.n_trials, show_progress_bar=True, catch=(Exception,)
+        )
 
         if isinstance(self.dataset_path, TemporaryDirectory):
             self.dataset_path.cleanup()
@@ -137,6 +139,7 @@ class _HuggingFaceOptimizedPipelineBase(ABC, Generic[ConfigSpace]):
 
 @dataclass
 class _HuggingFaceOptimizedPipelineDefaultsBase(ABC):
+    load_dataset_kwargs: Optional[Dict[str, Any]] = None
     n_warmup_steps: int = 10
     n_trials: int = 2
     sample_dev_split_fraction: Optional[float] = 0.1
