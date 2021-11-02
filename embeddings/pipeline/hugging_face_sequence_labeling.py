@@ -41,8 +41,9 @@ class HuggingFaceSequenceLabelingPipeline(
         seed: int = 441,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = HuggingFaceDataset(dataset_name)
+        dataset = HuggingFaceDataset(dataset=dataset_name, load_dataset_kwargs=load_dataset_kwargs)
         data_loader = HuggingFaceDataLoader()
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
