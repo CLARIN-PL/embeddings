@@ -65,7 +65,7 @@ class FlairTextClassificationPreprocessingPipeline(
         seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = HuggingFaceDataset(dataset=dataset_name, load_dataset_kwargs=load_dataset_kwargs)
+        dataset = HuggingFaceDataset(dataset_name, **load_dataset_kwargs)
         data_loader = HuggingFaceDataLoader()
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
@@ -102,7 +102,7 @@ class FlairTextPairClassificationPreprocessingPipeline(
         seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = HuggingFaceDataset(dataset=dataset_name, load_dataset_kwargs=load_dataset_kwargs)
+        dataset = HuggingFaceDataset(dataset_name, **load_dataset_kwargs)
         data_loader = HuggingFaceDataLoader()
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
@@ -137,7 +137,7 @@ class FlairSequenceLabelingPreprocessingPipeline(
         seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = HuggingFaceDataset(dataset=dataset_name, load_dataset_kwargs=load_dataset_kwargs)
+        dataset = HuggingFaceDataset(dataset_name, **load_dataset_kwargs)
         data_loader = HuggingFaceDataLoader()
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
