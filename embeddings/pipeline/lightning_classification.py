@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Union
 import pytorch_lightning as pl
 
 from embeddings.data.text_classification_datamodule import TextClassificationDataModule
-from embeddings.model.torch_models import TransformerSimpleMLP
+from embeddings.model.torch_models import AutoTransformerForSequenceClassification
 
 
 class TorchClassificationPipeline:
@@ -18,11 +18,6 @@ class TorchClassificationPipeline:
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        if task_model_kwargs is None:
-            task_model_kwargs = {}
-        if task_train_kwargs is None:
-            task_model_kwargs = {}
-
         self.dm = TextClassificationDataModule(
             model_name_or_path=embedding_name,
             dataset_name=dataset_name,
@@ -32,7 +27,7 @@ class TorchClassificationPipeline:
         )
         self.dm.initalize()
 
-        self.model = TransformerSimpleMLP(
+        self.model = AutoTransformerForSequenceClassification(
             model_name_or_path=embedding_name,
             input_dim=self.dm.input_dim,
             num_labels=self.dm.num_labels,
