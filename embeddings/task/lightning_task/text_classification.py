@@ -56,7 +56,7 @@ class TextClassificationTransformer(pl.LightningModule, abc.ABC):
     def shared_step(self, **batch: Any) -> Tuple[torch.Tensor, torch.Tensor]:
         labels = batch.pop("labels")
         logits = self.forward(**batch)
-        loss_fn = torch.nn.CrossEntropyLoss()  # type: ignore
+        loss_fn = torch.nn.CrossEntropyLoss()
         loss = loss_fn(logits.view(-1, self.hparams.num_labels), labels.view(-1))
         return loss, logits
 
@@ -65,17 +65,17 @@ class TextClassificationTransformer(pl.LightningModule, abc.ABC):
         loss, preds = self.shared_step(**batch)
         self.train_metrics(preds, batch["labels"])
         self.log("train/Loss", loss, on_step=True, on_epoch=True)
-        return loss
+        return {"loss": loss}
 
     def validation_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
-        batch, batch_idx, dataloader_idx = args
+        batch, batch_idx = args
         loss, preds = self.shared_step(**batch)
         self.val_metrics(preds, batch["labels"])
         self.log("val/Loss", loss, on_epoch=True)
         return None
 
     def test_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
-        batch, batch_idx, dataloader_idx = args
+        batch, batch_idx = args
         loss, preds = self.shared_step(**batch)
         self.test_metrics(preds, batch["labels"])
         self.log("test/Loss", loss, on_epoch=True)
@@ -131,10 +131,4 @@ class TextClassificationTransformer(pl.LightningModule, abc.ABC):
             eps=self.hparams.adam_epsilon,
         )
 
-        scheduler = get_linear_schedule_with_warmup(
-            optimizer,
-            num_warmup_steps=self.hparams.warmup_steps,
-            num_training_steps=self.total_steps,
-        )
-        scheduler = {"scheduler": scheduler, "interval": "step", "frequency": 1}
-        return [optimizer], [scheduler]
+        return [optimizer], []
