@@ -7,7 +7,7 @@ from embeddings.embedding.document_embedding import DocumentPoolEmbedding
 from embeddings.task.lightning_task.text_classification import TextClassificationTransformer
 
 
-class TransformerSimpleMLP(TextClassificationTransformer):
+class AutoTransformerForSequenceClassification(TextClassificationTransformer):
     def __init__(
         self,
         model_name_or_path: str,
