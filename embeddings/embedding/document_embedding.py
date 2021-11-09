@@ -4,7 +4,7 @@ import torch
 
 
 class DocumentPoolEmbedding:
-    SUPPORTED_STRATEGIES: List[str] = ["mean", "cls"]
+    SUPPORTED_STRATEGIES: List[str] = ["mean", "cls", "max"]
 
     def __init__(self, strategy: Literal["mean", "cls"]):
         if strategy not in self.SUPPORTED_STRATEGIES:
@@ -15,4 +15,6 @@ class DocumentPoolEmbedding:
         if self.strategy == "mean":
             return model_output.mean(dim=1)
         elif self.strategy == "cls":
-            return model_output[:, 0]
+            return model_output[:, 0, :]
+        elif self.strategy == "max":
+            return model_output.max(dim=1).values

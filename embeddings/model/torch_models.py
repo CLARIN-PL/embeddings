@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Literal
 
 from torch import nn
 from transformers import AutoConfig, AutoModel
@@ -13,15 +13,15 @@ class TransformerSimpleMLP(TextClassificationTransformer):
         model_name_or_path: str,
         input_dim: int,
         num_labels: int,
-        doc_embedder: DocumentPoolEmbedding = DocumentPoolEmbedding(strategy="cls"),
+        pool_strategy: Literal["cls", "mean", "max"] = "cls",
         dropout_rate: float = 0.5,
         freeze_transformer: bool = True,
         **kwargs: Any
     ):
         super().__init__(num_labels=num_labels, **kwargs)
-        self.doc_embedder = doc_embedder
         self.config = AutoConfig.from_pretrained(model_name_or_path, num_labels=num_labels)
         self.model = AutoModel.from_pretrained(model_name_or_path, config=self.config)
+        self.doc_embedder = DocumentPoolEmbedding(strategy=pool_strategy)
         if freeze_transformer:
             self.freeze_transformer()
 
@@ -36,9 +36,9 @@ class TransformerSimpleMLP(TextClassificationTransformer):
     def forward(self, *args: Any, **kwargs: Any) -> Any:
         inputs = kwargs
         outputs = self.model(**inputs)
-        embeddings = self.doc_embedder(outputs.last_hidden_state)
+        pooled_output = self.doc_embedder(outputs.last_hidden_state)
         # pooled_output = outputs.last_hidden_state[:, 0, :]  # take <s> token (equiv. to [CLS])
-        logits = self.layers(embeddings)
+        logits = self.layers(pooled_output)
         return logits
 
     def unfreeze_transformer(self, unfreeze_from: int = -1) -> None:

@@ -34,7 +34,7 @@ class TorchClassificationPipeline:
 
         self.model = TransformerSimpleMLP(
             model_name_or_path=embedding_name,
-            input_dim=768,
+            input_dim=self.dm.input_dim,
             num_labels=self.dm.num_labels,
             **self.instantiate_kwargs(task_model_kwargs),
         )
@@ -46,18 +46,8 @@ class TorchClassificationPipeline:
             kwargs = {}
         return kwargs
 
-    def run(self) -> None:
+    def run(self) -> List[Dict[str, float]]:
         self.dm.setup("fit")
         self.trainer.fit(self.model, self.dm)
-        self.trainer.test(datamodule=self.dm)
-        # print(results)
-
-
-p = TorchClassificationPipeline(
-    embedding_name="allegro/herbert-base-cased",
-    dataset_name="clarin-pl/cst-wikinews",
-    input_column_name=["sentence_1", "sentence_2"],
-    target_column_name="label",
-    task_train_kwargs={"max_epochs": 1, "gpus": 1},
-)
-p.run()
+        results: List[Dict[str, float]] = self.trainer.test(datamodule=self.dm)
+        return results

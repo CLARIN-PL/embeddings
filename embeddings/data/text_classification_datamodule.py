@@ -5,7 +5,11 @@ import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, BatchEncoding
 
+from embeddings.utils.loggers import get_logger
+
 HuggingFaceDataset = TypeVar("HuggingFaceDataset")
+
+_logger = get_logger(__name__)
 
 
 class TextClassificationDataModule(pl.LightningDataModule):
@@ -47,6 +51,19 @@ class TextClassificationDataModule(pl.LightningDataModule):
             self.load_dataset_kwargs = {}
         else:
             self.load_dataset_kwargs = load_dataset_kwargs
+
+    @property
+    def input_dim(self) -> int:
+        # TODO: hardcoded for now because text pairs are encoded together
+        return 768
+
+    @property
+    def output_dim(self) -> Optional[int]:
+        if not self.initialized:
+            _logger.warning("Datamodule not initialized. Returning None.")
+            return None
+        else:
+            return self.num_labels
 
     def setup(self, stage: Optional[str] = None) -> None:
         if not self.initialized:
