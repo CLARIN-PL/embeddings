@@ -36,7 +36,7 @@ class TextClassificationTransformer(pl.LightningModule, abc.ABC):
         if num_labels > 2:
             metrics = MetricCollection(
                 [
-                    Accuracy(num_classes=num_labels, average="macro"),
+                    Accuracy(num_classes=num_labels),
                     Precision(num_classes=num_labels, average="macro"),
                     Recall(num_classes=num_labels, average="macro"),
                     F1(num_classes=num_labels, average="macro"),
@@ -54,10 +54,9 @@ class TextClassificationTransformer(pl.LightningModule, abc.ABC):
         return metrics
 
     def shared_step(self, **batch: Any) -> Tuple[torch.Tensor, torch.Tensor]:
-        labels = batch.pop("labels")
         logits = self.forward(**batch)
         loss_fn = torch.nn.CrossEntropyLoss()
-        loss = loss_fn(logits.view(-1, self.hparams.num_labels), labels.view(-1))
+        loss = loss_fn(logits.view(-1, self.hparams.num_labels), batch["labels"].view(-1))
         return loss, logits
 
     def training_step(self, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
@@ -77,8 +76,9 @@ class TextClassificationTransformer(pl.LightningModule, abc.ABC):
     def test_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         batch, batch_idx = args
         loss, preds = self.shared_step(**batch)
-        self.test_metrics(preds, batch["labels"])
-        self.log("test/Loss", loss, on_epoch=True)
+        if -1 not in batch["labels"]:
+            self.test_metrics(preds, batch["labels"])
+            self.log("test/Loss", loss, on_epoch=True)
         return None
 
     def training_epoch_end(self, outputs: List[Any]) -> None:
