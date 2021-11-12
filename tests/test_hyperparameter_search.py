@@ -35,7 +35,7 @@ def text_classification_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
 
 
 @pytest.fixture
-def text_pair_classification_dataset_kwargs() -> Dict[str, Union[str, Tuple[str, str]]]:
+def text_pair_classification_dataset_kwargs() -> Dict[str, Union[PrimitiveTypes, Tuple[str, str]]]:
     return {
         "dataset_name": "clarin-pl/cst-wikinews",
         "input_columns_names_pair": ("sentence_1", "sentence_2"),
@@ -45,7 +45,7 @@ def text_pair_classification_dataset_kwargs() -> Dict[str, Union[str, Tuple[str,
 
 
 @pytest.fixture
-def sequence_labeling_dataset_kwargs() -> Dict[str, str]:
+def sequence_labeling_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
     return {
         "dataset_name": "clarin-pl/kpwr-ner",
         "input_column_name": "tokens",

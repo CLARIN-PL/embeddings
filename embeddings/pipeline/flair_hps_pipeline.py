@@ -212,7 +212,7 @@ class OptimizedFlairPairClassificationPipeline(
             "document_embedding_cls": document_embedding_cls,
             "dataset_name": self.dataset_name,
             "load_dataset_kwargs": self.load_dataset_kwargs,
-            "input_columns_names": self.input_columns_names_pair,
+            "input_columns_names_pair": self.input_columns_names_pair,
             "target_column_name": self.target_column_name,
             "task_model_kwargs": None,
             "task_train_kwargs": task_train_kwargs,
