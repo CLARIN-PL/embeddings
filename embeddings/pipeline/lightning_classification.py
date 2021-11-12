@@ -1,8 +1,11 @@
 from typing import Any, Dict, List, Optional, Union
 
+import numpy as np
 import pytorch_lightning as pl
+import torch
 
 from embeddings.data.text_classification_datamodule import TextClassificationDataModule
+from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.torch_models import AutoTransformerForSequenceClassification
 
 
@@ -34,6 +37,7 @@ class TorchClassificationPipeline:
             **self.instantiate_kwargs(task_model_kwargs),
         )
         self.trainer = pl.Trainer(**self.instantiate_kwargs(task_train_kwargs))
+        self.evaluator = TextClassificationEvaluator()
 
     @staticmethod
     def instantiate_kwargs(kwargs: Any) -> Any:
@@ -41,8 +45,16 @@ class TorchClassificationPipeline:
             kwargs = {}
         return kwargs
 
-    def run(self) -> List[Dict[str, float]]:
+    def predict(self, **kwargs: Any) -> Dict[str, np.ndarray]:
+        predictions = self.trainer.predict(**kwargs)
+        predictions = torch.argmax(torch.cat(predictions), dim=1).numpy()
+        ground_truth = torch.cat([x["labels"] for x in list(self.dm.test_dataloader())]).numpy()
+        return {"y_pred": predictions, "y_true": ground_truth}
+
+    def run(self) -> Dict[str, Any]:
         self.dm.setup("fit")
         self.trainer.fit(self.model, self.dm)
-        results: List[Dict[str, float]] = self.trainer.test(datamodule=self.dm)
-        return results
+        self.trainer.test(datamodule=self.dm)
+        model_result = self.predict(dataloaders=self.dm.test_dataloader())
+        metrics = self.evaluator.evaluate(model_result)
+        return metrics

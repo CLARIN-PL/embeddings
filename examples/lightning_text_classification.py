@@ -7,7 +7,7 @@ from embeddings.pipeline.lightning_classification import TorchClassificationPipe
 #     dataset_name="clarin-pl/cst-wikinews",
 #     input_column_name=["sentence_1", "sentence_2"],
 #     target_column_name="label",
-#     task_train_kwargs={"max_epochs": 10, "gpus": 1},
+#     task_train_kwargs={"max_epochs": 1, "gpus": 1},
 #     task_model_kwargs={"pool_strategy": "cls", "learning_rate": 5e-4}
 # )
 pipeline = TorchClassificationPipeline(

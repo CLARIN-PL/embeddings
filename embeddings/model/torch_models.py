@@ -1,3 +1,4 @@
+from collections import ChainMap
 from typing import Any, Literal
 
 from torch import nn
@@ -34,7 +35,13 @@ class AutoTransformerForSequenceClassification(TextClassificationTransformer):
         )
 
     def forward(self, *args: Any, **kwargs: Any) -> Any:
-        inputs = kwargs
+        assert not (args and kwargs)
+        assert args or kwargs
+        inputs = kwargs if kwargs else args
+        if isinstance(inputs, tuple):
+            inputs = dict(ChainMap(*inputs))
+        inputs.pop("labels", None)
+
         outputs = self.model(**inputs)
         pooled_output = self.doc_embedder(outputs.last_hidden_state)
         # pooled_output = outputs.last_hidden_state[:, 0, :]  # take <s> token (equiv. to [CLS])
