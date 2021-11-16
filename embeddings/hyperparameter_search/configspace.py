@@ -245,8 +245,8 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
         name="document_embedding",
         type="categorical",
         choices=[
-            # "FlairDocumentCNNEmbeddings",
-            # "FlairDocumentRNNEmbeddings",
+            "FlairDocumentCNNEmbeddings",
+            "FlairDocumentRNNEmbeddings",
             "FlairTransformerDocumentEmbedding",
         ],
     )
