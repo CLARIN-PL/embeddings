@@ -6,10 +6,11 @@ import torch
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.optim import AdamW, Optimizer
 from torchmetrics import F1, Accuracy, MetricCollection, Precision, Recall
-from transformers import get_linear_schedule_with_warmup
 
 
-class TextClassificationTransformer(pl.LightningModule, abc.ABC):
+class SequenceLabelingModule(pl.LightningModule, abc.ABC):
+    IGNORE_INDEX = -100
+
     def __init__(
         self,
         num_labels: int,
@@ -54,30 +55,37 @@ class TextClassificationTransformer(pl.LightningModule, abc.ABC):
         return metrics
 
     def shared_step(self, **batch: Any) -> Tuple[torch.Tensor, torch.Tensor]:
-        logits = self.forward(**batch)
-        loss_fn = torch.nn.CrossEntropyLoss()
-        loss = loss_fn(logits.view(-1, self.hparams.num_labels), batch["labels"].view(-1))
-        return loss, logits
+        outputs = self.forward(**batch)
+        loss, logits = outputs[:2]
+        preds = torch.argmax(logits, dim=2)
+        # loss_fn = torch.nn.CrossEntropyLoss()
+        # loss = loss_fn(logits.view(-1, self.hparams.num_labels), batch["labels"].view(-1))
+        return loss, preds
 
     def training_step(self, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
         batch, batch_idx = args
+        labels = batch["labels"]
         loss, preds = self.shared_step(**batch)
-        self.train_metrics(preds, batch["labels"])
+        self.train_metrics(preds[labels != self.IGNORE_INDEX], labels[labels != self.IGNORE_INDEX])
         self.log("train/Loss", loss, on_step=True, on_epoch=True)
         return {"loss": loss}
 
     def validation_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         batch, batch_idx = args
+        labels = batch["labels"]
         loss, preds = self.shared_step(**batch)
-        self.val_metrics(preds, batch["labels"])
+        self.val_metrics(preds[labels != self.IGNORE_INDEX], labels[labels != self.IGNORE_INDEX])
         self.log("val/Loss", loss, on_epoch=True)
         return None
 
     def test_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         batch, batch_idx = args
+        labels = batch["labels"]
         loss, preds = self.shared_step(**batch)
-        if -1 not in batch["labels"]:
-            self.test_metrics(preds, batch["labels"])
+        if -1 not in labels:
+            self.test_metrics(
+                preds[labels != self.IGNORE_INDEX], labels[labels != self.IGNORE_INDEX]
+            )
             self.log("test/Loss", loss, on_epoch=True)
         return None
 

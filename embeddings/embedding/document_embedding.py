@@ -6,7 +6,7 @@ import torch
 class DocumentPoolEmbedding:
     SUPPORTED_STRATEGIES: List[str] = ["mean", "cls", "max"]
 
-    def __init__(self, strategy: Literal["mean", "cls"]):
+    def __init__(self, strategy: str):
         if strategy not in self.SUPPORTED_STRATEGIES:
             raise ValueError("Wrong strategy given as the argument")
         self.strategy = strategy
