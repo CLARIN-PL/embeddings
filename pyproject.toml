@@ -32,6 +32,8 @@ typer = "0.3.2"
 seqeval = "1.2.2"
 numpy = "1.19.5"
 pymagnitude = { version="0.1.143", optional=true}
+pytorch-lightning = "1.5.2"
+torchmetrics = "^0.6.0"
 
 
 [tool.poetry.dev-dependencies]
