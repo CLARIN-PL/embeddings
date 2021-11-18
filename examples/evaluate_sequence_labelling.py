@@ -1,4 +1,5 @@
 import pprint
+from enum import Enum
 from pathlib import Path
 from typing import Optional
 
@@ -8,6 +9,21 @@ from embeddings.defaults import RESULTS_PATH
 from embeddings.pipeline.flair_sequence_labeling import FlairSequenceLabelingPipeline
 
 app = typer.Typer()
+
+
+class EvaluationMode(str, Enum):
+    UNIT = "unit"
+    CONLL = "conll"
+    STRICT = "strict"
+
+
+class TaggingScheme(str, Enum):
+    IOB1 = "IOB1"
+    IOB2 = "IOB2"
+    IOE1 = "IOE1"
+    IOE2 = "IOE2"
+    IOBES = "IOBES"
+    BILOU = "BILOU"
 
 
 def run(
@@ -25,13 +41,16 @@ def run(
     ),
     root: str = typer.Option(RESULTS_PATH.joinpath("pos_tagging")),
     hidden_size: int = typer.Option(256, help="Number of hidden states in RNN."),
-    evaluation_mode: str = typer.Option(
-        "conll", help="Evaluation mode. Supported modes: [unit, conll, strict]."
+    evaluation_mode: EvaluationMode = typer.Option(
+        EvaluationMode.CONLL, help="Evaluation mode. Supported modes: [unit, conll, strict]."
     ),
-    tagging_scheme: Optional[str] = typer.Option(
+    tagging_scheme: Optional[TaggingScheme] = typer.Option(
         None, help="Tagging scheme. Supported schemes: [IOB1, IOB2, IOE1, IOE2, IOBES, BILOU]"
     ),
 ) -> None:
+    if tagging_scheme:
+        tagging_scheme = tagging_scheme.value
+    evaluation_mode = evaluation_mode.value
     typer.echo(pprint.pformat(locals()))
 
     output_path = Path(root, embedding_name, dataset_name)

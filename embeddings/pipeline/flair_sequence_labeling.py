@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Literal, Optional, Tuple, Union
 
 import datasets
 from flair.data import Corpus
@@ -34,8 +34,8 @@ class FlairSequenceLabelingPipeline(
         target_column_name: str,
         output_path: T_path,
         hidden_size: int,
-        evaluation_mode: str = "conll",
-        tagging_scheme: Optional[str] = None,
+        evaluation_mode: Literal["conll", "strict", "unit"] = "conll",
+        tagging_scheme: Optional[Literal["IOB1", "IOB2", "IOE1", "IOE2", "IOBES", "BILOU"]] = None,
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
