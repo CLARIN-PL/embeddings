@@ -25,7 +25,7 @@ class AutoTransformer(Transformer):
         self.config = AutoConfig.from_pretrained(model_name_or_path, num_labels=num_labels)
         self.model = model_cls.from_pretrained(model_name_or_path, config=self.config)
         self.freeze_transformer()
-        if unfreeze_from:
+        if unfreeze_from is not None:
             self.unfreeze_transformer(unfreeze_from=unfreeze_from)
 
     def forward(self, *args, **kwargs) -> Any:
