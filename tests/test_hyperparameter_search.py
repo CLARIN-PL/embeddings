@@ -105,6 +105,7 @@ def hf_sequence_labeling_pipeline_metadata(
         **sequence_labeling_dataset_kwargs,
     }
 
+
 # Pydantic create_model_from_typeddict in 1.8.2 is no compilant with mypy
 # https://github.com/samuelcolvin/pydantic/issues/3008
 # It should be fixed in further release of pydantic library
