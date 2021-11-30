@@ -15,9 +15,6 @@ from embeddings.task.flair_task.sequence_labeling import SequenceLabeling
 from embeddings.transformation.flair_transformation.column_corpus_transformation import (
     ColumnCorpusTransformation,
 )
-from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
-    DownsampleFlairCorpusTransformation,
-)
 from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
     SampleSplitsFlairCorpusTransformation,
 )

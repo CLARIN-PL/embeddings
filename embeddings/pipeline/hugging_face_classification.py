@@ -16,9 +16,6 @@ from embeddings.task.flair_task.text_classification import TextClassification
 from embeddings.transformation.flair_transformation.classification_corpus_transformation import (
     ClassificationCorpusTransformation,
 )
-from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
-    DownsampleFlairCorpusTransformation,
-)
 from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
     SampleSplitsFlairCorpusTransformation,
 )

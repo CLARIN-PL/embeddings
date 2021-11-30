@@ -15,9 +15,6 @@ from embeddings.transformation.flair_transformation.classification_corpus_transf
 from embeddings.transformation.flair_transformation.column_corpus_transformation import (
     ColumnCorpusTransformation,
 )
-from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
-    DownsampleFlairCorpusTransformation,
-)
 from embeddings.transformation.flair_transformation.drop_subset_corpus_transformation import (
     DropSubsetFlairCorpusTransformation,
 )
