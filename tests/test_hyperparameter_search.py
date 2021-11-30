@@ -1,16 +1,11 @@
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple, Union
 
-import flair
-import numpy as np
 import optuna
 import pytest
-from optuna.trial import FixedTrial
 from pydantic import create_model_from_typeddict
 
-from embeddings.hyperparameter_search.configspace import TextClassificationConfigSpace
 from embeddings.hyperparameter_search.parameters import SearchableParameter
-from embeddings.pipeline.flair_hps_pipeline import OptimizedFlairClassificationPipeline
 from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
 from embeddings.pipeline.hugging_face_pair_classification import (
     HuggingFacePairClassificationPipeline,
@@ -226,48 +221,3 @@ def test_discrete_uniform_parameter() -> None:
         SearchableParameter(name="test", type="discrete_uniform", low=0.0, high=1.0, choices=[0, 1])
     with pytest.raises(TypeError):
         SearchableParameter(name="test", type="discrete_uniform", low=0.0, high=1.0, step=0.5)
-
-
-@pytest.fixture
-def text_classification_pipeline_hps() -> OptimizedFlairClassificationPipeline:
-    return OptimizedFlairClassificationPipeline(
-        config_space=TextClassificationConfigSpace(embedding_name="clarin-pl/roberta-polish-kgr10"),
-        dataset_name="clarin-pl/polemo2-official",
-        input_column_name="text",
-        target_column_name="target",
-    )
-
-
-@pytest.fixture
-def text_clasification_hps_fixed_trial() -> FixedTrial:
-    return FixedTrial(
-        {
-            "document_embedding": "FlairTransformerDocumentEmbedding",
-            "pooling_strategy": "cls",
-            "fine_tune": False,
-            "hidden_size": 128,
-            "rnn_type": "RNN",
-            "rnn_layers": 1,
-            "bidirectional": False,
-            "dropout": 0.5,
-            "word_dropout": 0,
-            "locked_dropout": 0,
-            "reproject_words": False,
-            "learning_rate": 0.01,
-            "mini_batch_size": 16,
-            "max_epochs": 1,
-        }
-    )
-
-
-def test_text_classification_hps_objective(
-    text_classification_pipeline_hps: OptimizedFlairClassificationPipeline,
-    text_clasification_hps_fixed_trial: FixedTrial,
-) -> None:
-    text_classification_pipeline_hps._pre_run_hook()
-    text_classification_pipeline_hps.preprocessing_pipeline.run()
-
-    flair.set_seed(441)
-    score = text_classification_pipeline_hps.objective(text_clasification_hps_fixed_trial)  # type: ignore
-
-    np.testing.assert_almost_equal(score, 0.3863, decimal=4)
