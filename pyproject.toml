@@ -38,7 +38,7 @@ pymagnitude = { version="0.1.143", optional=true}
 pytest = "6.2.4"
 mypy = "0.910"
 black = "21.6b0"
-typing-extensions = "3.7.4"
+typing-extensions = "4.0.0"
 isort = { version = "5.9.1", extras = ["pyproject"] }
 pyflakes = "2.3.1"
 poethepoet = "0.10.0"
@@ -82,13 +82,11 @@ strict = true
 
 [[tool.mypy.overrides]]
 module = [
-    "datasets",
     "flair.*",
     "numpy",
     "sklearn.*",
     "srsly",
     "tqdm.*",
-    "transformers",
     "numpy.random",
     "huggingface_hub",
     "pymagnitude",
@@ -102,5 +100,13 @@ ignore_missing_imports = true
 module = [
     "spacy.*",
     "torch.testing",
+    "datasets"
 ]
 implicit_reexport = true
+
+# due to https://github.com/huggingface/transformers/issues/13390#issuecomment-934830946
+[[tool.mypy.overrides]]
+module = [
+    "transformers"
+]
+follow_imports = "skip"
