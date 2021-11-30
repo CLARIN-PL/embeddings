@@ -96,7 +96,7 @@ class BaseConfigSpace(ABC):
         elif isinstance(embedding, StaticEmbedding):
             embedding_type = "static"
         else:
-            raise NameError("Embedding type not recognized")
+            raise TypeError("Embedding type not recognized")
         return embedding_type
 
 
