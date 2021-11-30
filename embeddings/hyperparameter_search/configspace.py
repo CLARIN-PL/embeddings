@@ -314,11 +314,14 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
     def _map_task_specific_parameters(
         self, trial: optuna.trial.Trial
     ) -> Tuple[Dict[str, PrimitiveTypes], Set[str]]:
-        cnn_params = ("cnn_pool_kernels",)
-        rnn_params = ("hidden_size", "rnn_type", "rnn_layers", "bidirectional")
         shared_params = ("dropout", "word_dropout", "locked_dropout", "reproject_words")
-        static_pooling_params = ("static_pooling_strategy", "static_fine_tune_mode")
-        dynamic_pooling_params = ("dynamic_pooling_strategy", "dynamic_fine_tune")
+        param_names_mapping: Final = {
+            "FlairDocumentCNNEmbeddings": ("cnn_pool_kernels",) + shared_params,
+            "FlairDocumentRNNEmbeddings": ("hidden_size", "rnn_type", "rnn_layers", "bidirectional")
+            + shared_params,
+            "FlairTransformerDocumentEmbedding": ("dynamic_pooling_strategy", "dynamic_fine_tune"),
+            "FlairDocumentPoolEmbedding": ("static_pooling_strategy", "static_fine_tune_mode"),
+        }
         parameters = {}
 
         embedding_name, embedding_name_val = self._parse_parameter(
