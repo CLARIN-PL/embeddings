@@ -44,7 +44,7 @@ class AbstractSearchableParameter(ABC, Generic[Distribution]):
     def _check_arguments(self, forbidden_args: Sequence[str], required_args: Sequence[str]) -> None:
         for variable_name in forbidden_args:
             var = getattr(self, variable_name)
-            if var:
+            if var is not None:
                 raise TypeError(
                     f'Argument "{variable_name}" cannot be set for SearchableParameter type: "{self.type}". '
                     f'Only {required_args} can be passed as argument for type: "{self.type}".'

@@ -23,7 +23,7 @@ class HuggingFaceClassificationPipelineMetadata(EmbeddingPipelineMetadata):
 
 
 class HuggingFacePairClassificationPipelineMetadata(EmbeddingPipelineMetadata):
-    input_columns_names: Tuple[str, str]
+    input_columns_names_pair: Tuple[str, str]
     target_column_name: str
     document_embedding_cls: str
     load_model_kwargs: Optional[Dict[str, Any]]
