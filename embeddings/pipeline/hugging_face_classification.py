@@ -57,8 +57,7 @@ class HuggingFaceClassificationPipeline(
             transformation = transformation.then(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
-        transformation = transformation.then(DownsampleFlairCorpusTransformation(percentage=0.01))
-        # TODO: Remove DownsampleFlairCorpusTransformation after Development phase
+
         embedding = AutoFlairDocumentPoolEmbedding.from_hub(
             repo_id=embedding_name,
             document_embedding_cls=document_embedding_cls,

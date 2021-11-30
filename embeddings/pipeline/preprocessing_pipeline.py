@@ -81,8 +81,7 @@ class FlairTextClassificationPreprocessingPipeline(
             transformation = transformation.then(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
-        transformation = transformation.then(DownsampleFlairCorpusTransformation(percentage=0.01))
-        # TODO: Remove DownsampleFlairCorpusTransformation after Development phase
+
         if ignore_test_subset:
             transformation = transformation.then(DropSubsetFlairCorpusTransformation(subset="test"))
         transformation = transformation.persisting(FlairPicklePersister(path=persist_path))
@@ -157,8 +156,7 @@ class FlairSequenceLabelingPreprocessingPipeline(
             transformation = transformation.then(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
-        transformation = transformation.then(DownsampleFlairCorpusTransformation(percentage=0.01))
-        # TODO: Remove DownsampleFlairCorpusTransformation after Development phase
+
         if ignore_test_subset:
             transformation = transformation.then(DropSubsetFlairCorpusTransformation(subset="test"))
         transformation = transformation.persisting(FlairConllPersister(path=persist_path))

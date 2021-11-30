@@ -55,8 +55,7 @@ class HuggingFaceSequenceLabelingPipeline(
             transformation = transformation.then(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
-        transformation = transformation.then(DownsampleFlairCorpusTransformation(percentage=0.01))
-        # TODO: Remove DownsampleFlairCorpusTransformation after Development phase
+
         embedding = AutoFlairWordEmbedding.from_hub(embedding_name)
         task = SequenceLabeling(
             output_path,
