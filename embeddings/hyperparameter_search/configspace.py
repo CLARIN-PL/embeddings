@@ -335,8 +335,10 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
         document_embedding_name, document_embedding_val = self._parse_parameter(
             trial=trial, param_name=f"{embedding_type_param}_document_embedding"
         )
-        parameters[document_embedding_name] = document_embedding_val
+        if not isinstance(document_embedding_val, str):
+            raise TypeError("Variable document_embedding_val must be a str!")
 
+        parameters[document_embedding_name] = document_embedding_val
         parameter_names = param_names_mapping[document_embedding_val]
 
         parameters.update(self._map_parameters(parameters_names=list(parameter_names), trial=trial))
