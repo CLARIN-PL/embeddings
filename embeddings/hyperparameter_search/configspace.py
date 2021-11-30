@@ -330,29 +330,14 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
         parameters[embedding_name] = embedding_name_val
 
         embedding_type_param: str = self.get_embedding_type()
+        assert embedding_type_param in ["dynamic", "static"]
 
-        if embedding_type_param == "dynamic":
-            document_embedding_name, document_embedding_val = self._parse_parameter(
-                trial=trial, param_name="dynamic_document_embedding"
-            )
-        else:
-            document_embedding_name, document_embedding_val = self._parse_parameter(
-                trial=trial, param_name="static_document_embedding"
-            )
+        document_embedding_name, document_embedding_val = self._parse_parameter(
+            trial=trial, param_name=f"{embedding_type_param}_document_embedding"
+        )
         parameters[document_embedding_name] = document_embedding_val
-        parameter_names: Tuple[str, ...]
-        if document_embedding_val == "FlairDocumentCNNEmbeddings":
-            parameter_names = cnn_params + shared_params
-        elif document_embedding_val == "FlairDocumentRNNEmbeddings":
-            parameter_names = rnn_params + shared_params
-        elif document_embedding_val == "FlairTransformerDocumentEmbedding":
-            parameter_names = dynamic_pooling_params
-        elif document_embedding_val == "FlairDocumentPoolEmbedding":
-            parameter_names = static_pooling_params
-        else:
-            raise ValueError(
-                f"{document_embedding_val} not recognized as valid document pooling class."
-            )
+
+        parameter_names = param_names_mapping[document_embedding_val]
 
         parameters.update(self._map_parameters(parameters_names=list(parameter_names), trial=trial))
 
