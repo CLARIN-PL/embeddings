@@ -19,13 +19,13 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "3.9.6"
-transformers = "4.8.2"
+transformers = "4.12.5"
 torch = "1.9.0"
 flair = "0.9"
 requests = "2.25.1"
 scikit-learn = "0.24.1"
 srsly = "2.4.1"
-datasets = "1.6.1"
+datasets = "1.16.1"
 Pillow = "8.2.0"
 tensorboard = "2.4.1"
 typer = "0.3.2"
