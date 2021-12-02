@@ -81,6 +81,7 @@ profile = "black"
 [tool.mypy]
 python_version = "3.9"
 strict = true
+implicit_reexport = true
 
 [[tool.mypy.overrides]]
 module = [
@@ -105,4 +106,3 @@ module = [
     "spacy.*",
     "torch.testing",
 ]
-implicit_reexport = true

@@ -29,7 +29,7 @@ pipeline = LightningClassificationPipeline(
         "text_cfg": "text",
     },
     task_train_kwargs={"max_epochs": 10, "gpus": 1},
-    task_model_kwargs={"pool_strategy": "cls", "learning_rate": 5e-4},
+    task_model_kwargs={"learning_rate": 5e-4},
 )
 
 result = pipeline.run()

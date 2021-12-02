@@ -96,8 +96,8 @@ class HuggingFaceDataModule(pl.LightningDataModule):
     def val_dataloader(self) -> DataLoader[HuggingFaceDataset]:
         if "validation" in self.dataset:
             return DataLoader(self.dataset["validation"], batch_size=self.eval_batch_size)
-        # else:
-        #     raise AttributeError("Validation dataset not available")
+        else:
+            raise AttributeError("Validation dataset not available")
 
     def test_dataloader(self) -> DataLoader[HuggingFaceDataset]:
         if "test" in self.dataset:

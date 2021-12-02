@@ -3,11 +3,11 @@ from typing import Any, Literal, Optional
 import torch
 from torch import FloatTensor, nn
 from transformers import AutoConfig, AutoModel
-from transformers.modeling_outputs import TokenClassifierOutput
+from transformers.modeling_outputs import TokenClassifierOutput  # type: ignore
 
 from embeddings.embedding.document_embedding import DocumentPoolEmbedding
-from embeddings.model.lightning.core import Transformer
 from embeddings.model.lightning.sequence_classification import SequenceClassificationModule
+from embeddings.model.lightning.transformer import Transformer
 
 
 class MLPTransformerForSequenceClassification(Transformer, SequenceClassificationModule):
@@ -45,11 +45,11 @@ class MLPTransformerForSequenceClassification(Transformer, SequenceClassificatio
         head_mask=None,
         inputs_embeds=None,
         labels=None,
-        output_attentions=None,
-        output_hidden_states=None,
-        return_dict=None,
-        *args,
-        **kwargs
+        output_attentions: Optional[bool] = None,
+        output_hidden_states: Optional[bool] = None,
+        return_dict: Optional[bool] = None,
+        *args: Any,
+        **kwargs: Any
     ) -> Any:
         # assert not (args and kwargs)
         # assert args or kwargs
@@ -88,7 +88,12 @@ class MLPTransformerForSequenceClassification(Transformer, SequenceClassificatio
             attentions=outputs.attentions,
         )
 
-    def calculate_loss(self, logits, labels, attention_mask) -> Optional[FloatTensor]:
+    def calculate_loss(
+        self,
+        logits: torch.FloatTensor,
+        labels: Optional[torch.FloatTensor],
+        attention_mask: torch.FloatTensor,
+    ) -> Optional[FloatTensor]:
         loss = None
         if labels is not None:
             loss_fct = nn.CrossEntropyLoss()

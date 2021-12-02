@@ -6,10 +6,11 @@ from transformers import (
     AutoModelForSequenceClassification,
     AutoModelForTokenClassification,
 )
+from transformers.file_utils import ModelOutput  # type: ignore
 
-from embeddings.model.lightning.transformer import Transformer
 from embeddings.model.lightning.sequence_classification import SequenceClassificationModule
 from embeddings.model.lightning.sequence_labeling import SequenceLabelingModule
+from embeddings.model.lightning.transformer import Transformer
 
 
 class AutoTransformer(Transformer):
@@ -28,14 +29,11 @@ class AutoTransformer(Transformer):
         if unfreeze_from is not None:
             self.unfreeze_transformer(unfreeze_from=unfreeze_from)
 
-    def forward(self, *args, **kwargs) -> Any:
-        assert not (args and kwargs)
-        assert args or kwargs
+    def forward(self, *args: Any, **kwargs: Any) -> ModelOutput:
+        assert (not (args and kwargs)) and (args or kwargs)
         inputs = kwargs if kwargs else args
         if isinstance(inputs, tuple):
             inputs = dict(ChainMap(*inputs))
-        # inputs.pop("labels", None)
-
         outputs = self.model(**inputs)
         return outputs
 
@@ -49,10 +47,10 @@ class AutoTransformerForSequenceClassification(AutoTransformer, SequenceClassifi
         **kwargs: Any
     ):
         super().__init__(
-            model_name_or_path,
-            AutoModelForSequenceClassification,
-            num_labels,
-            unfreeze_from,
+            model_name_or_path=model_name_or_path,
+            model_cls=AutoModelForSequenceClassification,
+            unfreeze_from=unfreeze_from,
+            num_labels=num_labels,
             **kwargs
         )
 
@@ -66,5 +64,9 @@ class AutoTransformerForTokenClassification(AutoTransformer, SequenceLabelingMod
         **kwargs: Any
     ):
         super().__init__(
-            model_name_or_path, AutoModelForTokenClassification, num_labels, unfreeze_from, **kwargs
+            model_name_or_path=model_name_or_path,
+            model_cls=AutoModelForTokenClassification,
+            unfreeze_from=unfreeze_from,
+            num_labels=num_labels,
+            **kwargs
         )

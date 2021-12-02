@@ -108,16 +108,16 @@ class SequenceLabelingModule(pl.LightningModule, abc.ABC):
 
     def setup(self, stage: Optional[str] = None) -> None:
         if stage == "fit":
-            # Get dataloader by calling it - train_dataloader() is called after setup() by default
+            assert self.trainer is not None
             train_loader = self.trainer.datamodule.train_dataloader()
-
-            # Calculate total steps
             tb_size = self.hparams.train_batch_size * max(1, self.trainer.gpus)
             ab_size = self.trainer.accumulate_grad_batches * float(self.trainer.max_epochs)
             self.total_steps = (len(train_loader.dataset) // tb_size) // ab_size
 
     def configure_optimizers(self) -> Tuple[List[Optimizer], List[Any]]:
         """Prepare optimizer and schedule (linear warmup and decay)"""
+        assert "weight_decay" in self.hparams
+        assert getattr(self.hparams, "weight_decay")
         no_decay = ["bias", "LayerNorm.weight"]
         optimizer_grouped_parameters = [
             {

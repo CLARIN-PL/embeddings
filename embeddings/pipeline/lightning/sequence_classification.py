@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, Union
 import numpy as np
 import pytorch_lightning as pl
 import torch
+from numpy.typing import NDArray
 from torch.utils.data import DataLoader
 
 from embeddings.data.huggingface_datamodule import HuggingFaceDataset, TextClassificationDataModule
@@ -44,13 +45,15 @@ class LightningClassificationPipeline(LightningPipeline):
         )
         self.evaluator = TextClassificationEvaluator()
 
-    def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, np.ndarray]:
+    def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, NDArray[np.int_]]:
         predictions = []
         for batch in dataloader:
             outputs = self.model(**batch)
             predictions.append(outputs.logits)
         predictions = torch.argmax(torch.cat(predictions), dim=1).numpy()
+        assert isinstance(predictions, np.ndarray)
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
+        assert isinstance(ground_truth, np.ndarray)
         return {"y_pred": predictions, "y_true": ground_truth}
 
     def run(self) -> Dict[str, Any]:

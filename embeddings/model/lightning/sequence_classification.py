@@ -6,7 +6,6 @@ import torch
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.optim import AdamW, Optimizer
 from torchmetrics import F1, Accuracy, MetricCollection, Precision, Recall
-from transformers import get_linear_schedule_with_warmup
 
 
 class SequenceClassificationModule(pl.LightningModule, abc.ABC):
@@ -56,9 +55,6 @@ class SequenceClassificationModule(pl.LightningModule, abc.ABC):
     def shared_step(self, **batch: Any) -> Tuple[torch.Tensor, torch.Tensor]:
         outputs = self.forward(**batch)
         loss, logits = outputs[:2]
-        preds = torch.argmax(logits, dim=1)
-        # loss_fn = torch.nn.CrossEntropyLoss()
-        # loss = loss_fn(logits.view(-1, self.hparams.num_labels), batch["labels"].view(-1))
         return loss, logits
 
     def training_step(self, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
@@ -102,10 +98,8 @@ class SequenceClassificationModule(pl.LightningModule, abc.ABC):
 
     def setup(self, stage: Optional[str] = None) -> None:
         if stage == "fit":
-            # Get dataloader by calling it - train_dataloader() is called after setup() by default
+            assert self.trainer is not None
             train_loader = self.trainer.datamodule.train_dataloader()
-
-            # Calculate total steps
             tb_size = self.hparams.train_batch_size * max(1, self.trainer.gpus)
             ab_size = self.trainer.accumulate_grad_batches * float(self.trainer.max_epochs)
             self.total_steps = (len(train_loader.dataset) // tb_size) // ab_size

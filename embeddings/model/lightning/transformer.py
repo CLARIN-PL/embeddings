@@ -2,8 +2,14 @@ import abc
 from typing import Any
 
 
+from transformers import PreTrainedModel
+
+
 class Transformer(abc.ABC):
-    model: Any
+    model: PreTrainedModel
+
+    def __init__(self, **kwargs: Any) -> None:
+        pass
 
     def freeze_transformer(self) -> None:
         for param in self.model.base_model.parameters():

@@ -3,7 +3,6 @@ from typing import Any, Dict
 
 
 class LightningPipeline(abc.ABC):
-
     @abc.abstractmethod
     def run(self) -> Dict[str, Any]:
         pass

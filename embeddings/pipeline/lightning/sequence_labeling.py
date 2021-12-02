@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 import numpy as np
 import pytorch_lightning as pl
 import torch
+from numpy.typing import NDArray
 from torch.utils.data import DataLoader
 
 from embeddings.data.huggingface_datamodule import HuggingFaceDataset, SequenceLabelingDataModule
@@ -49,7 +50,7 @@ class LightningSequenceLabelingPipeline(LightningPipeline):
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         )
 
-    def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, np.ndarray]:
+    def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, NDArray[np.string_]]:
         predictions = []
 
         for batch in dataloader:

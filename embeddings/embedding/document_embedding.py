@@ -18,3 +18,5 @@ class DocumentPoolEmbedding:
             return model_output[:, 0, :]
         elif self.strategy == "max":
             return model_output.max(dim=1).values
+        else:
+            raise ValueError("Wrong strategy given as the argument")
