@@ -40,7 +40,6 @@ class HuggingFacePairClassificationPipeline(
         load_model_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
         dataset = HuggingFaceDataset(
             dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
@@ -58,7 +57,7 @@ class HuggingFacePairClassificationPipeline(
         embedding = AutoFlairDocumentPoolEmbedding.from_hub(
             repo_id=embedding_name,
             document_embedding_cls=document_embedding_cls,
-            **load_model_kwargs
+            **load_model_kwargs if load_model_kwargs else {}
         )
         task = TextPairClassification(
             output_path,
