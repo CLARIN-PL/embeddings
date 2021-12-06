@@ -16,6 +16,7 @@ from embeddings.utils.utils import PrimitiveTypes
 Parameter = Union[SearchableParameter, ConstantParameter]
 ParsedParameters = TypeVar("ParsedParameters")
 SampledParameters = Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]
+ConfigSpace = TypeVar("ConfigSpace", bound="BaseConfigSpace")
 
 
 class BaseConfigSpace(ABC):
@@ -387,6 +388,3 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
             "task_train_kwargs": task_train_kwargs,
             "load_model_kwargs": load_model_kwargs,
         }
-
-
-ConfigSpace = TypeVar("ConfigSpace", bound=BaseConfigSpace)
