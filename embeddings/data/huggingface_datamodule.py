@@ -33,6 +33,7 @@ class HuggingFaceDataModule(pl.LightningDataModule):
         max_seq_length: int = 128,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
+        input_dim: int = 768,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ):
@@ -42,6 +43,7 @@ class HuggingFaceDataModule(pl.LightningDataModule):
         self.max_seq_length = max_seq_length
         self.train_batch_size = train_batch_size
         self.eval_batch_size = eval_batch_size
+        self.input_dim = input_dim
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name_or_path, use_fast=True)
         self.initialized = False
         if load_dataset_kwargs is None:
@@ -50,11 +52,6 @@ class HuggingFaceDataModule(pl.LightningDataModule):
             self.load_dataset_kwargs = load_dataset_kwargs
         self.dataset: DatasetDict
         self.num_labels: int
-
-    @property
-    def input_dim(self) -> int:
-        # TODO: hardcoded for now because text pairs are encoded together
-        return 768
 
     @property
     def output_dim(self) -> Optional[int]:
