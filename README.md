@@ -209,7 +209,7 @@ Sequence Labeling | [OptimizedFlairSequenceLabelingPipeline](embeddings/pipeline
 
 ## Example with Text Classification
 
-Optimized pipilenes can be run via following snippet of code:
+Optimized pipelines can be run via following snippet of code:
 
 ```python
 from embeddings.hyperparameter_search.configspace import TextClassificationConfigSpace
