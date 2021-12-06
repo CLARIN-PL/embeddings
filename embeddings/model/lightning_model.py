@@ -1,15 +1,14 @@
-from typing import Any, Dict, Literal
+from typing import Dict, Literal
 
+import numpy as np
 import pytorch_lightning as pl
-from numpy.typing import NDArray
 from torch.utils.data import DataLoader
 
-from embeddings.data.huggingface_datamodule import HuggingFaceDataset
 from embeddings.model.model import Model
 from embeddings.task.lightning_task.lightning_task import HuggingfaceLightningTask
 
 
-class LightningModel(Model[pl.LightningDataModule, Dict[str, NDArray[Any]]]):
+class LightningModel(Model[pl.LightningDataModule, Dict[str, np.ndarray]]):
     def __init__(
         self,
         trainer: pl.Trainer,
@@ -21,7 +20,7 @@ class LightningModel(Model[pl.LightningDataModule, Dict[str, NDArray[Any]]]):
         self.task = task
         self.predict_subset = predict_subset
 
-    def execute(self, data: pl.LightningDataModule) -> Dict[str, NDArray[Any]]:
+    def execute(self, data: pl.LightningDataModule) -> Dict[str, np.ndarray]:
         self.trainer.fit(self.task, data)
         self.trainer.test(datamodule=data)
         dataloader = (

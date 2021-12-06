@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional, Tuple, Type
 import numpy as np
 import pytorch_lightning as pl
 import torch
-from numpy.typing import NDArray
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.optim import AdamW, Optimizer
 from torch.utils.data import DataLoader
@@ -130,7 +129,7 @@ class HuggingfaceLightningTask(pl.LightningModule, abc.ABC):
 
         return [optimizer], []
 
-    def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, NDArray[np.int_]]:
+    def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, np.ndarray]:
         predictions = torch.argmax(
             torch.cat([self.forward(**batch).logits for batch in dataloader]), dim=1
         ).numpy()
