@@ -79,6 +79,10 @@ class HuggingFaceLightningTask(pl.LightningModule, abc.ABC):
     def test_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         pass
 
+    @abc.abstractmethod
+    def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, np.ndarray]:
+        pass
+
     def training_epoch_end(self, outputs: List[Any]) -> None:
         self._aggregate_and_log_metrics(self.train_metrics)
 
@@ -128,12 +132,3 @@ class HuggingFaceLightningTask(pl.LightningModule, abc.ABC):
         )
 
         return [optimizer], []
-
-    def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, np.ndarray]:
-        predictions = torch.argmax(
-            torch.cat([self.forward(**batch).logits for batch in dataloader]), dim=1
-        ).numpy()
-        assert isinstance(predictions, np.ndarray)
-        ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
-        assert isinstance(ground_truth, np.ndarray)
-        return {"y_pred": predictions, "y_true": ground_truth}

@@ -1,10 +1,13 @@
 from typing import Any, Dict, Optional, Tuple, Type
 
+import numpy as np
 import torch
 from pytorch_lightning.utilities.types import STEP_OUTPUT
+from torch.utils.data import DataLoader
 from torchmetrics import F1, Accuracy, MetricCollection, Precision, Recall
 from transformers import AutoModel, AutoModelForSequenceClassification
 
+from embeddings.data.datamodule import HuggingFaceDataset
 from embeddings.task.lightning_task.lightning_task import HuggingFaceLightningTask
 
 
@@ -89,3 +92,12 @@ class TextClassificationTask(HuggingFaceLightningTask):
             self.test_metrics(preds, batch["labels"])
             self.log("test/Loss", loss, on_epoch=True)
         return None
+
+    def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, np.ndarray]:
+        predictions = torch.argmax(
+            torch.cat([self.forward(**batch).logits for batch in dataloader]), dim=1
+        ).numpy()
+        assert isinstance(predictions, np.ndarray)
+        ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
+        assert isinstance(ground_truth, np.ndarray)
+        return {"y_pred": predictions, "y_true": ground_truth}
