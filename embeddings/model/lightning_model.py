@@ -5,14 +5,14 @@ import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 
 from embeddings.model.model import Model
-from embeddings.task.lightning_task.lightning_task import HuggingfaceLightningTask
+from embeddings.task.lightning_task.lightning_task import HuggingFaceLightningTask
 
 
 class LightningModel(Model[pl.LightningDataModule, Dict[str, np.ndarray]]):
     def __init__(
         self,
         trainer: pl.Trainer,
-        task: HuggingfaceLightningTask,
+        task: HuggingFaceLightningTask,
         predict_subset: Literal["dev", "test"] = "test",
     ) -> None:
         super().__init__()
@@ -22,7 +22,6 @@ class LightningModel(Model[pl.LightningDataModule, Dict[str, np.ndarray]]):
 
     def execute(self, data: pl.LightningDataModule) -> Dict[str, np.ndarray]:
         self.trainer.fit(self.task, data)
-        self.trainer.test(datamodule=data)
         dataloader = (
             data.test_dataloader() if self.predict_subset == "test" else data.val_dataloader()
         )

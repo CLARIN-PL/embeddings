@@ -5,10 +5,10 @@ from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torchmetrics import F1, Accuracy, MetricCollection, Precision, Recall
 from transformers import AutoModel, AutoModelForSequenceClassification
 
-from embeddings.task.lightning_task.lightning_task import HuggingfaceLightningTask
+from embeddings.task.lightning_task.lightning_task import HuggingFaceLightningTask
 
 
-class TextClassificationTask(HuggingfaceLightningTask):
+class TextClassificationTask(HuggingFaceLightningTask):
     def __init__(
         self,
         model_name_or_path: str,

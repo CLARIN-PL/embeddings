@@ -2,7 +2,7 @@ import pprint
 from pathlib import Path
 
 from embeddings.defaults import RESULTS_PATH
-from embeddings.pipeline.lightning_text_classification import LightningClassificationPipeline
+from embeddings.pipeline.lightning_text_classification import TextClassificationPipeline
 
 root: Path = RESULTS_PATH.joinpath("lightning_sequence_classification")
 root.mkdir(parents=True, exist_ok=True)
@@ -16,7 +16,7 @@ root.mkdir(parents=True, exist_ok=True)
 #     task_model_kwargs={"pool_strategy": "cls", "learning_rate": 5e-4}
 # )
 
-pipeline = LightningClassificationPipeline(
+pipeline = TextClassificationPipeline(
     embedding_name="allegro/herbert-base-cased",
     dataset_name="clarin-pl/polemo2-official",
     input_column_name=["text"],
@@ -28,7 +28,7 @@ pipeline = LightningClassificationPipeline(
         "test_domains": ["hotels", "medicine"],
         "text_cfg": "text",
     },
-    task_train_kwargs={"max_epochs": 10, "gpus": 1},
+    task_train_kwargs={"max_epochs": 2, "gpus": 1},
     task_model_kwargs={"learning_rate": 5e-4},
 )
 

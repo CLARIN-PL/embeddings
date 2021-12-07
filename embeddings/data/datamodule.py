@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Dict, List, Optional, TypeVar, Union
+from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
 
 import datasets
 import pytorch_lightning as pl
@@ -9,12 +9,17 @@ from transformers import AutoTokenizer, BatchEncoding
 
 from embeddings.utils.loggers import get_logger
 
+Data = TypeVar("Data")
 HuggingFaceDataset = TypeVar("HuggingFaceDataset")
 
 _logger = get_logger(__name__)
 
 
-class HuggingFaceDataModule(pl.LightningDataModule):
+class BaseDataModule(abc.ABC, pl.LightningDataModule, Generic[Data]):
+    dataset: Data
+
+
+class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
     loader_columns = [
         "datasets_idx",
         "input_ids",
@@ -24,6 +29,7 @@ class HuggingFaceDataModule(pl.LightningDataModule):
         "end_positions",
         "labels",
     ]
+    num_labels: int
 
     def __init__(
         self,
@@ -36,7 +42,8 @@ class HuggingFaceDataModule(pl.LightningDataModule):
         input_dim: int = 768,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
-    ):
+    ) -> None:
+        super().__init__()  # type: ignore
         self.model_name_or_path = model_name_or_path
         self.dataset_name = dataset_name
         self.target_field = target_field
@@ -50,8 +57,6 @@ class HuggingFaceDataModule(pl.LightningDataModule):
             self.load_dataset_kwargs = {}
         else:
             self.load_dataset_kwargs = load_dataset_kwargs
-        self.dataset: DatasetDict
-        self.num_labels: int
 
     @property
     def output_dim(self) -> Optional[int]:
@@ -87,19 +92,14 @@ class HuggingFaceDataModule(pl.LightningDataModule):
         return DataLoader(self.dataset["train"], batch_size=self.train_batch_size)
 
     def val_dataloader(self) -> DataLoader[HuggingFaceDataset]:
-        if "validation" in self.dataset:
-            return DataLoader(self.dataset["validation"], batch_size=self.eval_batch_size)
-        else:
-            raise AttributeError("Validation dataset not available")
+        return DataLoader(self.dataset["validation"], batch_size=self.eval_batch_size)
 
     def test_dataloader(self) -> DataLoader[HuggingFaceDataset]:
-        if "test" in self.dataset:
-            return DataLoader(self.dataset["test"], batch_size=self.eval_batch_size)
-        else:
-            raise AttributeError("Test dataset not available")
+        return DataLoader(self.dataset["test"], batch_size=self.eval_batch_size)
 
     @abc.abstractmethod
     def initalize(self) -> None:
+        """Initialize dataset to populate important attributes needed before calling setup."""
         pass
 
     @abc.abstractmethod
@@ -119,6 +119,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         max_seq_length: int = 128,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
+        input_dim: int = 768,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ):
@@ -127,13 +128,14 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         assert 1 <= len(text_fields) <= 2
         self.text_fields = text_fields
         super().__init__(
-            model_name_or_path,
-            dataset_name,
-            target_field,
-            max_seq_length,
-            train_batch_size,
-            eval_batch_size,
-            load_dataset_kwargs,
+            model_name_or_path=model_name_or_path,
+            dataset_name=dataset_name,
+            target_field=target_field,
+            max_seq_length=max_seq_length,
+            train_batch_siz=train_batch_size,
+            eval_batch_size=eval_batch_size,
+            input_dim=input_dim,
+            load_dataset_kwargs=load_dataset_kwargs,
             **kwargs,
         )
 
@@ -145,7 +147,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
     def convert_to_features(
         self, example_batch: Dict[str, Any], indices: Optional[List[int]] = None
     ) -> BatchEncoding:
-        # Either encode single sentence or sentence pairs
+        """Encodes either single sentence or sentence pairs."""
         if len(self.text_fields) > 1:
             texts_or_text_pairs = list(
                 zip(example_batch[self.text_fields[0]], example_batch[self.text_fields[1]])

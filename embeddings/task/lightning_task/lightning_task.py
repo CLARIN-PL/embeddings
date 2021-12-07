@@ -10,10 +10,10 @@ from torch.utils.data import DataLoader
 from torchmetrics import MetricCollection
 from transformers import AutoConfig, AutoModel
 
-from embeddings.data.huggingface_datamodule import HuggingFaceDataset
+from embeddings.data.datamodule import HuggingFaceDataset
 
 
-class HuggingfaceLightningTask(pl.LightningModule, abc.ABC):
+class HuggingFaceLightningTask(pl.LightningModule, abc.ABC):
     def __init__(
         self,
         model_name_or_path: str,
