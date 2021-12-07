@@ -40,7 +40,7 @@ class TextClassificationPipeline(
         task = TextClassificationTask(
             model_name_or_path=embedding_name,
             num_labels=datamodule.num_labels,
-            **task_model_kwargs if task_model_kwargs else {},
+            task_model_kwargs=task_model_kwargs,
         )
         model = LightningModel(trainer=trainer, task=task, predict_subset="test")
         evaluator = TextClassificationEvaluator()

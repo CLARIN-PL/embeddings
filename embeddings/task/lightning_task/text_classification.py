@@ -14,32 +14,22 @@ from embeddings.task.lightning_task.lightning_task import HuggingFaceLightningTa
 class TextClassificationTask(HuggingFaceLightningTask):
     def __init__(
         self,
-        model_name_or_path: str,
         num_labels: int,
+        model_name_or_path: str,
         downstream_model_type: Type["AutoModel"] = AutoModelForSequenceClassification,
+        unfreeze_transformer_from_layer: Optional[int] = None,
         metrics: Optional[MetricCollection] = None,
-        learning_rate: float = 1e-4,
-        adam_epsilon: float = 1e-8,
-        warmup_steps: int = 0,
-        weight_decay: float = 0.0,
-        train_batch_size: int = 32,
-        eval_batch_size: int = 32,
         config_kwargs: Optional[Dict[str, Any]] = None,
-        **kwargs: Any,
+        task_model_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
-            model_name_or_path=model_name_or_path,
             num_labels=num_labels,
+            model_name_or_path=model_name_or_path,
             downstream_model_type=downstream_model_type,
+            unfreeze_transformer_from_layer=unfreeze_transformer_from_layer,
             metrics=metrics,
-            learning_rate=learning_rate,
-            adam_epsilon=adam_epsilon,
-            warmup_steps=warmup_steps,
-            weight_decay=weight_decay,
-            train_batch_size=train_batch_size,
-            eval_batch_size=eval_batch_size,
             config_kwargs=config_kwargs,
-            **kwargs,
+            task_model_kwargs=task_model_kwargs,
         )
 
     def get_default_metrics(self) -> MetricCollection:

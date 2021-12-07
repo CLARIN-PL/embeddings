@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Dict, List, Optional, Tuple, Type
+from typing import Any, Dict, Generic, List, Optional, Tuple, Type, TypeVar
 
 import numpy as np
 import pytorch_lightning as pl
@@ -12,13 +12,13 @@ from transformers import AutoConfig, AutoModel
 
 from embeddings.data.datamodule import HuggingFaceDataset
 
+Model = TypeVar("Model")
 
-class HuggingFaceLightningTask(pl.LightningModule, abc.ABC):
+
+class LightningTask(pl.LightningModule, abc.ABC, Generic[Model]):
     def __init__(
         self,
-        model_name_or_path: str,
         num_labels: int,
-        downstream_model_type: Type["AutoModel"],
         metrics: Optional[MetricCollection] = None,
         learning_rate: float = 1e-4,
         adam_epsilon: float = 1e-8,
@@ -26,38 +26,15 @@ class HuggingFaceLightningTask(pl.LightningModule, abc.ABC):
         weight_decay: float = 0.0,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
-        unfreeze_transformer_from_layer: Optional[int] = None,
-        config_kwargs: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
-    ) -> None:
+    ):
         super().__init__()
         self.save_hyperparameters()
-        self.config = AutoConfig.from_pretrained(
-            model_name_or_path, num_labels=num_labels, **config_kwargs if config_kwargs else {}
-        )
-        self.model = downstream_model_type.from_pretrained(model_name_or_path, config=self.config)
         self.configure_metrics(metrics=metrics)
-        self.freeze_transformer()
-        if unfreeze_transformer_from_layer is not None:
-            self.unfreeze_transformer(unfreeze_from=unfreeze_transformer_from_layer)
 
-    def configure_metrics(self, metrics: Optional[MetricCollection]) -> None:
-        if metrics is None:
-            metrics = self.get_default_metrics()
-        self.train_metrics = metrics.clone(prefix="train/")
-        self.val_metrics = metrics.clone(prefix="val/")
-        self.test_metrics = metrics.clone(prefix="test/")
-
-    def freeze_transformer(self) -> None:
-        for param in self.model.base_model.parameters():
-            param.requires_grad = False
-
-    def unfreeze_transformer(self, unfreeze_from: int = -1) -> None:
-        for name, param in self.model.base_model.named_parameters():
-            if name.startswith("encoder.layer"):
-                no_layer = int(name.split(".")[2])
-                if no_layer >= unfreeze_from:
-                    param.requires_grad = True
+    @abc.abstractmethod
+    def get_default_metrics(self) -> MetricCollection:
+        pass
 
     @abc.abstractmethod
     def forward(self, *args: Any, **kwargs: Any) -> Any:
@@ -82,6 +59,13 @@ class HuggingFaceLightningTask(pl.LightningModule, abc.ABC):
     @abc.abstractmethod
     def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, np.ndarray]:
         pass
+
+    def configure_metrics(self, metrics: Optional[MetricCollection]) -> None:
+        if metrics is None:
+            metrics = self.get_default_metrics()
+        self.train_metrics = metrics.clone(prefix="train/")
+        self.val_metrics = metrics.clone(prefix="val/")
+        self.test_metrics = metrics.clone(prefix="test/")
 
     def training_epoch_end(self, outputs: List[Any]) -> None:
         self._aggregate_and_log_metrics(self.train_metrics)
@@ -132,3 +116,39 @@ class HuggingFaceLightningTask(pl.LightningModule, abc.ABC):
         )
 
         return [optimizer], []
+
+
+class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
+    def __init__(
+        self,
+        num_labels: int,
+        model_name_or_path: str,
+        downstream_model_type: Type["AutoModel"],
+        unfreeze_transformer_from_layer: Optional[int] = None,
+        metrics: Optional[MetricCollection] = None,
+        config_kwargs: Optional[Dict[str, Any]] = None,
+        task_model_kwargs: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            num_labels=num_labels,
+            metrics=metrics,
+            **task_model_kwargs if task_model_kwargs else {},
+        )
+        self.config = AutoConfig.from_pretrained(
+            model_name_or_path, num_labels=num_labels, **config_kwargs if config_kwargs else {}
+        )
+        self.model = downstream_model_type.from_pretrained(model_name_or_path, config=self.config)
+        self.freeze_transformer()
+        if unfreeze_transformer_from_layer is not None:
+            self.unfreeze_transformer(unfreeze_from=unfreeze_transformer_from_layer)
+
+    def freeze_transformer(self) -> None:
+        for param in self.model.base_model.parameters():
+            param.requires_grad = False
+
+    def unfreeze_transformer(self, unfreeze_from: int = -1) -> None:
+        for name, param in self.model.base_model.named_parameters():
+            if name.startswith("encoder.layer"):
+                no_layer = int(name.split(".")[2])
+                if no_layer >= unfreeze_from:
+                    param.requires_grad = True
