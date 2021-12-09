@@ -149,6 +149,7 @@ class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
             metrics=metrics,
             **task_model_kwargs if task_model_kwargs else {},
         )
+        self.save_hyperparameters({"downstream_model_type": downstream_model_type.__name__})
         self.config = AutoConfig.from_pretrained(
             model_name_or_path, num_labels=num_labels, **config_kwargs if config_kwargs else {}
         )

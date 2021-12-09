@@ -119,7 +119,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         dataset_name: str,
         text_fields: Union[str, List[str]],
         target_field: str,
-        max_seq_length: int = 128,
+        max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
