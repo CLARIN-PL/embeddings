@@ -9,7 +9,7 @@ from embeddings.data.io import T_path
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
-from embeddings.task.lightning_task.text_classification import TextClassificationTask
+from embeddings.task.lightning_task.text_classification import TextClassification
 
 
 class LightningClassificationPipeline(
@@ -37,7 +37,7 @@ class LightningClassificationPipeline(
         trainer = pl.Trainer(
             default_root_dir=output_path, **task_train_kwargs if task_train_kwargs else {}
         )
-        task = TextClassificationTask(
+        task = TextClassification(
             model_name_or_path=embedding_name,
             num_labels=datamodule.num_labels,
             task_model_kwargs=task_model_kwargs,

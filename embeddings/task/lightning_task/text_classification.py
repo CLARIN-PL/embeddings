@@ -11,7 +11,7 @@ from embeddings.data.datamodule import HuggingFaceDataset
 from embeddings.task.lightning_task.lightning_task import HuggingFaceLightningTask
 
 
-class TextClassificationTask(HuggingFaceLightningTask):
+class TextClassification(HuggingFaceLightningTask):
     downstream_model_type = AutoModelForSequenceClassification
 
     def __init__(
