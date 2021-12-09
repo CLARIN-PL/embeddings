@@ -29,7 +29,7 @@ pipeline = LightningClassificationPipeline(
             EarlyStopping(monitor="val/F1", verbose=True, patience=5, min_delta=0.01, mode="max")
         ],
     },
-    task_model_kwargs={"learning_rate": 5e-4},
+    task_model_kwargs={"learning_rate": 5e-4, "use_scheduler": False},
 )
 
 result = pipeline.run()

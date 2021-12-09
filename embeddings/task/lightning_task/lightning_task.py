@@ -8,7 +8,7 @@ from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.optim import AdamW, Optimizer
 from torch.utils.data import DataLoader
 from torchmetrics import MetricCollection
-from transformers import AutoConfig, AutoModel
+from transformers import AutoConfig, AutoModel, get_linear_schedule_with_warmup
 
 from embeddings.data.datamodule import HuggingFaceDataset
 
@@ -22,14 +22,15 @@ class LightningTask(pl.LightningModule, abc.ABC, Generic[Model]):
         metrics: Optional[MetricCollection] = None,
         learning_rate: float = 1e-4,
         adam_epsilon: float = 1e-8,
-        warmup_steps: int = 0,
+        warmup_steps: int = 100,
         weight_decay: float = 0.0,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
+        use_scheduler: bool = False,
         **kwargs: Any,
     ):
         super().__init__()
-        self.save_hyperparameters()
+        self.save_hyperparameters(ignore=["downstream_model_type"])  # cannot pickle model type
         self.configure_metrics(metrics=metrics)
 
     @abc.abstractmethod
@@ -85,12 +86,12 @@ class LightningTask(pl.LightningModule, abc.ABC, Generic[Model]):
         return metric_values
 
     def setup(self, stage: Optional[str] = None) -> None:
-        if stage == "fit":
+        if stage == "fit" and self.hparams.use_scheduler:
             assert self.trainer is not None
             train_loader = self.trainer.datamodule.train_dataloader()
             tb_size = self.hparams.train_batch_size * max(1, self.trainer.gpus)
             ab_size = self.trainer.accumulate_grad_batches * float(self.trainer.max_epochs)
-            self.total_steps = (len(train_loader.dataset) // tb_size) // ab_size
+            self.total_steps: float = (len(train_loader.dataset) // tb_size) // ab_size
 
     def configure_optimizers(self) -> Tuple[List[Optimizer], List[Any]]:
         """Prepare optimizer and schedule (linear warmup and decay)"""
@@ -115,7 +116,21 @@ class LightningTask(pl.LightningModule, abc.ABC, Generic[Model]):
             eps=self.hparams.adam_epsilon,
         )
 
-        return [optimizer], []
+        if self.hparams.use_scheduler:
+            lr_scheduler = self.configure_scheduler(optimizer=optimizer)
+        else:
+            lr_scheduler = []
+
+        return [optimizer], lr_scheduler
+
+    def configure_scheduler(self, optimizer: Optimizer) -> List[Dict[str, Any]]:
+        scheduler = get_linear_schedule_with_warmup(
+            optimizer,
+            num_warmup_steps=self.hparams.warmup_steps,
+            num_training_steps=self.total_steps,
+        )
+        self.lr_scheduler = {"scheduler": scheduler, "interval": "step", "frequency": 1}
+        return [self.lr_scheduler]
 
 
 class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):

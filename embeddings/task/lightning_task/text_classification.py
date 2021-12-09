@@ -1,22 +1,23 @@
-from typing import Any, Dict, Optional, Tuple, Type
+from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 import torch
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.utils.data import DataLoader
 from torchmetrics import F1, Accuracy, MetricCollection, Precision, Recall
-from transformers import AutoModel, AutoModelForSequenceClassification
+from transformers import AutoModelForSequenceClassification
 
 from embeddings.data.datamodule import HuggingFaceDataset
 from embeddings.task.lightning_task.lightning_task import HuggingFaceLightningTask
 
 
 class TextClassificationTask(HuggingFaceLightningTask):
+    downstream_model_type = AutoModelForSequenceClassification
+
     def __init__(
         self,
         num_labels: int,
         model_name_or_path: str,
-        downstream_model_type: Type["AutoModel"] = AutoModelForSequenceClassification,
         unfreeze_transformer_from_layer: Optional[int] = None,
         metrics: Optional[MetricCollection] = None,
         config_kwargs: Optional[Dict[str, Any]] = None,
@@ -25,7 +26,7 @@ class TextClassificationTask(HuggingFaceLightningTask):
         super().__init__(
             num_labels=num_labels,
             model_name_or_path=model_name_or_path,
-            downstream_model_type=downstream_model_type,
+            downstream_model_type=self.downstream_model_type,
             unfreeze_transformer_from_layer=unfreeze_transformer_from_layer,
             metrics=metrics,
             config_kwargs=config_kwargs,
@@ -66,6 +67,10 @@ class TextClassificationTask(HuggingFaceLightningTask):
         loss, preds = self.shared_step(**batch)
         self.train_metrics(preds, batch["labels"])
         self.log("train/Loss", loss, on_step=True, on_epoch=True)
+        if self.hparams.use_scheduler:
+            last_lr = self.lr_scheduler["scheduler"].get_last_lr()
+            self.log("train/BaseLR", last_lr[0], on_step=True, on_epoch=True, prog_bar=True)
+            self.log("train/LambdaLR", last_lr[1], on_step=True, on_epoch=True, prog_bar=True)
         return {"loss": loss}
 
     def validation_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
