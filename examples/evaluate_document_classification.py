@@ -4,7 +4,7 @@ from pathlib import Path
 import typer
 
 from embeddings.defaults import RESULTS_PATH
-from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
+from embeddings.pipeline.flair_classification import FlairClassificationPipeline
 
 app = typer.Typer()
 
@@ -29,7 +29,7 @@ def run(
     output_path = Path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    pipeline = HuggingFaceClassificationPipeline(
+    pipeline = FlairClassificationPipeline(
         embedding_name, dataset_name, input_column_name, target_column_name, output_path
     )
     result = pipeline.run()

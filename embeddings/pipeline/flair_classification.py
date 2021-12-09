@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional, Tuple, Type, Union
 
 import datasets
+import numpy as np
 from flair.data import Corpus
 from numpy import typing as nptyping
 
@@ -22,7 +23,7 @@ from embeddings.transformation.flair_transformation.split_sample_corpus_transfor
 from embeddings.transformation.transformation import Transformation
 
 
-class HuggingFaceClassificationPipeline(
+class FlairClassificationPipeline(
     StandardPipeline[
         str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
     ]

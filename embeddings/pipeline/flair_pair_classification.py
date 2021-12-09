@@ -1,19 +1,21 @@
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Type, Union
 
 import datasets
+import numpy as np
 from flair.data import Corpus
 from numpy import typing as nptyping
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.data.io import T_path
-from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
-from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
+from embeddings.embedding.auto_flair import AutoFlairDocumentPoolEmbedding, DocumentEmbedding
+from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
+from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
-from embeddings.task.flair_task.sequence_labeling import SequenceLabeling
-from embeddings.transformation.flair_transformation.column_corpus_transformation import (
-    ColumnCorpusTransformation,
+from embeddings.task.flair_task.text_pair_classification import TextPairClassification
+from embeddings.transformation.flair_transformation.pair_classification_corpus_transformation import (
+    PairClassificationCorpusTransformation,
 )
 from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
     SampleSplitsFlairCorpusTransformation,
@@ -21,7 +23,7 @@ from embeddings.transformation.flair_transformation.split_sample_corpus_transfor
 from embeddings.transformation.transformation import Transformation
 
 
-class HuggingFaceSequenceLabelingPipeline(
+class FlairPairClassificationPipeline(
     StandardPipeline[
         str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
     ]
@@ -30,16 +32,15 @@ class HuggingFaceSequenceLabelingPipeline(
         self,
         embedding_name: str,
         dataset_name: str,
-        input_column_name: str,
+        input_columns_names_pair: Tuple[str, str],
         target_column_name: str,
         output_path: T_path,
-        hidden_size: int,
-        evaluation_mode: str = "conll",
-        tagging_scheme: Optional[str] = None,
+        document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        load_model_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = HuggingFaceDataset(
@@ -49,21 +50,23 @@ class HuggingFaceSequenceLabelingPipeline(
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
         ]
-        transformation = ColumnCorpusTransformation(input_column_name, target_column_name)
+        transformation = PairClassificationCorpusTransformation(
+            input_columns_names_pair, target_column_name
+        )
         if sample_missing_splits:
             transformation = transformation.then(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
-
-        embedding = AutoFlairWordEmbedding.from_hub(embedding_name)
-        task = SequenceLabeling(
+        embedding = AutoFlairDocumentPoolEmbedding.from_hub(
+            repo_id=embedding_name,
+            document_embedding_cls=document_embedding_cls,
+            **load_model_kwargs if load_model_kwargs else {}
+        )
+        task = TextPairClassification(
             output_path,
-            hidden_size=hidden_size,
             task_model_kwargs=task_model_kwargs,
             task_train_kwargs=task_train_kwargs,
         )
         model = FlairModel(embedding, task)
-        evaluator = SequenceLabelingEvaluator(
-            evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
-        )
+        evaluator = TextClassificationEvaluator()
         super().__init__(dataset, data_loader, transformation, model, evaluator)

@@ -12,7 +12,7 @@ from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task.text_classification import TextClassificationTask
 
 
-class TextClassificationPipeline(
+class LightningClassificationPipeline(
     LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]]
 ):
     def __init__(
