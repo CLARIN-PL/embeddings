@@ -71,7 +71,8 @@ class TextClassification(HuggingFaceLightningTask):
         self.train_metrics(preds, batch["labels"])
         self.log("train/Loss", loss)
         if self.hparams.use_scheduler:
-            last_lr = self.lr_scheduler["scheduler"].get_last_lr()
+            assert self.trainer is not None
+            last_lr = self.trainer.lr_schedulers[0]["scheduler"].get_last_lr()
             self.log("train/BaseLR", last_lr[0], prog_bar=True)
             self.log("train/LambdaLR", last_lr[1], prog_bar=True)
         return {"loss": loss}

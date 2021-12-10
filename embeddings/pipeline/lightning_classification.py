@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union, Sequence
+from typing import Any, Dict, Optional, Sequence, Union
 
 import datasets
 import numpy as np

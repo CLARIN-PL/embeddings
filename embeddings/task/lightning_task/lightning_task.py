@@ -108,20 +108,19 @@ class LightningTask(pl.LightningModule, abc.ABC, Generic[Model]):
         )
 
         if self.hparams.use_scheduler:
-            lr_scheduler = self.configure_scheduler(optimizer=optimizer)
+            lr_schedulers = self.configure_schedulers(optimizer=optimizer)
         else:
-            lr_scheduler = []
+            lr_schedulers = []
 
-        return [optimizer], lr_scheduler
+        return [optimizer], lr_schedulers
 
-    def configure_scheduler(self, optimizer: Optimizer) -> List[Dict[str, Any]]:
+    def configure_schedulers(self, optimizer: Optimizer) -> List[Dict[str, Any]]:
         scheduler = get_linear_schedule_with_warmup(
             optimizer,
             num_warmup_steps=self.hparams.warmup_steps,
             num_training_steps=self.total_steps,
         )
-        self.lr_scheduler = {"scheduler": scheduler, "interval": "step", "frequency": 1}
-        return [self.lr_scheduler]
+        return [{"scheduler": scheduler, "interval": "step", "frequency": 1}]
 
 
 class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
@@ -143,7 +142,7 @@ class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
         self.config_kwargs = config_kwargs if config_kwargs else {}
 
     def setup(self, stage: Optional[str] = None) -> None:
-        if stage == "fit":
+        if stage in ["fit", None]:
             self.configure_model()
             self.configure_metrics()
             if self.hparams.use_scheduler:
