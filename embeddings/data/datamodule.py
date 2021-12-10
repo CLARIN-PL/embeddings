@@ -37,10 +37,9 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
     def __init__(
         self,
-        model_name_or_path: str,
+        tokenizer_name_or_path: str,
         dataset_name: str,
         target_field: str,
-        tokenizer_name_or_path: Optional[str] = None,
         max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
@@ -52,12 +51,9 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         # ignoring the type to avoid calling to untyped function "__init__" in typed context error
         # caused by pl.LightningDataModule __init__ method not being typed
         super().__init__()  # type: ignore
-        self.model_name_or_path = model_name_or_path
+        self.tokenizer_name_or_path = tokenizer_name_or_path
         self.dataset_name = dataset_name
         self.target_field = target_field
-        self.tokenizer_name_or_path = (
-            tokenizer_name_or_path if tokenizer_name_or_path else model_name_or_path
-        )
         self.max_seq_length = max_seq_length
         self.train_batch_size = train_batch_size
         self.eval_batch_size = eval_batch_size
