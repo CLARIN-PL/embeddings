@@ -3,7 +3,7 @@ from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
 
 import datasets
 import pytorch_lightning as pl
-from datasets import DatasetDict
+from datasets import ClassLabel, DatasetDict
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, BatchEncoding
 
@@ -29,16 +29,23 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         "end_positions",
         "labels",
     ]
-    num_labels: int
+    DEFAULT_TOKENIZER_KWARGS = {"use_fast": True}
+    DEFAULT_BATCH_ENCODING_KWARGS = {
+        "padding": True,
+        "truncation": True,
+    }
 
     def __init__(
         self,
         model_name_or_path: str,
         dataset_name: str,
         target_field: str,
+        tokenizer_name_or_path: Optional[str] = None,
         max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
+        tokenizer_kwargs: Optional[Dict[str, Any]] = None,
+        batch_encoding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
@@ -48,35 +55,49 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.model_name_or_path = model_name_or_path
         self.dataset_name = dataset_name
         self.target_field = target_field
+        self.tokenizer_name_or_path = (
+            tokenizer_name_or_path if tokenizer_name_or_path else model_name_or_path
+        )
         self.max_seq_length = max_seq_length
         self.train_batch_size = train_batch_size
         self.eval_batch_size = eval_batch_size
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name_or_path, use_fast=True)
-        self.initialized = False
-        if load_dataset_kwargs is None:
-            self.load_dataset_kwargs = {}
-        else:
-            self.load_dataset_kwargs = load_dataset_kwargs
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.tokenizer_name_or_path,
+            **tokenizer_kwargs if tokenizer_kwargs else self.DEFAULT_TOKENIZER_KWARGS,
+        )
+        self.batch_encoding_kwargs = (
+            batch_encoding_kwargs if batch_encoding_kwargs else self.DEFAULT_BATCH_ENCODING_KWARGS
+        )
+        self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
+        self.dataset = None
 
-    @property
-    def output_dim(self) -> Optional[int]:
-        if not self.initialized:
-            _logger.warning("Datamodule not initialized. Returning None.")
-            return None
-        else:
-            return self.num_labels
+    def initalize(self) -> None:
+        """Initialize dataset to populate important attributes needed before calling setup."""
+        self.dataset = self.load_dataset()
+        self.num_labels = self.get_num_classes()
+
+    def load_dataset(self) -> DatasetDict:
+        return datasets.load_dataset(self.dataset_name, **self.load_dataset_kwargs)
+
+    def get_num_classes(self) -> int:
+        assert isinstance(self.dataset, DatasetDict)
+        if not isinstance(self.dataset["train"].features[self.target_field], ClassLabel):
+            self.dataset.class_encode_column(self.target_field)
+        num_classes = self.dataset["train"].features[self.target_field].num_classes
+        assert isinstance(num_classes, int)
+        return num_classes
 
     def prepare_data(self) -> None:
         datasets.load_dataset(self.dataset_name)
         AutoTokenizer.from_pretrained(self.model_name_or_path, use_fast=True)
 
     def setup(self, stage: Optional[str] = None) -> None:
-        if not self.initialized:
+        if self.dataset is None:
             self.initalize()
         if stage in (None, "fit"):
-            self.process_data(stage)
+            self.process_data()
 
-    def process_data(self, stage: Optional[str] = None) -> None:
+    def process_data(self) -> None:
         for split in self.dataset.keys():
             self.dataset[split] = self.dataset[split].map(
                 self.convert_to_features,
@@ -99,11 +120,6 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
     def test_dataloader(self) -> DataLoader[HuggingFaceDataset]:
         return DataLoader(self.dataset["test"], batch_size=self.eval_batch_size)
-
-    @abc.abstractmethod
-    def initalize(self) -> None:
-        """Initialize dataset to populate important attributes needed before calling setup."""
-        pass
 
     @abc.abstractmethod
     def convert_to_features(
@@ -141,11 +157,6 @@ class TextClassificationDataModule(HuggingFaceDataModule):
             **kwargs,
         )
 
-    def initalize(self) -> None:
-        self.dataset = datasets.load_dataset(self.dataset_name, **self.load_dataset_kwargs)
-        self.num_labels = len(set(ex[self.target_field] for ex in self.dataset["train"]))
-        self.initialized = True
-
     def convert_to_features(
         self, example_batch: Dict[str, Any], indices: Optional[List[int]] = None
     ) -> BatchEncoding:
@@ -159,11 +170,10 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         else:
             raise ValueError("Inappropriate length of text_fields attribute")
 
-        features = self.tokenizer.batch_encode_plus(
+        features = self.tokenizer(
             texts_or_text_pairs,
             max_length=self.max_seq_length,
-            pad_to_max_length=True,
-            truncation=True,
+            **self.batch_encoding_kwargs,
         )
 
         features["labels"] = example_batch[self.target_field]

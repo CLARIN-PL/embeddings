@@ -9,6 +9,9 @@ from transformers import AutoModelForSequenceClassification
 
 from embeddings.data.datamodule import HuggingFaceDataset
 from embeddings.task.lightning_task.lightning_task import HuggingFaceLightningTask
+from embeddings.utils.loggers import get_logger
+
+_logger = get_logger(__name__)
 
 
 class TextClassification(HuggingFaceLightningTask):
@@ -66,11 +69,11 @@ class TextClassification(HuggingFaceLightningTask):
         batch, batch_idx = args
         loss, preds = self.shared_step(**batch)
         self.train_metrics(preds, batch["labels"])
-        self.log("train/Loss", loss, on_step=True, on_epoch=True)
+        self.log("train/Loss", loss)
         if self.hparams.use_scheduler:
             last_lr = self.lr_scheduler["scheduler"].get_last_lr()
-            self.log("train/BaseLR", last_lr[0], on_step=True, on_epoch=True, prog_bar=True)
-            self.log("train/LambdaLR", last_lr[1], on_step=True, on_epoch=True, prog_bar=True)
+            self.log("train/BaseLR", last_lr[0], prog_bar=True)
+            self.log("train/LambdaLR", last_lr[1], prog_bar=True)
         return {"loss": loss}
 
     def validation_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
@@ -86,6 +89,8 @@ class TextClassification(HuggingFaceLightningTask):
         if -1 not in batch["labels"]:
             self.test_metrics(preds, batch["labels"])
             self.log("test/Loss", loss, on_epoch=True)
+        else:
+            _logger.warning("Missing labels for the test data")
         return None
 
     def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, np.ndarray]:

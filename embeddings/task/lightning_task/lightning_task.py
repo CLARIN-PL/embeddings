@@ -90,8 +90,10 @@ class LightningTask(pl.LightningModule, abc.ABC, Generic[Model]):
             assert self.trainer is not None
             train_loader = self.trainer.datamodule.train_dataloader()
             tb_size = self.hparams.train_batch_size * max(1, self.trainer.gpus)
-            ab_size = self.trainer.accumulate_grad_batches * float(self.trainer.max_epochs)
-            self.total_steps: float = (len(train_loader.dataset) // tb_size) // ab_size
+            ab_size = tb_size * self.trainer.accumulate_grad_batches
+            self.total_steps: int = int(
+                (len(train_loader.dataset) / ab_size) * float(self.trainer.max_epochs)
+            )
 
     def configure_optimizers(self) -> Tuple[List[Optimizer], List[Any]]:
         """Prepare optimizer and schedule (linear warmup and decay)"""
