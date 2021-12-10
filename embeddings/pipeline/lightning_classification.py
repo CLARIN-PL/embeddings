@@ -33,13 +33,11 @@ class LightningClassificationPipeline(
             target_field=target_column_name,
             load_dataset_kwargs=load_dataset_kwargs,
         )
-        datamodule.initalize()
         trainer = pl.Trainer(
             default_root_dir=output_path, **task_train_kwargs if task_train_kwargs else {}
         )
         task = TextClassification(
             model_name_or_path=embedding_name,
-            num_labels=datamodule.num_labels,
             task_model_kwargs=task_model_kwargs,
         )
         model = LightningModel(trainer=trainer, task=task, predict_subset="test")

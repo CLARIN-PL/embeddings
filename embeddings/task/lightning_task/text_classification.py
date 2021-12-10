@@ -19,7 +19,6 @@ class TextClassification(HuggingFaceLightningTask):
 
     def __init__(
         self,
-        num_labels: int,
         model_name_or_path: str,
         unfreeze_transformer_from_layer: Optional[int] = None,
         metrics: Optional[MetricCollection] = None,
@@ -27,7 +26,6 @@ class TextClassification(HuggingFaceLightningTask):
         task_model_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
-            num_labels=num_labels,
             model_name_or_path=model_name_or_path,
             downstream_model_type=self.downstream_model_type,
             unfreeze_transformer_from_layer=unfreeze_transformer_from_layer,
@@ -37,22 +35,24 @@ class TextClassification(HuggingFaceLightningTask):
         )
 
     def get_default_metrics(self) -> MetricCollection:
-        if self.hparams.num_labels > 2:
+        assert self.trainer is not None
+        num_classes = self.trainer.datamodule.num_classes
+        if num_classes > 2:
             metrics = MetricCollection(
                 [
-                    Accuracy(num_classes=self.hparams.num_labels),
-                    Precision(num_classes=self.hparams.num_labels, average="macro"),
-                    Recall(num_classes=self.hparams.num_labels, average="macro"),
-                    F1(num_classes=self.hparams.num_labels, average="macro"),
+                    Accuracy(num_classes=num_classes),
+                    Precision(num_classes=num_classes, average="macro"),
+                    Recall(num_classes=num_classes, average="macro"),
+                    F1(num_classes=num_classes, average="macro"),
                 ]
             )
         else:
             metrics = MetricCollection(
                 [
-                    Accuracy(num_classes=self.hparams.num_labels),
-                    Precision(num_classes=self.hparams.num_labels),
-                    Recall(num_classes=self.hparams.num_labels),
-                    F1(num_classes=self.hparams.num_labels),
+                    Accuracy(num_classes=num_classes),
+                    Precision(num_classes=num_classes),
+                    Recall(num_classes=num_classes),
+                    F1(num_classes=num_classes),
                 ]
             )
         return metrics

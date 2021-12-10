@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
+from typing import Any, Dict, Generic, List, Optional, Sequence, TypeVar, Union
 
 import datasets
 import pytorch_lightning as pl
@@ -69,12 +69,6 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
             batch_encoding_kwargs if batch_encoding_kwargs else self.DEFAULT_BATCH_ENCODING_KWARGS
         )
         self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
-        self.dataset = None
-
-    def initalize(self) -> None:
-        """Initialize dataset to populate important attributes needed before calling setup."""
-        self.dataset = self.load_dataset()
-        self.num_labels = self.get_num_classes()
 
     def load_dataset(self) -> DatasetDict:
         return datasets.load_dataset(self.dataset_name, **self.load_dataset_kwargs)
@@ -92,10 +86,9 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         AutoTokenizer.from_pretrained(self.model_name_or_path, use_fast=True)
 
     def setup(self, stage: Optional[str] = None) -> None:
-        if self.dataset is None:
-            self.initalize()
-        if stage in (None, "fit"):
-            self.process_data()
+        self.dataset = self.load_dataset()
+        self.num_classes = self.get_num_classes()
+        self.process_data()
 
     def process_data(self) -> None:
         for split in self.dataset.keys():
@@ -133,7 +126,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         self,
         model_name_or_path: str,
         dataset_name: str,
-        text_fields: Union[str, List[str]],
+        text_fields: Union[str, Sequence[str]],
         target_field: str,
         max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,

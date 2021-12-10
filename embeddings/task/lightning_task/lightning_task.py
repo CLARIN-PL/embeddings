@@ -18,7 +18,6 @@ Model = TypeVar("Model")
 class LightningTask(pl.LightningModule, abc.ABC, Generic[Model]):
     def __init__(
         self,
-        num_labels: int,
         metrics: Optional[MetricCollection] = None,
         learning_rate: float = 1e-4,
         adam_epsilon: float = 1e-8,
@@ -31,7 +30,7 @@ class LightningTask(pl.LightningModule, abc.ABC, Generic[Model]):
     ):
         super().__init__()
         self.save_hyperparameters(ignore=["downstream_model_type"])  # cannot pickle model type
-        self.configure_metrics(metrics=metrics)
+        self.metrics = metrics
 
     @abc.abstractmethod
     def get_default_metrics(self) -> MetricCollection:
@@ -61,12 +60,12 @@ class LightningTask(pl.LightningModule, abc.ABC, Generic[Model]):
     def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, np.ndarray]:
         pass
 
-    def configure_metrics(self, metrics: Optional[MetricCollection]) -> None:
-        if metrics is None:
-            metrics = self.get_default_metrics()
-        self.train_metrics = metrics.clone(prefix="train/")
-        self.val_metrics = metrics.clone(prefix="val/")
-        self.test_metrics = metrics.clone(prefix="test/")
+    def configure_metrics(self) -> None:
+        if self.metrics is None:
+            self.metrics = self.get_default_metrics()
+        self.train_metrics = self.metrics.clone(prefix="train/")
+        self.val_metrics = self.metrics.clone(prefix="val/")
+        self.test_metrics = self.metrics.clone(prefix="test/")
 
     def training_epoch_end(self, outputs: List[Any]) -> None:
         self._aggregate_and_log_metrics(self.train_metrics)
@@ -84,16 +83,6 @@ class LightningTask(pl.LightningModule, abc.ABC, Generic[Model]):
         metrics.reset()
         self.log_dict(metric_values, prog_bar=prog_bar)
         return metric_values
-
-    def setup(self, stage: Optional[str] = None) -> None:
-        if stage == "fit" and self.hparams.use_scheduler:
-            assert self.trainer is not None
-            train_loader = self.trainer.datamodule.train_dataloader()
-            tb_size = self.hparams.train_batch_size * max(1, self.trainer.gpus)
-            ab_size = tb_size * self.trainer.accumulate_grad_batches
-            self.total_steps: int = int(
-                (len(train_loader.dataset) / ab_size) * float(self.trainer.max_epochs)
-            )
 
     def configure_optimizers(self) -> Tuple[List[Optimizer], List[Any]]:
         """Prepare optimizer and schedule (linear warmup and decay)"""
@@ -138,7 +127,6 @@ class LightningTask(pl.LightningModule, abc.ABC, Generic[Model]):
 class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
     def __init__(
         self,
-        num_labels: int,
         model_name_or_path: str,
         downstream_model_type: Type["AutoModel"],
         unfreeze_transformer_from_layer: Optional[int] = None,
@@ -147,18 +135,39 @@ class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
         task_model_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
-            num_labels=num_labels,
             metrics=metrics,
             **task_model_kwargs if task_model_kwargs else {},
         )
         self.save_hyperparameters({"downstream_model_type": downstream_model_type.__name__})
+        self.downstream_model_type = downstream_model_type
+        self.config_kwargs = config_kwargs if config_kwargs else {}
+
+    def setup(self, stage: Optional[str] = None) -> None:
+        if stage == "fit":
+            self.configure_model()
+            self.configure_metrics()
+            if self.hparams.use_scheduler:
+                assert self.trainer is not None
+                train_loader = self.trainer.datamodule.train_dataloader()
+                tb_size = self.hparams.train_batch_size * max(1, self.trainer.gpus)
+                ab_size = tb_size * self.trainer.accumulate_grad_batches
+                self.total_steps: int = int(
+                    (len(train_loader.dataset) / ab_size) * float(self.trainer.max_epochs)
+                )
+
+    def configure_model(self) -> None:
+        assert self.trainer is not None
         self.config = AutoConfig.from_pretrained(
-            model_name_or_path, num_labels=num_labels, **config_kwargs if config_kwargs else {}
+            self.hparams.model_name_or_path,
+            num_labels=self.trainer.datamodule.num_classes,
+            **self.config_kwargs,
         )
-        self.model = downstream_model_type.from_pretrained(model_name_or_path, config=self.config)
+        self.model: AutoModel = self.downstream_model_type.from_pretrained(
+            self.hparams.model_name_or_path, config=self.config
+        )
         self.freeze_transformer()
-        if unfreeze_transformer_from_layer is not None:
-            self.unfreeze_transformer(unfreeze_from=unfreeze_transformer_from_layer)
+        if self.hparams.unfreeze_transformer_from_layer is not None:
+            self.unfreeze_transformer(unfreeze_from=self.hparams.unfreeze_transformer_from_layer)
 
     def freeze_transformer(self) -> None:
         for param in self.model.base_model.parameters():
