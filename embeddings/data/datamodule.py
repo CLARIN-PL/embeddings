@@ -120,7 +120,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 class TextClassificationDataModule(HuggingFaceDataModule):
     def __init__(
         self,
-        model_name_or_path: str,
+        tokenizer_name_or_path: str,
         dataset_name: str,
         text_fields: Union[str, Sequence[str]],
         target_field: str,
@@ -136,7 +136,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
             raise ValueError("Too many fields given in text_fields attribute")
         self.text_fields = text_fields
         super().__init__(
-            model_name_or_path=model_name_or_path,
+            tokenizer_name_or_path=tokenizer_name_or_path,
             dataset_name=dataset_name,
             target_field=target_field,
             max_seq_length=max_seq_length,

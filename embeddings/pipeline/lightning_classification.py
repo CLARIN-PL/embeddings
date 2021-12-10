@@ -22,12 +22,13 @@ class LightningClassificationPipeline(
         input_column_name: Union[str, List[str]],
         target_column_name: str,
         output_path: T_path,
+        tokenizer_name: Optional[str] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
     ):
         datamodule = TextClassificationDataModule(
-            model_name_or_path=embedding_name,
+            tokenizer_name_or_path=tokenizer_name if tokenizer_name else embedding_name,
             dataset_name=dataset_name,
             text_fields=input_column_name,
             target_field=target_column_name,
