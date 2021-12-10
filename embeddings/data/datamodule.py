@@ -79,7 +79,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
     def prepare_data(self) -> None:
         datasets.load_dataset(self.dataset_name)
-        AutoTokenizer.from_pretrained(self.model_name_or_path, use_fast=True)
+        AutoTokenizer.from_pretrained(self.tokenizer_name_or_path)
 
     def setup(self, stage: Optional[str] = None) -> None:
         self.dataset = self.load_dataset()
@@ -87,14 +87,13 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.process_data()
 
     def process_data(self) -> None:
-        for split in self.dataset.keys():
-            self.dataset[split] = self.dataset[split].map(
-                self.convert_to_features,
-                batched=True,
-                remove_columns=[self.target_field],
-            )
-            self.columns = [c for c in self.dataset[split].column_names if c in self.LOADER_COLUMNS]
-            self.dataset[split].set_format(type="torch", columns=self.columns)
+        columns = [c for c in self.dataset["train"].column_names if c not in self.LOADER_COLUMNS]
+        self.dataset = self.dataset.map(
+            self.convert_to_features,
+            batched=True,
+            remove_columns=columns,
+        )
+        set(map(lambda split: self.dataset[split].set_format(type="torch"), self.dataset.keys()))
 
     def train_dataloader(self) -> DataLoader[HuggingFaceDataset]:
         return DataLoader(self.dataset["train"], batch_size=self.train_batch_size)
