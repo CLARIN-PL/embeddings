@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Sequence
 
 import datasets
 import numpy as np
@@ -15,11 +15,14 @@ from embeddings.task.lightning_task.text_classification import TextClassificatio
 class LightningClassificationPipeline(
     LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]]
 ):
+    DEFAULT_TASK_TRAIN_KWARGS = {"gpus": 1, "auto_select_gpus": True}
+    DEFAULT_TASK_MODEL_KWARGS = {"use_scheduler": True}
+
     def __init__(
         self,
         embedding_name: str,
         dataset_name: str,
-        input_column_name: Union[str, List[str]],
+        input_column_name: Union[str, Sequence[str]],
         target_column_name: str,
         output_path: T_path,
         tokenizer_name: Optional[str] = None,
@@ -35,11 +38,14 @@ class LightningClassificationPipeline(
             load_dataset_kwargs=load_dataset_kwargs,
         )
         trainer = pl.Trainer(
-            default_root_dir=output_path, **task_train_kwargs if task_train_kwargs else {}
+            default_root_dir=output_path,
+            **task_train_kwargs if task_train_kwargs else self.DEFAULT_TASK_TRAIN_KWARGS
         )
         task = TextClassification(
             model_name_or_path=embedding_name,
-            task_model_kwargs=task_model_kwargs,
+            task_model_kwargs=task_model_kwargs
+            if task_model_kwargs
+            else self.DEFAULT_TASK_MODEL_KWARGS,
         )
         model = LightningModel(trainer=trainer, task=task, predict_subset="test")
         evaluator = TextClassificationEvaluator()
