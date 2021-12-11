@@ -1,5 +1,5 @@
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
 import datasets
 import flair
@@ -15,14 +15,12 @@ from embeddings.pipeline.evaluation_pipeline import (
     ModelEvaluationPipeline,
 )
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
+from embeddings.pipeline.standard_pipeline import StandardPipeline
 from embeddings.transformation.flair_transformation.column_corpus_transformation import (
     ColumnCorpusTransformation,
 )
 from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
     DownsampleFlairCorpusTransformation,
-)
-from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
-    SampleSplitsFlairCorpusTransformation,
 )
 from embeddings.utils.flair_corpus_persister import FlairConllPersister
 
@@ -43,13 +41,8 @@ def ner_dataset_name() -> str:
 
 
 @pytest.fixture
-def hidden_size() -> int:
+def default_hidden_size() -> int:
     return 256
-
-
-@pytest.fixture
-def task_train_kwargs() -> Dict[str, int]:
-    return {"max_epochs": 1, "mini_batch_size": 256}
 
 
 @pytest.fixture
@@ -57,19 +50,18 @@ def sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
     ner_dataset_name: str,
-) -> Tuple[PreprocessingPipeline[str, datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"]:
+) -> PreprocessingPipeline[str, datasets.DatasetDict, Corpus]:
     dataset = HuggingFaceDataset(ner_dataset_name)
     data_loader = HuggingFaceDataLoader()
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
-        .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, test_fraction=0.1, seed=441))
-        .then(DownsampleFlairCorpusTransformation(percentage=0.005))
+        .then(DownsampleFlairCorpusTransformation(percentage=0.005, seed=14))
         .persisting(FlairConllPersister(result_path.name))
     )
     pipeline = PreprocessingPipeline(
         dataset=dataset, data_loader=data_loader, transformation=transformation
     )
-    return pipeline, result_path
+    return pipeline
 
 
 @pytest.fixture
@@ -77,49 +69,42 @@ def sequence_labeling_evaluation_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
     ner_dataset_name: str,
-    hidden_size: int,
-    task_train_kwargs: Dict[str, int],
-) -> Tuple[
-    ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
-    "TemporaryDirectory[str]",
-]:
+    default_hidden_size: int,
+) -> ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]]:
 
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,
         embedding_name=embedding_name,
         output_path=result_path.name,
-        hidden_size=hidden_size,
+        hidden_size=default_hidden_size,
         persist_path=None,
-        task_train_kwargs=task_train_kwargs,
+        task_train_kwargs={"max_epochs": 1, "mini_batch_size": 32},
     )
-    return pipeline, result_path
+    return pipeline
 
 
-def test_sequence_labeling_preprocessing_pipeline(
+def test_no_dev_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
     ner_dataset_name: str,
-    hidden_size: int,
-    task_train_kwargs: Dict[str, int],
-    sequence_labeling_preprocessing_pipeline: Tuple[
-        PreprocessingPipeline[str, datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"
+    sequence_labeling_preprocessing_pipeline: StandardPipeline[
+        str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]
     ],
-    sequence_labeling_evaluation_pipeline: Tuple[
-        ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
-        "TemporaryDirectory[str]",
+    sequence_labeling_evaluation_pipeline: ModelEvaluationPipeline[
+        str, Corpus, Dict[str, np.ndarray], Dict[str, Any]
     ],
 ) -> None:
     flair.set_seed(441)
     flair.device = torch.device("cpu")  # type: ignore
 
-    preprocessing_pipeline, path = sequence_labeling_preprocessing_pipeline
-    preprocessing_pipeline.run()
-    evaluation_pipeline, _ = sequence_labeling_evaluation_pipeline
-    result = evaluation_pipeline.run()
+    data: Corpus = sequence_labeling_preprocessing_pipeline.run()
+    assert data.dev is None
+
+    result = sequence_labeling_evaluation_pipeline.run()
 
     np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.7881773
+        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.9
     )
     np.testing.assert_almost_equal(result["seqeval__mode_None__scheme_None"]["overall_f1"], 0)
 
-    path.cleanup()
+    result_path.cleanup()

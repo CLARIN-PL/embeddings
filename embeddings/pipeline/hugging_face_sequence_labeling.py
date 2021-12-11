@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple, Union
 
 import datasets
 import numpy as np
@@ -15,6 +15,10 @@ from embeddings.task.flair_task.sequence_labeling import SequenceLabeling
 from embeddings.transformation.flair_transformation.column_corpus_transformation import (
     ColumnCorpusTransformation,
 )
+from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
+    SampleSplitsFlairCorpusTransformation,
+)
+from embeddings.transformation.transformation import Transformation
 
 
 class HuggingFaceSequenceLabelingPipeline(
@@ -30,12 +34,25 @@ class HuggingFaceSequenceLabelingPipeline(
         hidden_size: int,
         evaluation_mode: str = "conll",
         tagging_scheme: Optional[str] = None,
+        sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
+        seed: int = 441,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = HuggingFaceDataset(dataset_name)
+        dataset = HuggingFaceDataset(
+            dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
+        )
         data_loader = HuggingFaceDataLoader()
+        transformation: Union[
+            Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
+        ]
         transformation = ColumnCorpusTransformation(input_column_name, target_column_name)
+        if sample_missing_splits:
+            transformation = transformation.then(
+                SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
+            )
+
         embedding = AutoFlairWordEmbedding.from_hub(embedding_name)
         task = SequenceLabeling(
             output_path,

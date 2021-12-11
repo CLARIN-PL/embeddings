@@ -1,5 +1,8 @@
 import importlib
-from typing import Any
+from typing import Any, Union
+
+Numeric = Union[float, int]
+PrimitiveTypes = Union[None, bool, int, float, str]
 
 
 def import_from_string(dotted_path: str) -> Any:

@@ -196,3 +196,58 @@ Instead of the `allegro/herbert-base-cased` model, you can pass any model from [
 | [clarin-pl/fastText-kgr10](https://huggingface.co/clarin-pl/fastText-kgr10) | static, word | FastText trained on trained on the KGR10 corpus. |
 | [clarin-pl/word2vec-kgr10](https://huggingface.co/clarin-pl/word2vec-kgr10) | static, word | Word2vec trained on trained on the KGR10 corpus. |
 | ... |
+
+
+# Optimized pipelines.
+
+Task | Optimized Pipeline |
+ --- | --- |
+Text Classification | [OptimizedFlairClassificationPipeline](embeddings/pipeline/flair_hps_pipeline.py) | 
+Pair Text Classification | [OptimizedFlairPairClassificationPipeline](embeddings/pipeline/flair_hps_pipeline.py) |
+Sequence Labeling | [OptimizedFlairSequenceLabelingPipeline](embeddings/pipeline/flair_hps_pipeline.py) |
+
+
+## Example with Text Classification
+
+Optimized pipelines can be run via following snippet of code:
+
+```python
+from embeddings.hyperparameter_search.configspace import TextClassificationConfigSpace
+from embeddings.pipeline.flair_hps_pipeline import OptimizedFlairClassificationPipeline
+
+pipeline = OptimizedFlairClassificationPipeline(
+    config_space=TextClassificationConfigSpace(
+        embedding_name=["allegro/herbert-base-cased", "clarin-pl/roberta-polish-kgr10"]
+    ),
+    dataset_name="clarin-pl/polemo2-official",
+    input_column_name="text",
+    target_column_name="target",
+).persisting(best_params_path="best_prams.yaml", log_path="hps_log.pickle")
+df, metadata = pipeline.run()
+```
+
+### Training model with obtained parameters
+
+After the parameters search process we can train model with best parameters found.
+
+```python
+from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
+
+pipeline = HuggingFaceClassificationPipeline(**metadata)
+results = pipeline.run()
+```
+
+### Selection of best embedding model.
+
+Instead of performing search with single embedding model we can search with multiple embedding models via passing them as list to ConfigSpace.
+
+```python
+pipeline = OptimizedFlairClassificationPipeline(
+    config_space=TextClassificationConfigSpace(
+        embedding_name=["allegro/herbert-base-cased", "clarin-pl/roberta-polish-kgr10"]
+    ),
+    dataset_name="clarin-pl/polemo2-official",
+    input_column_name="text",
+    target_column_name="target",
+).persisting(best_params_path="best_prams.yaml", log_path="hps_log.pickle")
+```

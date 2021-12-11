@@ -38,7 +38,7 @@ def text_classification_pipeline(
     )
     data_loader = HuggingFaceDataLoader()
     transformation = ClassificationCorpusTransformation("text", "target").then(
-        DownsampleFlairCorpusTransformation(percentage=0.01)
+        DownsampleFlairCorpusTransformation(percentage=0.01, stratify=False)
     )
     embedding = AutoFlairDocumentEmbedding.from_hub("allegro/herbert-base-cased")
     task = TextClassification(result_path.name, task_train_kwargs={"max_epochs": 1})
@@ -58,7 +58,7 @@ def test_text_classification_pipeline(
     pipeline, path = text_classification_pipeline
     result = pipeline.run()
     path.cleanup()
-    np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.6666666)
-    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.4)
-    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.3333333)
-    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.5)
+    np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.3333333)
+    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.1666666)
+    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.1111111)
+    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.3333333)

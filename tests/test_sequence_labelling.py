@@ -5,6 +5,7 @@ import datasets
 import flair
 import numpy as np
 import pytest
+import torch
 from flair.data import Corpus
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
@@ -19,6 +20,9 @@ from embeddings.transformation.flair_transformation.column_corpus_transformation
 )
 from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
     DownsampleFlairCorpusTransformation,
+)
+from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
+    SampleSplitsFlairCorpusTransformation,
 )
 
 
@@ -52,8 +56,10 @@ def ner_tagging_pipeline(
 ]:
     dataset = HuggingFaceDataset("clarin-pl/kpwr-ner")
     data_loader = HuggingFaceDataLoader()
-    transformation = ColumnCorpusTransformation("tokens", "ner").then(
-        DownsampleFlairCorpusTransformation(percentage=0.005)
+    transformation = (
+        ColumnCorpusTransformation("tokens", "ner")
+        .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, seed=441))
+        .then(DownsampleFlairCorpusTransformation(percentage=0.005))
     )
     embedding = AutoFlairWordEmbedding.from_hub("allegro/herbert-base-cased")
     task = SequenceLabeling(
@@ -75,11 +81,12 @@ def test_pos_tagging_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
+    flair.device = torch.device("cpu")  # type: ignore
     pipeline, path = pos_tagging_pipeline
     result = pipeline.run()
     path.cleanup()
 
-    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.2464788)
+    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.1603053)
 
 
 def test_ner_tagging_pipeline(
@@ -89,6 +96,7 @@ def test_ner_tagging_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
+    flair.device = torch.device("cpu")  # type: ignore
     pipeline, path = ner_tagging_pipeline
     result = pipeline.run()
     path.cleanup()

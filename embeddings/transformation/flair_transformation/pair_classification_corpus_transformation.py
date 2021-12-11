@@ -17,7 +17,11 @@ class PairClassificationCorpusTransformation(ClassificationCorpusTransformation)
         target_column_name: str,
         datasets_path: Path = DATASET_PATH,
     ):
-        super().__init__(input_columns_names_pair[0], target_column_name, datasets_path)
+        super().__init__(
+            input_columns_names_pair[0],
+            target_column_name,
+            datasets_path,
+        )
         self.pair_column_name: str = input_columns_names_pair[1]
 
     def _preprocess_subset(

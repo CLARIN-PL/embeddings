@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generic, Optional
+from typing import Any, Dict, Generic, Literal, Optional, Type, Union
 
 import numpy as np
 from flair.data import Corpus
@@ -9,10 +9,12 @@ from embeddings.data.data_loader import (
     PickleFlairCorpusDataLoader,
 )
 from embeddings.data.dataset import Data, Dataset, LocalDataset
-from embeddings.embedding.flair_embedding import (
-    FlairTransformerDocumentEmbedding,
-    FlairTransformerWordEmbedding,
+from embeddings.embedding.auto_flair import (
+    AutoFlairDocumentPoolEmbedding,
+    AutoFlairWordEmbedding,
+    DocumentEmbedding,
 )
+from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
@@ -55,26 +57,31 @@ class FlairTextClassificationEvaluationPipeline(
         self,
         dataset_path: str,
         embedding_name: str,
-        fine_tune_embeddings: bool,
         output_path: str,
+        document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         persist_path: Optional[str] = None,
+        predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        load_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = LocalDataset(dataset_path)
+        load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
+        dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
-        embedding = FlairTransformerDocumentEmbedding(
-            name=embedding_name, fine_tune=fine_tune_embeddings
+        embedding = AutoFlairDocumentPoolEmbedding.from_hub(
+            repo_id=embedding_name,
+            document_embedding_cls=document_embedding_cls,
+            **load_model_kwargs
         )
         task = TextClassification(
             output_path=output_path,
             task_train_kwargs=task_train_kwargs,
             task_model_kwargs=task_model_kwargs,
         )
-        model = FlairModel(embedding=embedding, task=task)
+        model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
         evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = TextClassificationEvaluator()
         if persist_path is not None:
-            evaluator = evaluator.persisting(JsonPersister(persist_path))
+            evaluator = evaluator.persisting(JsonPersister(path=persist_path))
         super().__init__(dataset, data_loader, model, evaluator)
 
 
@@ -85,26 +92,31 @@ class FlairTextPairClassificationEvaluationPipeline(
         self,
         dataset_path: str,
         embedding_name: str,
-        fine_tune_embeddings: bool,
         output_path: str,
+        document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         persist_path: Optional[str] = None,
+        predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        load_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = LocalDataset(dataset_path)
+        load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
+        dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
-        embedding = FlairTransformerDocumentEmbedding(
-            name=embedding_name, fine_tune=fine_tune_embeddings
+        embedding = AutoFlairDocumentPoolEmbedding.from_hub(
+            repo_id=embedding_name,
+            document_embedding_cls=document_embedding_cls,
+            **load_model_kwargs
         )
         task = TextPairClassification(
             output_path=output_path,
             task_train_kwargs=task_train_kwargs,
             task_model_kwargs=task_model_kwargs,
         )
-        model = FlairModel(embedding=embedding, task=task)
+        model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
         evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = TextClassificationEvaluator()
         if persist_path:
-            evaluator = evaluator.persisting(JsonPersister(persist_path))
+            evaluator = evaluator.persisting(JsonPersister(path=persist_path))
         super().__init__(dataset, data_loader, model, evaluator)
 
 
@@ -115,30 +127,29 @@ class FlairSequenceLabelingEvaluationPipeline(
         self,
         dataset_path: str,
         embedding_name: str,
-        fine_tune_embeddings: bool,
         output_path: str,
         hidden_size: int,
         evaluation_mode: str = "conll",
         tagging_scheme: Optional[str] = None,
         persist_path: Optional[str] = None,
+        predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        word_embedding_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = LocalDataset(dataset_path)
+        dataset = LocalDataset(dataset=dataset_path)
         data_loader = ConllFlairCorpusDataLoader()
-        embedding = FlairTransformerWordEmbedding(
-            name=embedding_name, fine_tune=fine_tune_embeddings
-        )
+        embedding = AutoFlairWordEmbedding.from_hub(embedding_name, kwargs=word_embedding_kwargs)
         task = SequenceLabeling(
             output_path=output_path,
             hidden_size=hidden_size,
             task_train_kwargs=task_train_kwargs,
             task_model_kwargs=task_model_kwargs,
         )
-        model = FlairModel(embedding=embedding, task=task)
+        model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
         evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         )
         if persist_path:
-            evaluator = evaluator.persisting(JsonPersister(persist_path))
+            evaluator = evaluator.persisting(JsonPersister(path=persist_path))
         super().__init__(dataset, data_loader, model, evaluator)

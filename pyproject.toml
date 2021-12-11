@@ -31,14 +31,16 @@ tensorboard = "2.4.1"
 typer = "0.3.2"
 seqeval = "1.2.2"
 numpy = "1.19.5"
+optuna = "2.9.1"
+types-PyYAML = "^5.4.10"
 pymagnitude = { version="0.1.143", optional=true}
-
+pydantic = "1.8.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.4"
 mypy = "0.910"
 black = "21.6b0"
-typing-extensions = "3.7.4"
+typing-extensions = "3.7.4.3"
 isort = { version = "5.9.1", extras = ["pyproject"] }
 pyflakes = "2.3.1"
 poethepoet = "0.10.0"
@@ -91,6 +93,7 @@ module = [
     "transformers",
     "numpy.random",
     "huggingface_hub",
+    "pandas",
     "pymagnitude",
     "spacy.*",
     "spacy",
