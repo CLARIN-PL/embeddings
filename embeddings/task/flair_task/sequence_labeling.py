@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 from flair.data import Corpus, Dictionary, Sentence
 from flair.models import SequenceTagger
+from numpy import typing as nptyping
 
 from embeddings.data.io import T_path
 from embeddings.embedding.flair_embedding import FlairEmbedding
@@ -49,7 +50,7 @@ class SequenceLabeling(FlairTask):
             raise self.MODEL_UNDEFINED_EXCEPTION
 
     @staticmethod
-    def get_y(data: List[Sentence], y_type: str, y_dictionary: Dictionary) -> np.ndarray:
+    def get_y(data: List[Sentence], y_type: str, y_dictionary: Dictionary) -> nptyping.NDArray[Any]:
         y = []
         for sent in data:
             sent_y = []

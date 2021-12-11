@@ -2,13 +2,13 @@ import hashlib
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, cast
+from typing import Any, List, cast
 from urllib.parse import urlparse
 
 import appdirs
 import requests
 from flair.data import Sentence
-from numpy import ndarray
+from numpy import typing as nptyping
 from pymagnitude import Magnitude
 
 from embeddings.embedding.embedding import Embedding
@@ -22,12 +22,12 @@ class MagnitudeConfig:
     model_path: str
 
 
-class MagnitudeEmbedding(Embedding[List[str], ndarray]):
+class MagnitudeEmbedding(Embedding[List[str], nptyping.NDArray[Any]]):
     def __init__(self, config: MagnitudeConfig) -> None:
         self.model = Magnitude(config.model_path)
 
-    def embed(self, data: List[str]) -> ndarray:
-        return cast(ndarray, self.model.query(data))
+    def embed(self, data: List[str]) -> nptyping.NDArray[Any]:
+        return cast(nptyping.NDArray[Any], self.model.query(data))
 
     def to_flair(self) -> "MagnitudeFlairConnector":
         return MagnitudeFlairConnector(self)

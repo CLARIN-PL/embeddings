@@ -1,12 +1,12 @@
 from typing import Any, Dict, List, Optional, Union
 
 import datasets
-import numpy as np
 import torch
+from numpy import typing as nptyping
 
 from embeddings.metric.metric import Metric
 
-HF_metric_input = Union[List[Any], np.ndarray, torch.Tensor]
+HF_metric_input = Union[List[Any], nptyping.NDArray[Any], torch.Tensor]
 
 
 class HuggingFaceMetric(Metric[HF_metric_input, Dict[Any, Any]]):

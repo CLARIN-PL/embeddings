@@ -1,7 +1,7 @@
 from typing import Any, Dict, Generic, Literal, Optional, Type, Union
 
-import numpy as np
 from flair.data import Corpus
+from numpy import typing as nptyping
 
 from embeddings.data.data_loader import (
     ConllFlairCorpusDataLoader,
@@ -51,7 +51,7 @@ class ModelEvaluationPipeline(
 
 
 class FlairTextClassificationEvaluationPipeline(
-    ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]]
+    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
     def __init__(
         self,
@@ -86,7 +86,7 @@ class FlairTextClassificationEvaluationPipeline(
 
 
 class FlairTextPairClassificationEvaluationPipeline(
-    ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]]
+    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
     def __init__(
         self,
@@ -121,7 +121,7 @@ class FlairTextPairClassificationEvaluationPipeline(
 
 
 class FlairSequenceLabelingEvaluationPipeline(
-    ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]]
+    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
     def __init__(
         self,

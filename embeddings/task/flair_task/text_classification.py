@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 from flair.data import Corpus, Dictionary, Sentence
 from flair.models import TextClassifier
+from numpy import typing as nptyping
 
 from embeddings.data.io import T_path
 from embeddings.embedding.flair_embedding import FlairEmbedding
@@ -46,7 +47,7 @@ class TextClassification(FlairTask):
             raise self.MODEL_UNDEFINED_EXCEPTION
 
     @staticmethod
-    def get_y(data: List[Sentence], y_type: str, y_dictionary: Dictionary) -> np.ndarray:
+    def get_y(data: List[Sentence], y_type: str, y_dictionary: Dictionary) -> nptyping.NDArray[Any]:
         labels = [sentence.get_labels(y_type) for sentence in data]
         labels = [[label.value for label in sentence] for sentence in labels]
         labels = [y_dictionary.get_idx_for_item(labels[0]) for labels in labels]

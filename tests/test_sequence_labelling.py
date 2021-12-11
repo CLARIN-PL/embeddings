@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 import torch
 from flair.data import Corpus
+from numpy import typing as nptyping
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
@@ -30,7 +31,9 @@ from embeddings.transformation.flair_transformation.split_sample_corpus_transfor
 def pos_tagging_pipeline(
     result_path: "TemporaryDirectory[str]",
 ) -> Tuple[
-    StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
+    StandardPipeline[
+        str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+    ],
     "TemporaryDirectory[str]",
 ]:
     dataset = HuggingFaceDataset("clarin-pl/nkjp-pos")
@@ -51,7 +54,9 @@ def pos_tagging_pipeline(
 def ner_tagging_pipeline(
     result_path: "TemporaryDirectory[str]",
 ) -> Tuple[
-    StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
+    StandardPipeline[
+        str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+    ],
     "TemporaryDirectory[str]",
 ]:
     dataset = HuggingFaceDataset("clarin-pl/kpwr-ner")
@@ -76,7 +81,9 @@ def ner_tagging_pipeline(
 
 def test_pos_tagging_pipeline(
     pos_tagging_pipeline: Tuple[
-        StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
+        StandardPipeline[
+            str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+        ],
         "TemporaryDirectory[str]",
     ],
 ) -> None:
@@ -91,7 +98,9 @@ def test_pos_tagging_pipeline(
 
 def test_ner_tagging_pipeline(
     ner_tagging_pipeline: Tuple[
-        StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
+        StandardPipeline[
+            str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+        ],
         "TemporaryDirectory[str]",
     ],
 ) -> None:

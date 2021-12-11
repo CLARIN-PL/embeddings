@@ -30,10 +30,12 @@ Pillow = "8.2.0"
 tensorboard = "2.4.1"
 typer = "0.3.2"
 seqeval = "1.2.2"
-numpy = "1.19.5"
+numpy = "^1.20.0"
 optuna = "2.9.1"
 types-PyYAML = "^5.4.10"
 pymagnitude = { version="0.1.143", optional=true}
+lz4 = { version="3.1.10", optional=true}
+annoy = { version="1.17.0", optional=true}
 pydantic = "1.8.2"
 
 [tool.poetry.dev-dependencies]
@@ -51,16 +53,16 @@ black = "black --check ./"
 isort = "isort .  -c"
 black_fix = "black ./"
 isort_fix = "isort . "
-pyflakes = "pyflakes ."
+pyflakes = "pyflakes embeddings"
 mypy = "mypy -p embeddings"
-test = "pytest"
+test = "python -m pytest"
 check = ["black", "isort", "mypy", "pyflakes"]
 fix = ["black_fix", "isort_fix"]
 all = ["check", "test"]
 
 [tool.poetry.extras]
 developer = ["black", "mypy", "typing-extensions"]
-pymagnitude = ["pymagnitude"]
+pymagnitude = ["pymagnitude", "lz4", "annoy"]
 
 [build-system]
 requires = ["poetry>=1.1.5"]
@@ -81,6 +83,7 @@ profile = "black"
 [tool.mypy]
 python_version = "3.9"
 strict = true
+plugins = "numpy.typing.mypy_plugin"
 
 [[tool.mypy.overrides]]
 module = [

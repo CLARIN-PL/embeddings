@@ -4,3 +4,5 @@ test:
 	docker run -ti --rm -v `pwd`:/code  clarin/embeddings:local -- 'poetry run poe test'
 check:
 	docker run -ti --rm -v `pwd`:/code  clarin/embeddings:local -- 'poetry run poe check'
+fix:
+	docker run -ti --rm -v `pwd`:/code  clarin/embeddings:local -- 'poetry run poe fix'
