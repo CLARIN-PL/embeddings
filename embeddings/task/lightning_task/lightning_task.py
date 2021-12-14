@@ -1,9 +1,9 @@
 import abc
 from typing import Any, Dict, Generic, List, Optional, Tuple, Type, TypeVar
 
-import numpy as np
 import pytorch_lightning as pl
 import torch
+from numpy import typing as nptyping
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.optim import AdamW, Optimizer
 from torch.utils.data import DataLoader
@@ -57,7 +57,9 @@ class LightningTask(pl.LightningModule, abc.ABC, Generic[Model]):
         pass
 
     @abc.abstractmethod
-    def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, np.ndarray]:
+    def predict(
+        self, dataloader: DataLoader[HuggingFaceDataset]
+    ) -> Dict[str, nptyping.NDArray[Any]]:
         pass
 
     def configure_metrics(self) -> None:

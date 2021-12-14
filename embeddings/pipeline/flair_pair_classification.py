@@ -1,7 +1,6 @@
 from typing import Any, Dict, Optional, Tuple, Type, Union
 
 import datasets
-import numpy as np
 from flair.data import Corpus
 from numpy import typing as nptyping
 

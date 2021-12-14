@@ -1,8 +1,8 @@
 from typing import Any, Dict, Optional, Sequence, Union
 
 import datasets
-import numpy as np
 import pytorch_lightning as pl
+from numpy import typing as nptyping
 
 from embeddings.data.datamodule import TextClassificationDataModule
 from embeddings.data.io import T_path
@@ -13,7 +13,7 @@ from embeddings.task.lightning_task.text_classification import TextClassificatio
 
 
 class LightningClassificationPipeline(
-    LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]]
+    LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
     DEFAULT_TASK_TRAIN_KWARGS = {"gpus": 1, "auto_select_gpus": True}
     DEFAULT_TASK_MODEL_KWARGS = {"use_scheduler": True}

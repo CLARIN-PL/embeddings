@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 import torch
+from numpy import typing as nptyping
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.utils.data import DataLoader
 from torchmetrics import F1, Accuracy, MetricCollection, Precision, Recall
@@ -94,7 +95,9 @@ class TextClassification(HuggingFaceLightningTask):
             _logger.warning("Missing labels for the test data")
         return None
 
-    def predict(self, dataloader: DataLoader[HuggingFaceDataset]) -> Dict[str, np.ndarray]:
+    def predict(
+        self, dataloader: DataLoader[HuggingFaceDataset]
+    ) -> Dict[str, nptyping.NDArray[Any]]:
         predictions = torch.argmax(
             torch.cat([self.forward(**batch).logits for batch in dataloader]), dim=1
         ).numpy()
