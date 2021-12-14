@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 import torch
 from flair.data import Corpus
+from numpy import typing as nptyping
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
@@ -80,7 +81,7 @@ def sequence_labeling_evaluation_pipeline(
     hidden_size: int,
     task_train_kwargs: Dict[str, int],
 ) -> Tuple[
-    ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
+    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]],
     "TemporaryDirectory[str]",
 ]:
 
@@ -105,7 +106,7 @@ def test_sequence_labeling_preprocessing_pipeline(
         PreprocessingPipeline[str, datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"
     ],
     sequence_labeling_evaluation_pipeline: Tuple[
-        ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]],
+        ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]],
         "TemporaryDirectory[str]",
     ],
 ) -> None:

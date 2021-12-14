@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Optional, Sequence, Set, Union
 
-import numpy as np
 import torch
+from numpy import typing as nptyping
 
 from embeddings.evaluator.metrics_evaluator import MetricsEvaluator
 from embeddings.metric.hugging_face_metric import HuggingFaceMetric
@@ -41,5 +41,5 @@ class SequenceLabelingEvaluator(MetricsEvaluator):
     @property
     def metrics(
         self,
-    ) -> Sequence[Metric[Union[List[Any], np.ndarray, torch.Tensor], Dict[Any, Any]]]:
+    ) -> Sequence[Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
         return [self.metric]

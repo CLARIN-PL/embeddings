@@ -1,8 +1,8 @@
 from typing import Any, Dict, Optional, Tuple, Type, Union
 
 import datasets
-import numpy as np
 from flair.data import Corpus
+from numpy import typing as nptyping
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
@@ -23,7 +23,9 @@ from embeddings.transformation.transformation import Transformation
 
 
 class HuggingFacePairClassificationPipeline(
-    StandardPipeline[str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]]
+    StandardPipeline[
+        str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+    ]
 ):
     def __init__(
         self,

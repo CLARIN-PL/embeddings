@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Tuple
 
 import flair
-import numpy as np
 from flair.data import Corpus, Dictionary, Sentence
 from flair.trainers import ModelTrainer
+from numpy import typing as nptyping
 
 from embeddings.data.io import T_path
 from embeddings.defaults import RESULTS_PATH
@@ -16,7 +16,7 @@ from embeddings.utils.loggers import get_logger
 _logger = get_logger(__name__)
 
 
-class FlairTask(Task[Corpus, Dict[str, np.ndarray]]):
+class FlairTask(Task[Corpus, Dict[str, nptyping.NDArray[Any]]]):
     MODEL_UNDEFINED_EXCEPTION = ValueError("Model undefined. Use build_task_model() first!")
 
     def __init__(
@@ -40,7 +40,9 @@ class FlairTask(Task[Corpus, Dict[str, np.ndarray]]):
         )
         return log
 
-    def predict(self, data: List[Sentence], mini_batch_size: int = 32) -> Tuple[np.ndarray, float]:
+    def predict(
+        self, data: List[Sentence], mini_batch_size: int = 32
+    ) -> Tuple[nptyping.NDArray[Any], float]:
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
 
@@ -59,7 +61,7 @@ class FlairTask(Task[Corpus, Dict[str, np.ndarray]]):
 
     def fit_predict(
         self, data: Corpus, predict_subset: Literal["dev", "test"] = "test"
-    ) -> Dict[str, np.ndarray]:
+    ) -> Dict[str, nptyping.NDArray[Any]]:
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
         if data.dev is None:
@@ -96,7 +98,7 @@ class FlairTask(Task[Corpus, Dict[str, np.ndarray]]):
 
     @staticmethod
     @abc.abstractmethod
-    def get_y(data: List[Sentence], y_type: str, y_dictionary: Dictionary) -> np.ndarray:
+    def get_y(data: List[Sentence], y_type: str, y_dictionary: Dictionary) -> nptyping.NDArray[Any]:
         pass
 
     @staticmethod

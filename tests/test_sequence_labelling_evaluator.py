@@ -1,15 +1,16 @@
 from itertools import chain
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
 import numpy as np
 import pytest
+from numpy import typing as nptyping
 from sklearn.metrics import classification_report, precision_recall_fscore_support
 
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 
 
 @pytest.fixture
-def data() -> Dict[str, np.ndarray]:
+def data() -> Dict[str, nptyping.NDArray[Any]]:
     return {
         "y_true": np.array(
             [
@@ -31,7 +32,7 @@ def data() -> Dict[str, np.ndarray]:
 
 
 @pytest.fixture
-def ner_data() -> Dict[str, np.ndarray]:
+def ner_data() -> Dict[str, nptyping.NDArray[Any]]:
     return {
         "y_true": np.array(
             [
@@ -51,7 +52,9 @@ def ner_data() -> Dict[str, np.ndarray]:
 
 
 @pytest.fixture
-def sklearn_metrics(data: Dict[str, np.ndarray]) -> Dict[str, Union[Dict[str, float], float]]:
+def sklearn_metrics(
+    data: Dict[str, nptyping.NDArray[Any]]
+) -> Dict[str, Union[Dict[str, float], float]]:
     out_dict = {}
     out_dict.update(
         classification_report(
@@ -89,7 +92,9 @@ def sklearn_metrics(data: Dict[str, np.ndarray]) -> Dict[str, Union[Dict[str, fl
 
 
 @pytest.fixture
-def seqeval_metrics(data: Dict[str, np.ndarray]) -> Dict[str, Union[Dict[str, float], float]]:
+def seqeval_metrics(
+    data: Dict[str, nptyping.NDArray[Any]]
+) -> Dict[str, Union[Dict[str, float], float]]:
     evaluator = SequenceLabelingEvaluator(evaluation_mode="unit")
     out = evaluator.evaluate(data)["UnitSeqeval"]
     assert isinstance(out, dict)
@@ -106,13 +111,13 @@ def test_pos_tagging_metrics(
     )
 
 
-def test_conll_metrics(ner_data: Dict[str, np.ndarray]) -> None:
+def test_conll_metrics(ner_data: Dict[str, nptyping.NDArray[Any]]) -> None:
     evaluator = SequenceLabelingEvaluator(evaluation_mode="conll")
     out = evaluator.evaluate(ner_data)
     np.testing.assert_almost_equal(out["seqeval__mode_None__scheme_None"]["overall_f1"], 1.0)
 
 
-def test_strict_metrics(ner_data: Dict[str, np.ndarray]) -> None:
+def test_strict_metrics(ner_data: Dict[str, nptyping.NDArray[Any]]) -> None:
     evaluator = SequenceLabelingEvaluator(evaluation_mode="strict", tagging_scheme="IOB2")
     out = evaluator.evaluate(ner_data)
     np.testing.assert_almost_equal(out["seqeval__mode_strict__scheme_IOB2"]["overall_f1"], 0.5)
