@@ -134,10 +134,10 @@ class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
         metrics: Optional[MetricCollection] = None,
         config_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
     ) -> None:
         super().__init__(
-            metrics=metrics,
-            **task_model_kwargs if task_model_kwargs else {},
+            metrics=metrics, **task_model_kwargs if task_model_kwargs else {}, **kwargs
         )
         self.save_hyperparameters({"downstream_model_type": downstream_model_type.__name__})
         self.downstream_model_type = downstream_model_type

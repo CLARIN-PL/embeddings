@@ -126,6 +126,8 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
+        tokenizer_kwargs: Optional[Dict[str, Any]] = None,
+        batch_encoding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ):
@@ -141,6 +143,8 @@ class TextClassificationDataModule(HuggingFaceDataModule):
             max_seq_length=max_seq_length,
             train_batch_siz=train_batch_size,
             eval_batch_size=eval_batch_size,
+            tokenizer_kwargs=tokenizer_kwargs,
+            batch_encoding_kwargs=batch_encoding_kwargs,
             load_dataset_kwargs=load_dataset_kwargs,
             **kwargs,
         )

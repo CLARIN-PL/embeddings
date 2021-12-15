@@ -25,6 +25,7 @@ class TextClassification(HuggingFaceLightningTask):
         metrics: Optional[MetricCollection] = None,
         config_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
+        **kwargs: Any
     ) -> None:
         super().__init__(
             model_name_or_path=model_name_or_path,
@@ -33,6 +34,7 @@ class TextClassification(HuggingFaceLightningTask):
             metrics=metrics,
             config_kwargs=config_kwargs,
             task_model_kwargs=task_model_kwargs,
+            **kwargs
         )
 
     def get_default_metrics(self) -> MetricCollection:
