@@ -1,7 +1,8 @@
-from typing import Any, Dict, Literal
+from typing import Any, Dict
 
 from flair.data import Corpus
 from numpy import typing as nptyping
+from typing_extensions import Literal
 
 from embeddings.embedding.flair_embedding import FlairEmbedding
 from embeddings.model.model import Model

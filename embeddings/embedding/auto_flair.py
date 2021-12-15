@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any, Final, Type, Union
+from typing import Any, Type, Union
+
+from typing_extensions import Final
 
 from embeddings.embedding import flair_embedding as flair_embedding_module
 from embeddings.embedding.flair_embedding import (

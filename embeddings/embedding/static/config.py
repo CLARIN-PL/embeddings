@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Dict
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
@@ -18,14 +18,16 @@ class StaticModelHubConfig:
 
     @property
     def model_type_reference(self) -> str:
-        if isinstance(reference := self._load_hub_json("module.json")["type"], str):
+        reference = self._load_hub_json("module.json")["type"]
+        if isinstance(reference, str):
             return reference
         else:
             raise ValueError(f"Wrong format of import reference {reference}.")
 
     @property
-    def default_config(self) -> dict[str, Any]:
-        if isinstance(config := self._load_hub_json("default_config.json"), dict):
+    def default_config(self) -> Dict[str, Any]:
+        config = self._load_hub_json("default_config.json")
+        if isinstance(config, dict):
             return config
         else:
             raise ValueError(f"Wrong format of default config {config}.")

@@ -18,7 +18,7 @@ from embeddings.utils.utils import PrimitiveTypes
 
 
 @pytest.fixture
-def output_path() -> TemporaryDirectory[str]:
+def output_path() -> "TemporaryDirectory[str]":
     return TemporaryDirectory()
 
 
@@ -53,7 +53,7 @@ def sequence_labeling_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
 
 
 @pytest.fixture
-def pipeline_kwargs(output_path: TemporaryDirectory[str]) -> Dict[str, PrimitiveTypes]:
+def pipeline_kwargs(output_path: "TemporaryDirectory[str]") -> Dict[str, PrimitiveTypes]:
     return {
         "output_path": output_path.name,
         "embedding_name": "clarin-pl/roberta-polish-kgr10",

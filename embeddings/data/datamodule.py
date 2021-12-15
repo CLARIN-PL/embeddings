@@ -3,6 +3,7 @@ from typing import Any, Dict, Generic, List, Optional, Sequence, TypeVar, Union
 
 import datasets
 import pytorch_lightning as pl
+from dataset.arrow_dataset import Dataset
 from datasets import ClassLabel, DatasetDict
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, BatchEncoding
@@ -10,8 +11,7 @@ from transformers import AutoTokenizer, BatchEncoding
 from embeddings.utils.loggers import get_logger
 
 Data = TypeVar("Data")
-HuggingFaceDataset = TypeVar("HuggingFaceDataset")
-
+HuggingFaceDataset = Union[Dataset]
 _logger = get_logger(__name__)
 
 
@@ -67,7 +67,9 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
 
     def load_dataset(self) -> DatasetDict:
-        return datasets.load_dataset(self.dataset_name, **self.load_dataset_kwargs)
+        result = datasets.load_dataset(self.dataset_name, **self.load_dataset_kwargs)
+        assert isinstance(result, DatasetDict)
+        return result
 
     def get_num_classes(self) -> int:
         assert isinstance(self.dataset, DatasetDict)
@@ -96,18 +98,18 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.dataset.set_format(type="torch")
 
     def train_dataloader(self) -> DataLoader[HuggingFaceDataset]:
-        return DataLoader(self.dataset["train"], batch_size=self.train_batch_size)
+        return DataLoader(self.dataset["train"], batch_size=self.train_batch_size)  # type: ignore
 
     # Ignoring the type of val_dataloader method from supertype "DataHooks" allowing for None
     # and training without validation dataset.
     def val_dataloader(self) -> Optional[DataLoader[HuggingFaceDataset]]:  # type: ignore
         if "validation" in self.dataset:
-            return DataLoader(self.dataset["validation"], batch_size=self.eval_batch_size)
+            return DataLoader(self.dataset["validation"], batch_size=self.eval_batch_size)  # type: ignore
         else:
             return None
 
     def test_dataloader(self) -> DataLoader[HuggingFaceDataset]:
-        return DataLoader(self.dataset["test"], batch_size=self.eval_batch_size)
+        return DataLoader(self.dataset["test"], batch_size=self.eval_batch_size)  # type: ignore
 
     @abc.abstractmethod
     def convert_to_features(

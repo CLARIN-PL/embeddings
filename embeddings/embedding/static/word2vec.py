@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
-from typing import Any, Literal, Optional
+from typing import Any, Optional
+
+from typing_extensions import Literal
 
 from embeddings.embedding.static.config import GensimFileConfig, StaticModelHubConfig
 from embeddings.embedding.static.embedding import SingleFileEmbedding, StandardStaticWordEmbedding

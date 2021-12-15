@@ -1,4 +1,6 @@
-from typing import Any, Dict, Literal, Optional, Tuple, TypedDict, TypeVar
+from typing import Any, Dict, Optional, Tuple, TypeVar
+
+from typing_extensions import Literal, TypedDict
 
 from embeddings.data.io import T_path
 
