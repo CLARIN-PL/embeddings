@@ -12,9 +12,9 @@ from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
-from embeddings.task.flair_task.text_classification import TextClassification
-from embeddings.transformation.flair_transformation.classification_corpus_transformation import (
-    ClassificationCorpusTransformation,
+from embeddings.task.flair_task.text_pair_classification import TextPairClassification
+from embeddings.transformation.flair_transformation.pair_classification_corpus_transformation import (
+    PairClassificationCorpusTransformation,
 )
 from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
     SampleSplitsFlairCorpusTransformation,
@@ -22,7 +22,7 @@ from embeddings.transformation.flair_transformation.split_sample_corpus_transfor
 from embeddings.transformation.transformation import Transformation
 
 
-class HuggingFaceClassificationPipeline(
+class FlairPairClassificationPipeline(
     StandardPipeline[
         str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
     ]
@@ -31,7 +31,7 @@ class HuggingFaceClassificationPipeline(
         self,
         embedding_name: str,
         dataset_name: str,
-        input_column_name: str,
+        input_columns_names_pair: Tuple[str, str],
         target_column_name: str,
         output_path: T_path,
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
@@ -49,19 +49,22 @@ class HuggingFaceClassificationPipeline(
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
         ]
-        transformation = ClassificationCorpusTransformation(input_column_name, target_column_name)
+        transformation = PairClassificationCorpusTransformation(
+            input_columns_names_pair, target_column_name
+        )
         if sample_missing_splits:
             transformation = transformation.then(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
-
         embedding = AutoFlairDocumentPoolEmbedding.from_hub(
             repo_id=embedding_name,
             document_embedding_cls=document_embedding_cls,
             **load_model_kwargs if load_model_kwargs else {}
         )
-        task = TextClassification(
-            output_path, task_model_kwargs=task_model_kwargs, task_train_kwargs=task_train_kwargs
+        task = TextPairClassification(
+            output_path,
+            task_model_kwargs=task_model_kwargs,
+            task_train_kwargs=task_train_kwargs,
         )
         model = FlairModel(embedding, task)
         evaluator = TextClassificationEvaluator()

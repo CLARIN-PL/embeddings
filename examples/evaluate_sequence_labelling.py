@@ -5,7 +5,7 @@ from typing import Optional
 import typer
 
 from embeddings.defaults import RESULTS_PATH
-from embeddings.pipeline.hugging_face_sequence_labeling import HuggingFaceSequenceLabelingPipeline
+from embeddings.pipeline.flair_sequence_labeling import FlairSequenceLabelingPipeline
 
 app = typer.Typer()
 
@@ -37,7 +37,7 @@ def run(
     output_path = Path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    pipeline = HuggingFaceSequenceLabelingPipeline(
+    pipeline = FlairSequenceLabelingPipeline(
         embedding_name,
         dataset_name,
         input_column_name,

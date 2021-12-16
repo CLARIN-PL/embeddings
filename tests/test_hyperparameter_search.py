@@ -6,11 +6,9 @@ import pytest
 from pydantic import create_model_from_typeddict
 
 from embeddings.hyperparameter_search.parameters import SearchableParameter
-from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
-from embeddings.pipeline.hugging_face_pair_classification import (
-    HuggingFacePairClassificationPipeline,
-)
-from embeddings.pipeline.hugging_face_sequence_labeling import HuggingFaceSequenceLabelingPipeline
+from embeddings.pipeline.flair_classification import FlairClassificationPipeline
+from embeddings.pipeline.flair_pair_classification import FlairPairClassificationPipeline
+from embeddings.pipeline.flair_sequence_labeling import FlairSequenceLabelingPipeline
 from embeddings.pipeline.pipelines_metadata import (
     HuggingFaceClassificationPipelineMetadata,
     HuggingFacePairClassificationPipelineMetadata,
@@ -115,7 +113,7 @@ def test_hf_classification_pipeline_metadata(
     metadata = create_model_from_typeddict(HuggingFaceClassificationPipelineMetadata)(  # type: ignore
         **hf_classification_pipeline_metadata
     ).dict()
-    HuggingFaceClassificationPipeline(**metadata)
+    FlairClassificationPipeline(**metadata)
 
 
 def test_hf_pair_classification_pipeline_metadata(
@@ -124,7 +122,7 @@ def test_hf_pair_classification_pipeline_metadata(
     metadata = create_model_from_typeddict(HuggingFacePairClassificationPipelineMetadata)(  # type: ignore
         **hf_pair_classification_pipeline_metadata
     ).dict()
-    HuggingFacePairClassificationPipeline(**metadata)
+    FlairPairClassificationPipeline(**metadata)
 
 
 def test_hf_sequence_labeling_pipeline_metadata(
@@ -133,7 +131,7 @@ def test_hf_sequence_labeling_pipeline_metadata(
     metadata = create_model_from_typeddict(HuggingFaceSequenceLabelingPipelineMetadata)(  # type: ignore
         **hf_sequence_labeling_pipeline_metadata
     ).dict()
-    HuggingFaceSequenceLabelingPipeline(**metadata)
+    FlairSequenceLabelingPipeline(**metadata)
 
 
 def test_categorical_parameter() -> None:

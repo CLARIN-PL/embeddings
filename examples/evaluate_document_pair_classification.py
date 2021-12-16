@@ -5,9 +5,7 @@ from typing import Tuple
 import typer
 
 from embeddings.defaults import RESULTS_PATH
-from embeddings.pipeline.hugging_face_pair_classification import (
-    HuggingFacePairClassificationPipeline,
-)
+from embeddings.pipeline.flair_pair_classification import FlairPairClassificationPipeline
 
 app = typer.Typer()
 
@@ -32,7 +30,7 @@ def run(
     output_path = Path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    pipeline = HuggingFacePairClassificationPipeline(
+    pipeline = FlairPairClassificationPipeline(
         embedding_name, dataset_name, input_columns_names_pair, target_column_name, output_path
     )
     result = pipeline.run()

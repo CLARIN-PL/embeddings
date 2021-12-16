@@ -11,9 +11,9 @@ pip install clarinpl-embeddings
 Text-classification with polemo2 dataset and transformer-based embeddings
 
 ```python
-from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
+from embeddings.pipeline.flair_classification import FlairClassificationPipeline
 
-pipeline = HuggingFaceClassificationPipeline(
+pipeline = FlairClassificationPipeline(
     dataset_name="clarin-pl/polemo2-official",
     embedding_name="allegro/herbert-base-cased",
     input_column_name="text",
@@ -47,8 +47,8 @@ We share predefined pipelines for common NLP tasks with corresponding scripts.
 ```python
 from pathlib import Path
 
-from embeddings.data.hugging_face_data_loader import HuggingFaceDataLoader
-from embeddings.data.hugging_face_dataset import HuggingFaceDataset
+from embeddings.data.data_loader import HuggingFaceDataLoader
+from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.embedding.auto_flair import AutoFlairDocumentEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
@@ -124,12 +124,12 @@ compatible with our pipeline.
 Model and training parameters can be controlled via `task_model_kwargs` and 
 `task_train_kwargs` parameters. 
 
-## Example with `polemo2` dataset.   
+## Example with `polemo2` dataset.
 
 ```python
-from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
+from embeddings.pipeline.flair_classification import FlairClassificationPipeline
 
-pipeline = HuggingFaceClassificationPipeline(
+pipeline = FlairClassificationPipeline(
     dataset_name="clarin-pl/polemo2-official",
     embedding_name="allegro/herbert-base-cased",
     input_column_name="text",
@@ -231,9 +231,9 @@ df, metadata = pipeline.run()
 After the parameters search process we can train model with best parameters found.
 
 ```python
-from embeddings.pipeline.hugging_face_classification import HuggingFaceClassificationPipeline
+from embeddings.pipeline.flair_classification import FlairClassificationPipeline
 
-pipeline = HuggingFaceClassificationPipeline(**metadata)
+pipeline = FlairClassificationPipeline(**metadata)
 results = pipeline.run()
 ```
 
