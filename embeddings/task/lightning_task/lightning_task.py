@@ -145,16 +145,17 @@ class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
         self.config_kwargs = config_kwargs if config_kwargs else {}
 
     def setup(self, stage: Optional[str] = None) -> None:
-        self.configure_model()
-        self.configure_metrics()
-        if self.hparams.use_scheduler:
-            assert self.trainer is not None
-            train_loader = self.trainer.datamodule.train_dataloader()
-            tb_size = self.hparams.train_batch_size * max(1, getattr(self.trainer, "gpus", 1))
-            ab_size = tb_size * self.trainer.accumulate_grad_batches
-            self.total_steps: int = int(
-                (len(train_loader.dataset) / ab_size) * float(self.trainer.max_epochs)
-            )
+        if stage in ("fit", None):
+            self.configure_model()
+            self.configure_metrics()
+            if self.hparams.use_scheduler:
+                assert self.trainer is not None
+                train_loader = self.trainer.datamodule.train_dataloader()
+                tb_size = self.hparams.train_batch_size * max(1, getattr(self.trainer, "gpus", 1))
+                ab_size = tb_size * self.trainer.accumulate_grad_batches
+                self.total_steps: int = int(
+                    (len(train_loader.dataset) / ab_size) * float(self.trainer.max_epochs)
+                )
 
     def configure_model(self) -> None:
         assert self.trainer is not None

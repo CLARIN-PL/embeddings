@@ -28,6 +28,7 @@ class LightningClassificationPipeline(
         max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
+        finetune_last_n_layers: int = -1,
         tokenizer_name: Optional[str] = None,
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
         batch_encoding_kwargs: Optional[Dict[str, Any]] = None,
@@ -56,6 +57,7 @@ class LightningClassificationPipeline(
             model_name_or_path=embedding_name,
             train_batch_size=train_batch_size,
             eval_batch_size=eval_batch_size,
+            finetune_last_n_layers=finetune_last_n_layers,
             task_model_kwargs=task_model_kwargs
             if task_model_kwargs
             else self.DEFAULT_TASK_MODEL_KWARGS,
