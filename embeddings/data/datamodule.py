@@ -93,7 +93,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
             batched=True,
             remove_columns=columns,
         )
-        set(map(lambda split: self.dataset[split].set_format(type="torch"), self.dataset.keys()))
+        self.dataset.set_format(type="torch")
 
     def train_dataloader(self) -> DataLoader[HuggingFaceDataset]:
         return DataLoader(self.dataset["train"], batch_size=self.train_batch_size)
