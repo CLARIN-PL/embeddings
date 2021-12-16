@@ -15,7 +15,7 @@ from embeddings.task.lightning_task.text_classification import TextClassificatio
 class LightningClassificationPipeline(
     LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
-    DEFAULT_TASK_TRAIN_KWARGS = {"gpus": 1, "auto_select_gpus": True}
+    DEFAULT_TASK_TRAIN_KWARGS = {"devices": "auto", "accelerator": "auto"}
     DEFAULT_TASK_MODEL_KWARGS = {"use_scheduler": True}
 
     def __init__(

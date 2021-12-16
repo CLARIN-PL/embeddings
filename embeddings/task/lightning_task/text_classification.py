@@ -1,3 +1,4 @@
+from collections import ChainMap
 from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
@@ -61,7 +62,11 @@ class TextClassification(HuggingFaceLightningTask):
         return metrics
 
     def forward(self, *args: Any, **kwargs: Any) -> Any:
-        return self.model(*args, **kwargs)
+        assert (not (args and kwargs)) and (args or kwargs)
+        inputs = kwargs if kwargs else args
+        if isinstance(inputs, tuple):
+            inputs = dict(ChainMap(*inputs))
+        return self.model(**inputs)
 
     def shared_step(self, **batch: Any) -> Tuple[torch.Tensor, torch.Tensor]:
         outputs = self.forward(**batch)

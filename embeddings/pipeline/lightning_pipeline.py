@@ -24,6 +24,5 @@ class LightningPipeline(
         self.evaluator = evaluator
 
     def run(self) -> EvaluationResult:
-        self.datamodule.setup("fit")
         model_result = self.model.execute(data=self.datamodule)
         return self.evaluator.evaluate(model_result)

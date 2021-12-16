@@ -131,7 +131,7 @@ class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
         self,
         model_name_or_path: str,
         downstream_model_type: Type["AutoModel"],
-        freeze_transformer_layers: Optional[int] = -1,
+        finetune_last_n_layers: int = -1,
         metrics: Optional[MetricCollection] = None,
         config_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
@@ -145,17 +145,16 @@ class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
         self.config_kwargs = config_kwargs if config_kwargs else {}
 
     def setup(self, stage: Optional[str] = None) -> None:
-        if stage in ["fit", None]:
-            self.configure_model()
-            self.configure_metrics()
-            if self.hparams.use_scheduler:
-                assert self.trainer is not None
-                train_loader = self.trainer.datamodule.train_dataloader()
-                tb_size = self.hparams.train_batch_size * max(1, self.trainer.gpus)
-                ab_size = tb_size * self.trainer.accumulate_grad_batches
-                self.total_steps: int = int(
-                    (len(train_loader.dataset) / ab_size) * float(self.trainer.max_epochs)
-                )
+        self.configure_model()
+        self.configure_metrics()
+        if self.hparams.use_scheduler:
+            assert self.trainer is not None
+            train_loader = self.trainer.datamodule.train_dataloader()
+            tb_size = self.hparams.train_batch_size * max(1, getattr(self.trainer, "gpus", 1))
+            ab_size = tb_size * self.trainer.accumulate_grad_batches
+            self.total_steps: int = int(
+                (len(train_loader.dataset) / ab_size) * float(self.trainer.max_epochs)
+            )
 
     def configure_model(self) -> None:
         assert self.trainer is not None
@@ -167,21 +166,24 @@ class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
         self.model: AutoModel = self.downstream_model_type.from_pretrained(
             self.hparams.model_name_or_path, config=self.config
         )
-        if self.hparams.freeze_transformer_layers is not None:
-            self.freeze_transformer(freeze_until=self.hparams.freeze_transformer_layers)
+        if self.hparams.finetune_last_n_layers > -1:
+            self.freeze_transformer(finetune_last_n_layers=self.hparams.finetune_last_n_layers)
 
-    def unfreeze_transformer(self, unfreeze_from: int = -1) -> None:
-        for name, param in self.model.base_model.named_parameters():
-            if name.startswith("encoder.layer"):
-                no_layer = int(name.split(".")[2])
-                if no_layer >= unfreeze_from:
-                    param.requires_grad = True
-
-    def freeze_transformer(self, freeze_until: int = -1) -> None:
-        if freeze_until == -1:
-            freeze_until = sys.maxsize
-        for name, param in self.model.base_model.named_parameters():
-            if name.startswith("encoder.layer"):
-                no_layer = int(name.split(".")[2])
-                if no_layer <= freeze_until:
-                    param.requires_grad = False
+    def freeze_transformer(self, finetune_last_n_layers: int) -> None:
+        if finetune_last_n_layers == 0:
+            for name, param in self.model.base_model.named_parameters():
+                param.requires_grad = False
+        else:
+            no_layers = self.model.config.num_hidden_layers
+            for name, param in self.model.base_model.named_parameters():
+                if name.startswith("embeddings"):
+                    layer = 0
+                elif name.startswith("encoder"):
+                    layer = int(name.split(".")[2])
+                elif name.startswith("pooler"):
+                    layer = sys.maxsize
+                else:
+                    raise ValueError("Parameter name not recognized when freezing transformer")
+                if layer >= (no_layers - finetune_last_n_layers):
+                    break
+                param.requires_grad = False
