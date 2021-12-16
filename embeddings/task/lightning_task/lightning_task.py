@@ -1,4 +1,5 @@
 import abc
+import sys
 from typing import Any, Dict, Generic, List, Optional, Tuple, Type, TypeVar
 
 import pytorch_lightning as pl
@@ -130,7 +131,7 @@ class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
         self,
         model_name_or_path: str,
         downstream_model_type: Type["AutoModel"],
-        unfreeze_transformer_from_layer: Optional[int] = None,
+        freeze_transformer_layers: Optional[int] = -1,
         metrics: Optional[MetricCollection] = None,
         config_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
@@ -166,13 +167,8 @@ class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
         self.model: AutoModel = self.downstream_model_type.from_pretrained(
             self.hparams.model_name_or_path, config=self.config
         )
-        self.freeze_transformer()
-        if self.hparams.unfreeze_transformer_from_layer is not None:
-            self.unfreeze_transformer(unfreeze_from=self.hparams.unfreeze_transformer_from_layer)
-
-    def freeze_transformer(self) -> None:
-        for param in self.model.base_model.parameters():
-            param.requires_grad = False
+        if self.hparams.freeze_transformer_layers is not None:
+            self.freeze_transformer(freeze_until=self.hparams.freeze_transformer_layers)
 
     def unfreeze_transformer(self, unfreeze_from: int = -1) -> None:
         for name, param in self.model.base_model.named_parameters():
@@ -180,3 +176,12 @@ class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
                 no_layer = int(name.split(".")[2])
                 if no_layer >= unfreeze_from:
                     param.requires_grad = True
+
+    def freeze_transformer(self, freeze_until: int = -1) -> None:
+        if freeze_until == -1:
+            freeze_until = sys.maxsize
+        for name, param in self.model.base_model.named_parameters():
+            if name.startswith("encoder.layer"):
+                no_layer = int(name.split(".")[2])
+                if no_layer <= freeze_until:
+                    param.requires_grad = False
