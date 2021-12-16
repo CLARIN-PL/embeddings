@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
-from typing import Any, Literal, Optional
+from typing import Any, Optional
 
 from flair.embeddings import FastTextEmbeddings
+from typing_extensions import Literal
 
 from embeddings.embedding.flair_embedding import FlairEmbedding
 from embeddings.embedding.static.config import SingleFileConfig, StaticModelHubConfig

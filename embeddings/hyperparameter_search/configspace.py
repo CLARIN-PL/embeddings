@@ -3,9 +3,10 @@ import dataclasses
 import functools
 from abc import ABC
 from dataclasses import InitVar, dataclass, field
-from typing import Any, Dict, Final, List, Set, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, List, Set, Tuple, Type, TypeVar, Union
 
 import optuna
+from typing_extensions import Final
 
 from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
 from embeddings.embedding.flair_embedding import FlairTransformerEmbedding

@@ -1,7 +1,8 @@
-from typing import Any, Dict, Generic, Literal, Optional, Type, Union
+from typing import Any, Dict, Generic, Optional, Type, Union
 
 from flair.data import Corpus
 from numpy import typing as nptyping
+from typing_extensions import Literal
 
 from embeddings.data.data_loader import (
     ConllFlairCorpusDataLoader,

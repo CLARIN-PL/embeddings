@@ -1,11 +1,12 @@
 import abc
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import flair
 from flair.data import Corpus, Dictionary, Sentence
 from flair.trainers import ModelTrainer
 from numpy import typing as nptyping
+from typing_extensions import Literal
 
 from embeddings.data.io import T_path
 from embeddings.defaults import RESULTS_PATH

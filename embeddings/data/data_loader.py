@@ -23,7 +23,9 @@ class DataLoader(ABC, Generic[Input, Output]):
 class HuggingFaceDataLoader(DataLoader[str, datasets.DatasetDict]):
     def load(self, dataset: Dataset[str]) -> datasets.DatasetDict:
         if isinstance(dataset, HuggingFaceDataset):
-            return datasets.load_dataset(dataset.dataset, **dataset.load_dataset_kwargs)
+            result = datasets.load_dataset(str(dataset.dataset), **dataset.load_dataset_kwargs)
+            assert isinstance(result, datasets.DatasetDict)
+            return result
         else:
             raise ValueError("This DataLoader should be used with HuggingFaceDataset only.")
 
@@ -46,7 +48,8 @@ class ConllFlairCorpusDataLoader(DataLoader[str, Corpus]):
         flair_datasets = {}
         dataset_dir = Path(dataset.dataset)
         for subset_name in self.DEFAULT_FLAIR_SUBSET_NAMES:
-            if (output_path := dataset_dir.joinpath(f"{subset_name}.tsv")).exists():
+            output_path = dataset_dir.joinpath(f"{subset_name}.tsv")
+            if output_path.exists():
                 flair_datasets[subset_name] = ColumnDataset(output_path, self.DEFAULT_COLUMN_FORMAT)
             else:
                 flair_datasets[subset_name] = None
