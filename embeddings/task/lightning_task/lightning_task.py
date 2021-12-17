@@ -42,7 +42,7 @@ class LightningTask(pl.LightningModule, abc.ABC, Generic[Model]):
         pass
 
     @abc.abstractmethod
-    def shared_step(self, **batch: Any) -> Tuple[torch.Tensor, torch.Tensor]:
+    def shared_step(self, **batch: Any) -> Tuple[torch.Tensor, ...]:
         pass
 
     @abc.abstractmethod
