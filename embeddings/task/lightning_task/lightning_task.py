@@ -151,7 +151,8 @@ class HuggingFaceLightningTask(LightningTask[AutoModel], abc.ABC):
             if self.hparams.use_scheduler:
                 assert self.trainer is not None
                 train_loader = self.trainer.datamodule.train_dataloader()
-                tb_size = self.hparams.train_batch_size * max(1, getattr(self.trainer, "gpus", 1))
+                gpus = getattr(self.trainer, "gpus") if getattr(self.trainer, "gpus") else 0
+                tb_size = self.hparams.train_batch_size * max(1, gpus)
                 ab_size = tb_size * self.trainer.accumulate_grad_batches
                 self.total_steps: int = int(
                     (len(train_loader.dataset) / ab_size) * float(self.trainer.max_epochs)

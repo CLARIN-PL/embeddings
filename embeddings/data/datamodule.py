@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Dict, Generic, List, Optional, Sequence, TypeVar, Union
+from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import datasets
 import pytorch_lightning as pl
@@ -11,7 +11,7 @@ from transformers import AutoTokenizer, BatchEncoding
 from embeddings.utils.loggers import get_logger
 
 Data = TypeVar("Data")
-HuggingFaceDataset = Union[Dataset]
+HuggingFaceDataset = Type[Dataset]
 _logger = get_logger(__name__)
 
 
@@ -43,6 +43,9 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
+        downsample_train: Optional[float] = None,
+        downsample_val: Optional[float] = None,
+        downsample_test: Optional[float] = None,
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
         batch_encoding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
@@ -57,6 +60,9 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.max_seq_length = max_seq_length
         self.train_batch_size = train_batch_size
         self.eval_batch_size = eval_batch_size
+        self.downsample_train = downsample_train
+        self.downsample_val = downsample_val
+        self.downsample_test = downsample_test
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.tokenizer_name_or_path,
             **tokenizer_kwargs if tokenizer_kwargs else self.DEFAULT_TOKENIZER_KWARGS,
@@ -79,12 +85,29 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         assert isinstance(num_classes, int)
         return num_classes
 
+    def downsample_dataset(self) -> None:
+        assert isinstance(self.dataset, DatasetDict)
+        downsamples = (
+            ("train", self.downsample_train),
+            ("validation", self.downsample_val),
+            ("test", self.downsample_test),
+        )
+        for column_name, downsample_factor in downsamples:
+            if (
+                downsample_factor is not None
+                and column_name in self.dataset
+                and 0 < downsample_factor < 1
+            ):
+                downsampled_data = self.dataset[column_name].train_test_split(downsample_factor)
+                self.dataset[column_name] = downsampled_data["test"]
+
     def prepare_data(self) -> None:
         datasets.load_dataset(self.dataset_name)
         AutoTokenizer.from_pretrained(self.tokenizer_name_or_path)
 
     def setup(self, stage: Optional[str] = None) -> None:
         self.dataset = self.load_dataset()
+        self.downsample_dataset()
         self.num_classes = self.get_num_classes()
         self.process_data()
 
@@ -143,7 +166,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
             dataset_name=dataset_name,
             target_field=target_field,
             max_seq_length=max_seq_length,
-            train_batch_siz=train_batch_size,
+            train_batch_size=train_batch_size,
             eval_batch_size=eval_batch_size,
             tokenizer_kwargs=tokenizer_kwargs,
             batch_encoding_kwargs=batch_encoding_kwargs,
