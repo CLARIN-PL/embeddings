@@ -3,8 +3,7 @@ from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, 
 
 import datasets
 import pytorch_lightning as pl
-from datasets import ClassLabel, DatasetDict
-from datasets.arrow_dataset import Dataset
+from datasets import ClassLabel, DatasetDict, Dataset
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, BatchEncoding
 
