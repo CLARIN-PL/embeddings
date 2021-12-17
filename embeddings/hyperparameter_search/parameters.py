@@ -1,10 +1,11 @@
 import abc
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import Generic, Literal, Optional, Sequence, Tuple, TypeVar, Union, get_args
+from typing import Generic, Optional, Sequence, Tuple, TypeVar, Union
 
 import optuna
 import optuna.distributions
+from typing_extensions import Literal, get_args
 
 from embeddings.utils.utils import Numeric, PrimitiveTypes
 

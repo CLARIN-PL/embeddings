@@ -2,7 +2,9 @@ from abc import ABC
 from dataclasses import dataclass, field
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Dict, Generic, Literal, Optional, Tuple
+from typing import Dict, Generic, Optional, Tuple
+
+from typing_extensions import Literal
 
 from embeddings.hyperparameter_search.configspace import (
     ConfigSpace,

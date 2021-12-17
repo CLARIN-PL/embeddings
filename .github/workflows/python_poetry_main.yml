@@ -9,8 +9,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.9.6 ]
-        poetry-version: [ 1.1.5 ]
+        python-version: [ 3.9, 3.8 ]
+        poetry-version: [ 1.1.12 ]
         os: [ ubuntu-20.04, macos-latest, windows-2022 ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -22,6 +22,12 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
+      - uses: actions/cache@v2
+        name: Load cached venv
+        id: cached-poetry-dependencies
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
       - name: Install deps
         run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
       - name: Run tests
@@ -30,8 +36,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.9.6 ]
-        poetry-version: [ 1.1.5 ]
+        python-version: [ 3.9]
+        poetry-version: [ 1.1.12 ]
         os: [ ubuntu-20.04 ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -43,6 +49,12 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
+      - uses: actions/cache@v2
+        name: Load cached venv
+        id: cached-poetry-dependencies
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
       - name: Install deps
         run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
       - name: Check
@@ -55,8 +67,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.9.6 ]
-        poetry-version: [ 1.1.5 ]
+        python-version: [ 3.9 ]
+        poetry-version: [ 1.1.12 ]
         os: [ ubuntu-20.04 ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -70,6 +82,12 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
+      - uses: actions/cache@v2
+        name: Load cached venv
+        id: cached-poetry-dependencies
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
       - name: Install deps
         run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
       - name: Build and publish
