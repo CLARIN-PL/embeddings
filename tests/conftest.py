@@ -25,5 +25,5 @@ def dummy_fasttext_config() -> KGR10FastTextConfig:
     return config
 
 
-def pytest_configure():
+def pytest_configure() -> None:
     pytest.decimal = 3
