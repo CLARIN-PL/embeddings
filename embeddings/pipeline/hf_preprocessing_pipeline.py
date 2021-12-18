@@ -8,6 +8,9 @@ from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
 from embeddings.transformation.hf_transformation.drop_subset_transformation import (
     DropSubsetHuggingFaceCorpusTransformation,
 )
+from embeddings.transformation.hf_transformation.sampling_transformation import (
+    SampleSplitsHuggingFaceTransformation,
+)
 from embeddings.transformation.transformation import EmptyTransformation, Transformation
 from embeddings.utils.hf_persister import HuggingFaceDatasetLocalPersister
 
@@ -34,15 +37,16 @@ class HuggingFaceTextClassificationPreprocessingPipeline(
             Transformation[datasets.DatasetDict, datasets.DatasetDict],
         ] = EmptyTransformation()
 
-        # # if ignore_test_subset:
-        #     transformation = transformation.then(
-        #         SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
-        #     )
-
         if ignore_test_subset:
             transformation = transformation.then(
                 DropSubsetHuggingFaceCorpusTransformation(subset="test")
             )
+
+        if sample_missing_splits:
+            transformation = transformation.then(
+                SampleSplitsHuggingFaceTransformation(*sample_missing_splits, seed=seed)
+            )
+
         transformation = transformation.persisting(
             HuggingFaceDatasetLocalPersister(path=persist_path)
         )
