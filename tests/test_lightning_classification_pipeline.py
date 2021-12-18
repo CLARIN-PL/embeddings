@@ -84,7 +84,15 @@ def test_lightning_classification_pipeline(
     pipeline, path = lightning_classification_pipeline
     result = pipeline.run()
     path.cleanup()
-    np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.4109589)
-    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.2270833)
-    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.1922905)
-    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.2857758)
+    np.testing.assert_almost_equal(
+        result["accuracy"]["accuracy"], 0.4109589, decimal=pytest.decimal
+    )
+    np.testing.assert_almost_equal(
+        result["f1__average_macro"]["f1"], 0.2270833, decimal=pytest.decimal
+    )
+    np.testing.assert_almost_equal(
+        result["precision__average_macro"]["precision"], 0.1922905, decimal=pytest.decimal
+    )
+    np.testing.assert_almost_equal(
+        result["recall__average_macro"]["recall"], 0.2857758, decimal=pytest.decimal
+    )
