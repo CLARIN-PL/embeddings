@@ -23,3 +23,7 @@ def dummy_fasttext_config() -> KGR10FastTextConfig:
     config = KGR10FastTextConfig()
     config.model_name = "test/dummy.model.bin"
     return config
+
+
+def pytest_configure() -> None:
+    pytest.decimal = 3

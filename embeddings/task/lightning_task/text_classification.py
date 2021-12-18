@@ -22,7 +22,7 @@ class TextClassification(HuggingFaceLightningTask):
     def __init__(
         self,
         model_name_or_path: str,
-        unfreeze_transformer_from_layer: Optional[int] = None,
+        finetune_last_n_layers: int = -1,
         metrics: Optional[MetricCollection] = None,
         config_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
@@ -31,7 +31,7 @@ class TextClassification(HuggingFaceLightningTask):
         super().__init__(
             model_name_or_path=model_name_or_path,
             downstream_model_type=self.downstream_model_type,
-            unfreeze_transformer_from_layer=unfreeze_transformer_from_layer,
+            finetune_last_n_layers=finetune_last_n_layers,
             metrics=metrics,
             config_kwargs=config_kwargs,
             task_model_kwargs=task_model_kwargs,
