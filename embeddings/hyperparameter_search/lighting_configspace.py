@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from plistlib import Dict
-from typing import Final
+from typing import Dict, Final
 
 from embeddings.hyperparameter_search.configspace import (
     BaseConfigSpace,
@@ -14,14 +13,10 @@ from embeddings.utils.utils import PrimitiveTypes
 @dataclass
 class LightingTextClassificationConfigSpace(BaseConfigSpace):
     max_epochs: Parameter = SearchableParameter(
-        name="max_epochs",
-        type="int_uniform",
-        low=1, high=30
+        name="max_epochs", type="int_uniform", low=1, high=30
     )
     mini_batch_size: Parameter = SearchableParameter(
-        name="batch_size",
-        type="log_int_uniform",
-        low=8, high=64
+        name="batch_size", type="log_int_uniform", low=8, high=64
     )
     max_seq_length: Parameter = ConstantParameter(
         name="max_seq_length",
@@ -45,11 +40,15 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
     )
     adam_epsilon: Parameter = SearchableParameter(
         name="adam_epsilon",
-        type="log_uniform", low=1e-9, high=0,
+        type="log_uniform",
+        low=1e-9,
+        high=0,
     )
     weight_decay: Parameter = SearchableParameter(
         name="weight_decay",
-        type="log_uniform", low=1e-9, high=0,
+        type="log_uniform",
+        low=1e-9,
+        high=0,
     )
     unfreeze_from: Parameter = SearchableParameter(
         name="unfreeze_from",
@@ -85,7 +84,7 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
         task_model_kwargs["eval_batch_size"] = dl_model_kwargs["batch_size"]
 
         return {
-            "dl_model_kwargs": dl_model_keys,
+            "dl_model_kwargs": dl_model_kwargs,
             "task_model_kwargs": task_model_kwargs,
-            "task_trainer_kwargs": task_trainer_kwargs
+            "task_trainer_kwargs": task_trainer_kwargs,
         }
