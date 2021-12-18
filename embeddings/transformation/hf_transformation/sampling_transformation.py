@@ -16,7 +16,12 @@ class SampleSplitsHuggingFaceTransformation(
     ):
         self.dev_fraction = dev_fraction
         self.test_fraction = test_fraction
-        self.seed: int = seed
+        self.seed = seed
+
+        if not dev_fraction and not test_fraction:
+            raise ValueError(
+                "At least one of parameters `dev_fraction` and `test_fraction` must be set for SampleSplitsHuggingFaceTransformation"
+            )
 
     def _train_test_split(
         self, data: datasets.Dataset, test_fraction: float
