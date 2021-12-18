@@ -1,4 +1,4 @@
-#State-of-the-art Text Representations for Natural Language Processing tasks, an initial version of library focus on the Polish Language
+# State-of-the-art Text Representations for Natural Language Processing tasks, an initial version of library focus on the Polish Language
 
 [![CI Main](https://github.com/CLARIN-PL/embeddings/actions/workflows/python_poetry_main.yml/badge.svg)](https://github.com/CLARIN-PL/embeddings/actions/workflows/python_poetry_main.yml)
 
