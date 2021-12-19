@@ -18,7 +18,7 @@ def pipeline_kwargs() -> Dict[str, Any]:
 @pytest.fixture
 def dataset_kwargs() -> Dict[str, Any]:
     return {
-        "dataset_name": "clarin-pl/polemo2-official",
+        "dataset_name_or_path": "clarin-pl/polemo2-official",
         "input_column_name": ["text"],
         "target_column_name": "target",
         "load_dataset_kwargs": {
