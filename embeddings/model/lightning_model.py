@@ -1,6 +1,7 @@
 from typing import Any, Dict, Literal
 
 import pytorch_lightning as pl
+import torch.cuda
 from numpy import typing as nptyping
 from torch.utils.data import DataLoader
 
@@ -21,7 +22,13 @@ class LightningModel(Model[pl.LightningDataModule, Dict[str, nptyping.NDArray[An
         self.predict_subset = predict_subset
 
     def execute(self, data: pl.LightningDataModule) -> Dict[str, nptyping.NDArray[Any]]:
-        self.trainer.fit(self.task, data)
+        try:
+            self.trainer.fit(self.task, data)
+        except Exception as e:
+            del self.trainer
+            torch.cuda.empty_cache()  # type: ignore
+            raise e
+
         dataloader = (
             data.test_dataloader() if self.predict_subset == "test" else data.val_dataloader()
         )

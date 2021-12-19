@@ -20,7 +20,7 @@ class SampleSplitsHuggingFaceTransformation(
 
         if not dev_fraction and not test_fraction:
             raise ValueError(
-                "At least one of parameters `dev_fraction` and `test_fraction` must be set for SampleSplitsHuggingFaceTransformation"
+                "At least one of parameters `dev_fraction` andgi `test_fraction` must be set for SampleSplitsHuggingFaceTransformation"
             )
 
     def _train_test_split(
