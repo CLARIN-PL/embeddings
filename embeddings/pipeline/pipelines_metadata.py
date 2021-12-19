@@ -11,13 +11,16 @@ class PathMetadata(TypedDict, total=False):
 
 class EmbeddingPipelineMetadata(PathMetadata):
     embedding_name: str
-    dataset_name: str
     load_dataset_kwargs: Optional[Dict[str, Any]]
     task_model_kwargs: Optional[Dict[str, Any]]
     task_train_kwargs: Optional[Dict[str, Any]]
 
 
-class FlairClassificationPipelineMetadata(EmbeddingPipelineMetadata):
+class FlairEmbeddingPipelineMetadata(EmbeddingPipelineMetadata):
+    dataset_name: str
+
+
+class FlairClassificationPipelineMetadata(FlairEmbeddingPipelineMetadata):
     input_column_name: str
     target_column_name: str
     document_embedding_cls: str
@@ -58,6 +61,17 @@ class FlairSequenceLabelingEvaluationPipelineMetadata(FlairEvaluationPipelineMet
 class FlairClassificationEvaluationPipelineMetadata(FlairEvaluationPipelineMetadata):
     document_embedding_cls: str
     load_model_kwargs: Optional[Dict[str, Any]]
+
+
+class LightningClassificationPipelineMetadata(EmbeddingPipelineMetadata):
+    dataset_name_or_path: str
+    train_batch_size: int
+    eval_batch_size: int
+    finetune_last_n_layers: int
+    tokenizer_name: Optional[str]
+    datamodule_kwargs: Optional[Dict[str, Any]]
+    tokenizer_kwargs: Optional[Dict[str, Any]]
+    batch_encoding_kwargs: Optional[Dict[str, Any]]
 
 
 Metadata = TypeVar("Metadata", bound=EmbeddingPipelineMetadata)
