@@ -22,7 +22,7 @@ class LightningClassificationPipeline(
     def __init__(
         self,
         embedding_name: str,
-        dataset_name_or_path: Union[str, os.PathLike[Any]],
+        dataset_name_or_path: Union[str, "os.PathLike[Any]"],
         input_column_name: Union[str, Sequence[str]],
         target_column_name: str,
         output_path: T_path,

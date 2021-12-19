@@ -41,7 +41,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
     def __init__(
         self,
         tokenizer_name_or_path: str,
-        dataset_name_or_path: Union[str, os.PathLike[Any]],
+        dataset_name_or_path: Union[str, "os.PathLike[Any]"],
         target_field: str,
         max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
@@ -156,7 +156,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
     def __init__(
         self,
         tokenizer_name_or_path: str,
-        dataset_name_or_path: Union[str, os.PathLike[Any]],
+        dataset_name_or_path: Union[str, "os.PathLike[Any]"],
         text_fields: Union[str, Sequence[str]],
         target_field: str,
         max_seq_length: Optional[int] = None,
