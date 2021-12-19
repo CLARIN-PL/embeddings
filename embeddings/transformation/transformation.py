@@ -27,7 +27,7 @@ class Transformation(ABC, Generic[Input, Output]):
         return PersistingTransformation(self, persister)
 
 
-class EmptyTransformation(Transformation[Input, Input]):
+class DummyTransformation(Transformation[Input, Input]):
     def transform(self, data: Input) -> Input:
         return data
 

@@ -11,7 +11,7 @@ from embeddings.transformation.hf_transformation.drop_subset_transformation impo
 from embeddings.transformation.hf_transformation.sampling_transformation import (
     SampleSplitsHuggingFaceTransformation,
 )
-from embeddings.transformation.transformation import EmptyTransformation, Transformation
+from embeddings.transformation.transformation import DummyTransformation, Transformation
 from embeddings.utils.hf_persister import HuggingFaceDatasetLocalPersister
 
 
@@ -33,9 +33,9 @@ class HuggingFaceTextClassificationPreprocessingPipeline(
         data_loader = HuggingFaceDataLoader()
 
         transformation: Union[
-            EmptyTransformation[datasets.DatasetDict],
+            DummyTransformation[datasets.DatasetDict],
             Transformation[datasets.DatasetDict, datasets.DatasetDict],
-        ] = EmptyTransformation()
+        ] = DummyTransformation()
 
         if ignore_test_subset:
             transformation = transformation.then(
