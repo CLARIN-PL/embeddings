@@ -1,4 +1,6 @@
 import abc
+import os
+import pathlib
 from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import datasets
@@ -7,6 +9,8 @@ from datasets import ClassLabel, Dataset, DatasetDict
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, BatchEncoding
 
+from embeddings.data import dataset as embeddings_dataset
+from embeddings.data.data_loader import HuggingFaceDataLoader, HuggingFaceLocalDataLoader
 from embeddings.utils.loggers import get_logger
 
 Data = TypeVar("Data")
@@ -37,7 +41,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
     def __init__(
         self,
         tokenizer_name_or_path: str,
-        dataset_name: str,
+        dataset_name_or_path: Union[str, os.PathLike[Any]],
         target_field: str,
         max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
@@ -54,7 +58,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         # caused by pl.LightningDataModule __init__ method not being typed
         super().__init__()  # type: ignore
         self.tokenizer_name_or_path = tokenizer_name_or_path
-        self.dataset_name = dataset_name
+        self.dataset_name_or_path = dataset_name_or_path
         self.target_field = target_field
         self.max_seq_length = max_seq_length
         self.train_batch_size = train_batch_size
@@ -71,10 +75,18 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         )
         self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
 
-    def load_dataset(self) -> DatasetDict:
-        result = datasets.load_dataset(self.dataset_name, **self.load_dataset_kwargs)
-        assert isinstance(result, DatasetDict)
-        return result
+    def load_dataset(self, preparation_step: bool = False) -> DatasetDict:
+        loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = HuggingFaceDataLoader()
+        if os.path.exists(self.dataset_name_or_path):
+            if preparation_step:
+                return datasets.DatasetDict()
+            dataset = embeddings_dataset.HuggingFaceDataset(pathlib.Path(self.dataset_name_or_path))
+            loader = HuggingFaceLocalDataLoader()
+        else:
+            dataset = embeddings_dataset.HuggingFaceDataset(
+                str(self.dataset_name_or_path), **self.load_dataset_kwargs
+            )
+        return loader.load(dataset)
 
     def get_num_classes(self) -> int:
         assert isinstance(self.dataset, DatasetDict)
@@ -101,7 +113,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
                 self.dataset[column_name] = downsampled_data["test"]
 
     def prepare_data(self) -> None:
-        datasets.load_dataset(self.dataset_name)
+        self.load_dataset(preparation_step=True)
         AutoTokenizer.from_pretrained(self.tokenizer_name_or_path)
 
     def setup(self, stage: Optional[str] = None) -> None:
@@ -144,7 +156,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
     def __init__(
         self,
         tokenizer_name_or_path: str,
-        dataset_name: str,
+        dataset_name_or_path: Union[str, os.PathLike[Any]],
         text_fields: Union[str, Sequence[str]],
         target_field: str,
         max_seq_length: Optional[int] = None,
@@ -162,7 +174,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         self.text_fields = text_fields
         super().__init__(
             tokenizer_name_or_path=tokenizer_name_or_path,
-            dataset_name=dataset_name,
+            dataset_name_or_path=dataset_name_or_path,
             target_field=target_field,
             max_seq_length=max_seq_length,
             train_batch_size=train_batch_size,

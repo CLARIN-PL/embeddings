@@ -1,3 +1,4 @@
+import os
 from typing import Any, Dict, Optional, Sequence, Union
 
 import datasets
@@ -21,7 +22,7 @@ class LightningClassificationPipeline(
     def __init__(
         self,
         embedding_name: str,
-        dataset_name: str,
+        dataset_name_or_path: Union[str, os.PathLike[Any]],
         input_column_name: Union[str, Sequence[str]],
         target_column_name: str,
         output_path: T_path,
@@ -38,7 +39,7 @@ class LightningClassificationPipeline(
     ):
         datamodule = TextClassificationDataModule(
             tokenizer_name_or_path=tokenizer_name if tokenizer_name else embedding_name,
-            dataset_name=dataset_name,
+            dataset_name_or_path=dataset_name_or_path,
             text_fields=input_column_name,
             target_field=target_column_name,
             train_batch_size=train_batch_size,
