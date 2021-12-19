@@ -24,12 +24,12 @@ from embeddings.pipeline.hps_pipeline import (
     _HuggingFaceOptimizedPipelineDefaultsBase,
 )
 from embeddings.pipeline.pipelines_metadata import (
-    EvaluationPipelineMetadata,
     FlairClassificationEvaluationPipelineMetadata,
+    FlairClassificationPipelineMetadata,
+    FlairEvaluationPipelineMetadata,
+    FlairPairClassificationPipelineMetadata,
     FlairSequenceLabelingEvaluationPipelineMetadata,
-    HuggingFaceClassificationPipelineMetadata,
-    HuggingFacePairClassificationPipelineMetadata,
-    HuggingFaceSequenceLabelingPipelineMetadata,
+    FlairSequenceLabelingPipelineMetadata,
 )
 from embeddings.pipeline.preprocessing_pipeline import (
     FlairSequenceLabelingPreprocessingPipeline,
@@ -88,8 +88,8 @@ class _OptimizedFlairClassificationPipelineDefaultsBase(
 class OptimizedFlairClassificationPipeline(
     OptunaPipeline[
         TextClassificationConfigSpace,
-        HuggingFaceClassificationPipelineMetadata,
-        EvaluationPipelineMetadata,
+        FlairClassificationPipelineMetadata,
+        FlairEvaluationPipelineMetadata,
     ],
     AbstractHuggingFaceOptimizedPipeline[TextClassificationConfigSpace],
     _OptimizedFlairClassificationPipelineDefaultsBase,
@@ -117,16 +117,14 @@ class OptimizedFlairClassificationPipeline(
             config_space=self.config_space,
         )
 
-    def _get_metadata(
-        self, parameters: SampledParameters
-    ) -> HuggingFaceClassificationPipelineMetadata:
+    def _get_metadata(self, parameters: SampledParameters) -> FlairClassificationPipelineMetadata:
         (
             embedding_name,
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
-        metadata: HuggingFaceClassificationPipelineMetadata = {
+        metadata: FlairClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
             "document_embedding_cls": document_embedding_cls,
             "dataset_name": self.dataset_name,
@@ -171,8 +169,8 @@ class OptimizedFlairClassificationPipeline(
 class OptimizedFlairPairClassificationPipeline(
     OptunaPipeline[
         TextClassificationConfigSpace,
-        HuggingFacePairClassificationPipelineMetadata,
-        EvaluationPipelineMetadata,
+        FlairPairClassificationPipelineMetadata,
+        FlairEvaluationPipelineMetadata,
     ],
     AbstractHuggingFaceOptimizedPipeline[TextClassificationConfigSpace],
     _OptimizedFlairClassificationPipelineDefaultsBase,
@@ -202,14 +200,14 @@ class OptimizedFlairPairClassificationPipeline(
 
     def _get_metadata(
         self, parameters: SampledParameters
-    ) -> HuggingFacePairClassificationPipelineMetadata:
+    ) -> FlairPairClassificationPipelineMetadata:
         (
             embedding_name,
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
-        metadata: HuggingFacePairClassificationPipelineMetadata = {
+        metadata: FlairPairClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
             "document_embedding_cls": document_embedding_cls,
             "dataset_name": self.dataset_name,
@@ -262,7 +260,7 @@ class _OptimizedFlairSequenceLabelingPipelineBase(
 class OptimizedFlairSequenceLabelingPipeline(
     OptunaPipeline[
         SequenceLabelingConfigSpace,
-        HuggingFaceSequenceLabelingPipelineMetadata,
+        FlairSequenceLabelingPipelineMetadata,
         FlairSequenceLabelingEvaluationPipelineMetadata,
     ],
     AbstractHuggingFaceOptimizedPipeline[SequenceLabelingConfigSpace],
@@ -326,16 +324,14 @@ class OptimizedFlairSequenceLabelingPipeline(
         assert isinstance(task_model_kwargs, dict)
         return embedding_name, hidden_size, task_train_kwargs, task_model_kwargs
 
-    def _get_metadata(
-        self, parameters: SampledParameters
-    ) -> HuggingFaceSequenceLabelingPipelineMetadata:
+    def _get_metadata(self, parameters: SampledParameters) -> FlairSequenceLabelingPipelineMetadata:
         (
             embedding_name,
             hidden_size,
             task_train_kwargs,
             task_model_kwargs,
         ) = self._pop_sampled_parameters(parameters)
-        metadata: HuggingFaceSequenceLabelingPipelineMetadata = {
+        metadata: FlairSequenceLabelingPipelineMetadata = {
             "embedding_name": embedding_name,
             "hidden_size": hidden_size,
             "dataset_name": self.dataset_name,

@@ -17,21 +17,21 @@ class EmbeddingPipelineMetadata(PathMetadata):
     task_train_kwargs: Optional[Dict[str, Any]]
 
 
-class HuggingFaceClassificationPipelineMetadata(EmbeddingPipelineMetadata):
+class FlairClassificationPipelineMetadata(EmbeddingPipelineMetadata):
     input_column_name: str
     target_column_name: str
     document_embedding_cls: str
     load_model_kwargs: Optional[Dict[str, Any]]
 
 
-class HuggingFacePairClassificationPipelineMetadata(EmbeddingPipelineMetadata):
+class FlairPairClassificationPipelineMetadata(EmbeddingPipelineMetadata):
     input_columns_names_pair: Tuple[str, str]
     target_column_name: str
     document_embedding_cls: str
     load_model_kwargs: Optional[Dict[str, Any]]
 
 
-class HuggingFaceSequenceLabelingPipelineMetadata(EmbeddingPipelineMetadata):
+class FlairSequenceLabelingPipelineMetadata(EmbeddingPipelineMetadata):
     input_column_name: str
     target_column_name: str
     hidden_size: int
@@ -39,7 +39,7 @@ class HuggingFaceSequenceLabelingPipelineMetadata(EmbeddingPipelineMetadata):
     tagging_scheme: Optional[str]
 
 
-class EvaluationPipelineMetadata(TypedDict):
+class FlairEvaluationPipelineMetadata(TypedDict):
     dataset_path: str
     embedding_name: str
     persist_path: Optional[str]
@@ -49,16 +49,16 @@ class EvaluationPipelineMetadata(TypedDict):
     output_path: str
 
 
-class FlairSequenceLabelingEvaluationPipelineMetadata(EvaluationPipelineMetadata):
+class FlairSequenceLabelingEvaluationPipelineMetadata(FlairEvaluationPipelineMetadata):
     hidden_size: int
     evaluation_mode: str
     tagging_scheme: Optional[str]
 
 
-class FlairClassificationEvaluationPipelineMetadata(EvaluationPipelineMetadata):
+class FlairClassificationEvaluationPipelineMetadata(FlairEvaluationPipelineMetadata):
     document_embedding_cls: str
     load_model_kwargs: Optional[Dict[str, Any]]
 
 
 Metadata = TypeVar("Metadata", bound=EmbeddingPipelineMetadata)
-EvaluationMetadata = TypeVar("EvaluationMetadata", bound=EvaluationPipelineMetadata)
+FlairEvaluationMetadata = TypeVar("FlairEvaluationMetadata", bound=FlairEvaluationPipelineMetadata)
