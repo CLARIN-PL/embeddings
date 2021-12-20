@@ -75,4 +75,4 @@ class LightningClassificationPipelineMetadata(EmbeddingPipelineMetadata):
 
 
 Metadata = TypeVar("Metadata", bound=EmbeddingPipelineMetadata)
-FlairEvaluationMetadata = TypeVar("FlairEvaluationMetadata", bound=FlairEvaluationPipelineMetadata)
+EvaluationMetadata = TypeVar("EvaluationMetadata", bound=TypedDict)

@@ -14,7 +14,7 @@ from embeddings.data.dataset import Data
 from embeddings.data.io import T_path
 from embeddings.hyperparameter_search.configspace import ConfigSpace, SampledParameters
 from embeddings.pipeline.evaluation_pipeline import ModelEvaluationPipeline
-from embeddings.pipeline.pipelines_metadata import FlairEvaluationMetadata, Metadata
+from embeddings.pipeline.pipelines_metadata import EvaluationMetadata, Metadata
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
 from embeddings.pipeline.standard_pipeline import LoaderResult, ModelResult, TransformationResult
 from embeddings.utils.hps_persister import HPSResultsPersister
@@ -53,7 +53,7 @@ class PersistingPipeline(OptimizedPipeline[Metadata]):
 
 
 class OptunaPipeline(
-    OptimizedPipeline[Metadata], Generic[ConfigSpace, Metadata, FlairEvaluationMetadata]
+    OptimizedPipeline[Metadata], Generic[ConfigSpace, Metadata, EvaluationMetadata]
 ):
     def __init__(
         self,
@@ -84,7 +84,7 @@ class OptunaPipeline(
         pass
 
     @abc.abstractmethod
-    def _get_evaluation_metadata(self, parameters: SampledParameters) -> FlairEvaluationMetadata:
+    def _get_evaluation_metadata(self, parameters: SampledParameters) -> EvaluationMetadata:
         pass
 
     def get_best_paramaters(self, study: Study) -> Metadata:
