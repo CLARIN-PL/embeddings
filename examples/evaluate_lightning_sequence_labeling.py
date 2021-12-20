@@ -5,7 +5,6 @@ from typing import Optional
 import typer
 
 from embeddings.defaults import RESULTS_PATH
-from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
 
 
