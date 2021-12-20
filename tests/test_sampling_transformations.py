@@ -1,9 +1,11 @@
+import copy
 from tempfile import TemporaryDirectory
 from typing import Tuple
 
 import datasets
 import flair
 import pytest
+from datasets import DatasetDict
 from flair.data import Corpus
 
 from embeddings.data.data_loader import ConllFlairCorpusDataLoader, HuggingFaceDataLoader
@@ -200,7 +202,7 @@ def test_combined_sampling(
     expected_test_size = round(len(ner_data["test"]) * downsample_percentage)
 
     transformation_other, path_other = ner_combined_other_order_sample_transformation
-    other_transformed_data = transformation_other.transform(ner_data.copy())
+    other_transformed_data = transformation_other.transform(copy.deepcopy(ner_data))
     transformation, path = ner_combined_sample_transformation
     transformed_data = transformation.transform(ner_data)
 
