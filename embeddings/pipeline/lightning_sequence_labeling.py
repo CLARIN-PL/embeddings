@@ -15,15 +15,9 @@ from embeddings.task.lightning_task.sequence_labeling import SequenceLabeling
 class LightningSequenceLabelingPipeline(
     LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
-    DEFAULT_TASK_TRAIN_KWARGS = {
-        "devices": "auto",
-        "accelerator": "auto",
-        "max_epochs": 1,  # TODO: remove after testing
-        "limit_train_batches": 0.1,
-        "limit_val_batches": 0.1,
-        "limit_test_batches": 0.1,
-    }
+    DEFAULT_TASK_TRAIN_KWARGS = {"devices": "auto", "accelerator": "auto"}
     DEFAULT_TASK_MODEL_KWARGS = {"use_scheduler": False}
+    DEFAULT_DATAMODULE_KWARGS = {"max_seq_length": None}
 
     def __init__(
         self,
@@ -34,13 +28,13 @@ class LightningSequenceLabelingPipeline(
         output_path: T_path,
         evaluation_mode: str = "conll",
         tagging_scheme: Optional[str] = None,
-        label_all_tokens: bool = False,
-        max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
-        finetune_last_n_layers: int = 0,  # TODO: -1 after testing
+        label_all_tokens: bool = False,
+        finetune_last_n_layers: int = -1,
         tokenizer_name: Optional[str] = None,
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
+        datamodule_kwargs: Optional[Dict[str, Any]] = None,
         batch_encoding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
@@ -51,17 +45,17 @@ class LightningSequenceLabelingPipeline(
             dataset_name=dataset_name,
             text_field=input_column_name,
             target_field=target_column_name,
-            label_all_tokens=label_all_tokens,
-            max_seq_length=max_seq_length,
             train_batch_size=train_batch_size,
             eval_batch_size=eval_batch_size,
+            label_all_tokens=label_all_tokens,
             tokenizer_kwargs=tokenizer_kwargs,
             batch_encoding_kwargs=batch_encoding_kwargs,
             load_dataset_kwargs=load_dataset_kwargs,
+            **datamodule_kwargs if datamodule_kwargs else self.DEFAULT_DATAMODULE_KWARGS,
         )
         trainer = pl.Trainer(
             default_root_dir=output_path,
-            **task_train_kwargs if task_train_kwargs else self.DEFAULT_TASK_TRAIN_KWARGS
+            **task_train_kwargs if task_train_kwargs else self.DEFAULT_TASK_TRAIN_KWARGS,
         )
 
         task = SequenceLabeling(

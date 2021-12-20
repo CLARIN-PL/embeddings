@@ -5,14 +5,16 @@ import torch
 from transformers import BatchEncoding, DataCollatorForTokenClassification
 
 
+# ignoring `Class cannot subclass "DataCollatorForTokenClassification" (has type "Any")` error
 @dataclass
-class CustomDataCollatorForTokenClassification(DataCollatorForTokenClassification):
+class CustomDataCollatorForTokenClassification(DataCollatorForTokenClassification):  # type: ignore
     label_name: str = "labels"
 
     def torch_call(self, features: List[Dict[str, Any]]) -> Union[BatchEncoding, Dict[str, Any]]:
         labels = [feature[self.label_name] for feature in features]
         features = [
-            {k: v for k, v in feature_dict if k != self.label_name} for feature_dict in features
+            {k: v for k, v in feature_dict.items() if k != self.label_name}
+            for feature_dict in features
         ]
 
         batch = self.tokenizer.pad(

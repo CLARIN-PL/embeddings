@@ -113,15 +113,11 @@ class SequenceLabeling(HuggingFaceLightningTask):
     def predict(
         self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Dict[str, nptyping.NDArray[Any]]:
-
-        predictions = []
-        for batch in dataloader:
-            outputs = self.model(**batch)
-            predictions.append(outputs.logits)
-
+        predictions = [self.model(**batch).logits for batch in dataloader]
         predictions = list(torch.argmax(torch.cat(predictions), dim=2).numpy())
         ground_truth = list(torch.cat([x["labels"] for x in dataloader]).numpy())
 
+        assert self.trainer is not None
         for i, (pred, gt) in enumerate(zip(predictions, ground_truth)):
             predictions[i] = [
                 self.trainer.datamodule.id_to_label[x] for x in list(pred[gt != self.ignore_index])
