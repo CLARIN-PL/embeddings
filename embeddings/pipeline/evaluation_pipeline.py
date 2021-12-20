@@ -124,14 +124,16 @@ class FlairTextPairClassificationEvaluationPipeline(
 class FlairSequenceLabelingEvaluationPipeline(
     ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
+    DEFAULT_EVAL_MODE = SequenceLabelingEvaluator.EvaluationMode.CONLL
+
     def __init__(
         self,
         dataset_path: str,
         embedding_name: str,
         output_path: str,
         hidden_size: int,
-        evaluation_mode: Literal["conll", "strict", "unit"] = "conll",
-        tagging_scheme: Optional[Literal["IOB1", "IOB2", "IOE1", "IOE2", "IOBES", "BILOU"]] = None,
+        evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = DEFAULT_EVAL_MODE,
+        tagging_scheme: Optional[SequenceLabelingEvaluator.TaggingScheme] = None,
         persist_path: Optional[str] = None,
         predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
