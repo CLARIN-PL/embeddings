@@ -5,7 +5,6 @@ from typing import Tuple
 import datasets
 import flair
 import pytest
-from datasets import DatasetDict
 from flair.data import Corpus
 
 from embeddings.data.data_loader import ConllFlairCorpusDataLoader, HuggingFaceDataLoader
