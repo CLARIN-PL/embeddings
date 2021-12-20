@@ -192,21 +192,21 @@ for token in sentence:
 
 Instead of the `allegro/herbert-base-cased` model, you can pass any model from [Hugging Face Hub](https://huggingface.co/models) that is compatible with [Transformers](https://huggingface.co/transformers/) or with our library. 
 
-| Embedding | Type | Description |
-| --- | --- | --- |
-| [clarin-pl/herbert-kgr10](https://huggingface.co/clarin-pl/herbert-kgr10) | bert | HerBERT Large  trained on supplementary data - the KGR10 corpus. |
-| [clarin-pl/fastText-kgr10](https://huggingface.co/clarin-pl/fastText-kgr10) | static, word | FastText trained on trained on the KGR10 corpus. |
-| [clarin-pl/word2vec-kgr10](https://huggingface.co/clarin-pl/word2vec-kgr10) | static, word | Word2vec trained on trained on the KGR10 corpus. |
-| ... |
+| Embedding                                                                   | Type         | Description                                                      |
+|-----------------------------------------------------------------------------|--------------|------------------------------------------------------------------|
+| [clarin-pl/herbert-kgr10](https://huggingface.co/clarin-pl/herbert-kgr10)   | bert         | HerBERT Large  trained on supplementary data - the KGR10 corpus. |
+| [clarin-pl/fastText-kgr10](https://huggingface.co/clarin-pl/fastText-kgr10) | static, word | FastText trained on trained on the KGR10 corpus.                 |
+| [clarin-pl/word2vec-kgr10](https://huggingface.co/clarin-pl/word2vec-kgr10) | static, word | Word2vec trained on trained on the KGR10 corpus.                 |
+| ...                                                                         |
 
 
 # Optimized pipelines.
 
-Task | Optimized Pipeline |
- --- | --- |
-Text Classification | [OptimizedFlairClassificationPipeline](embeddings/pipeline/flair_hps_pipeline.py) | 
-Pair Text Classification | [OptimizedFlairPairClassificationPipeline](embeddings/pipeline/flair_hps_pipeline.py) |
-Sequence Labeling | [OptimizedFlairSequenceLabelingPipeline](embeddings/pipeline/flair_hps_pipeline.py) |
+| Task                     | Optimized Pipeline                                                                    |
+|--------------------------|---------------------------------------------------------------------------------------|
+| Text Classification      | [OptimizedFlairClassificationPipeline](embeddings/pipeline/flair_hps_pipeline.py)     | 
+| Pair Text Classification | [OptimizedFlairPairClassificationPipeline](embeddings/pipeline/flair_hps_pipeline.py) |
+| Sequence Labeling        | [OptimizedFlairSequenceLabelingPipeline](embeddings/pipeline/flair_hps_pipeline.py)   |
 
 
 ## Example with Text Classification
