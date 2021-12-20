@@ -98,7 +98,9 @@ def sklearn_metrics(
 def seqeval_metrics(
     data: Dict[str, nptyping.NDArray[Any]]
 ) -> Dict[str, Union[Dict[str, float], float]]:
-    evaluator = SequenceLabelingEvaluator(evaluation_mode="unit")
+    evaluator = SequenceLabelingEvaluator(
+        evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.UNIT
+    )
     out = evaluator.evaluate(data)["UnitSeqeval"]
     assert isinstance(out, dict)
     return out
@@ -115,12 +117,17 @@ def test_pos_tagging_metrics(
 
 
 def test_conll_metrics(ner_data: Dict[str, nptyping.NDArray[Any]]) -> None:
-    evaluator = SequenceLabelingEvaluator(evaluation_mode="conll")
+    evaluator = SequenceLabelingEvaluator(
+        evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.CONLL
+    )
     out = evaluator.evaluate(ner_data)
     np.testing.assert_almost_equal(out["seqeval__mode_None__scheme_None"]["overall_f1"], 1.0)
 
 
 def test_strict_metrics(ner_data: Dict[str, nptyping.NDArray[Any]]) -> None:
-    evaluator = SequenceLabelingEvaluator(evaluation_mode="strict", tagging_scheme="IOB2")
+    evaluator = SequenceLabelingEvaluator(
+        evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.STRICT,
+        tagging_scheme=SequenceLabelingEvaluator.TaggingScheme.IOB2,
+    )
     out = evaluator.evaluate(ner_data)
     np.testing.assert_almost_equal(out["seqeval__mode_strict__scheme_IOB2"]["overall_f1"], 0.5)
