@@ -27,14 +27,14 @@ class FlairClassificationPipelineMetadata(FlairEmbeddingPipelineMetadata):
     load_model_kwargs: Optional[Dict[str, Any]]
 
 
-class FlairPairClassificationPipelineMetadata(EmbeddingPipelineMetadata):
+class FlairPairClassificationPipelineMetadata(FlairEmbeddingPipelineMetadata):
     input_columns_names_pair: Tuple[str, str]
     target_column_name: str
     document_embedding_cls: str
     load_model_kwargs: Optional[Dict[str, Any]]
 
 
-class FlairSequenceLabelingPipelineMetadata(EmbeddingPipelineMetadata):
+class FlairSequenceLabelingPipelineMetadata(FlairEmbeddingPipelineMetadata):
     input_column_name: str
     target_column_name: str
     hidden_size: int
