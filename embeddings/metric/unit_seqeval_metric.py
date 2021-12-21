@@ -17,7 +17,7 @@ class UnitSeqevalMetric(HuggingFaceMetric):
     @staticmethod
     def _convert_single_tag_to_bilou_scheme(tags: Optional[HF_metric_input]) -> List[List[str]]:
         assert isinstance(tags, np.ndarray)
-        return [[f"U-{tag}" for tag in sequence] for sequence in tags]
+        return [[f"U-{tag}" if tag != "O" else tag for tag in sequence] for sequence in tags]
 
     @staticmethod
     def _have_tags_unit_prefix(tags: Optional[HF_metric_input]) -> bool:

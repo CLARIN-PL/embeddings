@@ -95,7 +95,7 @@ def test_no_dev_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
-    flair.device = torch.device("cpu")  # type: ignore
+    flair.device = torch.device("cpu")
 
     data: Corpus = sequence_labeling_preprocessing_pipeline.run()
     assert data.dev is None

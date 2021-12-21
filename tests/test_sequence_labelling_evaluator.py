@@ -4,7 +4,7 @@ from typing import Any, Dict, Union
 import numpy as np
 import pytest
 from numpy import typing as nptyping
-from sklearn.metrics import classification_report, precision_recall_fscore_support
+from sklearn.metrics import accuracy_score, classification_report, precision_recall_fscore_support
 
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 
@@ -14,7 +14,7 @@ def data() -> Dict[str, nptyping.NDArray[Any]]:
     return {
         "y_true": np.array(
             [
-                ["VB", "RB", "VB"],
+                ["VB", "RB", "VB", "O"],
                 ["RB", "JJ", "VB", "NN"],
                 ["JJ", "RB", "NN", "VB"],
             ],
@@ -22,7 +22,7 @@ def data() -> Dict[str, nptyping.NDArray[Any]]:
         ),
         "y_pred": np.array(
             [
-                ["RB", "VB", "VB"],
+                ["RB", "VB", "VB", "O"],
                 ["NN", "NN", "VB", "NN"],
                 ["JJ", "RB", "RB", "VB"],
             ],
@@ -58,21 +58,24 @@ def sklearn_metrics(
     out_dict = {}
     out_dict.update(
         classification_report(
-            list(chain.from_iterable(data["y_true"])),
-            list(chain.from_iterable(data["y_pred"])),
+            list(filter(lambda tag: tag != "O", chain.from_iterable(data["y_true"]))),
+            list(filter(lambda tag: tag != "O", chain.from_iterable(data["y_pred"]))),
             output_dict=True,
         )
     )
     prfs = precision_recall_fscore_support(
-        list(chain.from_iterable(data["y_true"])),
-        list(chain.from_iterable(data["y_pred"])),
+        list(filter(lambda tag: tag != "O", chain.from_iterable(data["y_true"]))),
+        list(filter(lambda tag: tag != "O", chain.from_iterable(data["y_pred"]))),
         average="micro",
     )
 
     del out_dict["macro avg"]
     del out_dict["weighted avg"]
+    del out_dict["accuracy"]
 
-    accuracy = out_dict.pop("accuracy")
+    accuracy = accuracy_score(
+        list(chain.from_iterable(data["y_true"])), list(chain.from_iterable(data["y_pred"]))
+    )
     out_dict = {
         tag: {
             metric.replace("support", "number").replace("f1-score", "f1"): metric_value
@@ -95,7 +98,9 @@ def sklearn_metrics(
 def seqeval_metrics(
     data: Dict[str, nptyping.NDArray[Any]]
 ) -> Dict[str, Union[Dict[str, float], float]]:
-    evaluator = SequenceLabelingEvaluator(evaluation_mode="unit")
+    evaluator = SequenceLabelingEvaluator(
+        evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.UNIT
+    )
     out = evaluator.evaluate(data)["UnitSeqeval"]
     assert isinstance(out, dict)
     return out
@@ -112,12 +117,17 @@ def test_pos_tagging_metrics(
 
 
 def test_conll_metrics(ner_data: Dict[str, nptyping.NDArray[Any]]) -> None:
-    evaluator = SequenceLabelingEvaluator(evaluation_mode="conll")
+    evaluator = SequenceLabelingEvaluator(
+        evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.CONLL
+    )
     out = evaluator.evaluate(ner_data)
     np.testing.assert_almost_equal(out["seqeval__mode_None__scheme_None"]["overall_f1"], 1.0)
 
 
 def test_strict_metrics(ner_data: Dict[str, nptyping.NDArray[Any]]) -> None:
-    evaluator = SequenceLabelingEvaluator(evaluation_mode="strict", tagging_scheme="IOB2")
+    evaluator = SequenceLabelingEvaluator(
+        evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.STRICT,
+        tagging_scheme=SequenceLabelingEvaluator.TaggingScheme.IOB2,
+    )
     out = evaluator.evaluate(ner_data)
     np.testing.assert_almost_equal(out["seqeval__mode_strict__scheme_IOB2"]["overall_f1"], 0.5)

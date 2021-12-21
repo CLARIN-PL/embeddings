@@ -44,7 +44,9 @@ def pos_tagging_pipeline(
     embedding = AutoFlairWordEmbedding.from_hub("allegro/herbert-base-cased")
     task = SequenceLabeling(result_path.name, hidden_size=256, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(embedding, task)
-    evaluator = SequenceLabelingEvaluator(evaluation_mode="unit")
+    evaluator = SequenceLabelingEvaluator(
+        evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.UNIT
+    )
 
     pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)
     return pipeline, result_path
@@ -88,7 +90,7 @@ def test_pos_tagging_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
-    flair.device = torch.device("cpu")  # type: ignore
+    flair.device = torch.device("cpu")
     pipeline, path = pos_tagging_pipeline
     result = pipeline.run()
     path.cleanup()
@@ -105,7 +107,7 @@ def test_ner_tagging_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
-    flair.device = torch.device("cpu")  # type: ignore
+    flair.device = torch.device("cpu")
     pipeline, path = ner_tagging_pipeline
     result = pipeline.run()
     path.cleanup()
