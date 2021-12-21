@@ -6,7 +6,11 @@ from numpy import typing as nptyping
 
 from embeddings.data.datamodule import SequenceLabelingDataModule
 from embeddings.data.io import T_path
-from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
+from embeddings.evaluator.sequence_labeling_evaluator import (
+    EvaluationMode,
+    SequenceLabelingEvaluator,
+    TaggingScheme,
+)
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task.sequence_labeling import SequenceLabeling
@@ -26,8 +30,8 @@ class LightningSequenceLabelingPipeline(
         input_column_name: str,
         target_column_name: str,
         output_path: T_path,
-        evaluation_mode: str = "conll",
-        tagging_scheme: Optional[str] = None,
+        evaluation_mode: EvaluationMode = EvaluationMode.CONLL,
+        tagging_scheme: Optional[TaggingScheme] = None,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
         label_all_tokens: bool = False,

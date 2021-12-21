@@ -64,3 +64,7 @@ class SequenceLabelingEvaluator(MetricsEvaluator):
         self,
     ) -> Sequence[Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
         return [self.metric]
+
+
+EvaluationMode = SequenceLabelingEvaluator.EvaluationMode
+TaggingScheme = SequenceLabelingEvaluator.TaggingScheme
