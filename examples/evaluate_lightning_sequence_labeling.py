@@ -5,6 +5,7 @@ from typing import Optional
 import typer
 
 from embeddings.defaults import RESULTS_PATH
+from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
 
 
@@ -21,10 +22,11 @@ def run(
     target_column_name: str = typer.Option(
         "ner", help="Column name that contains tag labels for POS tagging."
     ),
-    evaluation_mode: str = typer.Option(
-        "conll", help="Evaluation mode. Supported modes: [unit, conll, strict]."
+    evaluation_mode: EvaluationMode = typer.Option(
+        EvaluationMode.CONLL,
+        help="Evaluation mode. Supported modes: [unit, conll, strict].",
     ),
-    tagging_scheme: Optional[str] = typer.Option(
+    tagging_scheme: Optional[TaggingScheme] = typer.Option(
         None, help="Tagging scheme. Supported schemes: [IOB1, IOB2, IOE1, IOE2, IOBES, BILOU]"
     ),
     root: str = typer.Option(RESULTS_PATH.joinpath("lightning_sequence_classification")),
