@@ -139,3 +139,4 @@ webpage/public
 #excluding pyenv
 !.python-version
 
+.hf
