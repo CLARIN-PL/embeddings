@@ -111,7 +111,7 @@ def test_sequence_labeling_preprocessing_pipeline(
     ],
 ) -> None:
     flair.set_seed(441)
-    flair.device = torch.device("cpu")  # type: ignore
+    flair.device = torch.device("cpu")
 
     preprocessing_pipeline, path = sequence_labeling_preprocessing_pipeline
     preprocessing_pipeline.run()

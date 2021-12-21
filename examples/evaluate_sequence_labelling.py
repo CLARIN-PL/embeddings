@@ -5,6 +5,7 @@ from typing import Optional
 import typer
 
 from embeddings.defaults import RESULTS_PATH
+from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.pipeline.flair_sequence_labeling import FlairSequenceLabelingPipeline
 
 app = typer.Typer()
@@ -25,10 +26,11 @@ def run(
     ),
     root: str = typer.Option(RESULTS_PATH.joinpath("pos_tagging")),
     hidden_size: int = typer.Option(256, help="Number of hidden states in RNN."),
-    evaluation_mode: str = typer.Option(
-        "conll", help="Evaluation mode. Supported modes: [unit, conll, strict]."
+    evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = typer.Option(
+        SequenceLabelingEvaluator.EvaluationMode.CONLL,
+        help="Evaluation mode. Supported modes: [unit, conll, strict].",
     ),
-    tagging_scheme: Optional[str] = typer.Option(
+    tagging_scheme: Optional[SequenceLabelingEvaluator.TaggingScheme] = typer.Option(
         None, help="Tagging scheme. Supported schemes: [IOB1, IOB2, IOE1, IOE2, IOBES, BILOU]"
     ),
 ) -> None:
