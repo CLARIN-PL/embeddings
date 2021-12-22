@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-from typing import Dict, Final
+from dataclasses import dataclass, InitVar
+from typing import Dict, Final, Union, List
 
 from embeddings.hyperparameter_search.configspace import (
     BaseConfigSpace,
@@ -12,6 +12,7 @@ from embeddings.utils.utils import PrimitiveTypes
 
 @dataclass
 class LightingTextClassificationConfigSpace(BaseConfigSpace):
+    embedding_name: InitVar[Union[str, List[str]]]
     max_epochs: Parameter = SearchableParameter(
         name="max_epochs", type="int_uniform", low=1, high=30
     )
@@ -20,7 +21,7 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
     )
     max_seq_length: Parameter = ConstantParameter(
         name="max_seq_length",
-        value=512,
+        value=None,
     )
     optimizer: Parameter = SearchableParameter(
         name="optimizer",
@@ -50,18 +51,31 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
         low=1e-9,
         high=0,
     )
-    unfreeze_from: Parameter = SearchableParameter(
-        name="unfreeze_from",
+    finetune_last_n_layers: Parameter = SearchableParameter(
+        name="finetune_last_n_layers",
         type="categorical",
         choices=[-1, 4, 7, 9, 11, None],
     )
 
+    def __post_init__(self, embedding_name: Union[str, List[str]]) -> None:
+        if isinstance(embedding_name, str):
+            self.param_embedding_name: Parameter = ConstantParameter(
+                name="embedding_name",
+                value=embedding_name,
+            )
+        else:
+            self.param_embedding_name: Parameter = SearchableParameter(
+                name="embedding_name",
+                type="categorical",
+                choices=embedding_name,
+            )
+
     @staticmethod
     def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
-        dl_model_keys: Final = {"batch_size", "max_seq_length"}
+        pipeline_keys: Final = {"batch_size",  "unfreeze_from", "embedding_name"}
+        datamodule_keys: Final = {"max_seq_length"}
         task_model_keys: Final = {
             "learning_rate",
-            "unfreeze_from",
             "optimizer",
             "use_scheduler",
             "warmup_steps",
@@ -71,8 +85,11 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
         task_trainer_keys: Final = {
             "max_epochs",
         }
-        dl_model_kwargs = BaseConfigSpace._pop_parameters(
-            parameters=parameters, parameters_keys=dl_model_keys
+        pipeline_kwargs = BaseConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=pipeline_keys
+        )
+        datamodule_kwargs = BaseConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=datamodule_keys
         )
         task_model_kwargs = BaseConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=task_model_keys
@@ -80,11 +97,14 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
         task_trainer_kwargs = BaseConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=task_trainer_keys
         )
-        task_model_kwargs["train_batch_size"] = dl_model_kwargs["batch_size"]
-        task_model_kwargs["eval_batch_size"] = dl_model_kwargs["batch_size"]
+
+        batch_size = pipeline_kwargs.pop("batch_size")
+        pipeline_kwargs["train_batch_size"] = batch_size
+        pipeline_kwargs["eval_batch_size"] = batch_size
 
         return {
-            "dl_model_kwargs": dl_model_kwargs,
+            "datamodule_kwargs": datamodule_kwargs,
             "task_model_kwargs": task_model_kwargs,
             "task_trainer_kwargs": task_trainer_kwargs,
+            **pipeline_kwargs,
         }
