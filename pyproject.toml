@@ -49,6 +49,7 @@ poethepoet = "0.11.0"
 pyflakes = "2.4.0"
 pytest = "6.2.5"
 types-requests = "2.26.1"
+coverage = {extras = ["toml"], version = "^6.2"}
 
 [tool.poe.tasks]
 black = "black --check ./"
@@ -57,7 +58,9 @@ black_fix = "black ./"
 isort_fix = "isort . "
 pyflakes = "pyflakes embeddings"
 mypy = "mypy -p embeddings"
-test = "python -m pytest"
+coverage_test = "coverage run -m pytest"
+coverage_report = "coverage report -m"
+test = ["coverage_test", "coverage_report"]
 check = ["black", "isort", "mypy", "pyflakes"]
 fix = ["black_fix", "isort_fix"]
 all = ["check", "test"]
@@ -122,3 +125,10 @@ module = [
     "transformers"
 ]
 follow_imports = "skip"
+
+
+[tool.coverage.run]
+omit = [".*", "*/site-packages/*"]
+
+[tool.coverage.report]
+fail_under = 80

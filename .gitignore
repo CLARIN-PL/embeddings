@@ -140,3 +140,4 @@ webpage/public
 !.python-version
 
 .hf
+.coverage
