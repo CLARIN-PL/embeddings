@@ -37,7 +37,7 @@ jobs:
         run: poetry run poe test
         env:
           HF_HOME: .hf
-          TRANSFORMERS_OFFLINE: true
+          TRANSFORMERS_OFFLINE: false
   lint:
     strategy:
       fail-fast: false
