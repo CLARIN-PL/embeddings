@@ -14,6 +14,7 @@ from embeddings.data.dataset import Data
 from embeddings.data.io import T_path
 from embeddings.hyperparameter_search.configspace import ConfigSpace, SampledParameters
 from embeddings.pipeline.evaluation_pipeline import ModelEvaluationPipeline
+from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.pipeline.pipelines_metadata import EvaluationMetadata, Metadata
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
 from embeddings.pipeline.standard_pipeline import LoaderResult, ModelResult, TransformationResult
@@ -59,8 +60,9 @@ class OptunaPipeline(
         self,
         config_space: ConfigSpace,
         preprocessing_pipeline: PreprocessingPipeline[Data, LoaderResult, TransformationResult],
-        evaluation_pipeline: Type[
-            ModelEvaluationPipeline[Data, LoaderResult, ModelResult, EvaluationResult]
+        evaluation_pipeline: Union[
+            Type[ModelEvaluationPipeline[Data, LoaderResult, ModelResult, EvaluationResult]],
+            Type[LightningPipeline[Data, ModelResult, EvaluationResult]],
         ],
         pruner: optuna.pruners.BasePruner,
         sampler: optuna.samplers.BaseSampler,

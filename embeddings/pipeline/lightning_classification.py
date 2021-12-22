@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional, Sequence, Union
 import datasets
 import pytorch_lightning as pl
 from numpy import typing as nptyping
+from typing_extensions import Literal
 
 from embeddings.data.datamodule import TextClassificationDataModule
 from embeddings.data.io import T_path
@@ -36,6 +37,7 @@ class LightningClassificationPipeline(
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        predict_subset: Literal["dev", "test"] = "test",
     ):
         datamodule = TextClassificationDataModule(
             tokenizer_name_or_path=tokenizer_name if tokenizer_name else embedding_name,
@@ -63,6 +65,6 @@ class LightningClassificationPipeline(
             if task_model_kwargs
             else self.DEFAULT_TASK_MODEL_KWARGS,
         )
-        model = LightningModel(trainer=trainer, task=task, predict_subset="test")
+        model = LightningModel(trainer=trainer, task=task, predict_subset=predict_subset)
         evaluator = TextClassificationEvaluator()
         super().__init__(datamodule, model, evaluator)

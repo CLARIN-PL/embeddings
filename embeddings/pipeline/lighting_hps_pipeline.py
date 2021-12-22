@@ -2,25 +2,29 @@ from abc import ABC
 from dataclasses import dataclass, field
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Optional, Generic, Dict, Any, Tuple
+from typing import Any, Dict, Generic, Optional, Tuple
 
-from embeddings.hyperparameter_search.configspace import SampledParameters, \
-    ConfigSpace
+from embeddings.hyperparameter_search.configspace import ConfigSpace, SampledParameters
 from embeddings.hyperparameter_search.lighting_configspace import (
     LightingTextClassificationConfigSpace,
 )
-from embeddings.pipeline.hf_preprocessing_pipeline import \
-    HuggingFaceTextClassificationPreprocessingPipeline
-from embeddings.pipeline.hps_pipeline import OptunaPipeline, \
-    AbstractHuggingFaceOptimizedPipeline, _HuggingFaceOptimizedPipelineBase
-from embeddings.pipeline.lightning_classification import \
-    LightningClassificationPipeline
+from embeddings.pipeline.hf_preprocessing_pipeline import (
+    HuggingFaceTextClassificationPreprocessingPipeline,
+)
+from embeddings.pipeline.hps_pipeline import (
+    AbstractHuggingFaceOptimizedPipeline,
+    OptunaPipeline,
+    _HuggingFaceOptimizedPipelineBase,
+)
+from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.pipelines_metadata import LightningClassificationPipelineMetadata
 from embeddings.utils.utils import PrimitiveTypes
 
 
 @dataclass
-class _OptimizedLightingPipelineBase(_HuggingFaceOptimizedPipelineBase[ConfigSpace], ABC, Generic[ConfigSpace]):
+class _OptimizedLightingPipelineBase(
+    _HuggingFaceOptimizedPipelineBase[ConfigSpace], ABC, Generic[ConfigSpace]
+):
     input_column_name: str
     target_column_name: str
 
@@ -35,80 +39,96 @@ class _OptimizedLightingPipelineBase(_HuggingFaceOptimizedPipelineBase[ConfigSpa
 
 @dataclass
 class OptimizedLightingClassificationPipeline(
-    _OptimizedLightingPipelineBase,
     OptunaPipeline[
         LightingTextClassificationConfigSpace,
         LightningClassificationPipelineMetadata,
         LightningClassificationPipelineMetadata,
     ],
     AbstractHuggingFaceOptimizedPipeline[LightingTextClassificationConfigSpace],
+    _OptimizedLightingPipelineBase[LightingTextClassificationConfigSpace],
 ):
+    def __post_init__(self) -> None:
+        super().__init__(
+            preprocessing_pipeline=HuggingFaceTextClassificationPreprocessingPipeline(
+                dataset_name=self.dataset_name,
+                persist_path=self.dataset_dir.name,
+                sample_missing_splits=(self.sample_dev_split_fraction, None),
+                ignore_test_subset=True,
+                load_dataset_kwargs=self.load_dataset_kwargs,
+            ),
+            evaluation_pipeline=LightningClassificationPipeline,
+            pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
+            sampler=self.sampler_cls(seed=self.seed),
+            n_trials=self.n_trials,
+            dataset_path=self.dataset_path,
+            metric_name="f1__average_macro",
+            metric_key="f1",
+            config_space=self.config_space,
+        )
 
-    #
-    # def __post_init__(self) -> None:
-    #     super().__init__(
-    #         preprocessing_pipeline=HuggingFaceTextClassificationPreprocessingPipeline(
-    #             dataset_name=self.dataset_name,
-    #             persist_path=self.dataset_dir.name,
-    #             sample_missing_splits=(self.sample_dev_split_fraction, None),
-    #             ignore_test_subset=True,
-    #             load_dataset_kwargs=self.load_dataset_kwargs,
-    #         ),
-    #         evaluation_pipeline=LightningClassificationPipeline,
-    #         pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
-    #         sampler=self.sampler_cls(seed=self.seed),
-    #         n_trials=self.n_trials,
-    #         dataset_path=self.dataset_path,
-    #         metric_name="f1__average_macro",
-    #         metric_key="f1",
-    #         config_space=self.config_space,
-    #     )
-    #
-    # def _get_metadata(self, parameters: SampledParameters) -> LightningClassificationPipelineMetadata:
-    #     (
-    #         embedding_name,
-    #         document_embedding_cls,
-    #         task_train_kwargs,
-    #         load_model_kwargs,
-    #     ) = self._pop_sampled_parameters(parameters=parameters)
-    #     metadata: LightningClassificationPipelineMetadata = {
-    #         "embedding_name": embedding_name,
-    #         "document_embedding_cls": document_embedding_cls,
-    #         "dataset_name": self.dataset_name,
-    #         "load_dataset_kwargs": self.load_dataset_kwargs,
-    #         "input_column_name": self.input_column_name,
-    #         "target_column_name": self.target_column_name,
-    #         "task_model_kwargs": None,
-    #         "task_train_kwargs": task_train_kwargs,
-    #         "load_model_kwargs": load_model_kwargs,
-    #     }
-    #     return metadata
-    #
-    # def _get_evaluation_metadata(
-    #     self, parameters: SampledParameters
-    # ) -> LightningClassificationPipelineMetadata:
-    #     (
-    #         embedding_name,
-    #         train_batch_size,
-    #         eval_batch_size,
-    #         unfreeze_from,
-    #         datamodule_kwargs,
-    #         task_model_kwargs,
-    #         task_trainer_kwargs
-    #     ) = self._pop_sampled_parameters(parameters=parameters)
-    #     metadata: LightningClassificationPipelineMetadata = {
-    #         "embedding_name": self.
-    #         "dataset_name_or_path": self.dataset_dir.name,
-    #         "document_embedding_cls": document_embedding_cls,
-    #         "dataset_path": str(self.dataset_path),
-    #         "persist_path": None,
-    #         "predict_subset": "dev",
-    #         "output_path": self.tmp_model_output_dir.name,
-    #         "task_model_kwargs": None,
-    #         "task_train_kwargs": task_train_kwargs,
-    #         "load_model_kwargs": load_model_kwargs,
-    #     }
-    #     return metadata
+    def _get_metadata(
+        self, parameters: SampledParameters
+    ) -> LightningClassificationPipelineMetadata:
+        (
+            embedding_name,
+            train_batch_size,
+            eval_batch_size,
+            finetune_last_n_layers,
+            datamodule_kwargs,
+            task_model_kwargs,
+            task_train_kwargs,
+        ) = self._pop_sampled_parameters(parameters=parameters)
+        metadata: LightningClassificationPipelineMetadata = {
+            "embedding_name": embedding_name,
+            "dataset_name_or_path": self.dataset_dir.name,
+            "input_column_name": self.input_column_name,
+            "target_column_name": self.target_column_name,
+            "output_path": self.tmp_model_output_dir.name,
+            "train_batch_size": train_batch_size,
+            "eval_batch_size": eval_batch_size,
+            "finetune_last_n_layers": finetune_last_n_layers,
+            "tokenizer_name": self.tokenizer_name,
+            "datamodule_kwargs": datamodule_kwargs,
+            "tokenizer_kwargs": self.tokenizer_kwargs,
+            "batch_encoding_kwargs": self.batch_encoding_kwargs,
+            "load_dataset_kwargs": self.load_dataset_kwargs,
+            "task_model_kwargs": task_model_kwargs,
+            "task_train_kwargs": task_train_kwargs,
+            "predict_subset": "test",
+        }
+        return metadata
+
+    def _get_evaluation_metadata(
+        self, parameters: SampledParameters
+    ) -> LightningClassificationPipelineMetadata:
+        (
+            embedding_name,
+            train_batch_size,
+            eval_batch_size,
+            finetune_last_n_layers,
+            datamodule_kwargs,
+            task_model_kwargs,
+            task_train_kwargs,
+        ) = self._pop_sampled_parameters(parameters=parameters)
+        metadata: LightningClassificationPipelineMetadata = {
+            "embedding_name": embedding_name,
+            "dataset_name_or_path": self.dataset_dir.name,
+            "input_column_name": self.input_column_name,
+            "target_column_name": self.target_column_name,
+            "output_path": self.tmp_model_output_dir.name,
+            "train_batch_size": train_batch_size,
+            "eval_batch_size": eval_batch_size,
+            "finetune_last_n_layers": finetune_last_n_layers,
+            "tokenizer_name": self.tokenizer_name,
+            "datamodule_kwargs": datamodule_kwargs,
+            "tokenizer_kwargs": self.tokenizer_kwargs,
+            "batch_encoding_kwargs": self.batch_encoding_kwargs,
+            "load_dataset_kwargs": self.load_dataset_kwargs,
+            "task_model_kwargs": task_model_kwargs,
+            "task_train_kwargs": task_train_kwargs,
+            "predict_subset": "dev",
+        }
+        return metadata
 
     def _post_run_hook(self) -> None:
         super()._post_run_hook()
@@ -118,20 +138,36 @@ class OptimizedLightingClassificationPipeline(
     @staticmethod
     def _pop_sampled_parameters(
         parameters: SampledParameters,
-    ) -> Tuple[str, int, int, Optional[int], Dict[str, PrimitiveTypes], Dict[str, PrimitiveTypes], Dict[str, PrimitiveTypes]]:
+    ) -> Tuple[
+        str,
+        int,
+        int,
+        Optional[int],
+        Dict[str, PrimitiveTypes],
+        Dict[str, PrimitiveTypes],
+        Dict[str, PrimitiveTypes],
+    ]:
         embedding_name = parameters["embedding_name"]
         assert isinstance(embedding_name, str)
         train_batch_size = parameters["train_batch_size"]
         assert isinstance(train_batch_size, int)
         eval_batch_size = parameters["eval_batch_size"]
         assert isinstance(eval_batch_size, int)
-        unfreeze_from = parameters["train_parameters"]
-        assert isinstance(unfreeze_from, int) or unfreeze_from is None
+        finetune_last_n_layers = parameters["train_parameters"]
+        assert finetune_last_n_layers is None or isinstance(finetune_last_n_layers, int)
         datamodule_kwargs = parameters["datamodule_kwargs"]
         assert isinstance(datamodule_kwargs, dict)
         task_model_kwargs = parameters["task_model_kwargs"]
         assert isinstance(task_model_kwargs, dict)
-        task_trainer_kwargs = parameters["task_train_kwargs"]
-        assert isinstance(task_trainer_kwargs, dict)
+        task_train_kwargs = parameters["task_train_kwargs"]
+        assert isinstance(task_train_kwargs, dict)
 
-        return embedding_name, train_batch_size, eval_batch_size, unfreeze_from, datamodule_kwargs, task_model_kwargs, task_trainer_kwargs
+        return (
+            embedding_name,
+            train_batch_size,
+            eval_batch_size,
+            finetune_last_n_layers,
+            datamodule_kwargs,
+            task_model_kwargs,
+            task_train_kwargs,
+        )

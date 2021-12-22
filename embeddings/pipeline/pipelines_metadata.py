@@ -9,15 +9,15 @@ class PathMetadata(TypedDict, total=False):
     output_path: T_path
 
 
-class EmbeddingPipelineMetadata(PathMetadata):
+class EmbeddingPipelineBaseMetadata(PathMetadata):
     embedding_name: str
-    load_dataset_kwargs: Optional[Dict[str, Any]]
     task_model_kwargs: Optional[Dict[str, Any]]
     task_train_kwargs: Optional[Dict[str, Any]]
 
 
-class FlairEmbeddingPipelineMetadata(EmbeddingPipelineMetadata):
+class FlairEmbeddingPipelineMetadata(EmbeddingPipelineBaseMetadata):
     dataset_name: str
+    load_dataset_kwargs: Optional[Dict[str, Any]]
 
 
 class FlairClassificationPipelineMetadata(FlairEmbeddingPipelineMetadata):
@@ -42,14 +42,10 @@ class FlairSequenceLabelingPipelineMetadata(FlairEmbeddingPipelineMetadata):
     tagging_scheme: Optional[str]
 
 
-class FlairEvaluationPipelineMetadata(TypedDict):
+class FlairEvaluationPipelineMetadata(EmbeddingPipelineBaseMetadata):
     dataset_path: str
-    embedding_name: str
     persist_path: Optional[str]
     predict_subset: Literal["dev", "test"]
-    task_model_kwargs: Optional[Dict[str, Any]]
-    task_train_kwargs: Optional[Dict[str, Any]]
-    output_path: str
 
 
 class FlairSequenceLabelingEvaluationPipelineMetadata(FlairEvaluationPipelineMetadata):
@@ -63,16 +59,20 @@ class FlairClassificationEvaluationPipelineMetadata(FlairEvaluationPipelineMetad
     load_model_kwargs: Optional[Dict[str, Any]]
 
 
-class LightningClassificationPipelineMetadata(EmbeddingPipelineMetadata):
+class LightningClassificationPipelineMetadata(EmbeddingPipelineBaseMetadata):
     dataset_name_or_path: str
+    input_column_name: str
+    target_column_name: str
     train_batch_size: int
     eval_batch_size: int
-    finetune_last_n_layers: int
+    finetune_last_n_layers: Optional[int]
     tokenizer_name: Optional[str]
+    load_dataset_kwargs: Optional[Dict[str, Any]]
     datamodule_kwargs: Optional[Dict[str, Any]]
     tokenizer_kwargs: Optional[Dict[str, Any]]
     batch_encoding_kwargs: Optional[Dict[str, Any]]
+    predict_subset: Literal["dev", "test"]
 
 
-Metadata = TypeVar("Metadata", bound=EmbeddingPipelineMetadata)
-EvaluationMetadata = TypeVar("EvaluationMetadata", bound=TypedDict)
+Metadata = TypeVar("Metadata", bound=EmbeddingPipelineBaseMetadata)
+EvaluationMetadata = TypeVar("EvaluationMetadata", bound=EmbeddingPipelineBaseMetadata)

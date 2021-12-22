@@ -1,5 +1,5 @@
-from dataclasses import dataclass, InitVar
-from typing import Dict, Final, Union, List
+from dataclasses import InitVar, dataclass, field
+from typing import Dict, Final, List, Union
 
 from embeddings.hyperparameter_search.configspace import (
     BaseConfigSpace,
@@ -13,6 +13,7 @@ from embeddings.utils.utils import PrimitiveTypes
 @dataclass
 class LightingTextClassificationConfigSpace(BaseConfigSpace):
     embedding_name: InitVar[Union[str, List[str]]]
+    param_embedding_name: Parameter = field(init=False)
     max_epochs: Parameter = SearchableParameter(
         name="max_epochs", type="int_uniform", low=1, high=30
     )
@@ -72,7 +73,7 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
 
     @staticmethod
     def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
-        pipeline_keys: Final = {"batch_size",  "unfreeze_from", "embedding_name"}
+        pipeline_keys: Final = {"batch_size", "unfreeze_from", "embedding_name"}
         datamodule_keys: Final = {"max_seq_length"}
         task_model_keys: Final = {
             "learning_rate",
@@ -94,7 +95,7 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
         task_model_kwargs = BaseConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=task_model_keys
         )
-        task_trainer_kwargs = BaseConfigSpace._pop_parameters(
+        task_train_kwargs = BaseConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=task_trainer_keys
         )
 
@@ -105,6 +106,6 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
         return {
             "datamodule_kwargs": datamodule_kwargs,
             "task_model_kwargs": task_model_kwargs,
-            "task_trainer_kwargs": task_trainer_kwargs,
+            "task_train_kwargs": task_train_kwargs,
             **pipeline_kwargs,
         }
