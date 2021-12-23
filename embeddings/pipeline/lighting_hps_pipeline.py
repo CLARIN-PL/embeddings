@@ -1,6 +1,5 @@
 from abc import ABC
 from dataclasses import dataclass, field
-from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, Optional, Tuple
 
@@ -28,11 +27,11 @@ class _OptimizedLightingPipelineBase(
     input_column_name: str
     target_column_name: str
 
-    tokenizer_name: Optional[str] = field(default=None)
     dataset_dir: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
     tmp_model_output_dir: TemporaryDirectory[str] = field(
         init=False, default_factory=TemporaryDirectory
     )
+    tokenizer_name: Optional[str] = None
     tokenizer_kwargs: Optional[Dict[str, Any]] = None
     batch_encoding_kwargs: Optional[Dict[str, Any]] = None
 
@@ -60,7 +59,7 @@ class OptimizedLightingClassificationPipeline(
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
-            dataset_path=self.dataset_path,
+            dataset_path=self.dataset_dir.name,
             metric_name="f1__average_macro",
             metric_key="f1",
             config_space=self.config_space,
@@ -153,7 +152,7 @@ class OptimizedLightingClassificationPipeline(
         assert isinstance(train_batch_size, int)
         eval_batch_size = parameters["eval_batch_size"]
         assert isinstance(eval_batch_size, int)
-        finetune_last_n_layers = parameters["train_parameters"]
+        finetune_last_n_layers = parameters["finetune_last_n_layers"]
         assert finetune_last_n_layers is None or isinstance(finetune_last_n_layers, int)
         datamodule_kwargs = parameters["datamodule_kwargs"]
         assert isinstance(datamodule_kwargs, dict)
