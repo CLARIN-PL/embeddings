@@ -16,5 +16,6 @@ class DropSubsetHuggingFaceCorpusTransformation(
         self.subset = subset
 
     def transform(self, data: datasets.DatasetDict) -> datasets.DatasetDict:
-        del data[self.subset]
+        if self.subset in data:
+            del data[self.subset]
         return data

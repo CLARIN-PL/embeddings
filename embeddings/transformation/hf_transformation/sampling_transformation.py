@@ -26,7 +26,7 @@ class SampleSplitsHuggingFaceTransformation(
     def _train_test_split(
         self, data: datasets.Dataset, test_fraction: float
     ) -> datasets.DatasetDict:
-        return data.train_test_split(test_fraction=test_fraction, seed=self.seed)  # type: ignore
+        return data.train_test_split(test_size=test_fraction, seed=self.seed)  # type: ignore
 
     def transform(self, data: datasets.DatasetDict) -> datasets.DatasetDict:
         dataset = datasets.DatasetDict()
