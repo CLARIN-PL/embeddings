@@ -15,10 +15,10 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
     embedding_name: InitVar[Union[str, List[str]]]
     param_embedding_name: Parameter = field(init=False)
     max_epochs: Parameter = SearchableParameter(
-        name="max_epochs", type="int_uniform", low=1, high=30
+        name="max_epochs", type="int_uniform", low=1, high=30, step=1
     )
     mini_batch_size: Parameter = SearchableParameter(
-        name="batch_size", type="log_int_uniform", low=8, high=64
+        name="batch_size", type="log_int_uniform", low=8, high=64, step=1
     )
     max_seq_length: Parameter = ConstantParameter(
         name="max_seq_length",
@@ -42,15 +42,15 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
     )
     adam_epsilon: Parameter = SearchableParameter(
         name="adam_epsilon",
-        type="log_uniform",
-        low=1e-9,
-        high=0,
+        type="uniform",
+        low=0.0,
+        high=1e-1,
     )
     weight_decay: Parameter = SearchableParameter(
         name="weight_decay",
-        type="log_uniform",
-        low=1e-9,
-        high=0,
+        type="uniform",
+        low=0.0,
+        high=1e-1,
     )
     finetune_last_n_layers: Parameter = SearchableParameter(
         name="finetune_last_n_layers",
@@ -73,7 +73,7 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
 
     @staticmethod
     def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
-        pipeline_keys: Final = {"batch_size", "unfreeze_from", "embedding_name"}
+        pipeline_keys: Final = {"batch_size", "finetune_last_n_layers", "embedding_name"}
         datamodule_keys: Final = {"max_seq_length"}
         task_model_keys: Final = {
             "learning_rate",
