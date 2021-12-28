@@ -77,7 +77,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
     def load_dataset(self, preparation_step: bool = False) -> DatasetDict:
         loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = HuggingFaceDataLoader()
-        if os.path.exists(self.dataset_name_or_path):
+        if exists(self.dataset_name_or_path):
             if preparation_step:
                 return datasets.DatasetDict()
             dataset = embeddings_dataset.HuggingFaceDataset(pathlib.Path(self.dataset_name_or_path))
