@@ -1,12 +1,11 @@
-import os
 from typing import Any, Dict, Optional, Sequence, Union
 
 import datasets
 import pytorch_lightning as pl
 from numpy import typing as nptyping
-from typing_extensions import Literal
 
 from embeddings.data.datamodule import TextClassificationDataModule
+from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.lightning_model import LightningModel
@@ -23,7 +22,7 @@ class LightningClassificationPipeline(
     def __init__(
         self,
         embedding_name: str,
-        dataset_name_or_path: Union[str, "os.PathLike[Any]"],
+        dataset_name_or_path: T_path,
         input_column_name: Union[str, Sequence[str]],
         target_column_name: str,
         output_path: T_path,
@@ -37,7 +36,7 @@ class LightningClassificationPipeline(
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
-        predict_subset: Literal["dev", "test"] = "test",
+        predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
     ):
         datamodule = TextClassificationDataModule(
             tokenizer_name_or_path=tokenizer_name if tokenizer_name else embedding_name,

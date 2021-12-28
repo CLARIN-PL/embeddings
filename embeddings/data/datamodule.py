@@ -1,6 +1,6 @@
 import abc
-import os
 import pathlib
+from os.path import exists
 from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import datasets
@@ -11,6 +11,7 @@ from transformers import AutoTokenizer, BatchEncoding
 
 from embeddings.data import dataset as embeddings_dataset
 from embeddings.data.data_loader import HuggingFaceDataLoader, HuggingFaceLocalDataLoader
+from embeddings.data.io import T_path
 from embeddings.utils.loggers import get_logger
 
 Data = TypeVar("Data")
@@ -41,7 +42,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
     def __init__(
         self,
         tokenizer_name_or_path: str,
-        dataset_name_or_path: Union[str, pathlib.Path],
+        dataset_name_or_path: T_path,
         target_field: str,
         max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
@@ -156,7 +157,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
     def __init__(
         self,
         tokenizer_name_or_path: str,
-        dataset_name_or_path: Union[str, "os.PathLike[Any]"],
+        dataset_name_or_path: T_path,
         text_fields: Union[str, Sequence[str]],
         target_field: str,
         max_seq_length: Optional[int] = None,
