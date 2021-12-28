@@ -214,7 +214,8 @@ Instead of the `allegro/herbert-base-cased` model, you can pass any model from [
 Optimized pipelines can be run via following snippet of code:
 
 ```python
-from embeddings.hyperparameter_search.configspace import TextClassificationConfigSpace
+
+from embeddings.hyperparameter_search.flair_configspace import TextClassificationConfigSpace
 from embeddings.pipeline.flair_hps_pipeline import OptimizedFlairClassificationPipeline
 
 pipeline = OptimizedFlairClassificationPipeline(

@@ -6,9 +6,8 @@ from typing import Dict, Generic, Optional, Tuple
 
 from typing_extensions import Literal
 
-from embeddings.hyperparameter_search.configspace import (
-    ConfigSpace,
-    SampledParameters,
+from embeddings.hyperparameter_search.configspace import ConfigSpace, SampledParameters
+from embeddings.hyperparameter_search.flair_configspace import (
     SequenceLabelingConfigSpace,
     TextClassificationConfigSpace,
 )
