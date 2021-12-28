@@ -54,6 +54,6 @@ class SampleSplitsHuggingFaceTransformation(
         elif self.test_fraction and "test" not in data:
             dataset = self._train_test_split(data["train"], self.test_fraction)
 
-        if not dataset:
-            dataset = data
+        else:
+            return data
         return dataset
