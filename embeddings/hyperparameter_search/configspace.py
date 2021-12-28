@@ -298,9 +298,6 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
     word_dropout: Parameter = SearchableParameter(
         name="word_dropout", type="discrete_uniform", low=0.0, high=0.5, q=0.05
     )
-    locked_dropout: Parameter = SearchableParameter(
-        name="locked_dropout", type="discrete_uniform", low=0.0, high=0.5, q=0.05
-    )
     reproject_words: Parameter = SearchableParameter(
         name="reproject_words", type="categorical", choices=[True, False]
     )
@@ -316,7 +313,7 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
     def _map_task_specific_parameters(
         self, trial: optuna.trial.Trial
     ) -> Tuple[Dict[str, PrimitiveTypes], Set[str]]:
-        shared_params = ("dropout", "word_dropout", "locked_dropout", "reproject_words")
+        shared_params = ("dropout", "word_dropout", "reproject_words")
         param_names_mapping: Final = {
             "FlairDocumentCNNEmbeddings": ("cnn_pool_kernels",) + shared_params,
             "FlairDocumentRNNEmbeddings": ("hidden_size", "rnn_type", "rnn_layers", "bidirectional")
@@ -370,7 +367,6 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
             "bidirectional",
             "dropout",
             "word_dropout",
-            "locked_dropout",
             "reproject_words",
         }
         load_model_kwargs = BaseConfigSpace._pop_parameters(
