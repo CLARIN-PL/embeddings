@@ -55,7 +55,7 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
     finetune_last_n_layers: Parameter = SearchableParameter(
         name="finetune_last_n_layers",
         type="categorical",
-        choices=[-1, 4, 7, 9, 11, None],
+        choices=[-1, 0, 1, 3, 5, 7, 9]
     )
 
     def __post_init__(self, embedding_name: Union[str, List[str]]) -> None:
