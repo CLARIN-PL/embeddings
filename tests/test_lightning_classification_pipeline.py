@@ -10,12 +10,12 @@ from embeddings.pipeline.lightning_classification import LightningClassification
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def pipeline_kwargs() -> Dict[str, Any]:
     return {"embedding_name": "allegro/herbert-base-cased", "finetune_last_n_layers": 0}
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def dataset_kwargs() -> Dict[str, Any]:
     return {
         "dataset_name_or_path": "clarin-pl/polemo2-official",
@@ -30,7 +30,7 @@ def dataset_kwargs() -> Dict[str, Any]:
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def task_train_kwargs() -> Dict[str, Any]:
     return {
         "max_epochs": 1,
@@ -40,12 +40,12 @@ def task_train_kwargs() -> Dict[str, Any]:
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def task_model_kwargs() -> Dict[str, Any]:
     return {"learning_rate": 5e-4, "use_scheduler": False}
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def datamodule_kwargs() -> Dict[str, Any]:
     return {
         "downsample_train": 0.01,
@@ -55,7 +55,7 @@ def datamodule_kwargs() -> Dict[str, Any]:
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def lightning_classification_pipeline(
     pipeline_kwargs: Dict[str, Any],
     dataset_kwargs: Dict[str, Any],

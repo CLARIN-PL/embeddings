@@ -26,7 +26,7 @@ from embeddings.transformation.flair_transformation.split_sample_corpus_transfor
 )
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def text_pair_classification_pipeline(
     result_path: "TemporaryDirectory[str]",
 ) -> Tuple[
