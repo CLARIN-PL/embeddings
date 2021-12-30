@@ -1,7 +1,6 @@
 from collections import ChainMap
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-import numpy as np
 import torch
 from numpy import typing as nptyping
 from pytorch_lightning.utilities.types import STEP_OUTPUT
@@ -113,17 +112,23 @@ class SequenceLabeling(HuggingFaceLightningTask):
     def predict(
         self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Dict[str, nptyping.NDArray[Any]]:
-        predictions = [self.model(**batch).logits for batch in dataloader]
-        predictions = list(torch.argmax(torch.cat(predictions), dim=2).numpy())
+        assert self.trainer is not None
+
+        logits = [self.model(**batch).logits for batch in dataloader]
+        predictions = list(torch.argmax(torch.cat(logits), dim=2).numpy())
         ground_truth = list(torch.cat([x["labels"] for x in dataloader]).numpy())
 
-        assert self.trainer is not None
-        for i, (pred, gt) in enumerate(zip(predictions, ground_truth)):
-            predictions[i] = [
-                self.trainer.datamodule.id_to_label[x] for x in list(pred[gt != self.ignore_index])
+        def map_filter_data(
+            data: nptyping.NDArray[Any], ground_truth_data: nptyping.NDArray[Any]
+        ) -> List[str]:
+            data = [
+                self.trainer.datamodule.id2str(x.item())
+                for x in data[ground_truth_data != self.ignore_index]
             ]
-            ground_truth[i] = [
-                self.trainer.datamodule.id_to_label[x] for x in list(gt[gt != self.ignore_index])
-            ]
+            return data
 
-        return {"y_pred": np.array(predictions), "y_true": np.array(ground_truth)}
+        for i, (pred, gt) in enumerate(zip(predictions, ground_truth)):
+            predictions[i] = map_filter_data(pred, gt)
+            ground_truth[i] = map_filter_data(gt, gt)
+
+        return {"y_pred": predictions, "y_true": ground_truth}

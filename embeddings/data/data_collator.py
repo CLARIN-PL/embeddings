@@ -8,6 +8,15 @@ from transformers import BatchEncoding, DataCollatorForTokenClassification
 # ignoring `Class cannot subclass "DataCollatorForTokenClassification" (has type "Any")` error
 @dataclass
 class CustomDataCollatorForTokenClassification(DataCollatorForTokenClassification):  # type: ignore
+    """
+    Fix issue with original DataCollator which fails when creating BatchEncoding tensor with labels.
+
+    Compared to the original version, the labels are removed from the dictionary (features object)
+    that is passed to the tokenizer for padding because it does not pad the labels.
+    When the tokenizer returns BatchEncoding object tries to convert the whole dictionary to tensor
+    and fails.
+    """
+
     label_name: str = "labels"
 
     def torch_call(self, features: List[Dict[str, Any]]) -> Union[BatchEncoding, Dict[str, Any]]:
