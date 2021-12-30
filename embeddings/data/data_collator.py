@@ -49,5 +49,4 @@ class CustomDataCollatorForTokenClassification(DataCollatorForTokenClassificatio
                 for label in labels
             ]
 
-        batch = {k: torch.tensor(v, dtype=torch.int64) for k, v in batch.items()}
-        return batch
+        return {k: torch.tensor(v, dtype=torch.int64) for k, v in batch.items()}
