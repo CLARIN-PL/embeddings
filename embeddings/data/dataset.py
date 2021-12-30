@@ -39,7 +39,7 @@ class HuggingFaceDataset(Dataset[str]):
 
 class LightingDataModuleSubset(str, Enum):
     TRAIN = "train"
-    VALIDATION = "val"
+    VALIDATION = "dev"
     TEST = "test"
     PREDICT = "predict"
 
@@ -47,13 +47,13 @@ class LightingDataModuleSubset(str, Enum):
 def get_subset_from_lighting_datamodule(
     data: pl.LightningDataModule, subset: LightingDataModuleSubset
 ) -> LightingDataLoaders:
-    if subset.TRAIN:
+    if subset == "train":
         return data.train_dataloader()
-    elif subset.VALIDATION:
+    elif subset == "dev":
         return data.val_dataloader()
-    elif subset.TEST:
+    elif subset == "test":
         return data.test_dataloader()
-    elif subset.PREDICT:
+    elif subset == "predict":
         return data.predict_dataloader()
     else:
         raise ValueError("Unrecognized LightingDataModuleSubset")
