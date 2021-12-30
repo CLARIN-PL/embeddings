@@ -1,4 +1,4 @@
-from typing import Any, Dict, Literal
+from typing import Any, Dict
 
 import pytorch_lightning as pl
 import torch.cuda
