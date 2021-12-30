@@ -20,7 +20,6 @@ def local_repo(tmpdir_factory: TempdirFactory) -> Path:
 def test_hub_repo_off_unoff() -> None:
     assert str(build_output_path(root, hub_repo_official, hub_repo_unofficial)) == str(
         Path("results/experiment_1/hub-123/org__hub-123")
-    )
 
 
 def test_hub_repo_off_off() -> None:

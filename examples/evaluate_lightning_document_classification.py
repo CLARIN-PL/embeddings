@@ -33,7 +33,6 @@ def run(
         input_column_name=input_columns_name,
         target_column_name=target_column_name,
         output_path=output_path,
-        finetune_last_n_layers=0,
     )
 
     result = pipeline.run()
