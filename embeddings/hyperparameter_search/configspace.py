@@ -261,11 +261,11 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
             "FlairDocumentPoolEmbedding",
         ],
     )
-    static_pooling_strategy: Parameter = SearchableParameter(
-        name="pooling_strategy", type="categorical", choices=["min", "max", "mean"]
+    static_pooling: Parameter = SearchableParameter(
+        name="pooling", type="categorical", choices=["min", "max", "mean"]
     )
-    dynamic_pooling_strategy: Parameter = SearchableParameter(
-        name="pooling_strategy", type="categorical", choices=["cls", "max", "mean"]
+    dynamic_pooling: Parameter = SearchableParameter(
+        name="pooling", type="categorical", choices=["cls", "max", "mean"]
     )
     static_fine_tune_mode: Parameter = SearchableParameter(
         name="fine_tune_mode", type="categorical", choices=["none", "linear", "nonlinear"]
@@ -298,9 +298,6 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
     word_dropout: Parameter = SearchableParameter(
         name="word_dropout", type="discrete_uniform", low=0.0, high=0.5, q=0.05
     )
-    locked_dropout: Parameter = SearchableParameter(
-        name="locked_dropout", type="discrete_uniform", low=0.0, high=0.5, q=0.05
-    )
     reproject_words: Parameter = SearchableParameter(
         name="reproject_words", type="categorical", choices=[True, False]
     )
@@ -316,13 +313,13 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
     def _map_task_specific_parameters(
         self, trial: optuna.trial.Trial
     ) -> Tuple[Dict[str, PrimitiveTypes], Set[str]]:
-        shared_params = ("dropout", "word_dropout", "locked_dropout", "reproject_words")
+        shared_params = ("dropout", "word_dropout", "reproject_words")
         param_names_mapping: Final = {
             "FlairDocumentCNNEmbeddings": ("cnn_pool_kernels",) + shared_params,
             "FlairDocumentRNNEmbeddings": ("hidden_size", "rnn_type", "rnn_layers", "bidirectional")
             + shared_params,
-            "FlairTransformerDocumentEmbedding": ("dynamic_pooling_strategy", "dynamic_fine_tune"),
-            "FlairDocumentPoolEmbedding": ("static_pooling_strategy", "static_fine_tune_mode"),
+            "FlairTransformerDocumentEmbedding": ("dynamic_pooling", "dynamic_fine_tune"),
+            "FlairDocumentPoolEmbedding": ("static_pooling", "static_fine_tune_mode"),
         }
         parameters = {}
 
@@ -360,7 +357,7 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
         assert isinstance(document_embedding, str)
 
         load_model_keys: Final = {
-            "pooling_strategy",
+            "pooling",
             "fine_tune_mode",
             "fine_tune",
             "kernels",
@@ -370,7 +367,6 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
             "bidirectional",
             "dropout",
             "word_dropout",
-            "locked_dropout",
             "reproject_words",
         }
         load_model_kwargs = BaseConfigSpace._pop_parameters(
