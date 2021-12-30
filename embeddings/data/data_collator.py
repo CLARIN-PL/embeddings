@@ -38,8 +38,7 @@ class CustomDataCollatorForTokenClassification(DataCollatorForTokenClassificatio
             return batch
 
         sequence_length = torch.tensor(batch["input_ids"]).shape[1]
-        padding_side = self.tokenizer.padding_side
-        if padding_side == "right":
+        if self.tokenizer.padding_side == "right":
             batch[self.label_name] = [
                 list(label) + [self.label_pad_token_id] * (sequence_length - len(label))
                 for label in labels
