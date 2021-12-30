@@ -1,5 +1,4 @@
 import pprint
-from pathlib import Path
 from typing import Optional
 
 import typer
@@ -7,6 +6,7 @@ import typer
 from embeddings.defaults import RESULTS_PATH
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.pipeline.flair_sequence_labeling import FlairSequenceLabelingPipeline
+from embeddings.utils.utils import build_output_path
 
 app = typer.Typer()
 
@@ -36,7 +36,7 @@ def run(
 ) -> None:
     typer.echo(pprint.pformat(locals()))
 
-    output_path = Path(root, embedding_name, dataset_name)
+    output_path = build_output_path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
     pipeline = FlairSequenceLabelingPipeline(

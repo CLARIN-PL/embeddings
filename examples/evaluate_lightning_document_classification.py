@@ -1,10 +1,10 @@
 import pprint
-from pathlib import Path
 
 import typer
 
 from embeddings.defaults import RESULTS_PATH
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
+from embeddings.utils.utils import build_output_path
 
 
 def run(
@@ -24,7 +24,7 @@ def run(
 ) -> None:
     typer.echo(pprint.pformat(locals()))
 
-    output_path = Path(root, embedding_name, dataset_name)
+    output_path = build_output_path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
     pipeline = LightningClassificationPipeline(
@@ -33,6 +33,13 @@ def run(
         input_column_name=input_columns_name,
         target_column_name=target_column_name,
         output_path=root,
+        finetune_last_n_layers=0,
+        datamodule_kwargs={
+            "downsample_train": 0.001,
+            "downsample_val": 0.1,
+            "downsample_test": 0.1,
+        },
+        task_train_kwargs={"max_epochs": 1},
     )
 
     result = pipeline.run()

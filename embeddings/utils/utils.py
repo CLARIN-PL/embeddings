@@ -5,6 +5,8 @@ from typing import Any, Dict, Optional, Union
 import numpy as np
 from numpy import typing as nptyping
 
+from embeddings.data.io import T_path
+
 Numeric = Union[float, int]
 PrimitiveTypes = Union[None, bool, int, float, str]
 NDArrayInt = nptyping.NDArray[np.int_]
@@ -33,6 +35,34 @@ def import_from_string(dotted_path: str) -> Any:
     except AttributeError:
         msg = 'Module "%s" does not define a "%s" attribute/class' % (module_path, class_name)
         raise ImportError(msg)
+
+
+def build_output_path(root: T_path, embedding_name: T_path, dataset_name: T_path) -> Path:
+    """Builds output path using pattern {root}/{embedding_name}/{dataset_name}.
+    Every "/" in the embedding/dataset name is replaced with  "__".
+    E.g. "clarin-pl/nkjp-pos" -> "clarin-pl__nkjp-pos".
+
+    Be aware that passed paths is str (instead of Path) are not checked if they exist and if
+    they are dirs.
+    """
+
+    for x in [embedding_name, dataset_name]:
+        if isinstance(x, Path) and (x.is_file() or not x.exists()):
+            raise ValueError(f"Path {x} is not correct.")
+
+    if os.path.isdir(embedding_name):
+        embedding_name = Path(embedding_name).name
+    else:
+        assert isinstance(embedding_name, str)
+        embedding_name = embedding_name.replace("/", "__")
+
+    if os.path.isdir(dataset_name):
+        dataset_name = Path(dataset_name).name
+    else:
+        assert isinstance(dataset_name, str)
+        dataset_name = dataset_name.replace("/", "__")
+
+    return Path(root, embedding_name, dataset_name)
 
 
 def initialize_kwargs(

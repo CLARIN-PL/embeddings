@@ -1,11 +1,11 @@
 import pprint
-from pathlib import Path
 from typing import Tuple
 
 import typer
 
 from embeddings.defaults import RESULTS_PATH
 from embeddings.pipeline.flair_pair_classification import FlairPairClassificationPipeline
+from embeddings.utils.utils import build_output_path
 
 app = typer.Typer()
 
@@ -27,7 +27,7 @@ def run(
 ) -> None:
     typer.echo(pprint.pformat(locals()))
 
-    output_path = Path(root, embedding_name, dataset_name)
+    output_path = build_output_path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
     pipeline = FlairPairClassificationPipeline(
