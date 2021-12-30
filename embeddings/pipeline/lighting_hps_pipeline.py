@@ -47,6 +47,7 @@ class OptimizedLightingClassificationPipeline(
     _OptimizedLightingPipelineBase[LightingTextClassificationConfigSpace],
 ):
     def __post_init__(self) -> None:
+        # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
         super().__init__(
             preprocessing_pipeline=HuggingFaceTextClassificationPreprocessingPipeline(
                 dataset_name=self.dataset_name,
@@ -55,7 +56,7 @@ class OptimizedLightingClassificationPipeline(
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,
             ),
-            evaluation_pipeline=LightningClassificationPipeline,
+            evaluation_pipeline=LightningClassificationPipeline,  # type: ignore
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
