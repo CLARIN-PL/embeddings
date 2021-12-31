@@ -109,6 +109,6 @@ class TextClassification(HuggingFaceLightningTask):
         predictions = self.trainer.predict(dataloaders=dataloader, return_predictions=True)
         predictions = torch.argmax(torch.cat([it.logits for it in predictions]), dim=1).numpy()
         assert isinstance(predictions, np.ndarray)
-        ground_truth = dataloader.dataset["labels"].numpy()
+        ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
         assert isinstance(ground_truth, np.ndarray)
         return {"y_pred": predictions, "y_true": ground_truth}
