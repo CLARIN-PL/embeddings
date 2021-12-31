@@ -45,7 +45,7 @@ class LightingDataModuleSubset(str, Enum):
 
 
 def get_subset_from_lighting_datamodule(
-    data: pl.LightningDataModule, subset: LightingDataModuleSubset
+    data: pl.LightningDataModule, subset: Union[str, LightingDataModuleSubset]
 ) -> LightingDataLoaders:
     if subset == "train":
         return data.train_dataloader()
