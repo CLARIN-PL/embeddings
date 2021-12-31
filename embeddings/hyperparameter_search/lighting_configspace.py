@@ -1,22 +1,23 @@
 from dataclasses import InitVar, dataclass, field
 from typing import Dict, Final, List, Union
 
-from pytorch_lightning.accelerators import Accelerator
-
 from embeddings.hyperparameter_search.configspace import (
     BaseConfigSpace,
     Parameter,
     SampledParameters,
 )
-from embeddings.hyperparameter_search.parameters import ConstantParameter, SearchableParameter
-from embeddings.utils.utils import PrimitiveTypes
+from embeddings.hyperparameter_search.parameters import (
+    ConstantParameter,
+    ParameterValues,
+    SearchableParameter,
+)
 
 
 @dataclass
 class LightingTextClassificationConfigSpace(BaseConfigSpace):
     embedding_name: InitVar[Union[str, List[str]]]
-    devices: InitVar[Union[int, str, List[int]], None] = field(default="auto")
-    accelerator: InitVar[Union[str, Accelerator, None]] = field(default="auto")
+    devices: InitVar[Union[int, str, None, List[int]]] = field(default="auto")
+    accelerator: InitVar[Union[str, None]] = field(default="auto")
 
     param_embedding_name: Parameter = field(init=False)
     trainer_devices: Parameter = field(init=False)
@@ -67,8 +68,8 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
     def __post_init__(
         self,
         embedding_name: Union[str, List[str]],
-        devices: Union[int, str, List[int]],
-        accelerator: Union[str, Accelerator, None],
+        devices: Union[int, str, None, List[int]],
+        accelerator: Union[str, None],
     ) -> None:
         if isinstance(embedding_name, str):
             self.param_embedding_name: Parameter = ConstantParameter(
@@ -86,7 +87,7 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
         self.trainer_accelerator = ConstantParameter(name="accelerator", value=accelerator)
 
     @staticmethod
-    def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
+    def parse_parameters(parameters: Dict[str, ParameterValues]) -> SampledParameters:
         pipeline_keys: Final = {"batch_size", "finetune_last_n_layers", "embedding_name"}
         datamodule_keys: Final = {"max_seq_length"}
         task_model_keys: Final = {

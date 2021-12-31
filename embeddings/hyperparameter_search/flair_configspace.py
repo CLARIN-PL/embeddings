@@ -10,8 +10,11 @@ from embeddings.hyperparameter_search.configspace import (
     Parameter,
     SampledParameters,
 )
-from embeddings.hyperparameter_search.parameters import ConstantParameter, SearchableParameter
-from embeddings.utils.utils import PrimitiveTypes
+from embeddings.hyperparameter_search.parameters import (
+    ConstantParameter,
+    ParameterValues,
+    SearchableParameter,
+)
 
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
@@ -50,8 +53,8 @@ class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
 
     @staticmethod
     def _parse_model_trainer_parameters(
-        parameters: Dict[str, PrimitiveTypes]
-    ) -> Tuple[Dict[str, PrimitiveTypes], Dict[str, PrimitiveTypes]]:
+        parameters: Dict[str, ParameterValues]
+    ) -> Tuple[Dict[str, ParameterValues], Dict[str, ParameterValues]]:
         task_train_keys: Final = {
             "learning_rate",
             "mini_batch_size",
@@ -67,7 +70,7 @@ class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
 
 class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
     @staticmethod
-    def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
+    def parse_parameters(parameters: Dict[str, ParameterValues]) -> SampledParameters:
         embedding_name = parameters.pop("embedding_name")
         (
             parameters,
@@ -109,7 +112,7 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
 
     def _map_task_specific_parameters(
         self, trial: optuna.trial.Trial
-    ) -> Tuple[Dict[str, PrimitiveTypes], Set[str]]:
+    ) -> Tuple[Dict[str, ParameterValues], Set[str]]:
         parameters = {}
         use_rnn_name, use_rnn_val = self._parse_parameter(trial=trial, param_name="use_rnn")
         parameters[use_rnn_name] = use_rnn_val
@@ -122,7 +125,7 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
         return parameters, mapped_parameters
 
     @staticmethod
-    def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
+    def parse_parameters(parameters: Dict[str, ParameterValues]) -> SampledParameters:
         embedding_name = parameters.pop("embedding_name")
         assert isinstance(embedding_name, str)
         hidden_size = parameters.pop("hidden_size")
@@ -224,7 +227,7 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
 
     def _map_task_specific_parameters(
         self, trial: optuna.trial.Trial
-    ) -> Tuple[Dict[str, PrimitiveTypes], Set[str]]:
+    ) -> Tuple[Dict[str, ParameterValues], Set[str]]:
         shared_params = ("dropout", "word_dropout", "reproject_words")
         param_names_mapping: Final = {
             "FlairDocumentCNNEmbeddings": ("cnn_pool_kernels",) + shared_params,
@@ -262,7 +265,7 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
         return parameters, mapped_parameters
 
     @staticmethod
-    def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
+    def parse_parameters(parameters: Dict[str, ParameterValues]) -> SampledParameters:
         embedding_name = parameters.pop("embedding_name")
         assert isinstance(embedding_name, str)
         document_embedding = parameters.pop("document_embedding")

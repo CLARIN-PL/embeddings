@@ -21,12 +21,13 @@ ParameterTypes = Literal[
 T_choices = Sequence[
     Union[PrimitiveTypes, Tuple[Tuple[int, int], ...]]
 ]  # second type for CNN kernels
+ParameterValues = Union[PrimitiveTypes, Sequence[PrimitiveTypes]]
 
 
 @dataclass(frozen=True)
 class ConstantParameter:
     name: str
-    value: PrimitiveTypes
+    value: ParameterValues
 
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374

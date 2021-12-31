@@ -11,6 +11,7 @@ from embeddings.hyperparameter_search.flair_configspace import (
     SequenceLabelingConfigSpace,
     TextClassificationConfigSpace,
 )
+from embeddings.hyperparameter_search.parameters import ParameterValues
 from embeddings.pipeline.evaluation_pipeline import (
     FlairSequenceLabelingEvaluationPipeline,
     FlairTextClassificationEvaluationPipeline,
@@ -35,7 +36,8 @@ from embeddings.pipeline.preprocessing_pipeline import (
     FlairTextClassificationPreprocessingPipeline,
     FlairTextPairClassificationPreprocessingPipeline,
 )
-from embeddings.utils.utils import PrimitiveTypes
+
+# from embeddings.utils.utils import PrimitiveTypes
 
 
 @dataclass
@@ -71,7 +73,7 @@ class _OptimizedFlairClassificationPipelineDefaultsBase(
     @staticmethod
     def _pop_sampled_parameters(
         parameters: SampledParameters,
-    ) -> Tuple[str, str, Dict[str, PrimitiveTypes], Dict[str, PrimitiveTypes]]:
+    ) -> Tuple[str, str, Dict[str, ParameterValues], Dict[str, ParameterValues]]:
         embedding_name = parameters["embedding_name"]
         assert isinstance(embedding_name, str)
         document_embedding = parameters["document_embedding"]
@@ -312,7 +314,7 @@ class OptimizedFlairSequenceLabelingPipeline(
     def _pop_sampled_parameters(
         self,
         parameters: SampledParameters,
-    ) -> Tuple[str, int, Dict[str, PrimitiveTypes], Dict[str, PrimitiveTypes]]:
+    ) -> Tuple[str, int, Dict[str, ParameterValues], Dict[str, ParameterValues]]:
         embedding_name = parameters["embedding_name"]
         assert isinstance(embedding_name, str)
         hidden_size = parameters["hidden_size"]

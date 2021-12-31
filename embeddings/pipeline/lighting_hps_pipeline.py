@@ -7,6 +7,7 @@ from embeddings.hyperparameter_search.configspace import ConfigSpace, SampledPar
 from embeddings.hyperparameter_search.lighting_configspace import (
     LightingTextClassificationConfigSpace,
 )
+from embeddings.hyperparameter_search.parameters import ParameterValues
 from embeddings.pipeline.hf_preprocessing_pipeline import (
     HuggingFaceTextClassificationPreprocessingPipeline,
 )
@@ -17,7 +18,6 @@ from embeddings.pipeline.hps_pipeline import (
 )
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.pipelines_metadata import LightningClassificationPipelineMetadata
-from embeddings.utils.utils import PrimitiveTypes
 
 
 @dataclass
@@ -143,9 +143,9 @@ class OptimizedLightingClassificationPipeline(
         int,
         int,
         Optional[int],
-        Dict[str, PrimitiveTypes],
-        Dict[str, PrimitiveTypes],
-        Dict[str, PrimitiveTypes],
+        Dict[str, ParameterValues],
+        Dict[str, ParameterValues],
+        Dict[str, ParameterValues],
     ]:
         embedding_name = parameters["embedding_name"]
         assert isinstance(embedding_name, str)

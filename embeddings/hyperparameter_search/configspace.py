@@ -9,19 +9,22 @@ import optuna
 from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
 from embeddings.embedding.flair_embedding import FlairTransformerEmbedding
 from embeddings.embedding.static.embedding import StaticEmbedding
-from embeddings.hyperparameter_search.parameters import ConstantParameter, SearchableParameter
-from embeddings.utils.utils import PrimitiveTypes
+from embeddings.hyperparameter_search.parameters import (
+    ConstantParameter,
+    ParameterValues,
+    SearchableParameter,
+)
 
 Parameter = Union[SearchableParameter, ConstantParameter]
 ParsedParameters = TypeVar("ParsedParameters")
-SampledParameters = Dict[str, Union[PrimitiveTypes, Dict[str, PrimitiveTypes]]]
+SampledParameters = Dict[str, Union[ParameterValues, Dict[str, ParameterValues]]]
 ConfigSpace = TypeVar("ConfigSpace", bound="BaseConfigSpace")
 
 
 class BaseConfigSpace(ABC):
     def _parse_parameter(
         self, param_name: str, trial: optuna.trial.Trial
-    ) -> Tuple[str, PrimitiveTypes]:
+    ) -> Tuple[str, ParameterValues]:
         param: Parameter = self.__getattribute__(param_name)
         if isinstance(param, SearchableParameter):
             param.value = trial._suggest(name=param.name, distribution=param.distribution)
@@ -37,8 +40,8 @@ class BaseConfigSpace(ABC):
 
     def _map_parameters(
         self, trial: optuna.trial.Trial, parameters_names: List[str]
-    ) -> Dict[str, PrimitiveTypes]:
-        parameters: Dict[str, PrimitiveTypes] = {}
+    ) -> Dict[str, ParameterValues]:
+        parameters: Dict[str, ParameterValues] = {}
         for param_name in parameters_names:
             parameters.update([self._parse_parameter(trial=trial, param_name=param_name)])
 
@@ -46,14 +49,14 @@ class BaseConfigSpace(ABC):
 
     def _map_task_specific_parameters(
         self, trial: optuna.trial.Trial
-    ) -> Tuple[Dict[str, PrimitiveTypes], Set[str]]:
+    ) -> Tuple[Dict[str, ParameterValues], Set[str]]:
         return dict(), set()
 
     @classmethod
     def _get_fields(cls) -> Dict[str, Type[Parameter]]:
         return {field_.name: field_.type for field_ in dataclasses.fields(cls)}
 
-    def sample_parameters(self, trial: optuna.trial.Trial) -> Dict[str, PrimitiveTypes]:
+    def sample_parameters(self, trial: optuna.trial.Trial) -> Dict[str, ParameterValues]:
         task_params, mapped_params_names = self._map_task_specific_parameters(trial)
         params = self._map_parameters(
             parameters_names=[
@@ -68,8 +71,8 @@ class BaseConfigSpace(ABC):
 
     @staticmethod
     def _pop_parameters(
-        parameters: Dict[str, PrimitiveTypes], parameters_keys: Set[str]
-    ) -> Dict[str, PrimitiveTypes]:
+        parameters: Dict[str, ParameterValues], parameters_keys: Set[str]
+    ) -> Dict[str, ParameterValues]:
         return {k: parameters.pop(k) for k in parameters_keys if k in parameters}
 
     @staticmethod
@@ -77,7 +80,7 @@ class BaseConfigSpace(ABC):
         assert not functools.reduce(set.intersection, (set(d.keys()) for d in parameter_dicts))
 
     @staticmethod
-    def _check_unmapped_parameters(parameters: Dict[str, PrimitiveTypes]) -> None:
+    def _check_unmapped_parameters(parameters: Dict[str, ParameterValues]) -> None:
         if len(parameters):
             raise ValueError(
                 f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
@@ -85,7 +88,7 @@ class BaseConfigSpace(ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
+    def parse_parameters(parameters: Dict[str, ParameterValues]) -> SampledParameters:
         pass
 
     @staticmethod
