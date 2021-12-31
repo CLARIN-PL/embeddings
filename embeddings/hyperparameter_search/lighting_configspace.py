@@ -15,8 +15,8 @@ from embeddings.utils.utils import PrimitiveTypes
 @dataclass
 class LightingTextClassificationConfigSpace(BaseConfigSpace):
     embedding_name: InitVar[Union[str, List[str]]]
-    devices: InitVar[Union[int, str, List[int]], None]
-    accelerator: InitVar[Union[str, Accelerator, None]]
+    devices: InitVar[Union[int, str, List[int]], None] = field(default="auto")
+    accelerator: InitVar[Union[str, Accelerator, None]] = field(default="auto")
 
     param_embedding_name: Parameter = field(init=False)
     trainer_devices: Parameter = field(init=False)
@@ -67,8 +67,8 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
     def __post_init__(
         self,
         embedding_name: Union[str, List[str]],
-        devices: Union[int, str, List[int]] = "auto",
-        accelerator: Union[str, Accelerator, None] = "auto",
+        devices: Union[int, str, List[int]],
+        accelerator: Union[str, Accelerator, None],
     ) -> None:
         if isinstance(embedding_name, str):
             self.param_embedding_name: Parameter = ConstantParameter(
