@@ -1,6 +1,8 @@
 from dataclasses import InitVar, dataclass, field
 from typing import Dict, Final, List, Union
 
+from pytorch_lightning.accelerators import Accelerator
+
 from embeddings.hyperparameter_search.configspace import (
     BaseConfigSpace,
     Parameter,
@@ -13,7 +15,13 @@ from embeddings.utils.utils import PrimitiveTypes
 @dataclass
 class LightingTextClassificationConfigSpace(BaseConfigSpace):
     embedding_name: InitVar[Union[str, List[str]]]
+    devices: InitVar[Union[int, str, List[int]], None]
+    accelerator: InitVar[Union[str, Accelerator, None]]
+
     param_embedding_name: Parameter = field(init=False)
+    trainer_devices: Parameter = field(init=False)
+    trainer_accelerator: Parameter = field(init=False)
+
     max_epochs: Parameter = SearchableParameter(
         name="max_epochs", type="int_uniform", low=1, high=30, step=1
     )
@@ -56,7 +64,12 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
         name="finetune_last_n_layers", type="categorical", choices=[-1, 0, 1, 3, 5, 7, 9]
     )
 
-    def __post_init__(self, embedding_name: Union[str, List[str]]) -> None:
+    def __post_init__(
+        self,
+        embedding_name: Union[str, List[str]],
+        devices: Union[int, str, List[int]] = "auto",
+        accelerator: Union[str, Accelerator, None] = "auto",
+    ) -> None:
         if isinstance(embedding_name, str):
             self.param_embedding_name: Parameter = ConstantParameter(
                 name="embedding_name",
@@ -68,6 +81,9 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
                 type="categorical",
                 choices=embedding_name,
             )
+
+        self.trainer_devices = ConstantParameter(name="devices", value=devices)
+        self.trainer_accelerator = ConstantParameter(name="accelerator", value=accelerator)
 
     @staticmethod
     def parse_parameters(parameters: Dict[str, PrimitiveTypes]) -> SampledParameters:
@@ -81,9 +97,7 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
             "adam_epsilon",
             "weight_decay",
         }
-        task_trainer_keys: Final = {
-            "max_epochs",
-        }
+        task_train_keys: Final = {"max_epochs", "devices", "accelerator"}
         pipeline_kwargs = BaseConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=pipeline_keys
         )
@@ -94,7 +108,7 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
             parameters=parameters, parameters_keys=task_model_keys
         )
         task_train_kwargs = BaseConfigSpace._pop_parameters(
-            parameters=parameters, parameters_keys=task_trainer_keys
+            parameters=parameters, parameters_keys=task_train_keys
         )
 
         batch_size = pipeline_kwargs.pop("batch_size")
