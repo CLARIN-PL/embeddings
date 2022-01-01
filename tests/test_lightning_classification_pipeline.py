@@ -36,6 +36,7 @@ def task_train_kwargs() -> Dict[str, Any]:
         "max_epochs": 1,
         "devices": "auto",
         "accelerator": "cpu",
+        "deterministic": True,
     }
 
 

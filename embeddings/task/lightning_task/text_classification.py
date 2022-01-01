@@ -106,7 +106,9 @@ class TextClassification(HuggingFaceLightningTask):
         self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.trainer is not None
-        predictions = self.trainer.predict(dataloaders=dataloader, return_predictions=True)
+        predictions = self.trainer.predict(
+            dataloaders=dataloader, return_predictions=True, ckpt_path="best"
+        )
         predictions = torch.argmax(torch.cat([it.logits for it in predictions]), dim=1).numpy()
         assert isinstance(predictions, np.ndarray)
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
