@@ -47,7 +47,12 @@ def task_model_kwargs() -> Dict[str, Any]:
 
 @pytest.fixture
 def datamodule_kwargs() -> Dict[str, Any]:
-    return {"downsample_train": 0.01, "downsample_val": 0.1, "downsample_test": 0.1}
+    return {
+        "downsample_train": 0.01,
+        "downsample_val": 0.01,
+        "downsample_test": 0.05,
+        "num_workers": 0,
+    }
 
 
 @pytest.fixture
@@ -86,14 +91,14 @@ def test_lightning_classification_pipeline(
     result = pipeline.run()
     path.cleanup()
     np.testing.assert_almost_equal(
-        result["accuracy"]["accuracy"], 0.4246575342465753, decimal=pytest.decimal
+        result["accuracy"]["accuracy"], 0.4864864864864865, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        result["f1__average_macro"]["f1"], 0.24111831943157244, decimal=pytest.decimal
+        result["f1__average_macro"]["f1"], 0.2684458398744113, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        result["precision__average_macro"]["precision"], 0.21174463937621832, decimal=pytest.decimal
+        result["precision__average_macro"]["precision"], 0.3602941176470588, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        result["recall__average_macro"]["recall"], 0.2982758620689655, decimal=pytest.decimal
+        result["recall__average_macro"]["recall"], 0.325, decimal=pytest.decimal
     )

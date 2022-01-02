@@ -112,7 +112,9 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
                 and column_name in self.dataset
                 and 0 < downsample_factor < 1
             ):
-                downsampled_data = self.dataset[column_name].train_test_split(downsample_factor, seed=self.seed)
+                downsampled_data = self.dataset[column_name].train_test_split(
+                    downsample_factor, seed=self.seed
+                )
                 self.dataset[column_name] = downsampled_data["test"]
 
     def prepare_data(self) -> None:
@@ -135,7 +137,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.dataset.set_format(type="torch")
 
     def train_dataloader(self) -> DataLoader[HuggingFaceDataset]:
-        return DataLoader(self.dataset["train"], batch_size=self.train_batch_size)  # type: ignore
+        return DataLoader(self.dataset["train"], batch_size=self.train_batch_size, shuffle=True)  # type: ignore
 
     # Ignoring the type of val_dataloader method from supertype "DataHooks" allowing for None
     # and training without validation dataset.
