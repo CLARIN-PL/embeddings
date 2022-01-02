@@ -53,6 +53,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
         batch_encoding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
+        seed: int = 441,
         **kwargs: Any,
     ) -> None:
         # ignoring the type to avoid calling to untyped function "__init__" in typed context error
@@ -75,6 +76,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
             batch_encoding_kwargs if batch_encoding_kwargs else self.DEFAULT_BATCH_ENCODING_KWARGS
         )
         self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
+        self.seed = seed
 
     def load_dataset(self, preparation_step: bool = False) -> DatasetDict:
         loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = HuggingFaceDataLoader()
@@ -110,7 +112,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
                 and column_name in self.dataset
                 and 0 < downsample_factor < 1
             ):
-                downsampled_data = self.dataset[column_name].train_test_split(downsample_factor)
+                downsampled_data = self.dataset[column_name].train_test_split(downsample_factor, seed=self.seed)
                 self.dataset[column_name] = downsampled_data["test"]
 
     def prepare_data(self) -> None:
@@ -139,12 +141,12 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
     # and training without validation dataset.
     def val_dataloader(self) -> Optional[DataLoader[HuggingFaceDataset]]:  # type: ignore
         if "validation" in self.dataset:
-            return DataLoader(self.dataset["validation"], batch_size=self.eval_batch_size)  # type: ignore
+            return DataLoader(self.dataset["validation"], batch_size=self.eval_batch_size, shuffle=False)  # type: ignore
         else:
             return None
 
     def test_dataloader(self) -> DataLoader[HuggingFaceDataset]:
-        return DataLoader(self.dataset["test"], batch_size=self.eval_batch_size)  # type: ignore
+        return DataLoader(self.dataset["test"], batch_size=self.eval_batch_size, shuffle=False)  # type: ignore
 
     @abc.abstractmethod
     def convert_to_features(

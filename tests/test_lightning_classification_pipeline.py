@@ -42,7 +42,7 @@ def task_train_kwargs() -> Dict[str, Any]:
 
 @pytest.fixture
 def task_model_kwargs() -> Dict[str, Any]:
-    return {"learning_rate": 5e-4}
+    return {"learning_rate": 5e-4, "use_scheduler": False}
 
 
 @pytest.fixture
@@ -81,7 +81,7 @@ def test_lightning_classification_pipeline(
         "TemporaryDirectory[str]",
     ],
 ) -> None:
-    pl.seed_everything(441)
+    pl.seed_everything(441, workers=True)
     pipeline, path = lightning_classification_pipeline
     result = pipeline.run()
     path.cleanup()
