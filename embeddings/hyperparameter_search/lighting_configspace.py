@@ -113,8 +113,7 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
         )
 
         batch_size = pipeline_kwargs.pop("batch_size")
-        pipeline_kwargs["train_batch_size"] = batch_size
-        pipeline_kwargs["eval_batch_size"] = batch_size
+        pipeline_kwargs["train_batch_size"] = pipeline_kwargs["eval_batch_size"]  = batch_size
 
         return {
             "datamodule_kwargs": datamodule_kwargs,
