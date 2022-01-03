@@ -3,7 +3,6 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Generic, Sequence, TypeVar, Union
 
-import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 
 Data = TypeVar("Data")
@@ -42,18 +41,3 @@ class LightingDataModuleSubset(str, Enum):
     VALIDATION = "dev"
     TEST = "test"
     PREDICT = "predict"
-
-
-def get_subset_from_lighting_datamodule(
-    data: pl.LightningDataModule, subset: Union[str, LightingDataModuleSubset]
-) -> LightingDataLoaders:
-    if subset == "train":
-        return data.train_dataloader()
-    elif subset == "dev":
-        return data.val_dataloader()
-    elif subset == "test":
-        return data.test_dataloader()
-    elif subset == "predict":
-        return data.predict_dataloader()
-    else:
-        raise ValueError("Unrecognized LightingDataModuleSubset")

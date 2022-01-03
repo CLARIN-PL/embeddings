@@ -27,7 +27,7 @@ class _OptimizedLightingPipelineBase(
     input_column_name: str
     target_column_name: str
 
-    dataset_dir: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
+    tmp_dataset_dir: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
     tmp_model_output_dir: TemporaryDirectory[str] = field(
         init=False, default_factory=TemporaryDirectory
     )
@@ -51,7 +51,7 @@ class OptimizedLightingClassificationPipeline(
         super().__init__(
             preprocessing_pipeline=HuggingFaceTextClassificationPreprocessingPipeline(
                 dataset_name=self.dataset_name,
-                persist_path=self.dataset_dir.name,
+                persist_path=self.tmp_dataset_dir.name,
                 sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,
@@ -60,7 +60,7 @@ class OptimizedLightingClassificationPipeline(
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
-            dataset_path=self.dataset_dir.name,
+            dataset_path=self.tmp_dataset_dir.name,
             metric_name="f1__average_macro",
             metric_key="f1",
             config_space=self.config_space,
@@ -80,7 +80,7 @@ class OptimizedLightingClassificationPipeline(
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: LightningClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
-            "dataset_name_or_path": self.dataset_dir.name,
+            "dataset_name_or_path": self.tmp_dataset_dir.name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
             "output_path": self.tmp_model_output_dir.name,
@@ -112,7 +112,7 @@ class OptimizedLightingClassificationPipeline(
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: LightningClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
-            "dataset_name_or_path": self.dataset_dir.name,
+            "dataset_name_or_path": self.tmp_dataset_dir.name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
             "output_path": self.tmp_model_output_dir.name,
@@ -132,7 +132,7 @@ class OptimizedLightingClassificationPipeline(
 
     def _post_run_hook(self) -> None:
         super()._post_run_hook()
-        self.dataset_dir.cleanup()
+        self.tmp_dataset_dir.cleanup()
         self.tmp_model_output_dir.cleanup()
 
     @staticmethod

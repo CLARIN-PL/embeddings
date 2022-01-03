@@ -65,7 +65,7 @@ class _OptimizedFlairClassificationPipelineDefaultsBase(
     _HuggingFaceOptimizedPipelineDefaultsBase,
     ABC,
 ):
-    dataset_dir: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
+    tmp_dataset_dir: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
     tmp_model_output_dir: TemporaryDirectory[str] = field(
         init=False, default_factory=TemporaryDirectory
     )
@@ -97,7 +97,7 @@ class OptimizedFlairClassificationPipeline(
     _OptimizedFlairClassificationPipelineBase[TextClassificationConfigSpace],
 ):
     def __post_init__(self) -> None:
-        self.dataset_path = Path(self.dataset_dir.name).joinpath("ds.pkl")
+        self.dataset_path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
         super().__init__(
             preprocessing_pipeline=FlairTextClassificationPreprocessingPipeline(
                 dataset_name=self.dataset_name,
@@ -162,7 +162,7 @@ class OptimizedFlairClassificationPipeline(
 
     def _post_run_hook(self) -> None:
         super()._post_run_hook()
-        self.dataset_dir.cleanup()
+        self.tmp_dataset_dir.cleanup()
         self.tmp_model_output_dir.cleanup()
 
 
@@ -178,7 +178,7 @@ class OptimizedFlairPairClassificationPipeline(
     _OptimizedFlairPairClassificationPipelineBase[TextClassificationConfigSpace],
 ):
     def __post_init__(self) -> None:
-        self.dataset_path = Path(self.dataset_dir.name).joinpath("ds.pkl")
+        self.dataset_path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
         super().__init__(
             preprocessing_pipeline=FlairTextPairClassificationPreprocessingPipeline(
                 dataset_name=self.dataset_name,
@@ -245,7 +245,7 @@ class OptimizedFlairPairClassificationPipeline(
 
     def _post_run_hook(self) -> None:
         super()._post_run_hook()
-        self.dataset_dir.cleanup()
+        self.tmp_dataset_dir.cleanup()
         self.tmp_model_output_dir.cleanup()
 
 

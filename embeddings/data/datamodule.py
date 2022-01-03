@@ -11,6 +11,7 @@ from transformers import AutoTokenizer, BatchEncoding
 
 from embeddings.data import dataset as embeddings_dataset
 from embeddings.data.data_loader import HuggingFaceDataLoader, HuggingFaceLocalDataLoader
+from embeddings.data.dataset import LightingDataLoaders, LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.utils.loggers import get_logger
 
@@ -149,6 +150,20 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
     def test_dataloader(self) -> DataLoader[HuggingFaceDataset]:
         return DataLoader(self.dataset["test"], batch_size=self.eval_batch_size, shuffle=False)  # type: ignore
+
+    def get_subset(
+        self, subset: Union[str, LightingDataModuleSubset]
+    ) -> Union[LightingDataLoaders, None]:
+        if subset == "train":
+            return self.train_dataloader()
+        elif subset == "dev":
+            return self.val_dataloader()
+        elif subset == "test":
+            return self.test_dataloader()
+        elif subset == "predict":
+            raise NotImplementedError("Predict subset not available in HuggingFaceDataModule")
+        else:
+            raise ValueError("Unrecognized LightingDataModuleSubset")
 
     @abc.abstractmethod
     def convert_to_features(
