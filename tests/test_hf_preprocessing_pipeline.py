@@ -17,14 +17,14 @@ from embeddings.transformation.hf_transformation.sampling_transformation import 
 )
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def hf_dataset_cfg():
     return {
         "dataset": "clarin-pl/polemo2-official",
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def hf_preprocessing_pipeline_kwargs(hf_dataset_cfg, result_path):
     return {
         "dataset_name": hf_dataset_cfg["dataset"],
