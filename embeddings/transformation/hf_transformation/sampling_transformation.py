@@ -3,6 +3,9 @@ from typing import Optional
 import datasets
 
 from embeddings.transformation.transformation import Transformation
+from embeddings.utils.loggers import get_logger
+
+_logger = get_logger(__name__)
 
 
 class SampleSplitsHuggingFaceTransformation(
@@ -28,8 +31,21 @@ class SampleSplitsHuggingFaceTransformation(
     ) -> datasets.DatasetDict:
         return data.train_test_split(test_size=test_fraction, seed=self.seed)  # type: ignore
 
+    def _check_args(self, data: datasets.DatasetDict) -> None:
+        if "test" in data.keys() and self.test_fraction:
+            _logger.warning(
+                "Original test subset found in dataset keys, therefore won't be replaced."
+                "Use DropSubsetTransformation firstly in case if you want to replace original test subset"
+            )
+        if "validation" in data.keys() and self.dev_fraction:
+            _logger.warning(
+                "Original validation subset found in dataset keys, therefore won't be replaced."
+                "Use DropSubsetTransformation firstly in case if you want to replace original validation subset"
+            )
+
     def transform(self, data: datasets.DatasetDict) -> datasets.DatasetDict:
         dataset = datasets.DatasetDict()
+        self._check_args(data)
 
         if (
             self.dev_fraction
@@ -53,8 +69,8 @@ class SampleSplitsHuggingFaceTransformation(
 
         elif self.test_fraction and "test" not in data:
             dataset = self._train_test_split(data["train"], self.test_fraction)
-
         else:
+            _logger.warning("No available transformations found. Returning original dataset")
             return data
 
         return dataset
