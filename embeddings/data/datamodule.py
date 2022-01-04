@@ -1,6 +1,6 @@
 import abc
 import pathlib
-from os.path import exists
+from os.path import exists, isdir
 from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import datasets
@@ -82,6 +82,12 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
     def load_dataset(self, preparation_step: bool = False) -> DatasetDict:
         loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = HuggingFaceDataLoader()
         if exists(self.dataset_name_or_path):
+            if not isdir(self.dataset_name_or_path):
+                raise NotImplementedError(
+                    "Reading from file is currently not supported. "
+                    "Pass dataset directory or HuggingFace repository name"
+                )
+
             if preparation_step:
                 return datasets.DatasetDict()
             dataset = embeddings_dataset.HuggingFaceDataset(pathlib.Path(self.dataset_name_or_path))

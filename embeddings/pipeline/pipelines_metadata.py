@@ -65,7 +65,7 @@ class LightningClassificationPipelineMetadata(EmbeddingPipelineBaseMetadata):
     target_column_name: str
     train_batch_size: int
     eval_batch_size: int
-    finetune_last_n_layers: Optional[int]
+    finetune_last_n_layers: int
     tokenizer_name: Optional[str]
     load_dataset_kwargs: Optional[Dict[str, Any]]
     datamodule_kwargs: Optional[Dict[str, Any]]

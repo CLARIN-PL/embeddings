@@ -142,7 +142,7 @@ class OptimizedLightingClassificationPipeline(
         str,
         int,
         int,
-        Optional[int],
+        int,
         Dict[str, ParameterValues],
         Dict[str, ParameterValues],
         Dict[str, ParameterValues],
@@ -154,7 +154,7 @@ class OptimizedLightingClassificationPipeline(
         eval_batch_size = parameters["eval_batch_size"]
         assert isinstance(eval_batch_size, int)
         finetune_last_n_layers = parameters["finetune_last_n_layers"]
-        assert finetune_last_n_layers is None or isinstance(finetune_last_n_layers, int)
+        assert isinstance(finetune_last_n_layers, int)
         datamodule_kwargs = parameters["datamodule_kwargs"]
         assert isinstance(datamodule_kwargs, dict)
         task_model_kwargs = parameters["task_model_kwargs"]

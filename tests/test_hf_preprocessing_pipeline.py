@@ -36,7 +36,7 @@ def hf_preprocessing_pipeline_kwargs(hf_dataset_cfg, result_path):
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def hf_dataset(hf_dataset_cfg):
     return HuggingFaceDataLoader().load(HuggingFaceDataset(**hf_dataset_cfg))
 

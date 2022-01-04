@@ -91,7 +91,7 @@ def lightning_classification_kwargs(output_path: "TemporaryDirectory[str]") -> D
         "task_train_kwargs": None,
         "train_batch_size": 1,
         "eval_batch_size": 1,
-        "finetune_last_n_layers": None,
+        "finetune_last_n_layers": 0,
         "tokenizer_name": None,
         "datamodule_kwargs": None,
         "tokenizer_kwargs": None,
