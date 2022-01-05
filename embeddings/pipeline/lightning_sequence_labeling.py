@@ -21,7 +21,7 @@ class LightningSequenceLabelingPipeline(
     LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
     DEFAULT_TASK_TRAIN_KWARGS = {"devices": "auto", "accelerator": "auto"}
-    DEFAULT_DATAMODULE_KWARGS = {"max_seq_length": 128}
+    DEFAULT_DATAMODULE_KWARGS = {"max_seq_length": None}
     DEFAULT_TASK_MODEL_KWARGS = {"use_scheduler": False}
 
     def __init__(
