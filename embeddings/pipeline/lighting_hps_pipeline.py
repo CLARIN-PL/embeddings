@@ -80,10 +80,9 @@ class OptimizedLightingClassificationPipeline(
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: LightningClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
-            "dataset_name_or_path": self.tmp_dataset_dir.name,
+            "dataset_name_or_path": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
-            "output_path": self.tmp_model_output_dir.name,
             "train_batch_size": train_batch_size,
             "eval_batch_size": eval_batch_size,
             "finetune_last_n_layers": finetune_last_n_layers,
