@@ -1,6 +1,7 @@
 from collections import ChainMap
 from typing import Any, Dict, List, Optional, Tuple
 
+import numpy as np
 import torch
 from numpy import typing as nptyping
 from pytorch_lightning.utilities.types import STEP_OUTPUT
@@ -11,6 +12,7 @@ from transformers import AutoModelForTokenClassification
 from embeddings.data.datamodule import HuggingFaceDataset
 from embeddings.task.lightning_task.lightning_task import HuggingFaceLightningTask
 from embeddings.utils.loggers import get_logger
+from embeddings.utils.utils import NDArrayInt
 
 _logger = get_logger(__name__)
 
@@ -109,18 +111,22 @@ class SequenceLabeling(HuggingFaceLightningTask):
             _logger.warning("Missing labels for the test data")
         return None
 
+    def predict_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
+        batch, batch_idx = args
+        loss, logits, preds = self.shared_step(**batch)
+        return preds
+
     def predict(
         self, dataloader: DataLoader[HuggingFaceDataset]
-    ) -> Dict[str, nptyping.NDArray[Any]]:
+    ) -> Dict[str, nptyping.NDArray[np.str_]]:
         assert self.trainer is not None
-
-        logits = [self.model(**batch).logits for batch in dataloader]
-        predictions = list(torch.argmax(torch.cat(logits), dim=2).numpy())
+        predictions = self.trainer.predict(
+            dataloaders=dataloader, return_predictions=True, ckpt_path="best"
+        )
+        predictions = list(torch.cat(predictions).numpy())
         ground_truth = list(torch.cat([x["labels"] for x in dataloader]).numpy())
 
-        def map_filter_data(
-            data: nptyping.NDArray[Any], ground_truth_data: nptyping.NDArray[Any]
-        ) -> List[str]:
+        def map_filter_data(data: NDArrayInt, ground_truth_data: NDArrayInt) -> List[str]:
             data = [
                 self.trainer.datamodule.id2str(x.item())
                 for x in data[ground_truth_data != self.ignore_index]
@@ -131,4 +137,4 @@ class SequenceLabeling(HuggingFaceLightningTask):
             predictions[i] = map_filter_data(pred, gt)
             ground_truth[i] = map_filter_data(gt, gt)
 
-        return {"y_pred": predictions, "y_true": ground_truth}
+        return {"y_pred": np.array(predictions), "y_true": np.array(ground_truth)}

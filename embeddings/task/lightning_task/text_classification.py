@@ -8,7 +8,6 @@ from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.utils.data import DataLoader
 from torchmetrics import F1, Accuracy, MetricCollection, Precision, Recall
 from transformers import AutoModelForSequenceClassification
-from transformers.modeling_outputs import SequenceClassifierOutput
 
 from embeddings.data.datamodule import HuggingFaceDataset
 from embeddings.task.lightning_task.lightning_task import HuggingFaceLightningTask
@@ -105,10 +104,8 @@ class TextClassification(HuggingFaceLightningTask):
 
     def predict_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         batch, batch_idx = args
-        loss, preds = self.shared_step(**batch)
-        if isinstance(preds, SequenceClassifierOutput):
-            assert isinstance(preds.logits, torch.Tensor)
-            return preds.logits
+        loss, logits = self.shared_step(**batch)
+        preds = torch.argmax(logits, dim=1)
         return preds
 
     def predict(
@@ -118,7 +115,7 @@ class TextClassification(HuggingFaceLightningTask):
         predictions = self.trainer.predict(
             dataloaders=dataloader, return_predictions=True, ckpt_path="best"
         )
-        predictions = torch.argmax(torch.cat(predictions), dim=1).numpy()
+        predictions = torch.cat(predictions).numpy()
         assert isinstance(predictions, np.ndarray)
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
         assert isinstance(ground_truth, np.ndarray)

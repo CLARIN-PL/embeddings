@@ -5,6 +5,7 @@ import pytorch_lightning as pl
 from numpy import typing as nptyping
 
 from embeddings.data.datamodule import SequenceLabelingDataModule
+from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.evaluator.sequence_labeling_evaluator import (
     EvaluationMode,
@@ -19,14 +20,19 @@ from embeddings.task.lightning_task.sequence_labeling import SequenceLabeling
 class LightningSequenceLabelingPipeline(
     LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
-    DEFAULT_TASK_TRAIN_KWARGS = {"devices": "auto", "accelerator": "auto"}
+    DEFAULT_TASK_TRAIN_KWARGS = {"devices": "auto", "accelerator": "auto", "max_epochs": 20}
+    DEFAULT_DATAMODULE_KWARGS = {
+        "max_seq_length": 128,
+        # "downsample_train": 0.01,
+        # "downsample_val": 0.1,
+        # "downsample_test": 0.1,
+    }  # change back
     DEFAULT_TASK_MODEL_KWARGS = {"use_scheduler": False}
-    DEFAULT_DATAMODULE_KWARGS = {"max_seq_length": None}
 
     def __init__(
         self,
         embedding_name: str,
-        dataset_name: str,
+        dataset_name_or_path: T_path,
         input_column_name: str,
         target_column_name: str,
         output_path: T_path,
@@ -35,7 +41,7 @@ class LightningSequenceLabelingPipeline(
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
         label_all_tokens: bool = False,
-        finetune_last_n_layers: int = -1,
+        finetune_last_n_layers: int = 0,  # change back
         tokenizer_name: Optional[str] = None,
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
         datamodule_kwargs: Optional[Dict[str, Any]] = None,
@@ -46,7 +52,7 @@ class LightningSequenceLabelingPipeline(
     ):
         datamodule = SequenceLabelingDataModule(
             tokenizer_name_or_path=tokenizer_name if tokenizer_name else embedding_name,
-            dataset_name=dataset_name,
+            dataset_name_or_path=dataset_name_or_path,
             text_field=input_column_name,
             target_field=target_column_name,
             train_batch_size=train_batch_size,
@@ -71,7 +77,9 @@ class LightningSequenceLabelingPipeline(
             if task_model_kwargs
             else self.DEFAULT_TASK_MODEL_KWARGS,
         )
-        model = LightningModel(trainer=trainer, task=task, predict_subset="test")
+        model = LightningModel(
+            trainer=trainer, task=task, predict_subset=LightingDataModuleSubset.TEST
+        )
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         )
