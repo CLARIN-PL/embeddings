@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Dict, Optional, Sequence, Union
 
 import datasets
@@ -11,6 +12,7 @@ from embeddings.evaluator.text_classification_evaluator import TextClassificatio
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task.text_classification import TextClassification
+from embeddings.utils.json_dict_persister import JsonPersister
 from embeddings.utils.utils import initialize_kwargs
 
 
@@ -55,6 +57,7 @@ class LightningClassificationPipeline(
             self.DEFAULT_MODEL_CONFIG_KWARGS, model_config_kwargs
         )
 
+        output_path = Path(output_path)
         datamodule = TextClassificationDataModule(
             tokenizer_name_or_path=tokenizer_name if tokenizer_name else embedding_name,
             dataset_name_or_path=dataset_name_or_path,
@@ -78,5 +81,7 @@ class LightningClassificationPipeline(
             task_model_kwargs=self.task_model_kwargs,
         )
         model = LightningModel(trainer=trainer, task=task, predict_subset=predict_subset)
-        evaluator = TextClassificationEvaluator()
+        evaluator = TextClassificationEvaluator().persisting(
+            JsonPersister(path=output_path.joinpath("evaluation.json"))
+        )
         super().__init__(datamodule, model, evaluator)

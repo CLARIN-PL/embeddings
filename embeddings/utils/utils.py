@@ -1,5 +1,8 @@
 import copy
 import importlib
+import os.path
+import pprint
+from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
 import numpy as np
@@ -63,6 +66,10 @@ def build_output_path(root: T_path, embedding_name: T_path, dataset_name: T_path
         dataset_name = dataset_name.replace("/", "__")
 
     return Path(root, embedding_name, dataset_name)
+
+
+def format_eval_result(result: Dict[str, Any]) -> str:
+    return pprint.pformat(result, sort_dicts=False)
 
 
 def initialize_kwargs(

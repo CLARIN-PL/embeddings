@@ -4,7 +4,7 @@ import typer
 
 from embeddings.defaults import RESULTS_PATH
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
-from embeddings.utils.utils import build_output_path
+from embeddings.utils.utils import build_output_path, format_eval_result
 
 
 def run(
@@ -32,7 +32,7 @@ def run(
         dataset_name_or_path=dataset_name,
         input_column_name=input_columns_name,
         target_column_name=target_column_name,
-        output_path=root,
+        output_path=output_path,
         finetune_last_n_layers=0,
         datamodule_kwargs={
             "downsample_train": 0.001,
@@ -43,7 +43,7 @@ def run(
     )
 
     result = pipeline.run()
-    typer.echo(pprint.pformat(result))
+    typer.echo(format_eval_result(result))
 
 
 typer.run(run)

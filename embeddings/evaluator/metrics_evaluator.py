@@ -17,7 +17,9 @@ class MetricsEvaluator(Evaluator[Dict[str, nptyping.NDArray[Any]], Dict[str, Any
         pass
 
     def evaluate(self, data: Dict[str, nptyping.NDArray[Any]]) -> Dict[str, Any]:
-        return {
+        result = {
             str(metric): metric.compute(y_true=data["y_true"], y_pred=data["y_pred"])
             for metric in self.metrics
         }
+        result["data"] = data
+        return result
