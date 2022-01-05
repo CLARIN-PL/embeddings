@@ -1,16 +1,17 @@
 import abc
 import pathlib
 from os.path import exists, isdir
-from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import datasets
 import pytorch_lightning as pl
 from datasets import ClassLabel, Dataset, DatasetDict
-from datasets import Sequence as DatasetsSequence
+from datasets import Sequence as HFSequence
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, BatchEncoding
 
 from embeddings.data import dataset as embeddings_dataset
+from embeddings.data.data_collator import CustomDataCollatorForTokenClassification
 from embeddings.data.data_loader import HuggingFaceDataLoader, HuggingFaceLocalDataLoader
 from embeddings.data.dataset import LightingDataLoaders, LightingDataModuleSubset
 from embeddings.data.io import T_path
@@ -39,8 +40,8 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
     def __init__(
         self,
-        tokenizer_name_or_path: str,
         dataset_name_or_path: T_path,
+        tokenizer_name_or_path: str,
         target_field: str,
         max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
@@ -74,6 +75,30 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
         self.seed = seed
 
+    @abc.abstractmethod
+    def prepare_labels(self) -> None:
+        pass
+
+    @abc.abstractmethod
+    def _class_encode_column(self, column_name: str) -> None:
+        pass
+
+    @abc.abstractmethod
+    def convert_to_features(
+        self, example_batch: Dict[str, Any], indices: Optional[List[int]] = None
+    ) -> BatchEncoding:
+        pass
+
+    def prepare_data(self) -> None:
+        self.load_dataset(preparation_step=True)
+        AutoTokenizer.from_pretrained(self.tokenizer_name_or_path)
+
+    def setup(self, stage: Optional[str] = None) -> None:
+        self.dataset = self.load_dataset()
+        self.downsample_dataset()
+        self.prepare_labels()
+        self.process_data()
+
     def load_dataset(self, preparation_step: bool = False) -> DatasetDict:
         loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = HuggingFaceDataLoader()
         if exists(self.dataset_name_or_path):
@@ -93,14 +118,6 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
             )
         return loader.load(dataset)
 
-    def get_num_classes(self) -> int:
-        assert isinstance(self.dataset, DatasetDict)
-        if not isinstance(self.dataset["train"].features[self.target_field], ClassLabel):
-            self.dataset.class_encode_column(self.target_field)
-        num_classes = self.dataset["train"].features[self.target_field].num_classes
-        assert isinstance(num_classes, int)
-        return num_classes
-
     def downsample_dataset(self) -> None:
         assert isinstance(self.dataset, DatasetDict)
         downsamples = (
@@ -118,24 +135,6 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
                     downsample_factor, seed=self.seed
                 )
                 self.dataset[column_name] = downsampled_data["test"]
-
-    def prepare_data(self) -> None:
-        self.load_dataset(preparation_step=True)
-        AutoTokenizer.from_pretrained(self.tokenizer_name_or_path)
-
-    def setup(self, stage: Optional[str] = None) -> None:
-        self.dataset = self.load_dataset()
-        self.downsample_dataset()
-        self.prepare_labels()
-        self.process_data()
-
-    @abc.abstractmethod
-    def prepare_labels(self) -> None:
-        pass
-
-    @abc.abstractmethod
-    def _class_encode_column(self, column_name: str) -> None:
-        pass
 
     def process_data(self) -> None:
         columns = [c for c in self.dataset["train"].column_names if c not in self.LOADER_COLUMNS]
@@ -168,7 +167,11 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
             return None
 
     def test_dataloader(self) -> DataLoader[HuggingFaceDataset]:
-        return DataLoader(self.dataset["test"], batch_size=self.eval_batch_size, shuffle=False)  # type: ignore
+        return DataLoader(
+            dataset=self.dataset["test"],  # type: ignore
+            batch_size=self.eval_batch_size,
+            collate_fn=self.collate_fn,
+        )
 
     def get_subset(
         self, subset: Union[str, LightingDataModuleSubset]
@@ -184,12 +187,6 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         else:
             raise ValueError("Unrecognized LightingDataModuleSubset")
 
-    @abc.abstractmethod
-    def convert_to_features(
-        self, example_batch: Dict[str, Any], indices: Optional[List[int]] = None
-    ) -> BatchEncoding:
-        pass
-
     @property
     def collate_fn(self) -> Optional[Callable[[Any], Any]]:
         return None
@@ -203,8 +200,8 @@ class TextClassificationDataModule(HuggingFaceDataModule):
 
     def __init__(
         self,
-        tokenizer_name_or_path: str,
         dataset_name_or_path: T_path,
+        tokenizer_name_or_path: str,
         text_fields: Union[str, Sequence[str]],
         target_field: str,
         max_seq_length: Optional[int] = None,
@@ -224,14 +221,13 @@ class TextClassificationDataModule(HuggingFaceDataModule):
             batch_encoding_kwargs if batch_encoding_kwargs else self.DEFAULT_BATCH_ENCODING_KWARGS
         )
         super().__init__(
-            tokenizer_name_or_path=tokenizer_name_or_path,
             dataset_name_or_path=dataset_name_or_path,
+            tokenizer_name_or_path=tokenizer_name_or_path,
             target_field=target_field,
             max_seq_length=max_seq_length,
             train_batch_size=train_batch_size,
             eval_batch_size=eval_batch_size,
             tokenizer_kwargs=tokenizer_kwargs,
-            batch_encoding_kwargs=batch_encoding_kwargs,
             load_dataset_kwargs=load_dataset_kwargs,
             **kwargs,
         )
@@ -242,6 +238,9 @@ class TextClassificationDataModule(HuggingFaceDataModule):
             self._class_encode_column(self.target_field)
         self.num_classes = self.dataset["train"].features[self.target_field].num_classes
         self.target_names = self.dataset["train"].features[self.target_field].names
+
+    def _class_encode_column(self, column_name: str) -> None:
+        self.dataset.class_encode_column(column_name)
 
     def convert_to_features(
         self, example_batch: Dict[str, Any], indices: Optional[List[int]] = None
@@ -266,9 +265,6 @@ class TextClassificationDataModule(HuggingFaceDataModule):
 
         return features
 
-    def _class_encode_column(self, column_name: str) -> None:
-        self.dataset.class_encode_column(column_name)
-
 
 class SequenceLabelingDataModule(HuggingFaceDataModule):
     DEFAULT_BATCH_ENCODING_KWARGS = {
@@ -281,10 +277,11 @@ class SequenceLabelingDataModule(HuggingFaceDataModule):
 
     def __init__(
         self,
+        dataset_name_or_path: T_path,
         tokenizer_name_or_path: str,
-        dataset_name: str,
         text_field: str,
         target_field: str,
+        max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
         label_all_tokens: bool = False,
@@ -299,13 +296,13 @@ class SequenceLabelingDataModule(HuggingFaceDataModule):
             batch_encoding_kwargs if batch_encoding_kwargs else self.DEFAULT_BATCH_ENCODING_KWARGS
         )
         super().__init__(
+            dataset_name_or_path=dataset_name_or_path,
             tokenizer_name_or_path=tokenizer_name_or_path,
-            dataset_name=dataset_name,
             target_field=target_field,
+            max_seq_length=max_seq_length,
             train_batch_size=train_batch_size,
             eval_batch_size=eval_batch_size,
             tokenizer_kwargs=tokenizer_kwargs,
-            batch_encoding_kwargs=batch_encoding_kwargs,
             load_dataset_kwargs=load_dataset_kwargs,
             **kwargs,
         )
@@ -333,7 +330,6 @@ class SequenceLabelingDataModule(HuggingFaceDataModule):
 
     def encode_tags(self, labels: List[List[int]], encodings: BatchEncoding) -> List[List[int]]:
         """Encode tags to fix mismatch caused by token split into multiple subtokens by tokenizer.
-
         Special tokens have a word id that is None.
         We set the label to -100 so they are automatically ignored in the loss function.
         We set the label for the first token of each word.
@@ -360,7 +356,7 @@ class SequenceLabelingDataModule(HuggingFaceDataModule):
 
     def _class_encode_column(self, column_name: str) -> None:
         new_features = self.dataset["train"].features.copy()
-        new_features[column_name] = DatasetsSequence(
+        new_features[column_name] = HFSequence(
             feature=ClassLabel(num_classes=self.num_classes, names=self.target_names)
         )
         self.dataset = self.dataset.cast(new_features)
