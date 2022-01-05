@@ -59,7 +59,7 @@ class LightningClassificationPipeline(
 
         output_path = Path(output_path)
         datamodule = TextClassificationDataModule(
-            tokenizer_name_or_path=tokenizer_name if tokenizer_name else embedding_name,
+            tokenizer_name_or_path=tokenizer_name,
             dataset_name_or_path=dataset_name_or_path,
             text_fields=input_column_name,
             target_field=target_column_name,
@@ -71,7 +71,6 @@ class LightningClassificationPipeline(
             **self.datamodule_kwargs
         )
         trainer = pl.Trainer(default_root_dir=output_path, **self.task_train_kwargs)
-
         task = TextClassification(
             model_name_or_path=embedding_name,
             train_batch_size=train_batch_size,
