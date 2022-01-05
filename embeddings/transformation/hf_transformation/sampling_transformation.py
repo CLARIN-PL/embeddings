@@ -70,7 +70,10 @@ class SampleSplitsHuggingFaceTransformation(
         elif self.test_fraction and "test" not in data:
             dataset = self._train_test_split(data["train"], self.test_fraction)
         else:
-            _logger.warning("No available transformations found. Returning original dataset")
+            _logger.warning(
+                "Sampling transformation wrongly defined. "
+                "Subsets can not be overwritten. Returning original dataset"
+            )
             return data
 
         return dataset
