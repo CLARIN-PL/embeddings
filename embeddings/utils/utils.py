@@ -1,8 +1,12 @@
 import importlib
 from typing import Any, Union
 
+import numpy as np
+from numpy import typing as nptyping
+
 Numeric = Union[float, int]
 PrimitiveTypes = Union[None, bool, int, float, str]
+NDArrayInt = nptyping.NDArray[np.int_]
 
 
 def import_from_string(dotted_path: str) -> Any:
