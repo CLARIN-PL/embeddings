@@ -11,31 +11,42 @@ from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLab
 
 
 @pytest.fixture
-def pipeline_kwargs() -> Dict[str, Any]:
-    return {"embedding_name": "allegro/herbert-base-cased", "finetune_last_n_layers": 0}
-
-
-@pytest.fixture
 def dataset_kwargs() -> Dict[str, Any]:
     return {
-        "dataset_name": "clarin-pl/kpwr-ner",
+        "dataset_name_or_path": "clarin-pl/kpwr-ner",
         "input_column_name": "tokens",
         "target_column_name": "ner",
     }
 
 
 @pytest.fixture
-def task_train_kwargs() -> Dict[str, Any]:
+def pipeline_kwargs(scope="session") -> Dict[str, Any]:
+    return {"embedding_name": "allegro/herbert-base-cased", "finetune_last_n_layers": 0}
+
+
+@pytest.fixture
+def task_train_kwargs(scope="session") -> Dict[str, Any]:
     return {
         "max_epochs": 1,
         "devices": "auto",
         "accelerator": "cpu",
+        "deterministic": True,
     }
 
 
 @pytest.fixture
-def datamodule_kwargs() -> Dict[str, Any]:
-    return {"downsample_train": 0.01, "downsample_val": 0.1, "downsample_test": 0.1}
+def task_model_kwargs(scope="session") -> Dict[str, Any]:
+    return {"learning_rate": 5e-4, "use_scheduler": False}
+
+
+@pytest.fixture
+def datamodule_kwargs(scope="session") -> Dict[str, Any]:
+    return {
+        "downsample_train": 0.01,
+        "downsample_val": 0.01,
+        "downsample_test": 0.05,
+        "num_workers": 0,
+    }
 
 
 @pytest.fixture
@@ -49,6 +60,7 @@ def lightning_sequence_labeling_pipeline(
     LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]],
     "TemporaryDirectory[str]",
 ]:
+    datamodule_kwargs["max_seq_length"] = 64
     return (
         LightningSequenceLabelingPipeline(
             output_path=result_path.name,
@@ -74,19 +86,19 @@ def test_lightning_sequence_labeling_pipeline(
     path.cleanup()
     np.testing.assert_almost_equal(
         result["seqeval__mode_None__scheme_None"]["overall_accuracy"],
-        0.0016163,
+        0.0015690,
         decimal=pytest.decimal,
     )
     np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_f1"], 0.0002569, decimal=pytest.decimal
+        result["seqeval__mode_None__scheme_None"]["overall_f1"], 0.0019831, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
         result["seqeval__mode_None__scheme_None"]["overall_precision"],
-        0.0001360,
+        0.0010551,
         decimal=pytest.decimal,
     )
     np.testing.assert_almost_equal(
         result["seqeval__mode_None__scheme_None"]["overall_recall"],
-        0.0023041,
+        0.0164609,
         decimal=pytest.decimal,
     )
