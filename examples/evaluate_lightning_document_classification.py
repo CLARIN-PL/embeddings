@@ -29,7 +29,7 @@ def run(
 
     pipeline = LightningClassificationPipeline(
         embedding_name=embedding_name,
-        dataset_name=dataset_name,
+        dataset_name_or_path=dataset_name,
         input_column_name=input_columns_name,
         target_column_name=target_column_name,
         output_path=root,

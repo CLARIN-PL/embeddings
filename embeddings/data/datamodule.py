@@ -1,4 +1,6 @@
 import abc
+import pathlib
+from os.path import exists, isdir
 from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import datasets
@@ -7,6 +9,10 @@ from datasets import ClassLabel, Dataset, DatasetDict
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, BatchEncoding
 
+from embeddings.data import dataset as embeddings_dataset
+from embeddings.data.data_loader import HuggingFaceDataLoader, HuggingFaceLocalDataLoader
+from embeddings.data.dataset import LightingDataLoaders, LightingDataModuleSubset
+from embeddings.data.io import T_path
 from embeddings.utils.loggers import get_logger
 
 Data = TypeVar("Data")
@@ -37,7 +43,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
     def __init__(
         self,
         tokenizer_name_or_path: str,
-        dataset_name: str,
+        dataset_name_or_path: T_path,
         target_field: str,
         max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
@@ -48,13 +54,14 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
         batch_encoding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
+        seed: int = 441,
         **kwargs: Any,
     ) -> None:
         # ignoring the type to avoid calling to untyped function "__init__" in typed context error
         # caused by pl.LightningDataModule __init__ method not being typed
         super().__init__()  # type: ignore
         self.tokenizer_name_or_path = tokenizer_name_or_path
-        self.dataset_name = dataset_name
+        self.dataset_name_or_path = dataset_name_or_path
         self.target_field = target_field
         self.max_seq_length = max_seq_length
         self.train_batch_size = train_batch_size
@@ -70,11 +77,26 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
             batch_encoding_kwargs if batch_encoding_kwargs else self.DEFAULT_BATCH_ENCODING_KWARGS
         )
         self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
+        self.seed = seed
 
-    def load_dataset(self) -> DatasetDict:
-        result = datasets.load_dataset(self.dataset_name, **self.load_dataset_kwargs)
-        assert isinstance(result, DatasetDict)
-        return result
+    def load_dataset(self, preparation_step: bool = False) -> DatasetDict:
+        loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = HuggingFaceDataLoader()
+        if exists(self.dataset_name_or_path):
+            if not isdir(self.dataset_name_or_path):
+                raise NotImplementedError(
+                    "Reading from file is currently not supported. "
+                    "Pass dataset directory or HuggingFace repository name"
+                )
+
+            if preparation_step:
+                return datasets.DatasetDict()
+            dataset = embeddings_dataset.HuggingFaceDataset(pathlib.Path(self.dataset_name_or_path))
+            loader = HuggingFaceLocalDataLoader()
+        else:
+            dataset = embeddings_dataset.HuggingFaceDataset(
+                str(self.dataset_name_or_path), **self.load_dataset_kwargs
+            )
+        return loader.load(dataset)
 
     def get_num_classes(self) -> int:
         assert isinstance(self.dataset, DatasetDict)
@@ -97,11 +119,13 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
                 and column_name in self.dataset
                 and 0 < downsample_factor < 1
             ):
-                downsampled_data = self.dataset[column_name].train_test_split(downsample_factor)
+                downsampled_data = self.dataset[column_name].train_test_split(
+                    downsample_factor, seed=self.seed
+                )
                 self.dataset[column_name] = downsampled_data["test"]
 
     def prepare_data(self) -> None:
-        datasets.load_dataset(self.dataset_name)
+        self.load_dataset(preparation_step=True)
         AutoTokenizer.from_pretrained(self.tokenizer_name_or_path)
 
     def setup(self, stage: Optional[str] = None) -> None:
@@ -120,18 +144,32 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.dataset.set_format(type="torch")
 
     def train_dataloader(self) -> DataLoader[HuggingFaceDataset]:
-        return DataLoader(self.dataset["train"], batch_size=self.train_batch_size)  # type: ignore
+        return DataLoader(self.dataset["train"], batch_size=self.train_batch_size, shuffle=True)  # type: ignore
 
     # Ignoring the type of val_dataloader method from supertype "DataHooks" allowing for None
     # and training without validation dataset.
     def val_dataloader(self) -> Optional[DataLoader[HuggingFaceDataset]]:  # type: ignore
         if "validation" in self.dataset:
-            return DataLoader(self.dataset["validation"], batch_size=self.eval_batch_size)  # type: ignore
+            return DataLoader(self.dataset["validation"], batch_size=self.eval_batch_size, shuffle=False)  # type: ignore
         else:
             return None
 
     def test_dataloader(self) -> DataLoader[HuggingFaceDataset]:
-        return DataLoader(self.dataset["test"], batch_size=self.eval_batch_size)  # type: ignore
+        return DataLoader(self.dataset["test"], batch_size=self.eval_batch_size, shuffle=False)  # type: ignore
+
+    def get_subset(
+        self, subset: Union[str, LightingDataModuleSubset]
+    ) -> Union[LightingDataLoaders, None]:
+        if subset == "train":
+            return self.train_dataloader()
+        elif subset == "dev":
+            return self.val_dataloader()
+        elif subset == "test":
+            return self.test_dataloader()
+        elif subset == "predict":
+            raise NotImplementedError("Predict subset not available in HuggingFaceDataModule")
+        else:
+            raise ValueError("Unrecognized LightingDataModuleSubset")
 
     @abc.abstractmethod
     def convert_to_features(
@@ -144,7 +182,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
     def __init__(
         self,
         tokenizer_name_or_path: str,
-        dataset_name: str,
+        dataset_name_or_path: T_path,
         text_fields: Union[str, Sequence[str]],
         target_field: str,
         max_seq_length: Optional[int] = None,
@@ -162,7 +200,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         self.text_fields = text_fields
         super().__init__(
             tokenizer_name_or_path=tokenizer_name_or_path,
-            dataset_name=dataset_name,
+            dataset_name_or_path=dataset_name_or_path,
             target_field=target_field,
             max_seq_length=max_seq_length,
             train_batch_size=train_batch_size,

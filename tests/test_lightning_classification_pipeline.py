@@ -18,7 +18,7 @@ def pipeline_kwargs() -> Dict[str, Any]:
 @pytest.fixture
 def dataset_kwargs() -> Dict[str, Any]:
     return {
-        "dataset_name": "clarin-pl/polemo2-official",
+        "dataset_name_or_path": "clarin-pl/polemo2-official",
         "input_column_name": ["text"],
         "target_column_name": "target",
         "load_dataset_kwargs": {
@@ -36,17 +36,23 @@ def task_train_kwargs() -> Dict[str, Any]:
         "max_epochs": 1,
         "devices": "auto",
         "accelerator": "cpu",
+        "deterministic": True,
     }
 
 
 @pytest.fixture
 def task_model_kwargs() -> Dict[str, Any]:
-    return {"learning_rate": 5e-4}
+    return {"learning_rate": 5e-4, "use_scheduler": False}
 
 
 @pytest.fixture
 def datamodule_kwargs() -> Dict[str, Any]:
-    return {"downsample_train": 0.01, "downsample_val": 0.1, "downsample_test": 0.1}
+    return {
+        "downsample_train": 0.01,
+        "downsample_val": 0.01,
+        "downsample_test": 0.05,
+        "num_workers": 0,
+    }
 
 
 @pytest.fixture
@@ -80,19 +86,19 @@ def test_lightning_classification_pipeline(
         "TemporaryDirectory[str]",
     ],
 ) -> None:
-    pl.seed_everything(441)
+    pl.seed_everything(441, workers=True)
     pipeline, path = lightning_classification_pipeline
     result = pipeline.run()
     path.cleanup()
     np.testing.assert_almost_equal(
-        result["accuracy"]["accuracy"], 0.4109589, decimal=pytest.decimal
+        result["accuracy"]["accuracy"], 0.4864864864864865, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        result["f1__average_macro"]["f1"], 0.2270833, decimal=pytest.decimal
+        result["f1__average_macro"]["f1"], 0.2684458398744113, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        result["precision__average_macro"]["precision"], 0.1922905, decimal=pytest.decimal
+        result["precision__average_macro"]["precision"], 0.3602941176470588, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        result["recall__average_macro"]["recall"], 0.2857758, decimal=pytest.decimal
+        result["recall__average_macro"]["recall"], 0.325, decimal=pytest.decimal
     )

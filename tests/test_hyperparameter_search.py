@@ -10,9 +10,10 @@ from embeddings.pipeline.flair_classification import FlairClassificationPipeline
 from embeddings.pipeline.flair_pair_classification import FlairPairClassificationPipeline
 from embeddings.pipeline.flair_sequence_labeling import FlairSequenceLabelingPipeline
 from embeddings.pipeline.pipelines_metadata import (
-    HuggingFaceClassificationPipelineMetadata,
-    HuggingFacePairClassificationPipelineMetadata,
-    HuggingFaceSequenceLabelingPipelineMetadata,
+    FlairClassificationPipelineMetadata,
+    FlairPairClassificationPipelineMetadata,
+    FlairSequenceLabelingPipelineMetadata,
+    LightningClassificationPipelineMetadata,
 )
 from embeddings.utils.utils import PrimitiveTypes
 
@@ -23,7 +24,7 @@ def output_path() -> "TemporaryDirectory[str]":
 
 
 @pytest.fixture
-def text_classification_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
+def flair_text_classification_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
     return {
         "dataset_name": "clarin-pl/polemo2-official",
         "input_column_name": "text",
@@ -33,7 +34,9 @@ def text_classification_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
 
 
 @pytest.fixture
-def text_pair_classification_dataset_kwargs() -> Dict[str, Union[PrimitiveTypes, Tuple[str, str]]]:
+def flair_text_pair_classification_dataset_kwargs() -> Dict[
+    str, Union[PrimitiveTypes, Tuple[str, str]]
+]:
     return {
         "dataset_name": "clarin-pl/cst-wikinews",
         "input_columns_names_pair": ("sentence_1", "sentence_2"),
@@ -43,7 +46,7 @@ def text_pair_classification_dataset_kwargs() -> Dict[str, Union[PrimitiveTypes,
 
 
 @pytest.fixture
-def sequence_labeling_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
+def flair_sequence_labeling_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
     return {
         "dataset_name": "clarin-pl/kpwr-ner",
         "input_column_name": "tokens",
@@ -53,7 +56,7 @@ def sequence_labeling_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
 
 
 @pytest.fixture
-def pipeline_kwargs(output_path: "TemporaryDirectory[str]") -> Dict[str, PrimitiveTypes]:
+def flair_pipeline_kwargs(output_path: "TemporaryDirectory[str]") -> Dict[str, PrimitiveTypes]:
     return {
         "output_path": output_path.name,
         "embedding_name": "clarin-pl/roberta-polish-kgr10",
@@ -65,73 +68,115 @@ def pipeline_kwargs(output_path: "TemporaryDirectory[str]") -> Dict[str, Primiti
 
 
 @pytest.fixture
-def sequence_labeling_pipeline_kwargs() -> Dict[str, PrimitiveTypes]:
+def flair_sequence_labeling_pipeline_kwargs() -> Dict[str, PrimitiveTypes]:
     return {"evaluation_mode": "conll", "tagging_scheme": None, "hidden_size": 128}
 
 
 @pytest.fixture
-def hf_classification_pipeline_metadata(
-    pipeline_kwargs: Dict[str, str],
-    text_classification_dataset_kwargs: Dict[str, PrimitiveTypes],
-) -> Dict[str, Any]:
+def lightning_text_classification_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
     return {
-        **pipeline_kwargs,
-        **text_classification_dataset_kwargs,
+        "dataset_name_or_path": "clarin-pl/polemo2-official",
+        "input_column_name": "text",
+        "target_column_name": "target",
+        "load_dataset_kwargs": None,
     }
 
 
 @pytest.fixture
-def hf_pair_classification_pipeline_metadata(
-    pipeline_kwargs: Dict[str, str],
-    text_pair_classification_dataset_kwargs: Dict[str, PrimitiveTypes],
-) -> Dict[str, Any]:
+def lightning_classification_kwargs(output_path: "TemporaryDirectory[str]") -> Dict[str, Any]:
     return {
-        **pipeline_kwargs,
-        **text_pair_classification_dataset_kwargs,
+        "output_path": output_path.name,
+        "embedding_name": "clarin-pl/roberta-polish-kgr10",
+        "task_model_kwargs": None,
+        "task_train_kwargs": None,
+        "train_batch_size": 1,
+        "eval_batch_size": 1,
+        "finetune_last_n_layers": 0,
+        "tokenizer_name": None,
+        "datamodule_kwargs": None,
+        "tokenizer_kwargs": None,
+        "batch_encoding_kwargs": None,
+        "predict_subset": "test",
     }
 
 
 @pytest.fixture
-def hf_sequence_labeling_pipeline_metadata(
-    pipeline_kwargs: Dict[str, str],
-    sequence_labeling_pipeline_kwargs: Dict[str, PrimitiveTypes],
-    sequence_labeling_dataset_kwargs: Dict[str, PrimitiveTypes],
+def flair_classification_pipeline_metadata(
+    flair_pipeline_kwargs,
+    flair_text_classification_dataset_kwargs,
 ) -> Dict[str, Any]:
     return {
-        **pipeline_kwargs,
-        **sequence_labeling_pipeline_kwargs,
-        **sequence_labeling_dataset_kwargs,
+        **flair_pipeline_kwargs,
+        **flair_text_classification_dataset_kwargs,
     }
+
+
+@pytest.fixture
+def flair_pair_classification_pipeline_metadata(
+    flair_pipeline_kwargs,
+    flair_text_pair_classification_dataset_kwargs,
+) -> Dict[str, Any]:
+    return {
+        **flair_pipeline_kwargs,
+        **flair_text_pair_classification_dataset_kwargs,
+    }
+
+
+@pytest.fixture
+def flair_sequence_labeling_pipeline_metadata(
+    flair_pipeline_kwargs,
+    flair_sequence_labeling_pipeline_kwargs,
+    flair_sequence_labeling_dataset_kwargs,
+) -> Dict[str, Any]:
+    return {
+        **flair_pipeline_kwargs,
+        **flair_sequence_labeling_pipeline_kwargs,
+        **flair_sequence_labeling_dataset_kwargs,
+    }
+
+
+@pytest.fixture
+def lightning_classification_pipeline_metadata(
+    lightning_text_classification_dataset_kwargs, lightning_classification_kwargs
+) -> Dict[str, Any]:
+    return {**lightning_text_classification_dataset_kwargs, **lightning_classification_kwargs}
 
 
 # Pydantic create_model_from_typeddict in 1.8.2 is no compilant with mypy
 # https://github.com/samuelcolvin/pydantic/issues/3008
 # It should be fixed in further release of pydantic library
-def test_hf_classification_pipeline_metadata(
-    hf_classification_pipeline_metadata: Dict[str, Any]
-) -> None:
-    metadata = create_model_from_typeddict(HuggingFaceClassificationPipelineMetadata)(  # type: ignore
-        **hf_classification_pipeline_metadata
+def test_flair_classification_pipeline_metadata(flair_classification_pipeline_metadata) -> None:
+    metadata = create_model_from_typeddict(FlairClassificationPipelineMetadata)(  # type: ignore
+        **flair_classification_pipeline_metadata
     ).dict()
     FlairClassificationPipeline(**metadata)
 
 
-def test_hf_pair_classification_pipeline_metadata(
-    hf_pair_classification_pipeline_metadata: Dict[str, Any]
+def test_flair_pair_classification_pipeline_metadata(
+    flair_pair_classification_pipeline_metadata,
 ) -> None:
-    metadata = create_model_from_typeddict(HuggingFacePairClassificationPipelineMetadata)(  # type: ignore
-        **hf_pair_classification_pipeline_metadata
+    metadata = create_model_from_typeddict(FlairPairClassificationPipelineMetadata)(  # type: ignore
+        **flair_pair_classification_pipeline_metadata
     ).dict()
     FlairPairClassificationPipeline(**metadata)
 
 
-def test_hf_sequence_labeling_pipeline_metadata(
-    hf_sequence_labeling_pipeline_metadata: Dict[str, Any]
+def test_flair_sequence_labeling_pipeline_metadata(
+    flair_sequence_labeling_pipeline_metadata,
 ) -> None:
-    metadata = create_model_from_typeddict(HuggingFaceSequenceLabelingPipelineMetadata)(  # type: ignore
-        **hf_sequence_labeling_pipeline_metadata
+    metadata = create_model_from_typeddict(FlairSequenceLabelingPipelineMetadata)(  # type: ignore
+        **flair_sequence_labeling_pipeline_metadata
     ).dict()
     FlairSequenceLabelingPipeline(**metadata)
+
+
+def test_lightning_classification_pipeline_metadata(
+    lightning_classification_pipeline_metadata,
+) -> None:
+    metadata = create_model_from_typeddict(LightningClassificationPipelineMetadata)(  # type: ignore
+        **lightning_classification_pipeline_metadata
+    ).dict()
+    LightningClassificationPipelineMetadata(**metadata)
 
 
 def test_categorical_parameter() -> None:

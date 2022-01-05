@@ -6,12 +6,12 @@ from typing import Dict, Generic, Optional, Tuple
 
 from typing_extensions import Literal
 
-from embeddings.hyperparameter_search.configspace import (
-    ConfigSpace,
-    SampledParameters,
+from embeddings.hyperparameter_search.configspace import ConfigSpace, SampledParameters
+from embeddings.hyperparameter_search.flair_configspace import (
     SequenceLabelingConfigSpace,
     TextClassificationConfigSpace,
 )
+from embeddings.hyperparameter_search.parameters import ParameterValues
 from embeddings.pipeline.evaluation_pipeline import (
     FlairSequenceLabelingEvaluationPipeline,
     FlairTextClassificationEvaluationPipeline,
@@ -24,19 +24,20 @@ from embeddings.pipeline.hps_pipeline import (
     _HuggingFaceOptimizedPipelineDefaultsBase,
 )
 from embeddings.pipeline.pipelines_metadata import (
-    EvaluationPipelineMetadata,
     FlairClassificationEvaluationPipelineMetadata,
+    FlairClassificationPipelineMetadata,
+    FlairEvaluationPipelineMetadata,
+    FlairPairClassificationPipelineMetadata,
     FlairSequenceLabelingEvaluationPipelineMetadata,
-    HuggingFaceClassificationPipelineMetadata,
-    HuggingFacePairClassificationPipelineMetadata,
-    HuggingFaceSequenceLabelingPipelineMetadata,
+    FlairSequenceLabelingPipelineMetadata,
 )
 from embeddings.pipeline.preprocessing_pipeline import (
     FlairSequenceLabelingPreprocessingPipeline,
     FlairTextClassificationPreprocessingPipeline,
     FlairTextPairClassificationPreprocessingPipeline,
 )
-from embeddings.utils.utils import PrimitiveTypes
+
+# from embeddings.utils.utils import PrimitiveTypes
 
 
 @dataclass
@@ -64,7 +65,7 @@ class _OptimizedFlairClassificationPipelineDefaultsBase(
     _HuggingFaceOptimizedPipelineDefaultsBase,
     ABC,
 ):
-    dataset_dir: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
+    tmp_dataset_dir: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
     tmp_model_output_dir: TemporaryDirectory[str] = field(
         init=False, default_factory=TemporaryDirectory
     )
@@ -72,7 +73,7 @@ class _OptimizedFlairClassificationPipelineDefaultsBase(
     @staticmethod
     def _pop_sampled_parameters(
         parameters: SampledParameters,
-    ) -> Tuple[str, str, Dict[str, PrimitiveTypes], Dict[str, PrimitiveTypes]]:
+    ) -> Tuple[str, str, Dict[str, ParameterValues], Dict[str, ParameterValues]]:
         embedding_name = parameters["embedding_name"]
         assert isinstance(embedding_name, str)
         document_embedding = parameters["document_embedding"]
@@ -88,15 +89,15 @@ class _OptimizedFlairClassificationPipelineDefaultsBase(
 class OptimizedFlairClassificationPipeline(
     OptunaPipeline[
         TextClassificationConfigSpace,
-        HuggingFaceClassificationPipelineMetadata,
-        EvaluationPipelineMetadata,
+        FlairClassificationPipelineMetadata,
+        FlairEvaluationPipelineMetadata,
     ],
     AbstractHuggingFaceOptimizedPipeline[TextClassificationConfigSpace],
     _OptimizedFlairClassificationPipelineDefaultsBase,
     _OptimizedFlairClassificationPipelineBase[TextClassificationConfigSpace],
 ):
     def __post_init__(self) -> None:
-        self.dataset_path = Path(self.dataset_dir.name).joinpath("ds.pkl")
+        self.dataset_path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
         super().__init__(
             preprocessing_pipeline=FlairTextClassificationPreprocessingPipeline(
                 dataset_name=self.dataset_name,
@@ -117,16 +118,14 @@ class OptimizedFlairClassificationPipeline(
             config_space=self.config_space,
         )
 
-    def _get_metadata(
-        self, parameters: SampledParameters
-    ) -> HuggingFaceClassificationPipelineMetadata:
+    def _get_metadata(self, parameters: SampledParameters) -> FlairClassificationPipelineMetadata:
         (
             embedding_name,
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
-        metadata: HuggingFaceClassificationPipelineMetadata = {
+        metadata: FlairClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
             "document_embedding_cls": document_embedding_cls,
             "dataset_name": self.dataset_name,
@@ -163,7 +162,7 @@ class OptimizedFlairClassificationPipeline(
 
     def _post_run_hook(self) -> None:
         super()._post_run_hook()
-        self.dataset_dir.cleanup()
+        self.tmp_dataset_dir.cleanup()
         self.tmp_model_output_dir.cleanup()
 
 
@@ -171,15 +170,15 @@ class OptimizedFlairClassificationPipeline(
 class OptimizedFlairPairClassificationPipeline(
     OptunaPipeline[
         TextClassificationConfigSpace,
-        HuggingFacePairClassificationPipelineMetadata,
-        EvaluationPipelineMetadata,
+        FlairPairClassificationPipelineMetadata,
+        FlairEvaluationPipelineMetadata,
     ],
     AbstractHuggingFaceOptimizedPipeline[TextClassificationConfigSpace],
     _OptimizedFlairClassificationPipelineDefaultsBase,
     _OptimizedFlairPairClassificationPipelineBase[TextClassificationConfigSpace],
 ):
     def __post_init__(self) -> None:
-        self.dataset_path = Path(self.dataset_dir.name).joinpath("ds.pkl")
+        self.dataset_path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
         super().__init__(
             preprocessing_pipeline=FlairTextPairClassificationPreprocessingPipeline(
                 dataset_name=self.dataset_name,
@@ -202,14 +201,14 @@ class OptimizedFlairPairClassificationPipeline(
 
     def _get_metadata(
         self, parameters: SampledParameters
-    ) -> HuggingFacePairClassificationPipelineMetadata:
+    ) -> FlairPairClassificationPipelineMetadata:
         (
             embedding_name,
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
-        metadata: HuggingFacePairClassificationPipelineMetadata = {
+        metadata: FlairPairClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
             "document_embedding_cls": document_embedding_cls,
             "dataset_name": self.dataset_name,
@@ -246,7 +245,7 @@ class OptimizedFlairPairClassificationPipeline(
 
     def _post_run_hook(self) -> None:
         super()._post_run_hook()
-        self.dataset_dir.cleanup()
+        self.tmp_dataset_dir.cleanup()
         self.tmp_model_output_dir.cleanup()
 
 
@@ -262,7 +261,7 @@ class _OptimizedFlairSequenceLabelingPipelineBase(
 class OptimizedFlairSequenceLabelingPipeline(
     OptunaPipeline[
         SequenceLabelingConfigSpace,
-        HuggingFaceSequenceLabelingPipelineMetadata,
+        FlairSequenceLabelingPipelineMetadata,
         FlairSequenceLabelingEvaluationPipelineMetadata,
     ],
     AbstractHuggingFaceOptimizedPipeline[SequenceLabelingConfigSpace],
@@ -315,7 +314,7 @@ class OptimizedFlairSequenceLabelingPipeline(
     def _pop_sampled_parameters(
         self,
         parameters: SampledParameters,
-    ) -> Tuple[str, int, Dict[str, PrimitiveTypes], Dict[str, PrimitiveTypes]]:
+    ) -> Tuple[str, int, Dict[str, ParameterValues], Dict[str, ParameterValues]]:
         embedding_name = parameters["embedding_name"]
         assert isinstance(embedding_name, str)
         hidden_size = parameters["hidden_size"]
@@ -326,16 +325,14 @@ class OptimizedFlairSequenceLabelingPipeline(
         assert isinstance(task_model_kwargs, dict)
         return embedding_name, hidden_size, task_train_kwargs, task_model_kwargs
 
-    def _get_metadata(
-        self, parameters: SampledParameters
-    ) -> HuggingFaceSequenceLabelingPipelineMetadata:
+    def _get_metadata(self, parameters: SampledParameters) -> FlairSequenceLabelingPipelineMetadata:
         (
             embedding_name,
             hidden_size,
             task_train_kwargs,
             task_model_kwargs,
         ) = self._pop_sampled_parameters(parameters)
-        metadata: HuggingFaceSequenceLabelingPipelineMetadata = {
+        metadata: FlairSequenceLabelingPipelineMetadata = {
             "embedding_name": embedding_name,
             "hidden_size": hidden_size,
             "dataset_name": self.dataset_name,
