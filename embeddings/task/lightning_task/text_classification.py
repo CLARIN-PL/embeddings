@@ -105,17 +105,16 @@ class TextClassification(HuggingFaceLightningTask):
     def predict_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         batch, batch_idx = args
         loss, logits = self.shared_step(**batch)
-        preds = torch.argmax(logits, dim=1)
-        return preds
+        return logits
 
     def predict(
         self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.trainer is not None
-        predictions = self.trainer.predict(
+        logits = self.trainer.predict(
             dataloaders=dataloader, return_predictions=True, ckpt_path="best"
         )
-        predictions = torch.cat(predictions).numpy()
+        predictions = torch.argmax(torch.cat(logits), dim=1).numpy()
         assert isinstance(predictions, np.ndarray)
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
         assert isinstance(ground_truth, np.ndarray)

@@ -152,6 +152,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
             dataset=self.dataset["train"],  # type: ignore
             batch_size=self.train_batch_size,
             collate_fn=self.collate_fn,
+            shuffle=True,
         )
 
     # Ignoring the type of val_dataloader method from supertype "DataHooks" allowing for None
@@ -162,6 +163,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
                 dataset=self.dataset["validation"],  # type: ignore
                 batch_size=self.eval_batch_size,
                 collate_fn=self.collate_fn,
+                shuffle=True,
             )
         else:
             return None
@@ -171,6 +173,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
             dataset=self.dataset["test"],  # type: ignore
             batch_size=self.eval_batch_size,
             collate_fn=self.collate_fn,
+            shuffle=True,
         )
 
     def get_subset(
