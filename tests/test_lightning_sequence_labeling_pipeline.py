@@ -82,23 +82,22 @@ def test_lightning_sequence_labeling_pipeline(
     pl.seed_everything(441)
     pipeline, path = lightning_sequence_labeling_pipeline
     result = pipeline.run()
-    print(result)
     path.cleanup()
     np.testing.assert_almost_equal(
         result["seqeval__mode_None__scheme_None"]["overall_accuracy"],
-        0.0020920,
+        0.0015690,
         decimal=pytest.decimal,
     )
     np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_f1"], 0.0014880, decimal=pytest.decimal
+        result["seqeval__mode_None__scheme_None"]["overall_f1"], 0.0019846, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
         result["seqeval__mode_None__scheme_None"]["overall_precision"],
-        0.0007917,
+        0.0010559,
         decimal=pytest.decimal,
     )
     np.testing.assert_almost_equal(
         result["seqeval__mode_None__scheme_None"]["overall_recall"],
-        0.0123456,
+        0.0164609,
         decimal=pytest.decimal,
     )
