@@ -1,62 +1,70 @@
-from typing import Dict, Optional, Any
+from pathlib import Path
+from typing import Any, Dict, Optional
 
-import numpy as np
+import datasets
 import pandas as pd
+from sklearn.base import BaseEstimator as AnySklearnVectorizer
+from sklearn.base import ClassifierMixin as AnySklearnClassifier
+from sklearn.feature_extraction.text import CountVectorizer
 from typing_extensions import Literal
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.io import T_path
 from embeddings.embedding.sklearn_embedding import SklearnEmbedding
+from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
+from embeddings.model.sklearn_model import SklearnModel
+from embeddings.pipeline.standard_pipeline import StandardPipeline
+from embeddings.task.sklearn_task.text_classification import TextClassification
 from embeddings.transformation.hf_transformation.to_pandas_transformation import (
     ToPandasHuggingFaceCorpusTransformation,
 )
-from embeddings.task.sklearn_task.text_classification import TextClassification
+from embeddings.transformation.pandas_transformation.rename_input_columns_transformation import (
+    RenameInputColumnsTransformation,
+)
+from embeddings.utils.json_dict_persister import JsonPersister
 
 
-class SklearnClassificationPipeline:
+class SklearnClassificationPipeline(
+    StandardPipeline[
+        str,
+        datasets.DatasetDict,
+        Dict[str, pd.DataFrame],
+        Dict[str, pd.DataFrame],
+        Dict[str, Any],
+    ]
+):
     def __init__(
         self,
         dataset_name: str,
         input_column_name: str,
         target_column_name: str,
-        model_type: Literal["tree", "forest", "logistic"] = "tree",
-        fit_classifier_kwargs: Optional[Dict[str, Any]] = None,
-        fit_vectorizer_kwargs: Optional[Dict[str, Any]] = None,
+        output_path: T_path,
+        classifier: AnySklearnClassifier,
+        vectorizer: AnySklearnVectorizer = CountVectorizer,
+        evaluation_filename: str = "evaluation.json",
+        predict_subset: Literal["dev", "validation", "test"] = "test",
+        classifier_kwargs: Optional[Dict[str, Any]] = None,
+        embedding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        self.dataset = HuggingFaceDataset(
+        dataset = HuggingFaceDataset(
             dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
-        self.data_loader = HuggingFaceDataLoader()
-        self.transformation = ToPandasHuggingFaceCorpusTransformation()
-        self.embedding = SklearnEmbedding()
-        self.task = TextClassification()
+        data_loader = HuggingFaceDataLoader()
+        transformation = ToPandasHuggingFaceCorpusTransformation().then(
+            RenameInputColumnsTransformation(input_column_name, target_column_name)
+        )
+        classifier_kwargs = classifier_kwargs if classifier_kwargs else {}
+        embedding = SklearnEmbedding(embedding_kwargs=embedding_kwargs, vectorizer=vectorizer)
+        task = TextClassification(classifier=classifier, classifier_kwargs=classifier_kwargs)
+        model = SklearnModel(embedding, task, predict_subset=predict_subset)
+        output_path = Path(output_path)
+        evaluator = TextClassificationEvaluator().persisting(
+            JsonPersister(path=output_path.joinpath(evaluation_filename))
+        )
+        super().__init__(dataset, data_loader, transformation, model, evaluator)
 
         self.input_column_name = input_column_name
         self.target_column_name = target_column_name
-        self.fit_classifier_kwargs = fit_classifier_kwargs if fit_classifier_kwargs else {}
-        self.fit_vectorizer_kwargs = fit_vectorizer_kwargs if fit_vectorizer_kwargs else {}
-        self.task = TextClassification(
-            model=model_type, train_model_kwargs=self.fit_classifier_kwargs
-        )
-
-    def run(self):
-        data = self.data_loader.load(self.dataset)
-        data = self.transformation.transform(data)
-        for subset in data:
-            data[subset].rename(
-                {self.input_column_name: "x", self.target_column_name: "y"},
-                axis="columns",
-                inplace=True,
-            )
-        self.embedding.fit(data["train"]["x"].values, self.fit_vectorizer_kwargs)
-
-        data_transformed = {}
-        for subset in data:
-            data_transformed[subset] = {
-                "x": self.embedding.embed(data[subset]["x"].values),
-                "y": data[subset]["y"].copy(),
-            }
-
-        result = self.task.fit_predict(data_transformed)
-        return result
+        self.predict_subset = predict_subset
