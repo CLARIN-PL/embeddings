@@ -13,10 +13,10 @@ pip install clarinpl-embeddings
 Text-classification with polemo2 dataset and transformer-based embeddings
 
 ```python
-from embeddings.pipeline.flair_classification import FlairClassificationPipeline
+from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 
-pipeline = FlairClassificationPipeline(
-    dataset_name="clarin-pl/polemo2-official",
+pipeline = LightningClassificationPipeline(
+    dataset_name_or_path="clarin-pl/polemo2-official",
     embedding_name="allegro/herbert-base-cased",
     input_column_name="text",
     target_column_name="target",
@@ -27,6 +27,9 @@ print(pipeline.run())
 
 ```
 
+**Important Remark**: As the library is still under active development, default model hyperparameters **MAY BE NOT OPTIMAL**. 
+We encourage running [OptimizedPipelines](https://github.com/cLARIN-PL/embeddings/#optimized-pipelines) as the first step to select appropriate hyperparameters. 
+
 # Conventions
 
 We use many of the HuggingFace concepts such as models (https://huggingface.co/models) or  datasets (https://huggingface.co/datasets) to make our library as easy to use as it is possible. We want to enable users to create, customise, test, and execute NLP/NLU/SLU tasks in the fastest possible manner. 
@@ -35,13 +38,27 @@ Moreover, we present easy to use static embeddings, that were trained by CLARIN-
 
 # Pipelines
 
-We share predefined pipelines for common NLP tasks with corresponding scripts.
+We share predefined pipelines for common NLP tasks with corresponding scripts. 
+For Transformer based pipelines we utilize [PyTorch Lighting](https://www.pytorchlightning.ai) trainers with Transformers [AutoModels](https://huggingface.co/docs/transformers/master/en/model_doc/auto#transformers.AutoModel). 
+For static embedding based pipelines we use [Flair](https://github.com/flairNLP/flair) library under the hood.
 
-| Task | Class | Script |
-| ---- | ---- | ---- |
-| Text classification | [HuggingFaceClassificationPipeline](embeddings/pipeline/hugging_face_classification.py) | [evaluate_document_classification.py](examples/evaluate_document_classification.py) |
-| Sequence labelling | [HuggingFaceSequenceLabelingPipeline](embeddings/pipeline/hugging_face_sequence_labeling.py) | [evaluate_sequence_labelling.py](examples/evaluate_sequence_labelling.py) |
-| Sequence pair classification | [HuggingFacePairClassificationPipeline](embeddings/pipeline/hugging_face_pair_classification.py)| [evaluate_document_pair_classification.py](examples/evaluate_document_pair_classification.py) |
+**REMARK**: As currently we haven't blocked transformers based pipelines from **flair** pipelines we **may remove it in the nearest future.** We encourage to use **Lightning** based pipelines for transformers.
+### Transformer embedding based pipelines (e.g. Bert, RoBERTA, Herbert):
+
+| Task                | Class                                                                                   | Script                                                                                                  | 
+|---------------------|-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+| Text classification | [LightningClassificationPipeline](embeddings/pipeline/lightning_classification.py)      | [evaluate_lightning_document_classification.py](examples/evaluate_lightning_document_classification.py) |
+| Sequence labelling  | [LightningSequenceLabelingPipeline](embeddings/pipeline/lightning_sequence_labeling.py) | [evaluate_lightning_sequence_labeling.py](examples/evaluate_lightning_sequence_labeling.py)             |
+
+
+### Static embedding based pipelines (e.g. word2vec, fasttext)
+
+| Task                         | Class                                                                               | Script                                                                                        |
+|------------------------------|-------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| Text classification          | [FlairClassificationPipeline](embeddings/pipeline/flair_classification.py)          | [evaluate_document_classification.py](examples/evaluate_document_classification.py)           |
+| Sequence labelling           | [FlairSequenceLabelingPipeline](embeddings/pipeline/flair_sequence_labeling.py)     | [evaluate_sequence_labelling.py](examples/evaluate_sequence_labelling.py)                     |
+| Sequence pair classification | [FlairPairClassificationPipeline](embeddings/pipeline/flair_pair_classification.py) | [evaluate_document_pair_classification.py](examples/evaluate_document_pair_classification.py) |
+
 
  
 ## Writing custom HuggingFace-based pipeline
@@ -74,17 +91,21 @@ result = pipeline.run()
 
 # Running tasks scripts
 
+All up-to-date examples can be found under [examples](examples/) path.
+
 ```bash
 cd examples
 ```
 
 ## Run classification task
 
+The example with non-default arguments
+
 ```bash
-python evaluate_document_classification.py \
+python evaluate_lightning_document_classification.py \
     --embedding-name allegro/herbert-base-cased \
     --dataset-name clarin-pl/polemo2-official \
-    --input-column-name text \
+    --input-columns-name text \
     --target-column-name target
 ```
 
@@ -93,7 +114,7 @@ python evaluate_document_classification.py \
 The example with default language model and dataset. 
 
 ```bash
-python evaluate_sequence_tagging.py
+python evaluate_lightning_sequence_labeling.py
 ```
 
 ## Run pair classification task
@@ -107,8 +128,7 @@ python evaluate_document_pair_classification.py \
 
 
 # Compatible datasets
-There are several datasets available in the huggingface repository that are 
-compatible with our pipeline.
+As most datasets in huggingface repository should be compatible with our pipelines, there are several datasets that were tested by the authors.
 
 | dataset name               	| task type                                 	| input_column_name(s)       	| target_column_name  	| description                                                        	|
 |----------------------------	|-------------------------------------------	|----------------------------	|---------------------	|------------------------------------------------------------	        |
@@ -121,8 +141,7 @@ compatible with our pipeline.
 <sup>*to load the dataset pass name='cdsc-e' in load_dataset_kwargs: HuggingFaceDataset("cdsc", name="cdsc-e")</sup><br />
 <sup>**only pair classification task is supported for now</sup>
 
-# Passing task model and task training parameters to predefined pipelines
-
+# Passing task model and task training parameters to predefined flair pipelines
 Model and training parameters can be controlled via `task_model_kwargs` and 
 `task_train_kwargs` parameters. 
 
@@ -152,7 +171,7 @@ pipeline = FlairClassificationPipeline(
 print(pipeline.run())
 ```
 
-# Embeddings
+# Static embeddings
 
 Computed vectors are stored in [Flair](https://github.com/flairNLP/flair) structures - [Sentences](https://github.com/flairNLP/flair/blob/master/resources/docs/TUTORIAL_1_BASICS.md).
 
@@ -165,7 +184,7 @@ from embeddings.embedding.auto_flair import AutoFlairDocumentEmbedding
 
 sentence = Sentence("Myśl z duszy leci bystro, Nim się w słowach złamie.")
 
-embedding = AutoFlairDocumentEmbedding.from_hub("clarin-pl/herbert-kgr10")
+embedding = AutoFlairDocumentEmbedding.from_hub("clarin-pl/word2vec-kgr10")
 embedding.embed([sentence])
 
 print(sentence.embedding)
@@ -180,7 +199,7 @@ from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
 
 sentence = Sentence("Myśl z duszy leci bystro, Nim się w słowach złamie.")
 
-embedding = AutoFlairWordEmbedding.from_hub("clarin-pl/herbert-kgr10")
+embedding = AutoFlairWordEmbedding.from_hub("clarin-pl/word2vec-kgr10")
 embedding.embed([sentence])
 
 for token in sentence:
@@ -188,7 +207,7 @@ for token in sentence:
     print(token.embedding)
 ```
 
-## Available models
+# Available embedding models for Polish
 
 Instead of the `allegro/herbert-base-cased` model, you can pass any model from [Hugging Face Hub](https://huggingface.co/models) that is compatible with [Transformers](https://huggingface.co/transformers/) or with our library. 
 
@@ -202,11 +221,22 @@ Instead of the `allegro/herbert-base-cased` model, you can pass any model from [
 
 # Optimized pipelines.
 
-| Task                     | Optimized Pipeline                                                                    |
-|--------------------------|---------------------------------------------------------------------------------------|
-| Text Classification      | [OptimizedFlairClassificationPipeline](embeddings/pipeline/flair_hps_pipeline.py)     | 
-| Pair Text Classification | [OptimizedFlairPairClassificationPipeline](embeddings/pipeline/flair_hps_pipeline.py) |
-| Sequence Labeling        | [OptimizedFlairSequenceLabelingPipeline](embeddings/pipeline/flair_hps_pipeline.py)   |
+## Transformers embeddings
+
+| Task                          | Optimized Pipeline                                                                       |
+|-------------------------------|------------------------------------------------------------------------------------------|
+| Lightning Text Classification | [OptimizedLightingClassificationPipeline](embeddings/pipeline/lightning_hps_pipeline.py) | 
+| Lightning Sequence Labeling   | -                                                                                        |
+
+
+
+## Static embeddings
+
+| Task                           | Optimized Pipeline                                                                    |
+|--------------------------------|---------------------------------------------------------------------------------------|
+| Flair Text Classification      | [OptimizedFlairClassificationPipeline](embeddings/pipeline/flair_hps_pipeline.py)     | 
+| Flair Pair Text Classification | [OptimizedFlairPairClassificationPipeline](embeddings/pipeline/flair_hps_pipeline.py) |
+| Flair Sequence Labeling        | [OptimizedFlairSequenceLabelingPipeline](embeddings/pipeline/flair_hps_pipeline.py)   |
 
 
 ## Example with Text Classification
@@ -215,12 +245,12 @@ Optimized pipelines can be run via following snippet of code:
 
 ```python
 
-from embeddings.hyperparameter_search.flair_configspace import TextClassificationConfigSpace
-from embeddings.pipeline.flair_hps_pipeline import OptimizedFlairClassificationPipeline
+from embeddings.hyperparameter_search.lighting_configspace import LightingTextClassificationConfigSpace
+from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingClassificationPipeline
 
-pipeline = OptimizedFlairClassificationPipeline(
-    config_space=TextClassificationConfigSpace(
-        embedding_name=["allegro/herbert-base-cased", "clarin-pl/roberta-polish-kgr10"]
+pipeline = OptimizedLightingClassificationPipeline(
+    config_space=LightingTextClassificationConfigSpace(
+        embedding_name="allegro/herbert-base-cased"
     ),
     dataset_name="clarin-pl/polemo2-official",
     input_column_name="text",
@@ -232,11 +262,18 @@ df, metadata = pipeline.run()
 ### Training model with obtained parameters
 
 After the parameters search process we can train model with best parameters found.
+But firstly we have to set `output_path` parameter, which is not automatically generated from `OptimizedLightingClassificationPipeline`.
 
 ```python
-from embeddings.pipeline.flair_classification import FlairClassificationPipeline
+metadata["output_path"] = "."
+```
 
-pipeline = FlairClassificationPipeline(**metadata)
+Now we are able to train the pipeline
+
+```python
+from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
+
+pipeline = LightningClassificationPipeline(**metadata)
 results = pipeline.run()
 ```
 
@@ -245,8 +282,8 @@ results = pipeline.run()
 Instead of performing search with single embedding model we can search with multiple embedding models via passing them as list to ConfigSpace.
 
 ```python
-pipeline = OptimizedFlairClassificationPipeline(
-    config_space=TextClassificationConfigSpace(
+pipeline = OptimizedLightingClassificationPipeline(
+    config_space=LightingTextClassificationConfigSpace(
         embedding_name=["allegro/herbert-base-cased", "clarin-pl/roberta-polish-kgr10"]
     ),
     dataset_name="clarin-pl/polemo2-official",
