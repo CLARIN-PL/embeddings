@@ -6,32 +6,26 @@ import numpy as np
 import pytest
 import pytorch_lightning as pl
 
-from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
-
-
-@pytest.fixture
-def pipeline_kwargs() -> Dict[str, Any]:
-    return {"embedding_name": "allegro/herbert-base-cased", "finetune_last_n_layers": 0}
+from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
 
 
 @pytest.fixture
 def dataset_kwargs() -> Dict[str, Any]:
     return {
-        "dataset_name_or_path": "clarin-pl/polemo2-official",
-        "input_column_name": ["text"],
-        "target_column_name": "target",
-        "load_dataset_kwargs": {
-            "train_domains": ["hotels", "medicine"],
-            "dev_domains": ["hotels", "medicine"],
-            "test_domains": ["hotels", "medicine"],
-            "text_cfg": "text",
-        },
+        "dataset_name_or_path": "clarin-pl/kpwr-ner",
+        "input_column_name": "tokens",
+        "target_column_name": "ner",
     }
 
 
 @pytest.fixture
-def task_train_kwargs() -> Dict[str, Any]:
+def pipeline_kwargs(scope="session") -> Dict[str, Any]:
+    return {"embedding_name": "allegro/herbert-base-cased", "finetune_last_n_layers": 0}
+
+
+@pytest.fixture
+def task_train_kwargs(scope="session") -> Dict[str, Any]:
     return {
         "max_epochs": 1,
         "devices": "auto",
@@ -41,12 +35,12 @@ def task_train_kwargs() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def task_model_kwargs() -> Dict[str, Any]:
+def task_model_kwargs(scope="session") -> Dict[str, Any]:
     return {"learning_rate": 5e-4, "use_scheduler": False}
 
 
 @pytest.fixture
-def datamodule_kwargs() -> Dict[str, Any]:
+def datamodule_kwargs(scope="session") -> Dict[str, Any]:
     return {
         "downsample_train": 0.01,
         "downsample_val": 0.01,
@@ -56,49 +50,54 @@ def datamodule_kwargs() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def lightning_classification_pipeline(
+def lightning_sequence_labeling_pipeline(
     pipeline_kwargs: Dict[str, Any],
     dataset_kwargs: Dict[str, Any],
     datamodule_kwargs: Dict[str, Any],
     task_train_kwargs: Dict[str, Any],
-    task_model_kwargs: Dict[str, Any],
     result_path: "TemporaryDirectory[str]",
 ) -> Tuple[
     LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]],
     "TemporaryDirectory[str]",
 ]:
+    datamodule_kwargs["max_seq_length"] = 64
     return (
-        LightningClassificationPipeline(
+        LightningSequenceLabelingPipeline(
             output_path=result_path.name,
-            **pipeline_kwargs,
-            **dataset_kwargs,
             datamodule_kwargs=datamodule_kwargs,
             task_train_kwargs=task_train_kwargs,
-            task_model_kwargs=task_model_kwargs,
+            **pipeline_kwargs,
+            **dataset_kwargs,
         ),
         result_path,
     )
 
 
-def test_lightning_classification_pipeline(
-    lightning_classification_pipeline: Tuple[
+def test_lightning_sequence_labeling_pipeline(
+    lightning_sequence_labeling_pipeline: Tuple[
         LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]],
         "TemporaryDirectory[str]",
     ],
 ) -> None:
-    pl.seed_everything(441, workers=True)
-    pipeline, path = lightning_classification_pipeline
+    pl.seed_everything(441)
+    pipeline, path = lightning_sequence_labeling_pipeline
     result = pipeline.run()
     path.cleanup()
     np.testing.assert_almost_equal(
-        result["accuracy"]["accuracy"], 0.4864864, decimal=pytest.decimal
+        result["seqeval__mode_None__scheme_None"]["overall_accuracy"],
+        0.0015690,
+        decimal=pytest.decimal,
     )
     np.testing.assert_almost_equal(
-        result["f1__average_macro"]["f1"], 0.2684458, decimal=pytest.decimal
+        result["seqeval__mode_None__scheme_None"]["overall_f1"], 0.0019846, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        result["precision__average_macro"]["precision"], 0.3602941, decimal=pytest.decimal
+        result["seqeval__mode_None__scheme_None"]["overall_precision"],
+        0.0010559,
+        decimal=pytest.decimal,
     )
     np.testing.assert_almost_equal(
-        result["recall__average_macro"]["recall"], 0.325, decimal=pytest.decimal
+        result["seqeval__mode_None__scheme_None"]["overall_recall"],
+        0.0164609,
+        decimal=pytest.decimal,
     )
