@@ -89,6 +89,7 @@ def lightning_classification_kwargs(output_path: "TemporaryDirectory[str]") -> D
         "embedding_name": "clarin-pl/roberta-polish-kgr10",
         "task_model_kwargs": None,
         "task_train_kwargs": None,
+        "model_config_kwargs": None,
         "train_batch_size": 1,
         "eval_batch_size": 1,
         "finetune_last_n_layers": 0,

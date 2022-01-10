@@ -64,6 +64,9 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
     finetune_last_n_layers: Parameter = SearchableParameter(
         name="finetune_last_n_layers", type="categorical", choices=[-1, 0, 1, 3, 5, 7, 9]
     )
+    classifier_dropout: Parameter = SearchableParameter(
+        name="classifier_dropout", type="discrete_uniform", low=0.0, high=0.5, q=0.05
+    )
 
     def __post_init__(
         self,
@@ -99,6 +102,8 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
             "weight_decay",
         }
         task_train_keys: Final = {"max_epochs", "devices", "accelerator"}
+        model_config_keys: Final = {"classifier_dropout"}
+
         pipeline_kwargs = BaseConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=pipeline_keys
         )
@@ -111,6 +116,9 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
         task_train_kwargs = BaseConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=task_train_keys
         )
+        model_config_kwargs = BaseConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=model_config_keys
+        )
 
         batch_size = pipeline_kwargs.pop("batch_size")
         pipeline_kwargs["train_batch_size"] = pipeline_kwargs["eval_batch_size"] = batch_size
@@ -119,5 +127,6 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
             "datamodule_kwargs": datamodule_kwargs,
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
+            "model_config_kwargs": model_config_kwargs,
             **pipeline_kwargs,
         }

@@ -77,6 +77,7 @@ class OptimizedLightingClassificationPipeline(
             datamodule_kwargs,
             task_model_kwargs,
             task_train_kwargs,
+            model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: LightningClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
@@ -93,6 +94,7 @@ class OptimizedLightingClassificationPipeline(
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
+            "model_config_kwargs": model_config_kwargs,
             "predict_subset": "test",
         }
         return metadata
@@ -108,6 +110,7 @@ class OptimizedLightingClassificationPipeline(
             datamodule_kwargs,
             task_model_kwargs,
             task_train_kwargs,
+            model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: LightningClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
@@ -125,6 +128,7 @@ class OptimizedLightingClassificationPipeline(
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
+            "model_config_kwargs": model_config_kwargs,
             "predict_subset": "dev",
         }
         return metadata
@@ -145,6 +149,7 @@ class OptimizedLightingClassificationPipeline(
         Dict[str, ParameterValues],
         Dict[str, ParameterValues],
         Dict[str, ParameterValues],
+        Dict[str, ParameterValues],
     ]:
         embedding_name = parameters["embedding_name"]
         assert isinstance(embedding_name, str)
@@ -160,6 +165,8 @@ class OptimizedLightingClassificationPipeline(
         assert isinstance(task_model_kwargs, dict)
         task_train_kwargs = parameters["task_train_kwargs"]
         assert isinstance(task_train_kwargs, dict)
+        model_config_kwargs = parameters["task_train_kwargs"]
+        assert isinstance(model_config_kwargs, dict)
 
         return (
             embedding_name,
@@ -169,4 +176,5 @@ class OptimizedLightingClassificationPipeline(
             datamodule_kwargs,
             task_model_kwargs,
             task_train_kwargs,
+            model_config_kwargs,
         )
