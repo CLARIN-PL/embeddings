@@ -2,6 +2,8 @@
 
 [![CI Main](https://github.com/CLARIN-PL/embeddings/actions/workflows/python_poetry_main.yml/badge.svg)](https://github.com/CLARIN-PL/embeddings/actions/workflows/python_poetry_main.yml)
 
+:construction:️ The library is currently in an active development state. Some functionalities may be subject to change before the stable release. You can track our milestones [here](https://github.com/CLARIN-PL/embeddings/milestones).
+
 # Installation
 
 ```bash
@@ -27,19 +29,18 @@ print(pipeline.run())
 
 ```
 
-**Important Remark**: As the library is still under active development, default model hyperparameters **MAY BE NOT OPTIMAL**. 
-We encourage running [OptimizedPipelines](https://github.com/cLARIN-PL/embeddings/#optimized-pipelines) as the first step to select appropriate hyperparameters. 
+#### :warning: As for now, default pipeline model hyperparameters may provide poor results. It will be subject to change in further releases. We encourage users to use [Optimized Pipelines](#optimized-pipelines) to select appropriate hyperparameters.
 
 # Conventions
 
 We use many of the HuggingFace concepts such as models (https://huggingface.co/models) or  datasets (https://huggingface.co/datasets) to make our library as easy to use as it is possible. We want to enable users to create, customise, test, and execute NLP/NLU/SLU tasks in the fastest possible manner. 
-Moreover, we present easy to use static embeddings, that were trained by CLARIN-PL.
+Moreover, we present easy to use static embeddings, that were trained by CLARIN-PL. 
 
 
 # Pipelines
 
 We share predefined pipelines for common NLP tasks with corresponding scripts. 
-For Transformer based pipelines we utilize [PyTorch Lighting](https://www.pytorchlightning.ai) trainers with Transformers [AutoModels](https://huggingface.co/docs/transformers/master/en/model_doc/auto#transformers.AutoModel). 
+For Transformer based pipelines we utilize [PyTorch Lighting](https://www.pytorchlightning.ai) ⚡ trainers with Transformers [AutoModels](https://huggingface.co/docs/transformers/master/en/model_doc/auto#transformers.AutoModel). 
 For static embedding based pipelines we use [Flair](https://github.com/flairNLP/flair) library under the hood.
 
 **REMARK**: As currently we haven't blocked transformers based pipelines from **flair** pipelines we **may remove it in the nearest future.** We encourage to use **Lightning** based pipelines for transformers.
