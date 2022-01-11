@@ -34,12 +34,6 @@ def run(
         target_column_name=target_column_name,
         output_path=output_path,
         finetune_last_n_layers=0,
-        datamodule_kwargs={
-            "downsample_train": 0.001,
-            "downsample_val": 0.1,
-            "downsample_test": 0.1,
-        },
-        task_train_kwargs={"max_epochs": 1},
     )
 
     result = pipeline.run()

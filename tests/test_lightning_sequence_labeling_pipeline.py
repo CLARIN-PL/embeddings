@@ -10,7 +10,7 @@ from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def dataset_kwargs() -> Dict[str, Any]:
     return {
         "dataset_name_or_path": "clarin-pl/kpwr-ner",
@@ -19,13 +19,13 @@ def dataset_kwargs() -> Dict[str, Any]:
     }
 
 
-@pytest.fixture
-def pipeline_kwargs(scope="session") -> Dict[str, Any]:
+@pytest.fixture(scope="module")
+def pipeline_kwargs() -> Dict[str, Any]:
     return {"embedding_name": "allegro/herbert-base-cased", "finetune_last_n_layers": 0}
 
 
-@pytest.fixture
-def task_train_kwargs(scope="session") -> Dict[str, Any]:
+@pytest.fixture(scope="module")
+def task_train_kwargs() -> Dict[str, Any]:
     return {
         "max_epochs": 1,
         "devices": "auto",
@@ -34,13 +34,13 @@ def task_train_kwargs(scope="session") -> Dict[str, Any]:
     }
 
 
-@pytest.fixture
-def task_model_kwargs(scope="session") -> Dict[str, Any]:
+@pytest.fixture(scope="module")
+def task_model_kwargs() -> Dict[str, Any]:
     return {"learning_rate": 5e-4, "use_scheduler": False}
 
 
-@pytest.fixture
-def datamodule_kwargs(scope="session") -> Dict[str, Any]:
+@pytest.fixture(scope="module")
+def datamodule_kwargs() -> Dict[str, Any]:
     return {
         "downsample_train": 0.01,
         "downsample_val": 0.01,
@@ -101,3 +101,13 @@ def test_lightning_sequence_labeling_pipeline(
         0.0164609,
         decimal=pytest.decimal,
     )
+
+    assert "data" in result
+    assert "y_pred" in result["data"]
+    assert "y_true" in result["data"]
+    assert isinstance(result["data"]["y_pred"], np.ndarray)
+    assert isinstance(result["data"]["y_true"], np.ndarray)
+    assert isinstance(result["data"]["y_pred"][0], list)
+    assert isinstance(result["data"]["y_true"][0], list)
+    assert isinstance(result["data"]["y_pred"][0][0], str)
+    assert isinstance(result["data"]["y_true"][0][0], str)

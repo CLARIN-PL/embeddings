@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Type, Union
 
 import datasets
@@ -16,10 +17,14 @@ from embeddings.task.flair_task.text_classification import TextClassification
 from embeddings.transformation.flair_transformation.classification_corpus_transformation import (
     ClassificationCorpusTransformation,
 )
+from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
+    DownsampleFlairCorpusTransformation,
+)
 from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
     SampleSplitsFlairCorpusTransformation,
 )
 from embeddings.transformation.transformation import Transformation
+from embeddings.utils.json_dict_persister import JsonPersister
 
 
 class FlairClassificationPipeline(
@@ -42,6 +47,7 @@ class FlairClassificationPipeline(
         load_model_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
+        output_path = Path(output_path)
         dataset = HuggingFaceDataset(
             dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
@@ -64,5 +70,7 @@ class FlairClassificationPipeline(
             output_path, task_model_kwargs=task_model_kwargs, task_train_kwargs=task_train_kwargs
         )
         model = FlairModel(embedding, task)
-        evaluator = TextClassificationEvaluator()
+        evaluator = TextClassificationEvaluator().persisting(
+            JsonPersister(path=output_path.joinpath("evaluation.json"))
+        )
         super().__init__(dataset, data_loader, transformation, model, evaluator)

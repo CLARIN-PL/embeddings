@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Union
 
 import datasets
@@ -19,6 +20,7 @@ from embeddings.transformation.flair_transformation.split_sample_corpus_transfor
     SampleSplitsFlairCorpusTransformation,
 )
 from embeddings.transformation.transformation import Transformation
+from embeddings.utils.json_dict_persister import JsonPersister
 
 
 class FlairSequenceLabelingPipeline(
@@ -42,6 +44,7 @@ class FlairSequenceLabelingPipeline(
         task_train_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
+        output_path = Path(output_path)
         dataset = HuggingFaceDataset(
             dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
@@ -65,5 +68,5 @@ class FlairSequenceLabelingPipeline(
         model = FlairModel(embedding, task)
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
-        )
+        ).persisting(JsonPersister(path=output_path.joinpath("evaluation.json")))
         super().__init__(dataset, data_loader, transformation, model, evaluator)

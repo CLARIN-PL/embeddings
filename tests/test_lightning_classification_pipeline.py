@@ -102,3 +102,11 @@ def test_lightning_classification_pipeline(
     np.testing.assert_almost_equal(
         result["recall__average_macro"]["recall"], 0.325, decimal=pytest.decimal
     )
+
+    assert "data" in result
+    assert "y_pred" in result["data"]
+    assert "y_true" in result["data"]
+    assert isinstance(result["data"]["y_pred"], np.ndarray)
+    assert isinstance(result["data"]["y_true"], np.ndarray)
+    assert result["data"]["y_pred"].dtype == int
+    assert result["data"]["y_true"].dtype == int

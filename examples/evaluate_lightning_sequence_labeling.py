@@ -7,6 +7,7 @@ import typer
 from embeddings.defaults import RESULTS_PATH
 from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
+from embeddings.utils.utils import build_output_path, format_eval_result
 
 
 def run(
@@ -33,7 +34,7 @@ def run(
 ) -> None:
     typer.echo(pprint.pformat(locals()))
 
-    output_path = Path(root, embedding_name, dataset_name)
+    output_path = build_output_path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
     pipeline = LightningSequenceLabelingPipeline(
@@ -47,7 +48,7 @@ def run(
     )
 
     result = pipeline.run()
-    typer.echo(pprint.pformat(result))
+    typer.echo(format_eval_result(result))
 
 
 typer.run(run)

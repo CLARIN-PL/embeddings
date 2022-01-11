@@ -5,14 +5,14 @@ import typer
 
 from embeddings.defaults import RESULTS_PATH
 from embeddings.pipeline.flair_pair_classification import FlairPairClassificationPipeline
-from embeddings.utils.utils import build_output_path
+from embeddings.utils.utils import build_output_path, format_eval_result
 
 app = typer.Typer()
 
 
 def run(
     embedding_name: str = typer.Option(
-        "allegro/herbert-base-cased", help="Hugging Face embedding model name or path."
+        "clarin-pl/word2vec-kgr10", help="Hugging Face embedding model name or path."
     ),
     dataset_name: str = typer.Option(
         "clarin-pl/cst-wikinews", help="Hugging Face dataset name or path."
@@ -34,7 +34,7 @@ def run(
         embedding_name, dataset_name, input_columns_names_pair, target_column_name, output_path
     )
     result = pipeline.run()
-    typer.echo(pprint.pformat(result))
+    typer.echo(format_eval_result(result))
 
 
 typer.run(run)
