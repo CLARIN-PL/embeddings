@@ -71,6 +71,7 @@ class LightningClassificationPipelineMetadata(EmbeddingPipelineBaseMetadata):
     datamodule_kwargs: Optional[Dict[str, Any]]
     tokenizer_kwargs: Optional[Dict[str, Any]]
     batch_encoding_kwargs: Optional[Dict[str, Any]]
+    model_config_kwargs: Optional[Dict[str, Any]]
     predict_subset: Literal["dev", "test"]
 
 
