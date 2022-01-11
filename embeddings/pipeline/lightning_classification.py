@@ -36,6 +36,7 @@ class LightningClassificationPipeline(
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        model_config_kwargs: Optional[Dict[str, Any]] = None,
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
     ):
         datamodule = TextClassificationDataModule(
@@ -60,6 +61,7 @@ class LightningClassificationPipeline(
             train_batch_size=train_batch_size,
             eval_batch_size=eval_batch_size,
             finetune_last_n_layers=finetune_last_n_layers,
+            config_kwargs=model_config_kwargs if model_config_kwargs else {},
             task_model_kwargs=task_model_kwargs
             if task_model_kwargs
             else self.DEFAULT_TASK_MODEL_KWARGS,
