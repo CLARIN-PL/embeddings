@@ -20,44 +20,38 @@ def local_repo() -> Iterator[Path]:
 
 
 def test_hub_repo_off_unoff() -> None:
-    assert (
-        str(build_output_path(root, hub_repo_official, hub_repo_unofficial))
-        == "results/experiment_1/hub-123/org__hub-123"
+    assert str(build_output_path(root, hub_repo_official, hub_repo_unofficial)) == str(
+        Path("results/experiment_1/hub-123/org__hub-123")
     )
 
 
 def test_hub_repo_off_off() -> None:
-    assert (
-        str(build_output_path(root, hub_repo_official, hub_repo_official))
-        == "results/experiment_1/hub-123/hub-123"
+    assert str(build_output_path(root, hub_repo_official, hub_repo_official)) == str(
+        Path("results/experiment_1/hub-123/hub-123")
     )
 
 
 def test_hub_repo_unoff_unoff() -> None:
-    assert (
-        str(build_output_path(root, hub_repo_unofficial, hub_repo_unofficial))
-        == "results/experiment_1/org__hub-123/org__hub-123"
+    assert str(build_output_path(root, hub_repo_unofficial, hub_repo_unofficial)) == str(
+        Path("results/experiment_1/org__hub-123/org__hub-123")
     )
 
 
 def test_local_repo_hub_str_repo_official(local_repo: Path) -> None:
-    assert (
-        str(build_output_path(root, local_repo, hub_repo_unofficial))
-        == "results/experiment_1/local-123/org__hub-123"
+    assert str(build_output_path(root, local_repo, hub_repo_unofficial)) == str(
+        Path("results/experiment_1/local-123/org__hub-123")
     )
 
 
 def test_local_repo_path_hub_repo_official(local_repo: Path) -> None:
-    assert (
-        str(build_output_path(root, Path(local_repo), hub_repo_unofficial))
-        == "results/experiment_1/local-123/org__hub-123"
+    assert str(build_output_path(root, Path(local_repo), hub_repo_unofficial)) == str(
+        Path("results/experiment_1/local-123/org__hub-123")
     )
 
 
 def test_local_repo_path_local_repo_path(local_repo: Path) -> None:
-    assert (
-        str(build_output_path(root, Path(local_repo), Path(local_repo)))
-        == "results/experiment_1/local-123/local-123"
+    assert str(build_output_path(root, Path(local_repo), Path(local_repo))) == str(
+        Path("results/experiment_1/local-123/local-123")
     )
 
 
