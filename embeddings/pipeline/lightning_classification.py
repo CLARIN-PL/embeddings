@@ -53,7 +53,8 @@ class LightningClassificationPipeline(
         )
         trainer = pl.Trainer(
             default_root_dir=output_path,
-            **task_train_kwargs if task_train_kwargs else self.DEFAULT_TASK_TRAIN_KWARGS
+            **{**task_train_kwargs, **self.DEFAULT_TASK_TRAIN_KWARGS}
+            if task_train_kwargs else self.DEFAULT_TASK_TRAIN_KWARGS,
         )
 
         task = TextClassification(
