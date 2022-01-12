@@ -3,21 +3,23 @@ from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, Optional, Tuple
 
+from embeddings.evaluator.sequence_labeling_evaluator import (
+    EvaluationMode,
+    SequenceLabelingEvaluator,
+    TaggingScheme,
+)
 from embeddings.hyperparameter_search.configspace import ConfigSpace, SampledParameters
-from embeddings.hyperparameter_search.lighting_configspace import (
-    LightingTextClassificationConfigSpace,
-)
+from embeddings.hyperparameter_search.lighting_configspace import LightingConfigSpace
 from embeddings.hyperparameter_search.parameters import ParameterValues
-from embeddings.pipeline.hf_preprocessing_pipeline import (
-    HuggingFaceTextClassificationPreprocessingPipeline,
-)
+from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.hps_pipeline import (
     AbstractHuggingFaceOptimizedPipeline,
     OptunaPipeline,
     _HuggingFaceOptimizedPipelineBase,
 )
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
-from embeddings.pipeline.pipelines_metadata import LightningClassificationPipelineMetadata
+from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
+from embeddings.pipeline.pipelines_metadata import LightningPipelineMetadata
 
 
 @dataclass
@@ -37,38 +39,21 @@ class _OptimizedLightingPipelineBase(
 
 
 @dataclass
-class OptimizedLightingClassificationPipeline(
+class OptimizedLightingPipeline(
     OptunaPipeline[
-        LightingTextClassificationConfigSpace,
-        LightningClassificationPipelineMetadata,
-        LightningClassificationPipelineMetadata,
+        LightingConfigSpace,
+        LightningPipelineMetadata,
+        LightningPipelineMetadata,
     ],
-    AbstractHuggingFaceOptimizedPipeline[LightingTextClassificationConfigSpace],
-    _OptimizedLightingPipelineBase[LightingTextClassificationConfigSpace],
+    AbstractHuggingFaceOptimizedPipeline[LightingConfigSpace],
+    _OptimizedLightingPipelineBase[LightingConfigSpace],
 ):
     def __post_init__(self) -> None:
-        # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
-        super().__init__(
-            preprocessing_pipeline=HuggingFaceTextClassificationPreprocessingPipeline(
-                dataset_name=self.dataset_name,
-                persist_path=self.tmp_dataset_dir.name,
-                sample_missing_splits=(self.sample_dev_split_fraction, None),
-                ignore_test_subset=True,
-                load_dataset_kwargs=self.load_dataset_kwargs,
-            ),
-            evaluation_pipeline=LightningClassificationPipeline,  # type: ignore
-            pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
-            sampler=self.sampler_cls(seed=self.seed),
-            n_trials=self.n_trials,
-            dataset_path=self.tmp_dataset_dir.name,
-            metric_name="f1__average_macro",
-            metric_key="f1",
-            config_space=self.config_space,
+        raise NotImplementedError(
+            f"You cannot use generic OptimizedLightingPipeline object. You need to specify pipeline type, e.g. {OptimizedLightingClassificationPipeline.__name__}"
         )
 
-    def _get_metadata(
-        self, parameters: SampledParameters
-    ) -> LightningClassificationPipelineMetadata:
+    def _get_metadata(self, parameters: SampledParameters) -> LightningPipelineMetadata:
         (
             embedding_name,
             train_batch_size,
@@ -79,7 +64,7 @@ class OptimizedLightingClassificationPipeline(
             task_train_kwargs,
             model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
-        metadata: LightningClassificationPipelineMetadata = {
+        metadata: LightningPipelineMetadata = {
             "embedding_name": embedding_name,
             "dataset_name_or_path": self.dataset_name,
             "input_column_name": self.input_column_name,
@@ -99,9 +84,7 @@ class OptimizedLightingClassificationPipeline(
         }
         return metadata
 
-    def _get_evaluation_metadata(
-        self, parameters: SampledParameters
-    ) -> LightningClassificationPipelineMetadata:
+    def _get_evaluation_metadata(self, parameters: SampledParameters) -> LightningPipelineMetadata:
         (
             embedding_name,
             train_batch_size,
@@ -112,7 +95,7 @@ class OptimizedLightingClassificationPipeline(
             task_train_kwargs,
             model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
-        metadata: LightningClassificationPipelineMetadata = {
+        metadata: LightningPipelineMetadata = {
             "embedding_name": embedding_name,
             "dataset_name_or_path": self.tmp_dataset_dir.name,
             "input_column_name": self.input_column_name,
@@ -177,4 +160,56 @@ class OptimizedLightingClassificationPipeline(
             task_model_kwargs,
             task_train_kwargs,
             model_config_kwargs,
+        )
+
+
+@dataclass
+class OptimizedLightingClassificationPipeline(OptimizedLightingPipeline):
+    def __post_init__(self) -> None:
+        # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
+        super(OptimizedLightingPipeline, self).__init__(
+            preprocessing_pipeline=HuggingFacePreprocessingPipeline(
+                dataset_name=self.dataset_name,
+                persist_path=self.tmp_dataset_dir.name,
+                sample_missing_splits=(self.sample_dev_split_fraction, None),
+                ignore_test_subset=True,
+                load_dataset_kwargs=self.load_dataset_kwargs,
+            ),
+            evaluation_pipeline=LightningClassificationPipeline,  # type: ignore
+            pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
+            sampler=self.sampler_cls(seed=self.seed),
+            n_trials=self.n_trials,
+            dataset_path=self.tmp_dataset_dir.name,
+            metric_name="f1__average_macro",
+            metric_key="f1",
+            config_space=self.config_space,
+        )
+
+
+@dataclass
+class OptimizedLightingSequenceLabelingPipeline(OptimizedLightingPipeline):
+    evaluation_mode: EvaluationMode = EvaluationMode.CONLL
+    tagging_scheme: Optional[TaggingScheme] = None
+
+    def __post_init__(self) -> None:
+        self.metric_name = SequenceLabelingEvaluator.get_metric_name(
+            evaluation_mode=self.evaluation_mode, tagging_scheme=self.tagging_scheme
+        )
+        # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
+        super(OptimizedLightingPipeline, self).__init__(
+            preprocessing_pipeline=HuggingFacePreprocessingPipeline(
+                dataset_name=self.dataset_name,
+                persist_path=self.tmp_dataset_dir.name,
+                sample_missing_splits=(self.sample_dev_split_fraction, None),
+                ignore_test_subset=True,
+                load_dataset_kwargs=self.load_dataset_kwargs,
+            ),
+            evaluation_pipeline=LightningSequenceLabelingPipeline,  # type: ignore
+            pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
+            sampler=self.sampler_cls(seed=self.seed),
+            n_trials=self.n_trials,
+            dataset_path=self.tmp_dataset_dir.name,
+            metric_name=self.metric_name,
+            metric_key="overall_f1",
+            config_space=self.config_space,
         )

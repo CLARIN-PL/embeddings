@@ -65,6 +65,24 @@ class SequenceLabelingEvaluator(MetricsEvaluator):
     ) -> Sequence[Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
         return [self.metric]
 
+    @classmethod
+    def get_metric_name(
+        cls, evaluation_mode: EvaluationMode, tagging_scheme: Optional[TaggingScheme] = None
+    ) -> str:
+        if evaluation_mode == "unit":
+            return "UnitSeqeval"
+        elif evaluation_mode in SequenceLabelingEvaluator.SEQEVAL_EVALUATION_MODES:
+            metric_name = "seqeval"
+            if evaluation_mode == "conll":
+                metric_name += "__mode_None"  # todo: deal with None in metric names
+            else:
+                metric_name += "__mode_strict"
+
+            metric_name += f"__scheme_{tagging_scheme}"
+            return metric_name
+        else:
+            raise ValueError(f"Evaluation Mode {evaluation_mode} unsupported.")
+
 
 EvaluationMode = SequenceLabelingEvaluator.EvaluationMode
 TaggingScheme = SequenceLabelingEvaluator.TaggingScheme

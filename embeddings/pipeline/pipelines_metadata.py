@@ -59,7 +59,7 @@ class FlairClassificationEvaluationPipelineMetadata(FlairEvaluationPipelineMetad
     load_model_kwargs: Optional[Dict[str, Any]]
 
 
-class LightningClassificationPipelineMetadata(EmbeddingPipelineBaseMetadata):
+class LightningPipelineMetadata(EmbeddingPipelineBaseMetadata):
     dataset_name_or_path: str
     input_column_name: str
     target_column_name: str

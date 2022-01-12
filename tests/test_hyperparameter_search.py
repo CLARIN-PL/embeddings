@@ -13,7 +13,7 @@ from embeddings.pipeline.pipelines_metadata import (
     FlairClassificationPipelineMetadata,
     FlairPairClassificationPipelineMetadata,
     FlairSequenceLabelingPipelineMetadata,
-    LightningClassificationPipelineMetadata,
+    LightningPipelineMetadata,
 )
 from embeddings.utils.utils import PrimitiveTypes
 
@@ -174,10 +174,10 @@ def test_flair_sequence_labeling_pipeline_metadata(
 def test_lightning_classification_pipeline_metadata(
     lightning_classification_pipeline_metadata,
 ) -> None:
-    metadata = create_model_from_typeddict(LightningClassificationPipelineMetadata)(  # type: ignore
+    metadata = create_model_from_typeddict(LightningPipelineMetadata)(  # type: ignore
         **lightning_classification_pipeline_metadata
     ).dict()
-    LightningClassificationPipelineMetadata(**metadata)
+    LightningPipelineMetadata(**metadata)
 
 
 def test_categorical_parameter() -> None:

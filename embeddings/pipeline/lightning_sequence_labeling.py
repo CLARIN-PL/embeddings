@@ -44,6 +44,8 @@ class LightningSequenceLabelingPipeline(
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        model_config_kwargs: Optional[Dict[str, Any]] = None,
+        predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
     ):
         datamodule = SequenceLabelingDataModule(
             tokenizer_name_or_path=tokenizer_name if tokenizer_name else embedding_name,
@@ -68,13 +70,12 @@ class LightningSequenceLabelingPipeline(
             train_batch_size=train_batch_size,
             eval_batch_size=eval_batch_size,
             finetune_last_n_layers=finetune_last_n_layers,
+            config_kwargs=model_config_kwargs if model_config_kwargs else {},
             task_model_kwargs=task_model_kwargs
             if task_model_kwargs
             else self.DEFAULT_TASK_MODEL_KWARGS,
         )
-        model = LightningModel(
-            trainer=trainer, task=task, predict_subset=LightingDataModuleSubset.TEST
-        )
+        model = LightningModel(trainer=trainer, task=task, predict_subset=predict_subset)
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         )
