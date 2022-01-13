@@ -1,5 +1,4 @@
 import abc
-import copy
 import pathlib
 from os.path import exists, isdir
 from typing import Any, Callable, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
@@ -17,6 +16,7 @@ from embeddings.data.data_loader import HuggingFaceDataLoader, HuggingFaceLocalD
 from embeddings.data.dataset import LightingDataLoaders, LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.utils.loggers import get_logger
+from embeddings.utils.utils import initialize_kwargs
 
 Data = TypeVar("Data")
 HuggingFaceDataset = Type[Dataset]
@@ -69,8 +69,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.downsample_train = downsample_train
         self.downsample_val = downsample_val
         self.downsample_test = downsample_test
-        self.tokenizer_kwargs = copy.deepcopy(self.DEFAULT_TOKENIZER_KWARGS)
-        self.tokenizer_kwargs.update(tokenizer_kwargs if tokenizer_kwargs else {})
+        self.tokenizer_kwargs = initialize_kwargs(self.DEFAULT_TOKENIZER_KWARGS, tokenizer_kwargs)
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.tokenizer_name_or_path,
             **self.tokenizer_kwargs,
@@ -223,8 +222,9 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         if len(text_fields) > 2:
             raise ValueError("Too many fields given in text_fields attribute")
         self.text_fields = text_fields
-        self.batch_encoding_kwargs = copy.deepcopy(self.DEFAULT_BATCH_ENCODING_KWARGS)
-        self.batch_encoding_kwargs.update(batch_encoding_kwargs if batch_encoding_kwargs else {})
+        self.batch_encoding_kwargs = initialize_kwargs(
+            self.DEFAULT_BATCH_ENCODING_KWARGS, batch_encoding_kwargs
+        )
         super().__init__(
             dataset_name_or_path=dataset_name_or_path,
             tokenizer_name_or_path=tokenizer_name_or_path,
@@ -297,8 +297,9 @@ class SequenceLabelingDataModule(HuggingFaceDataModule):
     ):
         self.text_field = text_field
         self.label_all_tokens = label_all_tokens
-        self.batch_encoding_kwargs = copy.deepcopy(self.DEFAULT_BATCH_ENCODING_KWARGS)
-        self.batch_encoding_kwargs.update(batch_encoding_kwargs if batch_encoding_kwargs else {})
+        self.batch_encoding_kwargs = initialize_kwargs(
+            self.DEFAULT_BATCH_ENCODING_KWARGS, batch_encoding_kwargs
+        )
         super().__init__(
             dataset_name_or_path=dataset_name_or_path,
             tokenizer_name_or_path=tokenizer_name_or_path,

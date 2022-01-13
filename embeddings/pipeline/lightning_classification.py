@@ -1,4 +1,3 @@
-import copy
 from typing import Any, Dict, Optional, Sequence, Union
 
 import datasets
@@ -12,6 +11,7 @@ from embeddings.evaluator.text_classification_evaluator import TextClassificatio
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task.text_classification import TextClassification
+from embeddings.utils.utils import initialize_kwargs
 
 
 class LightningClassificationPipeline(
@@ -42,14 +42,18 @@ class LightningClassificationPipeline(
         model_config_kwargs: Optional[Dict[str, Any]] = None,
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
     ):
-        self.task_train_kwargs = copy.deepcopy(self.DEFAULT_TASK_TRAIN_KWARGS)
-        self.task_train_kwargs.update(task_train_kwargs if task_train_kwargs else {})
-        self.task_model_kwargs = copy.deepcopy(self.DEFAULT_TASK_MODEL_KWARGS)
-        self.task_model_kwargs.update(task_model_kwargs if task_model_kwargs else {})
-        self.datamodule_kwargs = copy.deepcopy(self.DEFAULT_DATAMODULE_KWARGS)
-        self.datamodule_kwargs.update(datamodule_kwargs if datamodule_kwargs else {})
-        self.model_config_kwargs = copy.deepcopy(self.DEFAULT_MODEL_CONFIG_KWARGS)
-        self.model_config_kwargs.update(model_config_kwargs if model_config_kwargs else {})
+        self.task_train_kwargs = initialize_kwargs(
+            self.DEFAULT_TASK_TRAIN_KWARGS, task_train_kwargs
+        )
+        self.task_model_kwargs = initialize_kwargs(
+            self.DEFAULT_TASK_MODEL_KWARGS, task_model_kwargs
+        )
+        self.datamodule_kwargs = initialize_kwargs(
+            self.DEFAULT_DATAMODULE_KWARGS, datamodule_kwargs
+        )
+        self.model_config_kwargs = initialize_kwargs(
+            self.DEFAULT_MODEL_CONFIG_KWARGS, model_config_kwargs
+        )
 
         datamodule = TextClassificationDataModule(
             tokenizer_name_or_path=tokenizer_name if tokenizer_name else embedding_name,
