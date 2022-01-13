@@ -220,14 +220,14 @@ Instead of the `allegro/herbert-base-cased` model, you can pass any model from [
 | ...                                                                         |
 
 
-# Optimized pipelines.
+# Optimized pipelines
 
 ## Transformers embeddings
 
 | Task                          | Optimized Pipeline                                                                       |
 |-------------------------------|------------------------------------------------------------------------------------------|
 | Lightning Text Classification | [OptimizedLightingClassificationPipeline](embeddings/pipeline/lightning_hps_pipeline.py) | 
-| Lightning Sequence Labeling   | -                                                                                        |
+| Lightning Sequence Labeling   | [OptimizedLightingSequenceLabelingPipeline](embeddings/pipeline/lightning_hps_pipeline.py)                                                                                        |
 
 
 
