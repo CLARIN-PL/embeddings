@@ -1,4 +1,5 @@
 import abc
+import copy
 import pathlib
 from os.path import exists, isdir
 from typing import Any, Callable, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
@@ -36,7 +37,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         "end_positions",
         "labels",
     ]
-    tokenizer_kwargs = {"use_fast": True}
+    DEFAULT_TOKENIZER_KWARGS = {"use_fast": True}
 
     def __init__(
         self,
@@ -68,6 +69,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.downsample_train = downsample_train
         self.downsample_val = downsample_val
         self.downsample_test = downsample_test
+        self.tokenizer_kwargs = copy.deepcopy(self.DEFAULT_TOKENIZER_KWARGS)
         self.tokenizer_kwargs.update(tokenizer_kwargs if tokenizer_kwargs else {})
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.tokenizer_name_or_path,
@@ -197,7 +199,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
 
 class TextClassificationDataModule(HuggingFaceDataModule):
-    batch_encoding_kwargs = {
+    DEFAULT_BATCH_ENCODING_KWARGS = {
         "padding": True,
         "truncation": True,
     }
@@ -221,6 +223,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         if len(text_fields) > 2:
             raise ValueError("Too many fields given in text_fields attribute")
         self.text_fields = text_fields
+        self.batch_encoding_kwargs = copy.deepcopy(self.DEFAULT_BATCH_ENCODING_KWARGS)
         self.batch_encoding_kwargs.update(batch_encoding_kwargs if batch_encoding_kwargs else {})
         super().__init__(
             dataset_name_or_path=dataset_name_or_path,
@@ -270,7 +273,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
 
 class SequenceLabelingDataModule(HuggingFaceDataModule):
     IGNORE_INDEX = -100
-    batch_encoding_kwargs = {
+    DEFAULT_BATCH_ENCODING_KWARGS = {
         "padding": True,
         "truncation": True,
         "is_split_into_words": True,
@@ -294,8 +297,8 @@ class SequenceLabelingDataModule(HuggingFaceDataModule):
     ):
         self.text_field = text_field
         self.label_all_tokens = label_all_tokens
+        self.batch_encoding_kwargs = copy.deepcopy(self.DEFAULT_BATCH_ENCODING_KWARGS)
         self.batch_encoding_kwargs.update(batch_encoding_kwargs if batch_encoding_kwargs else {})
-
         super().__init__(
             dataset_name_or_path=dataset_name_or_path,
             tokenizer_name_or_path=tokenizer_name_or_path,
