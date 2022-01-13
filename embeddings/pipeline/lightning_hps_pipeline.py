@@ -1,3 +1,4 @@
+import abc
 from abc import ABC
 from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
@@ -19,7 +20,10 @@ from embeddings.pipeline.hps_pipeline import (
 )
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
-from embeddings.pipeline.pipelines_metadata import LightningPipelineMetadata
+from embeddings.pipeline.pipelines_metadata import (
+    LightningPipelineMetadata,
+    LightningSequenceLabelingPipelineMetadata,
+)
 
 
 @dataclass
@@ -38,7 +42,8 @@ class _OptimizedLightingPipelineBase(
     batch_encoding_kwargs: Optional[Dict[str, Any]] = None
 
 
-@dataclass
+# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
+@dataclass  # type: ignore
 class OptimizedLightingPipeline(
     OptunaPipeline[
         LightingConfigSpace,
@@ -48,72 +53,23 @@ class OptimizedLightingPipeline(
     AbstractHuggingFaceOptimizedPipeline[LightingConfigSpace],
     _OptimizedLightingPipelineBase[LightingConfigSpace],
 ):
+    @abc.abstractmethod
     def __post_init__(self) -> None:
-        raise NotImplementedError(
-            f"You cannot use generic OptimizedLightingPipeline object. You need to specify pipeline type, e.g. {OptimizedLightingClassificationPipeline.__name__}"
-        )
+        pass
 
+    @abc.abstractmethod
     def _get_metadata(self, parameters: SampledParameters) -> LightningPipelineMetadata:
-        (
-            embedding_name,
-            train_batch_size,
-            eval_batch_size,
-            finetune_last_n_layers,
-            datamodule_kwargs,
-            task_model_kwargs,
-            task_train_kwargs,
-            model_config_kwargs,
-        ) = self._pop_sampled_parameters(parameters=parameters)
-        metadata: LightningPipelineMetadata = {
-            "embedding_name": embedding_name,
-            "dataset_name_or_path": self.dataset_name,
-            "input_column_name": self.input_column_name,
-            "target_column_name": self.target_column_name,
-            "train_batch_size": train_batch_size,
-            "eval_batch_size": eval_batch_size,
-            "finetune_last_n_layers": finetune_last_n_layers,
-            "tokenizer_name": self.tokenizer_name,
-            "datamodule_kwargs": datamodule_kwargs,
-            "tokenizer_kwargs": self.tokenizer_kwargs,
-            "batch_encoding_kwargs": self.batch_encoding_kwargs,
-            "load_dataset_kwargs": self.load_dataset_kwargs,
-            "task_model_kwargs": task_model_kwargs,
-            "task_train_kwargs": task_train_kwargs,
-            "model_config_kwargs": model_config_kwargs,
-            "predict_subset": "test",
-        }
-        return metadata
+        pass
 
     def _get_evaluation_metadata(self, parameters: SampledParameters) -> LightningPipelineMetadata:
-        (
-            embedding_name,
-            train_batch_size,
-            eval_batch_size,
-            finetune_last_n_layers,
-            datamodule_kwargs,
-            task_model_kwargs,
-            task_train_kwargs,
-            model_config_kwargs,
-        ) = self._pop_sampled_parameters(parameters=parameters)
-        metadata: LightningPipelineMetadata = {
-            "embedding_name": embedding_name,
-            "dataset_name_or_path": self.tmp_dataset_dir.name,
-            "input_column_name": self.input_column_name,
-            "target_column_name": self.target_column_name,
-            "output_path": self.tmp_model_output_dir.name,
-            "train_batch_size": train_batch_size,
-            "eval_batch_size": eval_batch_size,
-            "finetune_last_n_layers": finetune_last_n_layers,
-            "tokenizer_name": self.tokenizer_name,
-            "datamodule_kwargs": datamodule_kwargs,
-            "tokenizer_kwargs": self.tokenizer_kwargs,
-            "batch_encoding_kwargs": self.batch_encoding_kwargs,
-            "load_dataset_kwargs": self.load_dataset_kwargs,
-            "task_model_kwargs": task_model_kwargs,
-            "task_train_kwargs": task_train_kwargs,
-            "model_config_kwargs": model_config_kwargs,
-            "predict_subset": "dev",
-        }
+        metadata = self._get_metadata(parameters)
+        metadata.update(
+            {
+                "dataset_name_or_path": self.tmp_dataset_dir.name,
+                "predict_subset": "dev",
+                "output_path": self.tmp_model_output_dir.name,
+            }
+        )
         return metadata
 
     def _post_run_hook(self) -> None:
@@ -185,6 +141,37 @@ class OptimizedLightingClassificationPipeline(OptimizedLightingPipeline):
             config_space=self.config_space,
         )
 
+    def _get_metadata(self, parameters: SampledParameters) -> LightningPipelineMetadata:
+        (
+            embedding_name,
+            train_batch_size,
+            eval_batch_size,
+            finetune_last_n_layers,
+            datamodule_kwargs,
+            task_model_kwargs,
+            task_train_kwargs,
+            model_config_kwargs,
+        ) = self._pop_sampled_parameters(parameters=parameters)
+        metadata: LightningPipelineMetadata = {
+            "embedding_name": embedding_name,
+            "dataset_name_or_path": self.dataset_name,
+            "input_column_name": self.input_column_name,
+            "target_column_name": self.target_column_name,
+            "train_batch_size": train_batch_size,
+            "eval_batch_size": eval_batch_size,
+            "finetune_last_n_layers": finetune_last_n_layers,
+            "tokenizer_name": self.tokenizer_name,
+            "datamodule_kwargs": datamodule_kwargs,
+            "tokenizer_kwargs": self.tokenizer_kwargs,
+            "batch_encoding_kwargs": self.batch_encoding_kwargs,
+            "load_dataset_kwargs": self.load_dataset_kwargs,
+            "task_model_kwargs": task_model_kwargs,
+            "task_train_kwargs": task_train_kwargs,
+            "model_config_kwargs": model_config_kwargs,
+            "predict_subset": "test",
+        }
+        return metadata
+
 
 @dataclass
 class OptimizedLightingSequenceLabelingPipeline(OptimizedLightingPipeline):
@@ -213,3 +200,38 @@ class OptimizedLightingSequenceLabelingPipeline(OptimizedLightingPipeline):
             metric_key="overall_f1",
             config_space=self.config_space,
         )
+
+    def _get_metadata(
+        self, parameters: SampledParameters
+    ) -> LightningSequenceLabelingPipelineMetadata:
+        (
+            embedding_name,
+            train_batch_size,
+            eval_batch_size,
+            finetune_last_n_layers,
+            datamodule_kwargs,
+            task_model_kwargs,
+            task_train_kwargs,
+            model_config_kwargs,
+        ) = self._pop_sampled_parameters(parameters=parameters)
+        metadata: LightningSequenceLabelingPipelineMetadata = {
+            "embedding_name": embedding_name,
+            "dataset_name_or_path": self.dataset_name,
+            "input_column_name": self.input_column_name,
+            "target_column_name": self.target_column_name,
+            "evaluation_mode": self.evaluation_mode,
+            "tagging_scheme": self.tagging_scheme,
+            "train_batch_size": train_batch_size,
+            "eval_batch_size": eval_batch_size,
+            "finetune_last_n_layers": finetune_last_n_layers,
+            "tokenizer_name": self.tokenizer_name,
+            "datamodule_kwargs": datamodule_kwargs,
+            "tokenizer_kwargs": self.tokenizer_kwargs,
+            "batch_encoding_kwargs": self.batch_encoding_kwargs,
+            "load_dataset_kwargs": self.load_dataset_kwargs,
+            "task_model_kwargs": task_model_kwargs,
+            "task_train_kwargs": task_train_kwargs,
+            "model_config_kwargs": model_config_kwargs,
+            "predict_subset": "test",
+        }
+        return metadata

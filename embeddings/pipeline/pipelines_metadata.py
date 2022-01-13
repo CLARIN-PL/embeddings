@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional, Tuple, TypeVar
 from typing_extensions import Literal, TypedDict
 
 from embeddings.data.io import T_path
+from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 
 
 class PathMetadata(TypedDict, total=False):
@@ -73,6 +74,15 @@ class LightningPipelineMetadata(EmbeddingPipelineBaseMetadata):
     batch_encoding_kwargs: Optional[Dict[str, Any]]
     model_config_kwargs: Optional[Dict[str, Any]]
     predict_subset: Literal["dev", "test"]
+
+
+class LightningClassificationPipelineMetadata(LightningPipelineMetadata):
+    pass
+
+
+class LightningSequenceLabelingPipelineMetadata(LightningPipelineMetadata):
+    evaluation_mode: EvaluationMode
+    tagging_scheme: Optional[TaggingScheme]
 
 
 Metadata = TypeVar("Metadata", bound=EmbeddingPipelineBaseMetadata)
