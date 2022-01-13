@@ -27,7 +27,7 @@ from embeddings.transformation.flair_transformation.split_sample_corpus_transfor
 )
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def pos_tagging_pipeline(
     result_path: "TemporaryDirectory[str]",
 ) -> Tuple[
@@ -52,7 +52,7 @@ def pos_tagging_pipeline(
     return pipeline, result_path
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def ner_tagging_pipeline(
     result_path: "TemporaryDirectory[str]",
 ) -> Tuple[

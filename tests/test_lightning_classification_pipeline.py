@@ -108,5 +108,5 @@ def test_lightning_classification_pipeline(
     assert "y_true" in result["data"]
     assert isinstance(result["data"]["y_pred"], np.ndarray)
     assert isinstance(result["data"]["y_true"], np.ndarray)
-    assert result["data"]["y_pred"].dtype == int
-    assert result["data"]["y_true"].dtype == int
+    assert result["data"]["y_pred"].dtype == np.int64
+    assert result["data"]["y_true"].dtype == np.int64
