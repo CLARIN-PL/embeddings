@@ -1,8 +1,7 @@
 from pathlib import Path
-from tempfile import TemporaryDirectory
-from typing import Iterator
 
 import pytest
+from _pytest.tmpdir import TempdirFactory
 
 from embeddings.utils.utils import build_output_path
 
@@ -12,11 +11,10 @@ hub_repo_unofficial = "org/hub-123"
 
 
 @pytest.fixture(scope="module")
-def local_repo() -> Iterator[Path]:
-    with TemporaryDirectory() as temp_path:
-        local_repo = Path(temp_path).joinpath("local-123")
-        local_repo.mkdir()
-        yield local_repo
+def local_repo(tmpdir_factory: TempdirFactory) -> Path:
+    local_repo = tmpdir_factory.mktemp("tmp").join("local-123")
+    local_repo.mkdir()
+    return Path(local_repo)
 
 
 def test_hub_repo_off_unoff() -> None:
