@@ -45,8 +45,8 @@ def build_output_path(root: T_path, embedding_name: T_path, dataset_name: T_path
     Every "/" in the embedding/dataset name is replaced with  "__".
     E.g. "clarin-pl/nkjp-pos" -> "clarin-pl__nkjp-pos".
 
-    Be aware that passed paths is str (instead of Path) are not checked if they exist and if
-    they are dirs.
+    Be aware that if passed paths are str (instead of Path) they are not checked if they exist
+    and if they are dirs.
     """
 
     for x in [embedding_name, dataset_name]:
