@@ -2,7 +2,7 @@
 
 [![CI Main](https://github.com/CLARIN-PL/embeddings/actions/workflows/python_poetry_main.yml/badge.svg)](https://github.com/CLARIN-PL/embeddings/actions/workflows/python_poetry_main.yml)
 
-:construction:️ The library is currently in an active development state. Some functionalities may be subject to change before the stable release. You can track our milestones [here](https://github.com/CLARIN-PL/embeddings/milestones).
+:construction:️ The library is currently in an active development state. Some functionalities may be subject to change before the stable release. Users can track our milestones [here](https://github.com/CLARIN-PL/embeddings/milestones).
 
 # Installation
 
@@ -33,7 +33,7 @@ print(pipeline.run())
 
 # Conventions
 
-We use many of the HuggingFace concepts such as models (https://huggingface.co/models) or  datasets (https://huggingface.co/datasets) to make our library as easy to use as it is possible. We want to enable users to create, customise, test, and execute NLP/NLU/SLU tasks in the fastest possible manner. 
+We use many of the HuggingFace concepts such as models (https://huggingface.co/models) or datasets (https://huggingface.co/datasets) to make our library as easy to use as it is possible. We want to enable users to create, customise, test, and execute NLP / NLU / SLU tasks in the fastest possible manner. 
 Moreover, we present easy to use static embeddings, that were trained by CLARIN-PL. 
 
 
@@ -129,7 +129,7 @@ python evaluate_document_pair_classification.py \
 
 
 # Compatible datasets
-As most datasets in huggingface repository should be compatible with our pipelines, there are several datasets that were tested by the authors.
+As most datasets in HuggingFace repository should be compatible with our pipelines, there are several datasets that were tested by the authors.
 
 | dataset name               	| task type                                 	| input_column_name(s)       	| target_column_name  	| description                                                        	|
 |----------------------------	|-------------------------------------------	|----------------------------	|---------------------	|------------------------------------------------------------	        |
@@ -210,7 +210,7 @@ for token in sentence:
 
 # Available embedding models for Polish
 
-Instead of the `allegro/herbert-base-cased` model, you can pass any model from [Hugging Face Hub](https://huggingface.co/models) that is compatible with [Transformers](https://huggingface.co/transformers/) or with our library. 
+Instead of the `allegro/herbert-base-cased` model, user can pass any model from [HuggingFace Hub](https://huggingface.co/models) that is compatible with [Transformers](https://huggingface.co/transformers/) or with our library. 
 
 | Embedding                                                                   | Type         | Description                                                      |
 |-----------------------------------------------------------------------------|--------------|------------------------------------------------------------------|
