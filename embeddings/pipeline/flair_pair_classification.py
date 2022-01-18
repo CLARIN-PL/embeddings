@@ -36,6 +36,7 @@ class FlairPairClassificationPipeline(
         input_columns_names_pair: Tuple[str, str],
         target_column_name: str,
         output_path: T_path,
+        evaluation_filename: str = "evaluation.json",
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
@@ -71,6 +72,6 @@ class FlairPairClassificationPipeline(
         )
         model = FlairModel(embedding, task)
         evaluator = TextClassificationEvaluator().persisting(
-            JsonPersister(path=output_path.joinpath("evaluation.json"))
+            JsonPersister(path=output_path.joinpath(evaluation_filename))
         )
         super().__init__(dataset, data_loader, transformation, model, evaluator)

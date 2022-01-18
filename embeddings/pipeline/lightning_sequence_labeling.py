@@ -35,6 +35,7 @@ class LightningSequenceLabelingPipeline(
         input_column_name: str,
         target_column_name: str,
         output_path: T_path,
+        evaluation_filename: str = "evaluation.json",
         evaluation_mode: EvaluationMode = EvaluationMode.CONLL,
         tagging_scheme: Optional[TaggingScheme] = None,
         train_batch_size: int = 32,
@@ -90,5 +91,5 @@ class LightningSequenceLabelingPipeline(
         model = LightningModel(trainer=trainer, task=task, predict_subset=predict_subset)
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
-        ).persisting(JsonPersister(path=output_path.joinpath("evaluation.json")))
+        ).persisting(JsonPersister(path=output_path.joinpath(evaluation_filename)))
         super().__init__(datamodule, model, evaluator)

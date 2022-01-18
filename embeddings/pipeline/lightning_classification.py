@@ -31,6 +31,7 @@ class LightningClassificationPipeline(
         input_column_name: Union[str, Sequence[str]],
         target_column_name: str,
         output_path: T_path,
+        evaluation_filename: str = "evaluation.json",
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
         finetune_last_n_layers: int = -1,
@@ -81,6 +82,6 @@ class LightningClassificationPipeline(
         )
         model = LightningModel(trainer=trainer, task=task, predict_subset=predict_subset)
         evaluator = TextClassificationEvaluator().persisting(
-            JsonPersister(path=output_path.joinpath("evaluation.json"))
+            JsonPersister(path=output_path.joinpath(evaluation_filename))
         )
         super().__init__(datamodule, model, evaluator)

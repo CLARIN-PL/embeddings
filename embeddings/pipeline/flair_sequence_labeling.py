@@ -36,6 +36,7 @@ class FlairSequenceLabelingPipeline(
         target_column_name: str,
         output_path: T_path,
         hidden_size: int,
+        evaluation_filename: str = "evaluation.json",
         evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = SequenceLabelingEvaluator.EvaluationMode.CONLL,
         tagging_scheme: Optional[SequenceLabelingEvaluator.TaggingScheme] = None,
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
@@ -68,5 +69,5 @@ class FlairSequenceLabelingPipeline(
         model = FlairModel(embedding, task)
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
-        ).persisting(JsonPersister(path=output_path.joinpath("evaluation.json")))
+        ).persisting(JsonPersister(path=output_path.joinpath(evaluation_filename)))
         super().__init__(dataset, data_loader, transformation, model, evaluator)
