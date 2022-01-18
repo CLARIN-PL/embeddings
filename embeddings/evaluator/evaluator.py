@@ -1,3 +1,4 @@
+import abc
 from abc import ABC
 from typing import Generic, TypeVar
 
@@ -8,6 +9,7 @@ Output = TypeVar("Output")
 
 
 class Evaluator(ABC, Generic[Input, Output]):
+    @abc.abstractmethod
     def evaluate(self, data: Input) -> Output:
         pass
 
