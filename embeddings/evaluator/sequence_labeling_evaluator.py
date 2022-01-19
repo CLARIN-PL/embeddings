@@ -65,9 +65,9 @@ class SequenceLabelingEvaluator(MetricsEvaluator):
     ) -> Sequence[Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
         return [self.metric]
 
-    @classmethod
+    @staticmethod
     def get_metric_name(
-        cls, evaluation_mode: EvaluationMode, tagging_scheme: Optional[TaggingScheme] = None
+        evaluation_mode: EvaluationMode, tagging_scheme: Optional[TaggingScheme] = None
     ) -> str:
         if evaluation_mode == "unit":
             return "UnitSeqeval"

@@ -10,7 +10,10 @@ from embeddings.evaluator.sequence_labeling_evaluator import (
     TaggingScheme,
 )
 from embeddings.hyperparameter_search.configspace import ConfigSpace, SampledParameters
-from embeddings.hyperparameter_search.lighting_configspace import LightingConfigSpace
+from embeddings.hyperparameter_search.lighting_configspace import (
+    LightingSequenceLabelingConfigSpace,
+    LightingTextClassificationConfigSpace,
+)
 from embeddings.hyperparameter_search.parameters import ParameterValues
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.hps_pipeline import (
@@ -21,7 +24,8 @@ from embeddings.pipeline.hps_pipeline import (
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
 from embeddings.pipeline.pipelines_metadata import (
-    LightningPipelineMetadata,
+    LightningClassificationPipelineMetadata,
+    LightningMetadata,
     LightningSequenceLabelingPipelineMetadata,
 )
 
@@ -46,30 +50,27 @@ class _OptimizedLightingPipelineBase(
 @dataclass  # type: ignore
 class OptimizedLightingPipeline(
     OptunaPipeline[
-        LightingConfigSpace,
-        LightningPipelineMetadata,
-        LightningPipelineMetadata,
+        ConfigSpace,
+        LightningMetadata,
+        LightningMetadata,
     ],
-    AbstractHuggingFaceOptimizedPipeline[LightingConfigSpace],
-    _OptimizedLightingPipelineBase[LightingConfigSpace],
+    AbstractHuggingFaceOptimizedPipeline[ConfigSpace],
+    _OptimizedLightingPipelineBase[ConfigSpace],
+    Generic[ConfigSpace, LightningMetadata],
 ):
     @abc.abstractmethod
     def __post_init__(self) -> None:
         pass
 
     @abc.abstractmethod
-    def _get_metadata(self, parameters: SampledParameters) -> LightningPipelineMetadata:
+    def _get_metadata(self, parameters: SampledParameters) -> LightningMetadata:
         pass
 
-    def _get_evaluation_metadata(self, parameters: SampledParameters) -> LightningPipelineMetadata:
+    def _get_evaluation_metadata(self, parameters: SampledParameters) -> LightningMetadata:
         metadata = self._get_metadata(parameters)
-        metadata.update(
-            {
-                "dataset_name_or_path": self.tmp_dataset_dir.name,
-                "predict_subset": "dev",
-                "output_path": self.tmp_model_output_dir.name,
-            }
-        )
+        metadata["predict_subset"] = "dev"
+        metadata["dataset_name_or_path"] = self.tmp_dataset_dir.name
+        metadata["output_path"] = self.tmp_model_output_dir.name
         return metadata
 
     def _post_run_hook(self) -> None:
@@ -120,7 +121,11 @@ class OptimizedLightingPipeline(
 
 
 @dataclass
-class OptimizedLightingClassificationPipeline(OptimizedLightingPipeline):
+class OptimizedLightingClassificationPipeline(
+    OptimizedLightingPipeline[
+        LightingTextClassificationConfigSpace, LightningClassificationPipelineMetadata
+    ]
+):
     def __post_init__(self) -> None:
         # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
         super(OptimizedLightingPipeline, self).__init__(
@@ -141,7 +146,9 @@ class OptimizedLightingClassificationPipeline(OptimizedLightingPipeline):
             config_space=self.config_space,
         )
 
-    def _get_metadata(self, parameters: SampledParameters) -> LightningPipelineMetadata:
+    def _get_metadata(
+        self, parameters: SampledParameters
+    ) -> LightningClassificationPipelineMetadata:
         (
             embedding_name,
             train_batch_size,
@@ -152,7 +159,7 @@ class OptimizedLightingClassificationPipeline(OptimizedLightingPipeline):
             task_train_kwargs,
             model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
-        metadata: LightningPipelineMetadata = {
+        metadata: LightningClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
             "dataset_name_or_path": self.dataset_name,
             "input_column_name": self.input_column_name,
@@ -174,7 +181,12 @@ class OptimizedLightingClassificationPipeline(OptimizedLightingPipeline):
 
 
 @dataclass
-class OptimizedLightingSequenceLabelingPipeline(OptimizedLightingPipeline):
+class OptimizedLightingSequenceLabelingPipeline(
+    OptimizedLightingPipeline[
+        LightingSequenceLabelingConfigSpace,
+        LightningSequenceLabelingPipelineMetadata,
+    ]
+):
     evaluation_mode: EvaluationMode = EvaluationMode.CONLL
     tagging_scheme: Optional[TaggingScheme] = None
 

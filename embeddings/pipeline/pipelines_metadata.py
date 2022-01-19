@@ -86,4 +86,5 @@ class LightningSequenceLabelingPipelineMetadata(LightningPipelineMetadata):
 
 
 Metadata = TypeVar("Metadata", bound=EmbeddingPipelineBaseMetadata)
+LightningMetadata = TypeVar("LightningMetadata", bound=LightningPipelineMetadata)
 EvaluationMetadata = TypeVar("EvaluationMetadata", bound=EmbeddingPipelineBaseMetadata)

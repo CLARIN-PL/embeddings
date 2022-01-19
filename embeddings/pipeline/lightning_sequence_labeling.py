@@ -23,7 +23,7 @@ class LightningSequenceLabelingPipeline(
 ):
     DEFAULT_TASK_TRAIN_KWARGS = {"devices": "auto", "accelerator": "auto"}
     DEFAULT_TASK_MODEL_KWARGS = {"use_scheduler": True}
-    DEFAULT_DATAMODULE_KWARGS = {"max_seq_length": None}
+    DEFAULT_DATAMODULE_KWARGS = {"max_seq_length": None, "label_all_tokens": False}
     DEFAULT_MODEL_CONFIG_KWARGS = {"classifier_dropout": None}
 
     def __init__(
@@ -37,7 +37,6 @@ class LightningSequenceLabelingPipeline(
         tagging_scheme: Optional[TaggingScheme] = None,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
-        label_all_tokens: bool = False,
         finetune_last_n_layers: int = -1,
         tokenizer_name: Optional[str] = None,
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
@@ -69,7 +68,6 @@ class LightningSequenceLabelingPipeline(
             target_field=target_column_name,
             train_batch_size=train_batch_size,
             eval_batch_size=eval_batch_size,
-            label_all_tokens=label_all_tokens,
             tokenizer_kwargs=tokenizer_kwargs,
             batch_encoding_kwargs=batch_encoding_kwargs,
             load_dataset_kwargs=load_dataset_kwargs,
