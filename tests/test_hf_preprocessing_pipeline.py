@@ -6,9 +6,7 @@ import pytest
 
 from embeddings.data.data_loader import HuggingFaceDataLoader, HuggingFaceLocalDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
-from embeddings.pipeline.hf_preprocessing_pipeline import (
-    HuggingFaceTextClassificationPreprocessingPipeline,
-)
+from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.transformation.hf_transformation.drop_subset_transformation import (
     DropSubsetHuggingFaceCorpusTransformation,
 )
@@ -70,9 +68,7 @@ def test_sample_splits_huggingface_transformation_with_non_existing_keys(hf_data
 
 
 def test_huggingface_text_classification_preprocessing_pipeline(hf_preprocessing_pipeline_kwargs):
-    pipeline = HuggingFaceTextClassificationPreprocessingPipeline(
-        **hf_preprocessing_pipeline_kwargs
-    )
+    pipeline = HuggingFacePreprocessingPipeline(**hf_preprocessing_pipeline_kwargs)
     pipeline.run()
 
     dataset = HuggingFaceLocalDataLoader().load(

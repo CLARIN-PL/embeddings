@@ -69,8 +69,8 @@ class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
 
 
 class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
-    @staticmethod
-    def parse_parameters(parameters: Dict[str, ParameterValues]) -> SampledParameters:
+    @classmethod
+    def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
         embedding_name = parameters.pop("embedding_name")
         (
             parameters,
@@ -124,8 +124,8 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
         mapped_parameters: Final[Set[str]] = {"rnn_layers", "rnn_type", "use_rnn"}
         return parameters, mapped_parameters
 
-    @staticmethod
-    def parse_parameters(parameters: Dict[str, ParameterValues]) -> SampledParameters:
+    @classmethod
+    def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
         embedding_name = parameters.pop("embedding_name")
         assert isinstance(embedding_name, str)
         hidden_size = parameters.pop("hidden_size")
@@ -264,8 +264,8 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
 
         return parameters, mapped_parameters
 
-    @staticmethod
-    def parse_parameters(parameters: Dict[str, ParameterValues]) -> SampledParameters:
+    @classmethod
+    def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
         embedding_name = parameters.pop("embedding_name")
         assert isinstance(embedding_name, str)
         document_embedding = parameters.pop("document_embedding")

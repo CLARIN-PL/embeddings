@@ -120,9 +120,7 @@ class SequenceLabeling(HuggingFaceLightningTask):
         self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Dict[str, nptyping.NDArray[np.str_]]:
         assert self.trainer is not None
-        predictions = self.trainer.predict(
-            dataloaders=dataloader, return_predictions=True, ckpt_path="best"
-        )
+        predictions = self.trainer.predict(dataloaders=dataloader, return_predictions=True)
         predictions = list(torch.cat(predictions).numpy())
         ground_truth = list(torch.cat([x["labels"] for x in dataloader]).numpy())
 

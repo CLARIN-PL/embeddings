@@ -4,8 +4,11 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Dict, Generic, Optional, Tuple
 
-from typing_extensions import Literal
-
+from embeddings.evaluator.sequence_labeling_evaluator import (
+    EvaluationMode,
+    SequenceLabelingEvaluator,
+    TaggingScheme,
+)
 from embeddings.hyperparameter_search.configspace import ConfigSpace, SampledParameters
 from embeddings.hyperparameter_search.flair_configspace import (
     SequenceLabelingConfigSpace,
@@ -36,8 +39,6 @@ from embeddings.pipeline.preprocessing_pipeline import (
     FlairTextClassificationPreprocessingPipeline,
     FlairTextPairClassificationPreprocessingPipeline,
 )
-
-# from embeddings.utils.utils import PrimitiveTypes
 
 
 @dataclass
@@ -267,30 +268,17 @@ class OptimizedFlairSequenceLabelingPipeline(
     AbstractHuggingFaceOptimizedPipeline[SequenceLabelingConfigSpace],
     _OptimizedFlairSequenceLabelingPipelineBase[SequenceLabelingConfigSpace],
 ):
-    evaluation_mode: Literal["conll", "unit", "strict"] = "conll"
-    tagging_scheme: Optional[str] = None
+    evaluation_mode: EvaluationMode = EvaluationMode.CONLL
+    tagging_scheme: Optional[TaggingScheme] = None
     dataset_path: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
     tmp_model_output_dir: TemporaryDirectory[str] = field(
         init=False, default_factory=TemporaryDirectory
     )
 
-    def _get_metric_name(self) -> str:
-        if self.evaluation_mode == "unit":
-            return "UnitSeqeval"
-        elif self.evaluation_mode in {"conll", "strict"}:
-            metric_name = "seqeval"
-            if self.evaluation_mode == "conll":
-                metric_name += "__mode_None"  # todo: deal with None in metric names
-            else:
-                metric_name += "__mode_strict"
-
-            metric_name += f"__scheme_{self.tagging_scheme}"
-            return metric_name
-        else:
-            raise ValueError(f"Evaluation Mode {self.evaluation_mode} unsupported.")
-
     def __post_init__(self) -> None:
-        self.metric_name = self._get_metric_name()
+        self.metric_name = SequenceLabelingEvaluator.get_metric_name(
+            evaluation_mode=self.evaluation_mode, tagging_scheme=self.tagging_scheme
+        )
         super().__init__(
             preprocessing_pipeline=FlairSequenceLabelingPreprocessingPipeline(
                 dataset_name=self.dataset_name,
@@ -303,7 +291,7 @@ class OptimizedFlairSequenceLabelingPipeline(
             ),
             config_space=self.config_space,
             evaluation_pipeline=FlairSequenceLabelingEvaluationPipeline,
-            metric_name=self._get_metric_name(),
+            metric_name=self.metric_name,
             metric_key="overall_f1",
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
