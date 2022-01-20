@@ -245,7 +245,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         self.target_names = self.dataset["train"].features[self.target_field].names
 
     def _class_encode_column(self, column_name: str) -> None:
-        self.dataset.class_encode_column(column_name)
+        self.dataset = self.dataset.class_encode_column(column_name)
 
     def convert_to_features(
         self, example_batch: Dict[str, Any], indices: Optional[List[int]] = None
