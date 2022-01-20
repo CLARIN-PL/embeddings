@@ -86,9 +86,10 @@ class BaseConfigSpace(ABC):
                 f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
             )
 
-    @staticmethod
+    # classmethod instead of staticmethod omit the mypy error: Argument 2 for "super" not an instance of argument 1 (https://github.com/python/mypy/issues/9282)
+    @classmethod
     @abc.abstractmethod
-    def parse_parameters(parameters: Dict[str, ParameterValues]) -> SampledParameters:
+    def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
         pass
 
     @staticmethod

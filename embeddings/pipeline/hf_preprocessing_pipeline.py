@@ -15,7 +15,7 @@ from embeddings.transformation.transformation import DummyTransformation, Transf
 from embeddings.utils.hf_persister import HuggingFaceDatasetLocalPersister
 
 
-class HuggingFaceTextClassificationPreprocessingPipeline(
+class HuggingFacePreprocessingPipeline(
     PreprocessingPipeline[str, datasets.DatasetDict, datasets.DatasetDict]
 ):
     def __init__(

@@ -14,7 +14,7 @@ from embeddings.hyperparameter_search.parameters import (
 
 
 @dataclass
-class LightingTextClassificationConfigSpace(BaseConfigSpace):
+class LightingConfigSpace(BaseConfigSpace):
     embedding_name: InitVar[Union[str, List[str]]]
     devices: InitVar[Union[int, str, None, List[int]]] = field(default="auto")
     accelerator: InitVar[Union[str, None]] = field(default="auto")
@@ -23,9 +23,11 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
     trainer_devices: Parameter = field(init=False)
     trainer_accelerator: Parameter = field(init=False)
 
+    # Trainer parameters
     max_epochs: Parameter = SearchableParameter(
         name="max_epochs", type="int_uniform", low=1, high=30, step=1
     )
+    # DataModule parameters
     mini_batch_size: Parameter = SearchableParameter(
         name="batch_size", type="log_int_uniform", low=8, high=64, step=1
     )
@@ -33,6 +35,7 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
         name="max_seq_length",
         value=None,
     )
+    # Task/LightningModule parameters
     optimizer: Parameter = SearchableParameter(
         name="optimizer",
         type="categorical",
@@ -89,8 +92,8 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
         self.trainer_devices = ConstantParameter(name="devices", value=devices)
         self.trainer_accelerator = ConstantParameter(name="accelerator", value=accelerator)
 
-    @staticmethod
-    def parse_parameters(parameters: Dict[str, ParameterValues]) -> SampledParameters:
+    @classmethod
+    def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
         pipeline_keys: Final = {"batch_size", "finetune_last_n_layers", "embedding_name"}
         datamodule_keys: Final = {"max_seq_length"}
         task_model_keys: Final = {
@@ -130,3 +133,28 @@ class LightingTextClassificationConfigSpace(BaseConfigSpace):
             "model_config_kwargs": model_config_kwargs,
             **pipeline_kwargs,
         }
+
+
+@dataclass
+class LightingTextClassificationConfigSpace(LightingConfigSpace):
+    pass
+
+
+@dataclass
+class LightingSequenceLabelingConfigSpace(LightingConfigSpace):
+    label_all_tokens: Parameter = field(
+        init=False, default=ConstantParameter(name="label_all_tokens", value=False)
+    )
+
+    @classmethod
+    def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
+        sampled_parameters = super().parse_parameters(parameters=parameters)
+
+        extra_datamodule_keys: Final = {"label_all_tokens"}
+        extra_datamodule_kwargs = BaseConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=extra_datamodule_keys
+        )
+        assert isinstance(sampled_parameters["datamodule_kwargs"], dict)
+        sampled_parameters["datamodule_kwargs"].update(extra_datamodule_kwargs)
+
+        return sampled_parameters

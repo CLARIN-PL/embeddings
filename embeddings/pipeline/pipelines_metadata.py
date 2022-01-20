@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional, Tuple, TypeVar
 from typing_extensions import Literal, TypedDict
 
 from embeddings.data.io import T_path
+from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 
 
 class PathMetadata(TypedDict, total=False):
@@ -59,7 +60,7 @@ class FlairClassificationEvaluationPipelineMetadata(FlairEvaluationPipelineMetad
     load_model_kwargs: Optional[Dict[str, Any]]
 
 
-class LightningClassificationPipelineMetadata(EmbeddingPipelineBaseMetadata):
+class LightningPipelineMetadata(EmbeddingPipelineBaseMetadata):
     dataset_name_or_path: str
     input_column_name: str
     target_column_name: str
@@ -75,5 +76,15 @@ class LightningClassificationPipelineMetadata(EmbeddingPipelineBaseMetadata):
     predict_subset: Literal["dev", "test"]
 
 
+class LightningClassificationPipelineMetadata(LightningPipelineMetadata):
+    pass
+
+
+class LightningSequenceLabelingPipelineMetadata(LightningPipelineMetadata):
+    evaluation_mode: EvaluationMode
+    tagging_scheme: Optional[TaggingScheme]
+
+
 Metadata = TypeVar("Metadata", bound=EmbeddingPipelineBaseMetadata)
+LightningMetadata = TypeVar("LightningMetadata", bound=LightningPipelineMetadata)
 EvaluationMetadata = TypeVar("EvaluationMetadata", bound=EmbeddingPipelineBaseMetadata)

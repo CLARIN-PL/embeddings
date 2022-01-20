@@ -1,5 +1,6 @@
+import copy
 import importlib
-from typing import Any, Union
+from typing import Any, Dict, Optional, Union
 
 import numpy as np
 from numpy import typing as nptyping
@@ -32,3 +33,11 @@ def import_from_string(dotted_path: str) -> Any:
     except AttributeError:
         msg = 'Module "%s" does not define a "%s" attribute/class' % (module_path, class_name)
         raise ImportError(msg)
+
+
+def initialize_kwargs(
+    default_kwargs: Dict[str, Any], user_kwargs: Optional[Dict[str, Any]]
+) -> Dict[str, Any]:
+    new_kwargs = copy.deepcopy(default_kwargs)
+    new_kwargs.update(user_kwargs if user_kwargs else {})
+    return new_kwargs
