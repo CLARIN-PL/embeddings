@@ -49,22 +49,19 @@ def build_output_path(root: T_path, embedding_name: T_path, dataset_name: T_path
     and if they are dirs.
     """
 
+    def _get_new_dir_name(embedding_or_dataset: T_path) -> str:
+        if os.path.isdir(embedding_or_dataset):
+            return Path(embedding_or_dataset).name
+        else:
+            assert isinstance(embedding_or_dataset, str)
+            return embedding_or_dataset.replace("/", "__")
+
     for x in [embedding_name, dataset_name]:
         if isinstance(x, Path) and (x.is_file() or not x.exists()):
             raise ValueError(f"Path {x} is not correct.")
 
-    if os.path.isdir(embedding_name):
-        embedding_name = Path(embedding_name).name
-    else:
-        assert isinstance(embedding_name, str)
-        embedding_name = embedding_name.replace("/", "__")
-
-    if os.path.isdir(dataset_name):
-        dataset_name = Path(dataset_name).name
-    else:
-        assert isinstance(dataset_name, str)
-        dataset_name = dataset_name.replace("/", "__")
-
+    embedding_name = _get_new_dir_name(embedding_name)
+    dataset_name = _get_new_dir_name(dataset_name)
     return Path(root, embedding_name, dataset_name)
 
 
