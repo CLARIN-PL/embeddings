@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Sequence, Union
 
 import datasets
-import pytorch_lightning as pl
 from numpy import typing as nptyping
 
 from embeddings.data.datamodule import TextClassificationDataModule
@@ -11,8 +10,8 @@ from embeddings.data.io import T_path
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
-from embeddings.task.lightning_task.text_classification import TextClassification
 from embeddings.utils.json_dict_persister import JsonPersister
+from embeddings.task.lightning_task.text_classification import TextClassificationTask
 from embeddings.utils.utils import initialize_kwargs
 
 
@@ -72,16 +71,17 @@ class LightningClassificationPipeline(
             load_dataset_kwargs=load_dataset_kwargs,
             **self.datamodule_kwargs
         )
-        trainer = pl.Trainer(default_root_dir=output_path, **self.task_train_kwargs)
-        task = TextClassification(
+        task = TextClassificationTask(
             model_name_or_path=embedding_name,
+            output_path=output_path,
             train_batch_size=train_batch_size,
             eval_batch_size=eval_batch_size,
             finetune_last_n_layers=finetune_last_n_layers,
-            config_kwargs=self.model_config_kwargs,
+            model_config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
+            task_train_kwargs=self.task_train_kwargs,
         )
-        model = LightningModel(trainer=trainer, task=task, predict_subset=predict_subset)
+        model = LightningModel(task=task, predict_subset=predict_subset)
         evaluator = TextClassificationEvaluator().persisting(
             JsonPersister(path=output_path.joinpath(evaluation_filename))
         )
