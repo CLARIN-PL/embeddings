@@ -4,6 +4,7 @@ from typing import Any, Type, Union
 from flair.embeddings import WordEmbeddings
 
 from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding, FlairEmbedding
+from embeddings.embedding.static.flair import WordEmbeddingsPL
 from embeddings.embedding.static.config import SingleFileConfig, StaticModelHubConfig
 from embeddings.utils.utils import import_from_string
 
@@ -34,6 +35,11 @@ class SingleFileEmbedding(StaticEmbedding, ABC):
 class StandardStaticWordEmbedding(FlairEmbedding):
     def _get_model(self) -> WordEmbeddings:
         return WordEmbeddings(self.name, **self.load_model_kwargs)
+
+
+class StandardStaticWordEmbeddingPL(FlairEmbedding):
+    def _get_model(self) -> WordEmbeddingsPL:
+        return WordEmbeddingsPL(self.name, **self.load_model_kwargs)
 
 
 class AutoStaticEmbedding(ABC):
