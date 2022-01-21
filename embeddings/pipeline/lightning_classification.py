@@ -57,6 +57,7 @@ class LightningClassificationPipeline(
         self.model_config_kwargs = initialize_kwargs(
             self.DEFAULT_MODEL_CONFIG_KWARGS, model_config_kwargs
         )
+        tokenizer_name = tokenizer_name if tokenizer_name else embedding_name
 
         output_path = Path(output_path)
         datamodule = TextClassificationDataModule(
