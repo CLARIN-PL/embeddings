@@ -12,7 +12,7 @@ from embeddings.embedding.static.embedding import AutoStaticWordEmbedding, Stati
 from embeddings.embedding.static.word2vec import KGR10Word2VecConfig
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def dummy_word2vec(dummy_word2vec_config: KGR10Word2VecConfig) -> StaticEmbedding:
     config = dummy_word2vec_config
     word_embedding = AutoStaticWordEmbedding.from_config(config)

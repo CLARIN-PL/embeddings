@@ -18,12 +18,12 @@ from embeddings.pipeline.pipelines_metadata import (
 from embeddings.utils.utils import PrimitiveTypes
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def output_path() -> "TemporaryDirectory[str]":
     return TemporaryDirectory()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def flair_text_classification_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
     return {
         "dataset_name": "clarin-pl/polemo2-official",
@@ -33,7 +33,7 @@ def flair_text_classification_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def flair_text_pair_classification_dataset_kwargs() -> Dict[
     str, Union[PrimitiveTypes, Tuple[str, str]]
 ]:
@@ -45,7 +45,7 @@ def flair_text_pair_classification_dataset_kwargs() -> Dict[
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def flair_sequence_labeling_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
     return {
         "dataset_name": "clarin-pl/kpwr-ner",
@@ -55,7 +55,7 @@ def flair_sequence_labeling_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def flair_pipeline_kwargs(output_path: "TemporaryDirectory[str]") -> Dict[str, PrimitiveTypes]:
     return {
         "output_path": output_path.name,
@@ -67,12 +67,12 @@ def flair_pipeline_kwargs(output_path: "TemporaryDirectory[str]") -> Dict[str, P
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def flair_sequence_labeling_pipeline_kwargs() -> Dict[str, PrimitiveTypes]:
     return {"evaluation_mode": "conll", "tagging_scheme": None, "hidden_size": 128}
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def lightning_text_classification_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
     return {
         "dataset_name_or_path": "clarin-pl/polemo2-official",
@@ -82,7 +82,7 @@ def lightning_text_classification_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def lightning_classification_kwargs(output_path: "TemporaryDirectory[str]") -> Dict[str, Any]:
     return {
         "output_path": output_path.name,
@@ -101,7 +101,7 @@ def lightning_classification_kwargs(output_path: "TemporaryDirectory[str]") -> D
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def flair_classification_pipeline_metadata(
     flair_pipeline_kwargs,
     flair_text_classification_dataset_kwargs,
@@ -112,7 +112,7 @@ def flair_classification_pipeline_metadata(
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def flair_pair_classification_pipeline_metadata(
     flair_pipeline_kwargs,
     flair_text_pair_classification_dataset_kwargs,
@@ -123,7 +123,7 @@ def flair_pair_classification_pipeline_metadata(
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def flair_sequence_labeling_pipeline_metadata(
     flair_pipeline_kwargs,
     flair_sequence_labeling_pipeline_kwargs,
@@ -136,7 +136,7 @@ def flair_sequence_labeling_pipeline_metadata(
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def lightning_classification_pipeline_metadata(
     lightning_text_classification_dataset_kwargs, lightning_classification_kwargs
 ) -> Dict[str, Any]:

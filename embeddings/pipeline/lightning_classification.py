@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Dict, Optional, Sequence, Union
 
 import datasets
@@ -11,6 +12,7 @@ from embeddings.evaluator.text_classification_evaluator import TextClassificatio
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task.text_classification import TextClassification
+from embeddings.utils.json_dict_persister import JsonPersister
 from embeddings.utils.utils import initialize_kwargs
 
 
@@ -29,6 +31,7 @@ class LightningClassificationPipeline(
         input_column_name: Union[str, Sequence[str]],
         target_column_name: str,
         output_path: T_path,
+        evaluation_filename: str = "evaluation.json",
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
         finetune_last_n_layers: int = -1,
@@ -54,9 +57,11 @@ class LightningClassificationPipeline(
         self.model_config_kwargs = initialize_kwargs(
             self.DEFAULT_MODEL_CONFIG_KWARGS, model_config_kwargs
         )
+        tokenizer_name = tokenizer_name if tokenizer_name else embedding_name
 
+        output_path = Path(output_path)
         datamodule = TextClassificationDataModule(
-            tokenizer_name_or_path=tokenizer_name if tokenizer_name else embedding_name,
+            tokenizer_name_or_path=tokenizer_name,
             dataset_name_or_path=dataset_name_or_path,
             text_fields=input_column_name,
             target_field=target_column_name,
@@ -68,7 +73,6 @@ class LightningClassificationPipeline(
             **self.datamodule_kwargs
         )
         trainer = pl.Trainer(default_root_dir=output_path, **self.task_train_kwargs)
-
         task = TextClassification(
             model_name_or_path=embedding_name,
             train_batch_size=train_batch_size,
@@ -78,5 +82,7 @@ class LightningClassificationPipeline(
             task_model_kwargs=self.task_model_kwargs,
         )
         model = LightningModel(trainer=trainer, task=task, predict_subset=predict_subset)
-        evaluator = TextClassificationEvaluator()
+        evaluator = TextClassificationEvaluator().persisting(
+            JsonPersister(path=output_path.joinpath(evaluation_filename))
+        )
         super().__init__(datamodule, model, evaluator)

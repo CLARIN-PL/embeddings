@@ -25,27 +25,27 @@ from embeddings.transformation.flair_transformation.downsample_corpus_transforma
 from embeddings.utils.flair_corpus_persister import FlairConllPersister
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def result_path() -> "TemporaryDirectory[str]":
     return TemporaryDirectory()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def embedding_name() -> str:
     return "allegro/herbert-base-cased"
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def ner_dataset_name() -> str:
     return "clarin-pl/kpwr-ner"
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def default_hidden_size() -> int:
     return 256
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
@@ -64,7 +64,7 @@ def sequence_labeling_preprocessing_pipeline(
     return pipeline
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def sequence_labeling_evaluation_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,

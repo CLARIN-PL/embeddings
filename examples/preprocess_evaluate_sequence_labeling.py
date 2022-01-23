@@ -1,5 +1,4 @@
 import pprint
-from pathlib import Path
 from typing import Optional
 
 import typer
@@ -7,6 +6,7 @@ import typer
 from embeddings.defaults import DATASET_PATH, RESULTS_PATH
 from embeddings.pipeline.evaluation_pipeline import FlairSequenceLabelingEvaluationPipeline
 from embeddings.pipeline.preprocessing_pipeline import FlairSequenceLabelingPreprocessingPipeline
+from embeddings.utils.utils import build_output_path
 
 app = typer.Typer()
 
@@ -33,7 +33,7 @@ def run(
     ),
 ) -> None:
     typer.echo(pprint.pformat(locals()))
-    dataset_path = Path(DATASET_PATH, embedding_name, dataset_name)
+    dataset_path = build_output_path(DATASET_PATH, embedding_name, dataset_name)
     dataset_path.mkdir(parents=True, exist_ok=True)
 
     preprocessing_pipeline = FlairSequenceLabelingPreprocessingPipeline(
@@ -46,9 +46,9 @@ def run(
     )
     dataset = preprocessing_pipeline.run()
 
-    output_path = Path(RESULTS_PATH, embedding_name, dataset_name)
+    output_path = build_output_path(RESULTS_PATH, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
-    persist_out_path = Path(output_path, f"{embedding_name}.json")
+    persist_out_path = output_path.joinpath(f"{embedding_name}.json")
     persist_out_path.parent.mkdir(parents=True, exist_ok=True)
 
     evaluation_pipeline = FlairSequenceLabelingEvaluationPipeline(

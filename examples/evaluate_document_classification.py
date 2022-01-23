@@ -1,17 +1,17 @@
 import pprint
-from pathlib import Path
 
 import typer
 
 from embeddings.defaults import RESULTS_PATH
 from embeddings.pipeline.flair_classification import FlairClassificationPipeline
+from embeddings.utils.utils import build_output_path, format_eval_result
 
 app = typer.Typer()
 
 
 def run(
     embedding_name: str = typer.Option(
-        "allegro/herbert-base-cased", help="Hugging Face embedding model name or path."
+        "clarin-pl/word2vec-kgr10", help="Hugging Face embedding model name or path."
     ),
     dataset_name: str = typer.Option(
         "clarin-pl/polemo2-official", help="Hugging Face dataset name or path."
@@ -26,14 +26,14 @@ def run(
 ) -> None:
     typer.echo(pprint.pformat(locals()))
 
-    output_path = Path(root, embedding_name, dataset_name)
+    output_path = build_output_path(root, embedding_name, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
     pipeline = FlairClassificationPipeline(
         embedding_name, dataset_name, input_column_name, target_column_name, output_path
     )
     result = pipeline.run()
-    typer.echo(pprint.pformat(result))
+    typer.echo(format_eval_result(result))
 
 
 typer.run(run)

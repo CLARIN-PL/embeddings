@@ -40,7 +40,7 @@ def test_static_automodel_word_fast_text(dummy_fasttext_config: KGR10FastTextCon
     assert_close_embedding_word(embedding)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def automodel_document_fast_text(
     dummy_fasttext_config: KGR10FastTextConfig,
 ) -> FlairDocumentPoolEmbedding:

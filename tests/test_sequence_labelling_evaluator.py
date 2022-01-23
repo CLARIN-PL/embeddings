@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score, classification_report, precision_rec
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def data() -> Dict[str, nptyping.NDArray[Any]]:
     return {
         "y_true": np.array(
@@ -31,7 +31,7 @@ def data() -> Dict[str, nptyping.NDArray[Any]]:
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def ner_data() -> Dict[str, nptyping.NDArray[Any]]:
     return {
         "y_true": np.array(
@@ -51,7 +51,7 @@ def ner_data() -> Dict[str, nptyping.NDArray[Any]]:
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def sklearn_metrics(
     data: Dict[str, nptyping.NDArray[Any]]
 ) -> Dict[str, Union[Dict[str, float], float]]:
@@ -94,7 +94,7 @@ def sklearn_metrics(
     return out_dict
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def seqeval_metrics(
     data: Dict[str, nptyping.NDArray[Any]]
 ) -> Dict[str, Union[Dict[str, float], float]]:

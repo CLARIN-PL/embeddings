@@ -27,17 +27,17 @@ def result_path() -> "TemporaryDirectory[str]":
     return TemporaryDirectory()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def ner_dataset_name() -> str:
     return "clarin-pl/kpwr-ner"
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def downsample_percentage() -> float:
     return 0.005
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def split_sample_percentage() -> float:
     return 0.1
 
