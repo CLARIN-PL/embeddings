@@ -4,11 +4,9 @@ import numpy as np
 from numpy import typing as nptyping
 from torch.utils.data import DataLoader
 
-from embeddings.data.dataset import LightingDataLoaders
 from embeddings.data.io import T_path
 from embeddings.model.lightning_module.sequence_labeling import SequenceLabelingModule
 from embeddings.task.lightning_task.lightning_task import LightningTask
-from embeddings.utils.utils import NDArrayInt
 
 
 class SequenceLabelingTask(LightningTask):
@@ -43,19 +41,21 @@ class SequenceLabelingTask(LightningTask):
 
     def predict(self, dataloader: DataLoader[Any]) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.model is not None
-        predictions, ground_truth = self.model.predict(dataloader=dataloader).values()
+        predictions, ground_truth = map(
+            np.ndarray.tolist, self.model.predict(dataloader=dataloader).values()
+        )
         for i, (pred, gt) in enumerate(zip(list(predictions), list(ground_truth))):
-            predictions[i] = self.map_filter_data(pred, gt)
-            ground_truth[i] = self.map_filter_data(gt, gt)
+            predictions[i] = self._map_filter_data(pred, gt)
+            ground_truth[i] = self._map_filter_data(gt, gt)
         return {"y_pred": np.array(predictions), "y_true": np.array(ground_truth)}
 
-    def map_filter_data(
+    def _map_filter_data(
         self, data: nptyping.NDArray[Any], ground_truth_data: nptyping.NDArray[Any]
     ) -> List[str]:
+        assert self.model is not None
         assert self.trainer is not None
         assert hasattr(self.trainer, "datamodule")
-        data = [
-            self.trainer.datamodule.id2str(x.item())
+        return [
+            getattr(self.trainer, "datamodule").id2str(x.item())
             for x in data[ground_truth_data != self.model.ignore_index]
         ]
-        return data

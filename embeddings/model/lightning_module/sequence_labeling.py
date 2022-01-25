@@ -1,18 +1,13 @@
 from collections import ChainMap
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
-import numpy as np
 import torch
-from numpy import typing as nptyping
 from pytorch_lightning.utilities.types import STEP_OUTPUT
-from torch.utils.data import DataLoader
 from torchmetrics import F1, Accuracy, MetricCollection, Precision, Recall
 from transformers import AutoModelForTokenClassification
 
-from embeddings.data.datamodule import HuggingFaceDataset
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.utils.loggers import get_logger
-from embeddings.utils.utils import NDArrayInt
 
 _logger = get_logger(__name__)
 
