@@ -3,7 +3,6 @@ from typing import Any, Dict, Optional
 from numpy import typing as nptyping
 from torch.utils.data import DataLoader
 
-from embeddings.data.dataset import LightingDataLoaders
 from embeddings.data.io import T_path
 from embeddings.model.lightning_module.text_classification import TextClassificationModule
 from embeddings.task.lightning_task.lightning_task import LightningTask

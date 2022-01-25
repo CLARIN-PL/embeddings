@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import datasets
-import pytorch_lightning as pl
 from numpy import typing as nptyping
 
 from embeddings.data.datamodule import SequenceLabelingDataModule

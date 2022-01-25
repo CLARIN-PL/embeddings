@@ -3,15 +3,15 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import pytorch_lightning as pl
+import torch
 from numpy import typing as nptyping
 from torch.utils.data import DataLoader
 
 from embeddings.data.datamodule import HuggingFaceDataModule
-from embeddings.data.dataset import LightingDataLoaders, LightingDataModuleSubset
+from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.defaults import RESULTS_PATH
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
-from embeddings.model.lightning_module.lightning_module import LightningModule
 from embeddings.task.task import Task
 from embeddings.utils.loggers import get_logger
 
