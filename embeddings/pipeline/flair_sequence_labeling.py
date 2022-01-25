@@ -1,3 +1,4 @@
+import pathlib
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Union
 
@@ -9,6 +10,7 @@ from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.data.io import T_path
 from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
+from embeddings.embedding.static.embedding import StandardStaticWordEmbeddingPL
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -30,7 +32,7 @@ class FlairSequenceLabelingPipeline(
 ):
     def __init__(
         self,
-        embedding_name: str,
+        embedding_name: Union[str, pathlib.Path, pathlib.PosixPath],
         dataset_name: str,
         input_column_name: str,
         target_column_name: str,
@@ -59,7 +61,11 @@ class FlairSequenceLabelingPipeline(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
 
-        embedding = AutoFlairWordEmbedding.from_hub(embedding_name)
+        if isinstance(embedding_name, (pathlib.Path, pathlib.PosixPath)):
+            embedding = StandardStaticWordEmbeddingPL(str(embedding_name))
+        else:
+            embedding = AutoFlairWordEmbedding.from_hub(embedding_name)
+
         task = SequenceLabeling(
             output_path,
             hidden_size=hidden_size,
