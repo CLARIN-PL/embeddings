@@ -10,8 +10,8 @@ from embeddings.data.io import T_path
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
-from embeddings.utils.json_dict_persister import JsonPersister
 from embeddings.task.lightning_task.text_classification import TextClassificationTask
+from embeddings.utils.json_dict_persister import JsonPersister
 from embeddings.utils.utils import initialize_kwargs
 
 
@@ -72,7 +72,7 @@ class LightningClassificationPipeline(
             **self.datamodule_kwargs
         )
         task = TextClassificationTask(
-            model_name_or_path=embedding_name,
+            embedding_name=embedding_name,
             output_path=output_path,
             train_batch_size=train_batch_size,
             eval_batch_size=eval_batch_size,

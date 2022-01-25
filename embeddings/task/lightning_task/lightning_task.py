@@ -10,7 +10,6 @@ from torch.utils.data import DataLoader
 from embeddings.data.datamodule import HuggingFaceDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
-from embeddings.defaults import RESULTS_PATH
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.task.task import Task
 from embeddings.utils.loggers import get_logger
@@ -23,13 +22,13 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
 
     def __init__(
         self,
-        output_path: T_path = RESULTS_PATH,
-        task_train_kwargs: Optional[Dict[str, Any]] = None,
+        output_path: T_path,
+        task_train_kwargs: Dict[str, Any],
     ):
         super().__init__()
-        self.model: Optional[HuggingFaceLightningModule] = None
         self.output_path: Path = Path(output_path)
-        self.task_train_kwargs = task_train_kwargs if task_train_kwargs else {}
+        self.task_train_kwargs = task_train_kwargs
+        self.model: Optional[HuggingFaceLightningModule] = None
         self.trainer: Optional[pl.Trainer] = None
 
     def fit(
