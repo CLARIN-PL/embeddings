@@ -41,10 +41,9 @@ class SequenceLabelingTask(LightningTask):
 
     def predict(self, dataloader: DataLoader[Any]) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.model is not None
-        predictions, ground_truth = map(
-            np.ndarray.tolist, self.model.predict(dataloader=dataloader).values()
-        )
-        for i, (pred, gt) in enumerate(zip(list(predictions), list(ground_truth))):
+        results = self.model.predict(dataloader=dataloader)
+        predictions, ground_truth = (list(results["y_pred"]), list(results["y_true"]))
+        for i, (pred, gt) in enumerate(zip(predictions, ground_truth)):
             predictions[i] = self._map_filter_data(pred, gt)
             ground_truth[i] = self._map_filter_data(gt, gt)
         return {"y_pred": np.array(predictions), "y_true": np.array(ground_truth)}
