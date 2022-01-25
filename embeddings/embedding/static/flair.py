@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 import flair
@@ -10,6 +11,8 @@ from flair.file_utils import cached_path
 from pathlib import Path
 from pickle import UnpicklingError
 from torch import nn
+
+logging.getLogger("flair").setLevel(logging.INFO)
 
 
 class WordEmbeddingsPL(WordEmbeddings):
@@ -119,6 +122,7 @@ class WordEmbeddingsPL(WordEmbeddings):
             except UnpicklingError:
                 # For polish models usually gensim cannot unpickle non-binary files with a method
                 # gensim.models.KeyedVectors.load
+                logging.warning("Couldn't unpickle model file. Unpickle model with different method.")
                 precomputed_word_embeddings = gensim.models.KeyedVectors.load_word2vec_format(
                     str(embeddings_path), binary=False
                 )
