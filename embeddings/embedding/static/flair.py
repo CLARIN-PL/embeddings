@@ -1,15 +1,14 @@
 import logging
+from pathlib import Path
+from pickle import UnpicklingError
 from typing import Optional
 
 import flair
 import gensim
 import numpy as np
 import torch
-
 from flair.embeddings import WordEmbeddings
 from flair.file_utils import cached_path
-from pathlib import Path
-from pickle import UnpicklingError
 from torch import nn
 
 logging.getLogger("flair").setLevel(logging.INFO)
