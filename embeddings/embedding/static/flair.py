@@ -38,7 +38,9 @@ class WordEmbeddingsPL(WordEmbeddings):
         self.instance_parameters = self.get_instance_parameters(locals=locals())
 
         if fine_tune and force_cpu and flair.device.type != "cpu":
-            raise ValueError("Cannot train WordEmbeddings on cpu if the model is trained on gpu, set force_cpu=False")
+            raise ValueError(
+                "Cannot train WordEmbeddings on cpu if the model is trained on gpu, set force_cpu=False"
+            )
 
         hu_path: str = "https://flair.informatik.hu-berlin.de/resources/embeddings/token"
 
@@ -62,15 +64,21 @@ class WordEmbeddingsPL(WordEmbeddings):
                 f"{hu_path}/pubmed_pmc_wiki_sg_1M.gensim.vectors.npy",
                 cache_dir=cache_dir,
             )
-            embeddings_path = cached_path(f"{hu_path}/pubmed_pmc_wiki_sg_1M.gensim", cache_dir=cache_dir)
+            embeddings_path = cached_path(
+                f"{hu_path}/pubmed_pmc_wiki_sg_1M.gensim", cache_dir=cache_dir
+            )
 
         elif embeddings.lower() in ["crawl", "en-crawl"]:
             cached_path(f"{hu_path}/en-fasttext-crawl-300d-1M.vectors.npy", cache_dir=cache_dir)
-            embeddings_path = cached_path(f"{hu_path}/en-fasttext-crawl-300d-1M", cache_dir=cache_dir)
+            embeddings_path = cached_path(
+                f"{hu_path}/en-fasttext-crawl-300d-1M", cache_dir=cache_dir
+            )
 
         elif embeddings.lower() in ["news", "en-news", "en"]:
             cached_path(f"{hu_path}/en-fasttext-news-300d-1M.vectors.npy", cache_dir=cache_dir)
-            embeddings_path = cached_path(f"{hu_path}/en-fasttext-news-300d-1M", cache_dir=cache_dir)
+            embeddings_path = cached_path(
+                f"{hu_path}/en-fasttext-news-300d-1M", cache_dir=cache_dir
+            )
 
         elif embeddings.lower() in ["twitter", "en-twitter"]:
             cached_path(f"{hu_path}/twitter.gensim.vectors.npy", cache_dir=cache_dir)
@@ -81,14 +89,18 @@ class WordEmbeddingsPL(WordEmbeddings):
                 f"{hu_path}/{embeddings}-wiki-fasttext-300d-1M.vectors.npy",
                 cache_dir=cache_dir,
             )
-            embeddings_path = cached_path(f"{hu_path}/{embeddings}-wiki-fasttext-300d-1M", cache_dir=cache_dir)
+            embeddings_path = cached_path(
+                f"{hu_path}/{embeddings}-wiki-fasttext-300d-1M", cache_dir=cache_dir
+            )
 
         elif len(embeddings.lower()) == 7 and embeddings.endswith("-wiki"):
             cached_path(
                 f"{hu_path}/{embeddings[:2]}-wiki-fasttext-300d-1M.vectors.npy",
                 cache_dir=cache_dir,
             )
-            embeddings_path = cached_path(f"{hu_path}/{embeddings[:2]}-wiki-fasttext-300d-1M", cache_dir=cache_dir)
+            embeddings_path = cached_path(
+                f"{hu_path}/{embeddings[:2]}-wiki-fasttext-300d-1M", cache_dir=cache_dir
+            )
 
         elif len(embeddings.lower()) == 8 and embeddings.endswith("-crawl"):
             cached_path(
@@ -101,7 +113,9 @@ class WordEmbeddingsPL(WordEmbeddings):
             )
 
         elif not Path(embeddings).exists():
-            raise ValueError(f'The given embeddings "{embeddings}" is not available or is not a valid path.')
+            raise ValueError(
+                f'The given embeddings "{embeddings}" is not available or is not a valid path.'
+            )
         else:
             embeddings_path = Path(embeddings)
 
@@ -122,7 +136,9 @@ class WordEmbeddingsPL(WordEmbeddings):
             except UnpicklingError:
                 # For polish models usually gensim cannot unpickle non-binary files with a method
                 # gensim.models.KeyedVectors.load
-                logging.warning("Couldn't unpickle model file. Unpickle model with different method.")
+                logging.warning(
+                    "Couldn't unpickle model file. Unpickle model with different method."
+                )
                 precomputed_word_embeddings = gensim.models.KeyedVectors.load_word2vec_format(
                     str(embeddings_path), binary=False
                 )
@@ -135,7 +151,9 @@ class WordEmbeddingsPL(WordEmbeddings):
                 np.zeros(self.embedding_length, dtype="float"),
             )
         )
-        self.embedding = nn.Embedding.from_pretrained(torch.FloatTensor(vectors), freeze=not fine_tune)
+        self.embedding = nn.Embedding.from_pretrained(
+            torch.FloatTensor(vectors), freeze=not fine_tune
+        )
 
         try:
             # gensim version 4
