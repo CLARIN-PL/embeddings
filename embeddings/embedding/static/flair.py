@@ -20,7 +20,7 @@ class WordEmbeddingsPL(WordEmbeddings):
     def __init__(
         self,
         embeddings: str,
-        field: str = None,
+        field: Optional[str] = None,
         fine_tune: bool = False,
         force_cpu: bool = True,
         stable: bool = False,
@@ -172,9 +172,9 @@ class WordEmbeddingsPL(WordEmbeddings):
         self.to(flair.device)
 
     @property
-    def embedding_length(self):
+    def embedding_length(self) -> int:
         return self._embedding_length
 
     @embedding_length.setter
-    def embedding_length(self, value):
+    def embedding_length(self, value: int) -> None:
         self._embedding_length = value
