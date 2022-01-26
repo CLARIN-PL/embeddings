@@ -1,5 +1,6 @@
+from abc import ABC
 from dataclasses import InitVar, dataclass, field
-from typing import Dict, Final, List, Union
+from typing import Any, Dict, Final, List, Union
 
 from embeddings.data.io import T_path
 from embeddings.hyperparameter_search.configspace import (
@@ -12,13 +13,17 @@ from embeddings.hyperparameter_search.parameters import (
     ParameterValues,
     SearchableParameter,
 )
+from embeddings.utils.utils import read_yaml
+
+DEFAULT_DEVICES = "auto"
+DEFAULT_ACCELERATOR = "auto"
 
 
 @dataclass
-class LightingConfigSpace(BaseConfigSpace):
+class LightingConfigSpace(BaseConfigSpace, ABC):
     embedding_name_or_path: InitVar[Union[T_path, List[T_path]]]
-    devices: InitVar[Union[int, str, None, List[int]]] = field(default="auto")
-    accelerator: InitVar[Union[str, None]] = field(default="auto")
+    devices: InitVar[Union[int, str, None, List[int]]] = field(default=DEFAULT_DEVICES)
+    accelerator: InitVar[Union[str, None]] = field(default=DEFAULT_ACCELERATOR)
 
     param_embedding_name_or_path: Parameter = field(init=False)
     trainer_devices: Parameter = field(init=False)
@@ -127,6 +132,8 @@ class LightingConfigSpace(BaseConfigSpace):
         batch_size = pipeline_kwargs.pop("batch_size")
         pipeline_kwargs["train_batch_size"] = pipeline_kwargs["eval_batch_size"] = batch_size
 
+        cls._check_unmapped_parameters(parameters=parameters)
+
         return {
             "datamodule_kwargs": datamodule_kwargs,
             "task_model_kwargs": task_model_kwargs,
@@ -134,6 +141,22 @@ class LightingConfigSpace(BaseConfigSpace):
             "model_config_kwargs": model_config_kwargs,
             **pipeline_kwargs,
         }
+
+    @classmethod
+    def _parse_yaml(cls, path: T_path) -> Dict[str, Any]:
+        config = read_yaml(path)
+        variables = {
+            "embedding_name": config.pop("embedding_name"),
+            "devices": config.pop("devices", DEFAULT_DEVICES),
+            "accelerator": config.pop("accelerator", DEFAULT_ACCELERATOR),
+        }
+        parameters = cls._parse_yaml_params(config.pop("parameters"))
+        cls._check_unmapped_parameters(config)
+        return variables | parameters
+
+    @classmethod
+    def from_yaml(cls, path: T_path) -> "LightingConfigSpace":
+        return cls(**cls._parse_yaml(path))
 
 
 @dataclass
