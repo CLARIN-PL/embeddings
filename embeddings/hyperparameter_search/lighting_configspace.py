@@ -1,6 +1,9 @@
 from dataclasses import InitVar, dataclass, field
 from typing import Dict, Final, List, Union
 
+import yaml
+
+from embeddings.defaults import LIGHTNING_CONFIG_PATH
 from embeddings.hyperparameter_search.configspace import (
     BaseConfigSpace,
     Parameter,
@@ -133,6 +136,29 @@ class LightingConfigSpace(BaseConfigSpace):
             "model_config_kwargs": model_config_kwargs,
             **pipeline_kwargs,
         }
+
+    @classmethod
+    def read_from_yaml(cls) -> "LightingConfigSpace":
+        with open(LIGHTNING_CONFIG_PATH, 'r') as file:
+            data = yaml.load(file, Loader=yaml.CLoader)
+            data = data["LightingConfigSpace"]
+
+        return cls(
+            embedding_name=data["embedding_name"],
+            devices=field(**data["devices"]),
+            accelerator=field(**data["accelerator"]),
+            max_epochs=SearchableParameter(**data["max_epochs"]),
+            mini_batch_size=SearchableParameter(**data["mini_batch_size"]),
+            max_seq_length=ConstantParameter(**data["max_seq_length"]),
+            optimizer=SearchableParameter(**data["optimizer"]),
+            use_scheduler=SearchableParameter(**data["use_scheduler"]),
+            warmup_steps=SearchableParameter(**data["warmup_steps"]),
+            learning_rate=SearchableParameter(**data["learning_rate"]),
+            adam_epsilon=SearchableParameter(**data["adam_epsilon"]),
+            weight_decay=SearchableParameter(**data["weight_decay"]),
+            finetune_last_n_layers=SearchableParameter(**data["finetune_last_n_layers"]),
+            classifier_dropout=SearchableParameter(**data["classifier_dropout"]),
+        )
 
 
 @dataclass

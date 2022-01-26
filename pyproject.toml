@@ -40,6 +40,7 @@ transformers = ">=4.12.5"
 typer = ">=0.3.2"
 types-PyYAML = ">=5.4.10"
 typing-extensions = ">=4.0.1"
+PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]
 black = "21.12b0"
