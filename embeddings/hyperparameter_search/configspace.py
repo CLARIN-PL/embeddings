@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Set, Tuple, Type, TypeVar, Union
 
 import optuna
 
+from embeddings.data.io import T_path
 from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
 from embeddings.embedding.flair_embedding import FlairTransformerEmbedding
 from embeddings.embedding.static.embedding import StaticEmbedding
@@ -102,3 +103,28 @@ class BaseConfigSpace(ABC):
         else:
             raise TypeError("Embedding type not recognized")
         return embedding_type
+
+    @staticmethod
+    def _parse_yaml_params(parameters: Dict[str, Any]) -> Dict[str, Parameter]:
+        parsed_parameters = {}
+        for param_key, param_values in parameters.items():
+            param_type = param_values.pop("param_type")
+            param: Parameter
+            if param_type == "constant":
+                param = ConstantParameter(**param_values)
+            elif param_type == "searchable":
+                param = SearchableParameter(**param_values)
+            else:
+                raise ValueError("Unrecognized parameter type")
+            parsed_parameters.update({param_key: param})
+        return parsed_parameters
+
+    @classmethod
+    @abc.abstractmethod
+    def _parse_yaml(cls, path: T_path) -> Dict[str, Any]:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def from_yaml(cls, path: T_path) -> "BaseConfigSpace":
+        pass

@@ -1,10 +1,11 @@
 from abc import ABC
 from dataclasses import InitVar, dataclass, field
-from typing import Dict, List, Set, Tuple, Union
+from typing import Any, Dict, List, Set, Tuple, Union
 
 import optuna
 from typing_extensions import Final
 
+from embeddings.data.io import T_path
 from embeddings.hyperparameter_search.configspace import (
     BaseConfigSpace,
     Parameter,
@@ -15,6 +16,7 @@ from embeddings.hyperparameter_search.parameters import (
     ParameterValues,
     SearchableParameter,
 )
+from embeddings.utils.utils import read_yaml
 
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
@@ -67,6 +69,14 @@ class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
         )
         return parameters, task_train_kwargs
 
+    @classmethod
+    def _parse_yaml(cls, path: T_path) -> Dict[str, Any]:
+        config = read_yaml(path)
+        variables = {"embedding_name": config.pop("embedding_name")}
+        parameters = cls._parse_yaml_params(config.pop("parameters"))
+        cls._check_unmapped_parameters(config)
+        return variables | parameters
+
 
 class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
     @classmethod
@@ -78,6 +88,10 @@ class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
         ) = FlairModelTrainerConfigSpace._parse_model_trainer_parameters(parameters)
         BaseConfigSpace._check_unmapped_parameters(parameters=parameters)
         return {"embedding_name": embedding_name, "task_train_kwargs": task_train_kwargs}
+
+    @classmethod
+    def from_yaml(cls, path: T_path) -> "FlairModelTrainerConfigSpace":
+        return cls(**cls._parse_yaml(path))
 
 
 @dataclass
@@ -140,13 +154,13 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
             "rnn_layers",
             "rnn_type",
         }
-        task_model_kwargs = BaseConfigSpace._pop_parameters(
+        task_model_kwargs = cls._pop_parameters(
             parameters=parameters, parameters_keys=task_model_keys
         )
         parameters, task_train_kwargs = SequenceLabelingConfigSpace._parse_model_trainer_parameters(
             parameters=parameters
         )
-        BaseConfigSpace._check_unmapped_parameters(parameters=parameters)
+        cls._check_unmapped_parameters(parameters=parameters)
 
         return {
             "embedding_name": embedding_name,
@@ -154,6 +168,10 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
         }
+
+    @classmethod
+    def from_yaml(cls, path: T_path) -> "SequenceLabelingConfigSpace":
+        return cls(**cls._parse_yaml(path))
 
 
 @dataclass
@@ -284,14 +302,14 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
             "word_dropout",
             "reproject_words",
         }
-        load_model_kwargs = BaseConfigSpace._pop_parameters(
+        load_model_kwargs = cls._pop_parameters(
             parameters=parameters, parameters_keys=load_model_keys
         )
 
         parameters, task_train_kwargs = SequenceLabelingConfigSpace._parse_model_trainer_parameters(
             parameters=parameters
         )
-        BaseConfigSpace._check_unmapped_parameters(parameters=parameters)
+        cls._check_unmapped_parameters(parameters=parameters)
 
         return {
             "embedding_name": embedding_name,
@@ -300,3 +318,7 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
             "task_train_kwargs": task_train_kwargs,
             "load_model_kwargs": load_model_kwargs,
         }
+
+    @classmethod
+    def from_yaml(cls, path: T_path) -> "TextClassificationConfigSpace":
+        return cls(**cls._parse_yaml(path))

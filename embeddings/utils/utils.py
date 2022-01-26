@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
 import numpy as np
+import yaml
 from numpy import typing as nptyping
 
 from embeddings.data.io import T_path
@@ -75,3 +76,8 @@ def initialize_kwargs(
     new_kwargs = copy.deepcopy(default_kwargs)
     new_kwargs.update(user_kwargs if user_kwargs else {})
     return new_kwargs
+
+
+def read_yaml(filepath: Union[str, Path]) -> Any:
+    with open(filepath, "r") as f:
+        return yaml.safe_load(f)
