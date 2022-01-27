@@ -1,44 +1,63 @@
 from typing import Dict, Optional, Any
 
-import numpy as np
+from numpy import typing as nptyping
 import pandas as pd
+from sklearn.base import ClassifierMixin as AnySklearnClassifier
 from typing_extensions import Literal
+import datasets
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.io import T_path
 from embeddings.embedding.sklearn_embedding import SklearnEmbedding
 from embeddings.transformation.hf_transformation.to_pandas_transformation import (
     ToPandasHuggingFaceCorpusTransformation,
 )
+from embeddings.pipeline.standard_pipeline import StandardPipeline
 from embeddings.task.sklearn_task.text_classification import TextClassification
+from embeddings.model.sklearn_model import SklearnModel
+from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
+from embeddings.utils.json_dict_persister import JsonPersister
 
 
-class SklearnClassificationPipeline:
+class SklearnClassificationPipeline(
+    StandardPipeline[
+        str,
+        datasets.DatasetDict,
+        Dict[str, pd.DataFrame],
+        Dict[str, nptyping.NDArray[Any]],
+        Dict[str, Any],
+    ]
+):
     def __init__(
         self,
         dataset_name: str,
         input_column_name: str,
         target_column_name: str,
-        model_type: Literal["tree", "forest", "logistic"] = "tree",
+        output_path: T_path,
+        classifier: AnySklearnClassifier,
+        vectorizer: Optional[str] = "bow",
+        evaluation_filename: str = "evaluation.json",
         fit_classifier_kwargs: Optional[Dict[str, Any]] = None,
-        fit_vectorizer_kwargs: Optional[Dict[str, Any]] = None,
+        embedding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        self.dataset = HuggingFaceDataset(
+        dataset = HuggingFaceDataset(
             dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
-        self.data_loader = HuggingFaceDataLoader()
-        self.transformation = ToPandasHuggingFaceCorpusTransformation()
-        self.embedding = SklearnEmbedding()
-        self.task = TextClassification()
+        data_loader = HuggingFaceDataLoader()
+        transformation = ToPandasHuggingFaceCorpusTransformation()
+        fit_classifier_kwargs = fit_classifier_kwargs if fit_classifier_kwargs else {}
+        embedding = SklearnEmbedding(embedding_kwargs, method=vectorizer)
+        task = TextClassification(classifier=classifier, train_model_kwargs=fit_classifier_kwargs)
+        model = SklearnModel(embedding, task)
+        evaluator = TextClassificationEvaluator().persisting(
+            JsonPersister(path=output_path.joinpath(evaluation_filename))
+        )
+        super().__init__(dataset, data_loader, transformation, model, evaluator)
 
         self.input_column_name = input_column_name
         self.target_column_name = target_column_name
-        self.fit_classifier_kwargs = fit_classifier_kwargs if fit_classifier_kwargs else {}
-        self.fit_vectorizer_kwargs = fit_vectorizer_kwargs if fit_vectorizer_kwargs else {}
-        self.task = TextClassification(
-            model=model_type, train_model_kwargs=self.fit_classifier_kwargs
-        )
 
     def run(self):
         data = self.data_loader.load(self.dataset)
@@ -49,14 +68,4 @@ class SklearnClassificationPipeline:
                 axis="columns",
                 inplace=True,
             )
-        self.embedding.fit(data["train"]["x"].values, self.fit_vectorizer_kwargs)
-
-        data_transformed = {}
-        for subset in data:
-            data_transformed[subset] = {
-                "x": self.embedding.embed(data[subset]["x"].values),
-                "y": data[subset]["y"].copy(),
-            }
-
-        result = self.task.fit_predict(data_transformed)
-        return result
+        return self.model.execute(data)

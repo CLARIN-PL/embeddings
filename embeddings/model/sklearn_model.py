@@ -1,23 +1,27 @@
-from typing import Dict, Any
+from typing import Dict, Any, Union
 
 from numpy import typing as nptyping
 import pandas as pd
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
 from typing_extensions import Literal
 
 from embeddings.model.model import Model
 from embeddings.task.sklearn_task.text_classification import TextClassification
+from embeddings.embedding.sklearn_embedding import SklearnEmbedding
 
 
-class SklearnModel(Model[Any[pd.DataFrame, nptyping.NDArray[Any]], Dict]):
+class SklearnModel(Model[Union[pd.DataFrame, nptyping.NDArray[Any]], Dict]):
     def __init__(
-        self, model: Any[DecisionTreeClassifier, RandomForestClassifier, LogisticRegression]
+        self,
+        embedding: SklearnEmbedding,
+        task: TextClassification,
+        predict_subset: Literal["dev", "validation", "test"] = "test",
     ):
         super().__init__()
-        self.model = model
+        self.embedding = embedding
+        self.task = task
+        self.predict_subset = predict_subset
 
-    def execute(self, data):
-        pass
+    def execute(self, data: Dict[str, any]):
+        self.embedding.fit(data["train"]["x"])
+        self.task.build_task_model(self.embedding)
+        return self.task.fit_predict(data, self.predict_subset)
