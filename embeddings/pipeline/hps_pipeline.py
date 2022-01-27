@@ -122,6 +122,7 @@ class OptunaPipeline(
         args = self._get_evaluation_metadata(parsed_params)
         pipeline = self.evaluation_pipeline(**args)
         results = pipeline.run()
+        trial.set_user_attr('n_completed_epochs', pipeline.n_completed_epochs)
         metric = results[self.metric_name][self.metric_key]
         assert isinstance(metric, float)
         return metric

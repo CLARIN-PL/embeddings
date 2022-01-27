@@ -26,6 +26,7 @@ class LightningSequenceLabelingPipeline(
     DEFAULT_TASK_MODEL_KWARGS = {"use_scheduler": True}
     DEFAULT_DATAMODULE_KWARGS = {"max_seq_length": None, "label_all_tokens": False}
     DEFAULT_MODEL_CONFIG_KWARGS = {"classifier_dropout": None}
+    DEFAULT_EARLY_STOPPING_KWARGS = {"monitor": "val/Loss", "mode": "min", "patience": 1}
 
     def __init__(
         self,
@@ -48,6 +49,7 @@ class LightningSequenceLabelingPipeline(
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
         model_config_kwargs: Optional[Dict[str, Any]] = None,
+        early_stopping_kwargs: Optional[Dict[str, Any]] = None,
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
     ):
         self.task_train_kwargs = initialize_kwargs(
@@ -61,6 +63,9 @@ class LightningSequenceLabelingPipeline(
         )
         self.model_config_kwargs = initialize_kwargs(
             self.DEFAULT_MODEL_CONFIG_KWARGS, model_config_kwargs
+        )
+        self.early_stopping_kwargs = initialize_kwargs(
+            self.DEFAULT_EARLY_STOPPING_KWARGS, early_stopping_kwargs
         )
         tokenizer_name = tokenizer_name if tokenizer_name else embedding_name
 
@@ -86,6 +91,7 @@ class LightningSequenceLabelingPipeline(
             model_config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
             task_train_kwargs=self.task_train_kwargs,
+            early_stopping_kwargs=self.early_stopping_kwargs
         )
         model = LightningModel(task=task, predict_subset=predict_subset)
         evaluator = SequenceLabelingEvaluator(
