@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import pytorch_lightning as pl
+from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import torch
 from numpy import typing as nptyping
 from torch.utils.data import DataLoader
@@ -24,12 +25,15 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         self,
         output_path: T_path,
         task_train_kwargs: Dict[str, Any],
+        early_stopping_kwargs: Dict[str, Any],
     ):
         super().__init__()
         self.output_path: Path = Path(output_path)
         self.task_train_kwargs = task_train_kwargs
+        self.early_stopping_kwargs = early_stopping_kwargs
         self.model: Optional[HuggingFaceLightningModule] = None
         self.trainer: Optional[pl.Trainer] = None
+        self.current_epoch: Optional[int] = None
 
     def fit(
         self,
@@ -37,9 +41,12 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
     ) -> None:
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
-        self.trainer = pl.Trainer(default_root_dir=str(self.output_path), **self.task_train_kwargs)
+        self.trainer = pl.Trainer(default_root_dir=str(self.output_path),
+                                  callbacks=[EarlyStopping(**self.early_stopping_kwargs)],
+                                  **self.task_train_kwargs)
         try:
             self.trainer.fit(self.model, data)
+            self.current_epoch = self.trainer.current_epoch
         except Exception as e:
             del self.trainer
             torch.cuda.empty_cache()  # type: ignore

@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar
+from typing import Generic, Optional, TypeVar
 
 from embeddings.data.datamodule import BaseDataModule, Data
 from embeddings.evaluator.evaluator import Evaluator
@@ -22,7 +22,9 @@ class LightningPipeline(
         self.datamodule = datamodule
         self.model = model
         self.evaluator = evaluator
+        self.n_completed_epochs: Optional[int] = None
 
     def run(self) -> EvaluationResult:
         model_result = self.model.execute(data=self.datamodule)
+        self.n_completed_epochs = self.model.task.current_epoch
         return self.evaluator.evaluate(model_result)
