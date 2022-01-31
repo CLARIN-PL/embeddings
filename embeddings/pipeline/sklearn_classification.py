@@ -1,4 +1,3 @@
-from pyexpat import model
 from typing import Dict, Optional, Any
 
 from numpy import typing as nptyping
