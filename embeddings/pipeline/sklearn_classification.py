@@ -1,8 +1,13 @@
+from pyexpat import model
 from typing import Dict, Optional, Any
 
 from numpy import typing as nptyping
 import pandas as pd
-from sklearn.base import ClassifierMixin as AnySklearnClassifier
+from sklearn.base import (
+    ClassifierMixin as AnySklearnClassifier,
+    BaseEstimator as AnySklearnVectorizer,
+)
+from sklearn.feature_extraction.text import CountVectorizer
 from typing_extensions import Literal
 import datasets
 
@@ -36,8 +41,9 @@ class SklearnClassificationPipeline(
         target_column_name: str,
         output_path: T_path,
         classifier: AnySklearnClassifier,
-        vectorizer: Optional[str] = "bow",
+        vectorizer: AnySklearnVectorizer = CountVectorizer,
         evaluation_filename: str = "evaluation.json",
+        predict_subset: Literal["dev", "validation", "test"] = "test",
         fit_classifier_kwargs: Optional[Dict[str, Any]] = None,
         embedding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
@@ -48,9 +54,9 @@ class SklearnClassificationPipeline(
         data_loader = HuggingFaceDataLoader()
         transformation = ToPandasHuggingFaceCorpusTransformation()
         fit_classifier_kwargs = fit_classifier_kwargs if fit_classifier_kwargs else {}
-        embedding = SklearnEmbedding(embedding_kwargs, method=vectorizer)
+        embedding = SklearnEmbedding(embedding_kwargs, vectorizer=vectorizer)
         task = TextClassification(classifier=classifier, train_model_kwargs=fit_classifier_kwargs)
-        model = SklearnModel(embedding, task)
+        model = SklearnModel(embedding, task, predict_subset=predict_subset)
         evaluator = TextClassificationEvaluator().persisting(
             JsonPersister(path=output_path.joinpath(evaluation_filename))
         )
@@ -68,4 +74,10 @@ class SklearnClassificationPipeline(
                 axis="columns",
                 inplace=True,
             )
-        return self.model.execute(data)
+
+        model_result = {
+            "y_pred": self.model.execute(data),
+            "y_true": data[self.model.predict_subset]["y"].values,
+        }
+        evaluation_result = self.evaluator.evaluate(model_result)
+        return evaluation_result
