@@ -14,7 +14,6 @@ class SklearnEmbedding(Embedding[Union[pd.Series, nptyping.NDArray[Any]], pd.Dat
         self.vectorizer = vectorizer(**self.embedding_kwargs)
 
     def fit(self, data: Union[pd.Series, nptyping.NDArray[Any]]) -> None:
-
         self.vectorizer.fit(data)
 
     def embed(self, data: Union[pd.Series, nptyping.NDArray[Any]]) -> pd.DataFrame:

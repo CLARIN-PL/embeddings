@@ -3,7 +3,6 @@ from typing import Any, Dict, Optional, Union
 from numpy import typing as nptyping
 import pandas as pd
 from sklearn.base import ClassifierMixin as AnySklearnClassifier
-from typing_extensions import Literal
 
 from embeddings.task.sklearn_task.sklearn_task import SklearnTask
 from embeddings.embedding.sklearn_embedding import SklearnEmbedding
