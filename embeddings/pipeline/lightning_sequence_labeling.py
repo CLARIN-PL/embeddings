@@ -39,7 +39,7 @@ class LightningSequenceLabelingPipeline(
         tagging_scheme: Optional[TaggingScheme] = None,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
-        finetune_last_n_layers: int = 0,
+        finetune_last_n_layers: int = -1,
         tokenizer_name_or_path: Optional[T_path] = None,
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
         datamodule_kwargs: Optional[Dict[str, Any]] = None,
