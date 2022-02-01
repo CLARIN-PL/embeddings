@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, Optional, Tuple
 
+from embeddings.data.io import T_path
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.evaluator.sequence_labeling_evaluator import (
     EvaluationMode,
@@ -42,7 +43,7 @@ class _OptimizedLightingPipelineBase(
     tmp_model_output_dir: TemporaryDirectory[str] = field(
         init=False, default_factory=TemporaryDirectory
     )
-    tokenizer_name: Optional[str] = None
+    tokenizer_name_or_path: Optional[T_path] = None
     tokenizer_kwargs: Optional[Dict[str, Any]] = None
     batch_encoding_kwargs: Optional[Dict[str, Any]] = None
 
@@ -168,7 +169,7 @@ class OptimizedLightingClassificationPipeline(
             "train_batch_size": train_batch_size,
             "eval_batch_size": eval_batch_size,
             "finetune_last_n_layers": finetune_last_n_layers,
-            "tokenizer_name": self.tokenizer_name,
+            "tokenizer_name_or_path": self.tokenizer_name_or_path,
             "datamodule_kwargs": datamodule_kwargs,
             "tokenizer_kwargs": self.tokenizer_kwargs,
             "batch_encoding_kwargs": self.batch_encoding_kwargs,
@@ -237,7 +238,7 @@ class OptimizedLightingSequenceLabelingPipeline(
             "train_batch_size": train_batch_size,
             "eval_batch_size": eval_batch_size,
             "finetune_last_n_layers": finetune_last_n_layers,
-            "tokenizer_name": self.tokenizer_name,
+            "tokenizer_name_or_path": self.tokenizer_name_or_path,
             "datamodule_kwargs": datamodule_kwargs,
             "tokenizer_kwargs": self.tokenizer_kwargs,
             "batch_encoding_kwargs": self.batch_encoding_kwargs,

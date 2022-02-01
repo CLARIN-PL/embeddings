@@ -33,7 +33,7 @@ class LightningClassificationPipeline(
         evaluation_filename: str = "evaluation.json",
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
-        finetune_last_n_layers: int = -1,
+        finetune_last_n_layers: int = 0,
         tokenizer_name_or_path: Optional[T_path] = None,
         datamodule_kwargs: Optional[Dict[str, Any]] = None,
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,

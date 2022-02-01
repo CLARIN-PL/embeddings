@@ -66,7 +66,7 @@ class LightingConfigSpace(BaseConfigSpace):
         high=1e-1,
     )
     finetune_last_n_layers: Parameter = SearchableParameter(
-        name="finetune_last_n_layers", type="categorical", choices=[-1, 0, 1, 3, 5, 7, 9]
+        name="finetune_last_n_layers", type="categorical", choices=[0]
     )
     classifier_dropout: Parameter = SearchableParameter(
         name="classifier_dropout", type="discrete_uniform", low=0.0, high=0.5, q=0.05

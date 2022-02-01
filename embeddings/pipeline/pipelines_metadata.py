@@ -70,7 +70,7 @@ class LightningPipelineMetadata(EmbeddingPipelineBaseMetadata):
     train_batch_size: int
     eval_batch_size: int
     finetune_last_n_layers: int
-    tokenizer_name: Optional[str]
+    tokenizer_name_or_path: Optional[T_path]
     load_dataset_kwargs: Optional[Dict[str, Any]]
     datamodule_kwargs: Optional[Dict[str, Any]]
     tokenizer_kwargs: Optional[Dict[str, Any]]
