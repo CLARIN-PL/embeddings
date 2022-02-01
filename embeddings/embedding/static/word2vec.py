@@ -1,10 +1,11 @@
+import pathlib
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
 from typing_extensions import Literal
 
-from embeddings.embedding.static.config import GensimFileConfig, StaticModelHubConfig
-from embeddings.embedding.static.embedding import SingleFileEmbedding, StandardStaticWordEmbedding
+from embeddings.embedding.static.config import GensimFileConfig, StaticModelHubConfig, StaticModelLocalFileConfig, GensimLocalFileConfig
+from embeddings.embedding.static.embedding import SingleFileEmbedding, StandardStaticWordEmbedding, LocalFileStaticEmbedding, StandardStaticWordEmbeddingPL
 
 
 @dataclass
@@ -58,3 +59,49 @@ class KGR10Word2VecEmbedding(SingleFileEmbedding, StandardStaticWordEmbedding):
     @staticmethod
     def get_config(**kwargs: Any) -> KGR10Word2VecConfig:
         return KGR10Word2VecConfig(**kwargs)
+
+
+@dataclass
+class IPIPANWord2VecConfig(GensimLocalFileConfig):
+    corpus: str = field(init=False)
+    type: str = field(init=False)
+    subtype: str = field(init=False)
+    dimension: int = field(init=False)
+    method:  str = field(init=False)
+    algorithm:  str = field(init=False)
+    model_name: str = field(init=False)
+    reduced_vocabulary: bool = False
+    model_type_reference: str = "embeddings.embedding.static.word2vec.IPIPANWord2VecEmbedding"
+
+    def __post_init__(self) -> None:
+        self.model_name = self.model_file_path.name.split(".")[0]
+
+        metadata = self.model_name.split("-")
+        assert len(metadata) in [
+            6,
+            7,
+            8,
+        ], 'Model filename is not consistent with IPIPAN rules.'
+
+        self.corpus = metadata[0]
+        self.type = metadata[1]
+        self.subtype = metadata[2]
+        self.dimension = int(metadata[3])
+        self.method = metadata[4]
+        self.algorithm = metadata[5]
+        if len(metadata) > 6:
+            self.reduced_vocabulary = True
+
+
+class IPIPANWord2VecEmbedding(LocalFileStaticEmbedding, StandardStaticWordEmbeddingPL):
+    @staticmethod
+    def from_file(file_path: pathlib.Path, **kwargs: Any) -> "IPIPANWord2VecEmbedding":
+        return IPIPANWord2VecEmbedding(str(file_path))
+
+    @staticmethod
+    def get_config(**kwargs: Any) -> IPIPANWord2VecConfig:
+        return IPIPANWord2VecConfig(**kwargs)
+
+    @staticmethod
+    def create_config(file_path: pathlib.Path, **kwargs: Any) -> IPIPANWord2VecConfig:
+        return IPIPANWord2VecConfig(file_path)

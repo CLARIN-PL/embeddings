@@ -1,3 +1,4 @@
+import pathlib
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Type, Union
 
@@ -22,6 +23,9 @@ from embeddings.transformation.flair_transformation.split_sample_corpus_transfor
 )
 from embeddings.transformation.transformation import Transformation
 from embeddings.utils.json_dict_persister import JsonPersister
+from embeddings.utils.loggers import get_logger
+
+_logger = get_logger(__name__)
 
 
 class FlairClassificationPipeline(
@@ -31,13 +35,14 @@ class FlairClassificationPipeline(
 ):
     def __init__(
         self,
-        embedding_name: str,
+        embedding_name: Union[str, pathlib.Path, pathlib.PosixPath],
         dataset_name: str,
         input_column_name: str,
         target_column_name: str,
         output_path: T_path,
         evaluation_filename: str = "evaluation.json",
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
+        model_type_reference: str = None,
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
@@ -59,11 +64,23 @@ class FlairClassificationPipeline(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
 
-        embedding = AutoFlairDocumentPoolEmbedding.from_hub(
-            repo_id=embedding_name,
-            document_embedding_cls=document_embedding_cls,
-            **load_model_kwargs if load_model_kwargs else {}
-        )
+        if isinstance(embedding_name, pathlib.Path):
+            if not model_type_reference:
+                _logger.error("For embedding loaded directly from file model_type_reference must be provided!")
+
+            embedding = AutoFlairDocumentPoolEmbedding.from_file(
+                file_path=embedding_name,
+                model_type_reference=model_type_reference,
+                document_embedding_cls=document_embedding_cls,
+                **load_model_kwargs if load_model_kwargs else {}
+            )
+        else:
+            embedding = AutoFlairDocumentPoolEmbedding.from_hub(
+                repo_id=embedding_name,
+                document_embedding_cls=document_embedding_cls,
+                **load_model_kwargs if load_model_kwargs else {}
+            )
+
         task = TextClassification(
             output_path, task_model_kwargs=task_model_kwargs, task_train_kwargs=task_train_kwargs
         )

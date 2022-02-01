@@ -10,7 +10,6 @@ from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.data.io import T_path
 from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
-from embeddings.embedding.static.embedding import StandardStaticWordEmbeddingPL
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -23,6 +22,9 @@ from embeddings.transformation.flair_transformation.split_sample_corpus_transfor
 )
 from embeddings.transformation.transformation import Transformation
 from embeddings.utils.json_dict_persister import JsonPersister
+from embeddings.utils.loggers import get_logger
+
+_logger = get_logger(__name__)
 
 
 class FlairSequenceLabelingPipeline(
@@ -40,6 +42,7 @@ class FlairSequenceLabelingPipeline(
         hidden_size: int,
         evaluation_filename: str = "evaluation.json",
         evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = SequenceLabelingEvaluator.EvaluationMode.CONLL,
+        model_type_reference: str = None,
         tagging_scheme: Optional[SequenceLabelingEvaluator.TaggingScheme] = None,
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
@@ -62,7 +65,10 @@ class FlairSequenceLabelingPipeline(
             )
 
         if isinstance(embedding_name, pathlib.Path):
-            embedding = StandardStaticWordEmbeddingPL(str(embedding_name))
+            if not model_type_reference:
+                _logger.error("For embedding loaded directly from file model_type_reference must be provided!")
+
+            embedding = AutoFlairWordEmbedding.from_file(embedding_name, model_type_reference)
         else:
             embedding = AutoFlairWordEmbedding.from_hub(embedding_name)
 
