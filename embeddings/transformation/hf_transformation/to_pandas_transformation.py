@@ -6,8 +6,9 @@ import pandas as pd
 from embeddings.transformation.transformation import Transformation
 
 
-class ToPandasHuggingFaceCorpusTransformation(Transformation[datasets.DatasetDict, Dict[str, pd.DataFrame]]):
-
+class ToPandasHuggingFaceCorpusTransformation(
+    Transformation[datasets.DatasetDict, Dict[str, pd.DataFrame]]
+):
     def transform(self, data: datasets.DatasetDict) -> Dict[str, pd.DataFrame]:
         out = {}
         for subset in data.keys():
