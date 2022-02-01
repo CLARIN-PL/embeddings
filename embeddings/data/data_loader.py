@@ -24,7 +24,7 @@ class DataLoader(ABC, Generic[Input, Output]):
 class HuggingFaceDataLoader(DataLoader[str, datasets.DatasetDict]):
     def load(self, dataset: Dataset[str]) -> datasets.DatasetDict:
         if isinstance(dataset, HuggingFaceDataset):
-            result = datasets.load_dataset(str(dataset.dataset), **dataset.load_dataset_kwargs)
+            result = datasets.load_dataset(dataset.dataset, **dataset.load_dataset_kwargs)
             assert isinstance(result, datasets.DatasetDict)
             return result
         else:

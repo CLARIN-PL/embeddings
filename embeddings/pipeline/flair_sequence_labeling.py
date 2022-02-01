@@ -31,7 +31,7 @@ class FlairSequenceLabelingPipeline(
     def __init__(
         self,
         model_name: str,
-        dataset_name_or_path: str,
+        dataset_name: str,
         input_column_name: str,
         target_column_name: str,
         output_path: T_path,
@@ -47,7 +47,7 @@ class FlairSequenceLabelingPipeline(
     ):
         output_path = Path(output_path)
         dataset = HuggingFaceDataset(
-            dataset_name_or_path, **load_dataset_kwargs if load_dataset_kwargs else {}
+            dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
         data_loader = HuggingFaceDataLoader()
         transformation: Union[

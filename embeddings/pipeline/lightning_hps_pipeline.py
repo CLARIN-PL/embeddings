@@ -4,8 +4,8 @@ from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, Optional, Tuple
 
-from embeddings.data.io import T_path
 from embeddings.data.dataset import LightingDataModuleSubset
+from embeddings.data.io import T_path
 from embeddings.evaluator.sequence_labeling_evaluator import (
     EvaluationMode,
     SequenceLabelingEvaluator,

@@ -85,7 +85,7 @@ def sequence_labeling_evaluation_pipeline(
 
 def test_no_dev_pipeline(
     result_path: "TemporaryDirectory[str]",
-    embedding_name: str,
+    model_name: str,
     ner_dataset_name: str,
     sequence_labeling_preprocessing_pipeline: StandardPipeline[
         str, datasets.DatasetDict, Corpus, Dict[str, np.ndarray], Dict[str, Any]

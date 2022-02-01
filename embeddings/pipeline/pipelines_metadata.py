@@ -64,7 +64,7 @@ class FlairClassificationEvaluationPipelineMetadata(FlairEvaluationPipelineMetad
 
 class LightningPipelineMetadata(EmbeddingPipelineBaseMetadata):
     model_name_or_path: T_path
-    dataset_name_or_path: str
+    dataset_name_or_path: T_path
     input_column_name: str
     target_column_name: str
     train_batch_size: int
