@@ -32,7 +32,7 @@ class FlairSequenceLabelingPipeline(
 ):
     def __init__(
         self,
-        embedding_name: Union[str, pathlib.Path, pathlib.PosixPath],
+        embedding_name: Union[str, pathlib.Path],
         dataset_name: str,
         input_column_name: str,
         target_column_name: str,
@@ -61,7 +61,7 @@ class FlairSequenceLabelingPipeline(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
 
-        if isinstance(embedding_name, (pathlib.Path, pathlib.PosixPath)):
+        if isinstance(embedding_name, pathlib.Path):
             embedding = StandardStaticWordEmbeddingPL(str(embedding_name))
         else:
             embedding = AutoFlairWordEmbedding.from_hub(embedding_name)
