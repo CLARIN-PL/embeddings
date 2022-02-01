@@ -31,7 +31,7 @@ def sklearn_classification_pipeline(
     dataset_kwargs: Dict[str, any],
     embedding_kwargs: Dict[str, Any],
     result_path: "TemporaryDirectory[str]",
-) -> Tuple[SklearnClassificationPipeline, TemporaryDirectory[str]]:
+) -> Tuple[SklearnClassificationPipeline, "TemporaryDirectory[str]"]:
     return (
         SklearnClassificationPipeline(
             **dataset_kwargs,
