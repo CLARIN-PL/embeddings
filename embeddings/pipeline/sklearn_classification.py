@@ -1,6 +1,5 @@
 from typing import Dict, Optional, Any
 
-from numpy import typing as nptyping
 import pandas as pd
 from sklearn.base import (
     ClassifierMixin as AnySklearnClassifier,
@@ -29,7 +28,7 @@ class SklearnClassificationPipeline(
         str,
         datasets.DatasetDict,
         Dict[str, pd.DataFrame],
-        Dict[str, nptyping.NDArray[Any]],
+        Dict[str, pd.DataFrame],
         Dict[str, Any],
     ]
 ):
