@@ -15,7 +15,9 @@ logging.getLogger("flair").setLevel(logging.INFO)
 
 
 class WordEmbeddingsPL(WordEmbeddings):
-    """Standard static word embeddings, such as GloVe or FastText for polish language."""
+    """Standard static word embeddings, such as GloVe or FastText. This class is borrowed from
+     flairNLP library and fixes error with loading embeddings for polish language.
+    """
 
     def __init__(
         self,
