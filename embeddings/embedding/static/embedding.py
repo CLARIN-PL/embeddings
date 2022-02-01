@@ -38,6 +38,9 @@ class StandardStaticWordEmbedding(FlairEmbedding):
 
 
 class StandardStaticWordEmbeddingPL(FlairEmbedding):
+    """For polish language models we need separate class that overrides _get_model method and
+    return object of class WordEmbeddingsPL.
+    """
     def _get_model(self) -> WordEmbeddingsPL:
         return WordEmbeddingsPL(self.name, **self.load_model_kwargs)
 
