@@ -5,6 +5,7 @@ import optuna
 import pytest
 from pydantic import create_model_from_typeddict
 
+from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.hyperparameter_search.parameters import SearchableParameter
 from embeddings.pipeline.flair_classification import FlairClassificationPipeline
 from embeddings.pipeline.flair_pair_classification import FlairPairClassificationPipeline
@@ -97,7 +98,7 @@ def lightning_classification_kwargs(output_path: "TemporaryDirectory[str]") -> D
         "datamodule_kwargs": None,
         "tokenizer_kwargs": None,
         "batch_encoding_kwargs": None,
-        "predict_subset": "test",
+        "predict_subset": LightingDataModuleSubset.TEST,
     }
 
 

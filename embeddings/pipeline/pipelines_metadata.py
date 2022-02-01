@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional, Tuple, TypeVar
 
 from typing_extensions import Literal, TypedDict
 
+from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 
@@ -73,7 +74,7 @@ class LightningPipelineMetadata(EmbeddingPipelineBaseMetadata):
     tokenizer_kwargs: Optional[Dict[str, Any]]
     batch_encoding_kwargs: Optional[Dict[str, Any]]
     model_config_kwargs: Optional[Dict[str, Any]]
-    predict_subset: Literal["dev", "test"]
+    predict_subset: Literal[LightingDataModuleSubset.VALIDATION, LightingDataModuleSubset.TEST]
 
 
 class LightningClassificationPipelineMetadata(LightningPipelineMetadata):
