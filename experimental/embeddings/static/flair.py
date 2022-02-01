@@ -16,7 +16,10 @@ logging.getLogger("flair").setLevel(logging.INFO)
 
 class WordEmbeddingsPL(WordEmbeddings):
     """Standard static word embeddings, such as GloVe or FastText. This class is borrowed from
-     flairNLP library and fixes error with loading embeddings for polish language.
+    flairNLP library and fixes error with loading embeddings for polish language.
+
+    WordEmbeddings class source code:
+    https://github.com/flairNLP/flair/blob/cbe683c51f1664bee8ca72eae317df29902af54e/flair/embeddings/token.py#L106
     """
 
     def __init__(
