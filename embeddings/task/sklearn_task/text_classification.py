@@ -12,11 +12,11 @@ class TextClassification(SklearnTask):
     def __init__(
         self,
         classifier: AnySklearnClassifier,
-        train_model_kwargs: Optional[Dict[str, Any]] = None,
+        classifier_kwargs: Optional[Dict[str, Any]] = None,
     ):
         super().__init__()
-        self.train_model_kwargs = train_model_kwargs if train_model_kwargs else {}
-        self.classifier = classifier(**self.train_model_kwargs)
+        self.classifier_kwargs = classifier_kwargs if classifier_kwargs else {}
+        self.classifier = classifier(**self.classifier_kwargs)
 
     def build_task_model(self, embedding: SklearnEmbedding) -> None:
         self.embedding = embedding

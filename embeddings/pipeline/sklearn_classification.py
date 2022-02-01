@@ -43,7 +43,7 @@ class SklearnClassificationPipeline(
         vectorizer: AnySklearnVectorizer = CountVectorizer,
         evaluation_filename: str = "evaluation.json",
         predict_subset: Literal["dev", "validation", "test"] = "test",
-        fit_classifier_kwargs: Optional[Dict[str, Any]] = None,
+        classifier_kwargs: Optional[Dict[str, Any]] = None,
         embedding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
@@ -52,9 +52,9 @@ class SklearnClassificationPipeline(
         )
         data_loader = HuggingFaceDataLoader()
         transformation = ToPandasHuggingFaceCorpusTransformation()
-        fit_classifier_kwargs = fit_classifier_kwargs if fit_classifier_kwargs else {}
+        classifier_kwargs = classifier_kwargs if classifier_kwargs else {}
         embedding = SklearnEmbedding(embedding_kwargs, vectorizer=vectorizer)
-        task = TextClassification(classifier=classifier, train_model_kwargs=fit_classifier_kwargs)
+        task = TextClassification(classifier=classifier, classifier_kwargs=classifier_kwargs)
         model = SklearnModel(embedding, task, predict_subset=predict_subset)
         evaluator = TextClassificationEvaluator().persisting(
             JsonPersister(path=output_path.joinpath(evaluation_filename))
