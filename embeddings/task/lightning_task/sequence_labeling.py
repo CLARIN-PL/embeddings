@@ -17,7 +17,6 @@ class SequenceLabelingTask(LightningTask):
         model_config_kwargs: Dict[str, Any],
         task_model_kwargs: Dict[str, Any],
         task_train_kwargs: Dict[str, Any],
-        early_stopping_kwargs: Dict[str, Any],
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
         finetune_last_n_layers: int = -1,
@@ -26,7 +25,6 @@ class SequenceLabelingTask(LightningTask):
         self.model_name_or_path = model_name_or_path
         self.model_config_kwargs = model_config_kwargs
         self.task_model_kwargs = task_model_kwargs
-        self.early_stopping_kwargs = early_stopping_kwargs
         self.train_batch_size = train_batch_size
         self.eval_batch_size = eval_batch_size
         self.finetune_last_n_layers = finetune_last_n_layers
