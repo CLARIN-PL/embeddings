@@ -34,7 +34,7 @@ def result_path() -> "TemporaryDirectory[str]":
 
 
 @pytest.fixture(scope="module")
-def embedding_name() -> str:
+def model_name() -> str:
     return "allegro/herbert-base-cased"
 
 
@@ -56,7 +56,6 @@ def task_train_kwargs() -> Dict[str, int]:
 @pytest.fixture(scope="module")
 def sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
-    embedding_name: str,
     ner_dataset_name: str,
 ) -> Tuple[PreprocessingPipeline[str, datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"]:
     dataset = HuggingFaceDataset(ner_dataset_name)
@@ -76,7 +75,7 @@ def sequence_labeling_preprocessing_pipeline(
 @pytest.fixture(scope="module")
 def sequence_labeling_evaluation_pipeline(
     result_path: "TemporaryDirectory[str]",
-    embedding_name: str,
+    model_name: str,
     ner_dataset_name: str,
     hidden_size: int,
     task_train_kwargs: Dict[str, int],
@@ -87,7 +86,7 @@ def sequence_labeling_evaluation_pipeline(
 
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,
-        embedding_name=embedding_name,
+        model_name=model_name,
         output_path=result_path.name,
         hidden_size=hidden_size,
         persist_path=None,
@@ -98,7 +97,6 @@ def sequence_labeling_evaluation_pipeline(
 
 def test_sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
-    embedding_name: str,
     ner_dataset_name: str,
     hidden_size: int,
     task_train_kwargs: Dict[str, int],

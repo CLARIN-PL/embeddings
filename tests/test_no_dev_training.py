@@ -31,7 +31,7 @@ def result_path() -> "TemporaryDirectory[str]":
 
 
 @pytest.fixture(scope="module")
-def embedding_name() -> str:
+def model_name() -> str:
     return "allegro/herbert-base-cased"
 
 
@@ -48,7 +48,7 @@ def default_hidden_size() -> int:
 @pytest.fixture(scope="module")
 def sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
-    embedding_name: str,
+    model_name: str,
     ner_dataset_name: str,
 ) -> PreprocessingPipeline[str, datasets.DatasetDict, Corpus]:
     dataset = HuggingFaceDataset(ner_dataset_name)
@@ -67,14 +67,14 @@ def sequence_labeling_preprocessing_pipeline(
 @pytest.fixture(scope="module")
 def sequence_labeling_evaluation_pipeline(
     result_path: "TemporaryDirectory[str]",
-    embedding_name: str,
+    model_name: str,
     ner_dataset_name: str,
     default_hidden_size: int,
 ) -> ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]]:
 
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,
-        embedding_name=embedding_name,
+        model_name=model_name,
         output_path=result_path.name,
         hidden_size=default_hidden_size,
         persist_path=None,

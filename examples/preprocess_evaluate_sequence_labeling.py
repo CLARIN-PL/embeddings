@@ -12,7 +12,7 @@ app = typer.Typer()
 
 
 def run(
-    embedding_name: str = typer.Option(
+    model_name_or_path: str = typer.Option(
         "allegro/herbert-base-cased", help="Hugging Face embedding model name or path."
     ),
     dataset_name: str = typer.Option(
@@ -33,7 +33,7 @@ def run(
     ),
 ) -> None:
     typer.echo(pprint.pformat(locals()))
-    dataset_path = build_output_path(DATASET_PATH, embedding_name, dataset_name)
+    dataset_path = build_output_path(DATASET_PATH, model_name_or_path, dataset_name)
     dataset_path.mkdir(parents=True, exist_ok=True)
 
     preprocessing_pipeline = FlairSequenceLabelingPreprocessingPipeline(
@@ -46,14 +46,14 @@ def run(
     )
     dataset = preprocessing_pipeline.run()
 
-    output_path = build_output_path(RESULTS_PATH, embedding_name, dataset_name)
+    output_path = build_output_path(RESULTS_PATH, model_name_or_path, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
-    persist_out_path = output_path.joinpath(f"{embedding_name}.json")
+    persist_out_path = output_path.joinpath(f"{model_name_or_path}.json")
     persist_out_path.parent.mkdir(parents=True, exist_ok=True)
 
     evaluation_pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=str(dataset_path),
-        embedding_name=embedding_name,
+        embedding_name=model_name_or_path,
         output_path=str(output_path),
         hidden_size=hidden_size,
         persist_path=str(persist_out_path),

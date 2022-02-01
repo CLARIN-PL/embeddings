@@ -92,8 +92,8 @@ class OptimizedLightingPipeline(
         Dict[str, ParameterValues],
         Dict[str, ParameterValues],
     ]:
-        embedding_name = parameters["embedding_name"]
-        assert isinstance(embedding_name, str)
+        model_name_or_path = parameters["model_name_or_path"]
+        assert isinstance(model_name_or_path, str)
         train_batch_size = parameters["train_batch_size"]
         assert isinstance(train_batch_size, int)
         eval_batch_size = parameters["eval_batch_size"]
@@ -110,7 +110,7 @@ class OptimizedLightingPipeline(
         assert isinstance(model_config_kwargs, dict)
 
         return (
-            embedding_name,
+            model_name_or_path,
             train_batch_size,
             eval_batch_size,
             finetune_last_n_layers,
@@ -136,8 +136,8 @@ class OptimizedLightingClassificationPipeline(
                 sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,
-            ),
-            evaluation_pipeline=LightningClassificationPipeline,  # type: ignore
+            ),  # type: ignore
+            evaluation_pipeline=LightningClassificationPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
@@ -151,7 +151,7 @@ class OptimizedLightingClassificationPipeline(
         self, parameters: SampledParameters
     ) -> LightningClassificationPipelineMetadata:
         (
-            embedding_name,
+            model_name_or_path,
             train_batch_size,
             eval_batch_size,
             finetune_last_n_layers,
@@ -161,7 +161,7 @@ class OptimizedLightingClassificationPipeline(
             model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: LightningClassificationPipelineMetadata = {
-            "embedding_name": embedding_name,
+            "model_name_or_path": model_name_or_path,
             "dataset_name_or_path": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
@@ -203,8 +203,8 @@ class OptimizedLightingSequenceLabelingPipeline(
                 sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,
-            ),
-            evaluation_pipeline=LightningSequenceLabelingPipeline,  # type: ignore
+            ),  # type: ignore
+            evaluation_pipeline=LightningSequenceLabelingPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
@@ -218,7 +218,7 @@ class OptimizedLightingSequenceLabelingPipeline(
         self, parameters: SampledParameters
     ) -> LightningSequenceLabelingPipelineMetadata:
         (
-            embedding_name,
+            model_name_or_path,
             train_batch_size,
             eval_batch_size,
             finetune_last_n_layers,
@@ -228,7 +228,7 @@ class OptimizedLightingSequenceLabelingPipeline(
             model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: LightningSequenceLabelingPipelineMetadata = {
-            "embedding_name": embedding_name,
+            "model_name_or_path": model_name_or_path,
             "dataset_name_or_path": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,

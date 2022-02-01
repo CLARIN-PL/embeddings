@@ -12,7 +12,7 @@ from embeddings.task.lightning_task.lightning_task import LightningTask
 class SequenceLabelingTask(LightningTask):
     def __init__(
         self,
-        embedding_name: str,
+        model_name_or_path: T_path,
         output_path: T_path,
         model_config_kwargs: Dict[str, Any],
         task_model_kwargs: Dict[str, Any],
@@ -22,8 +22,8 @@ class SequenceLabelingTask(LightningTask):
         eval_batch_size: int = 32,
         finetune_last_n_layers: int = -1,
     ) -> None:
-        super().__init__(output_path, task_train_kwargs, early_stopping_kwargs)
-        self.embedding_name = embedding_name
+        super().__init__(output_path, task_train_kwargs)
+        self.model_name_or_path = model_name_or_path
         self.model_config_kwargs = model_config_kwargs
         self.task_model_kwargs = task_model_kwargs
         self.early_stopping_kwargs = early_stopping_kwargs
@@ -33,9 +33,7 @@ class SequenceLabelingTask(LightningTask):
 
     def build_task_model(self) -> None:
         self.model = SequenceLabelingModule(
-            model_name_or_path=self.embedding_name,
-            train_batch_size=self.train_batch_size,
-            eval_batch_size=self.eval_batch_size,
+            model_name_or_path=self.model_name_or_path,
             finetune_last_n_layers=self.finetune_last_n_layers,
             config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,

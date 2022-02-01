@@ -1,6 +1,7 @@
 from dataclasses import InitVar, dataclass, field
 from typing import Dict, Final, List, Union
 
+from embeddings.data.io import T_path
 from embeddings.hyperparameter_search.configspace import (
     BaseConfigSpace,
     Parameter,
@@ -15,11 +16,11 @@ from embeddings.hyperparameter_search.parameters import (
 
 @dataclass
 class LightingConfigSpace(BaseConfigSpace):
-    embedding_name: InitVar[Union[str, List[str]]]
+    model_name_or_path: InitVar[Union[T_path, List[T_path]]]
     devices: InitVar[Union[int, str, None, List[int]]] = field(default="auto")
     accelerator: InitVar[Union[str, None]] = field(default="auto")
 
-    param_embedding_name: Parameter = field(init=False)
+    param_model_name_or_path: Parameter = field(init=False)
     trainer_devices: Parameter = field(init=False)
     trainer_accelerator: Parameter = field(init=False)
 
@@ -73,20 +74,20 @@ class LightingConfigSpace(BaseConfigSpace):
 
     def __post_init__(
         self,
-        embedding_name: Union[str, List[str]],
+        model_name_or_path: Union[str, List[str]],
         devices: Union[int, str, None, List[int]],
         accelerator: Union[str, None],
     ) -> None:
-        if isinstance(embedding_name, str):
-            self.param_embedding_name: Parameter = ConstantParameter(
-                name="embedding_name",
-                value=embedding_name,
+        if isinstance(model_name_or_path, str):
+            self.param_model_name_or_path: Parameter = ConstantParameter(
+                name="model_name_or_path",
+                value=model_name_or_path,
             )
         else:
-            self.param_embedding_name: Parameter = SearchableParameter(
-                name="embedding_name",
+            self.param_model_name_or_path: Parameter = SearchableParameter(
+                name="model_name_or_path",
                 type="categorical",
-                choices=embedding_name,
+                choices=model_name_or_path,
             )
 
         self.trainer_devices = ConstantParameter(name="devices", value=devices)
@@ -94,7 +95,7 @@ class LightingConfigSpace(BaseConfigSpace):
 
     @classmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
-        pipeline_keys: Final = {"batch_size", "finetune_last_n_layers", "embedding_name"}
+        pipeline_keys: Final = {"batch_size", "finetune_last_n_layers", "model_name_or_path"}
         datamodule_keys: Final = {"max_seq_length"}
         task_model_keys: Final = {
             "learning_rate",

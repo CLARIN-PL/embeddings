@@ -60,7 +60,7 @@ def flair_sequence_labeling_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
 def flair_pipeline_kwargs(output_path: "TemporaryDirectory[str]") -> Dict[str, PrimitiveTypes]:
     return {
         "output_path": output_path.name,
-        "embedding_name": "clarin-pl/roberta-polish-kgr10",
+        "model_name": "clarin-pl/roberta-polish-kgr10",
         "document_embedding_cls": "FlairDocumentPoolEmbedding",
         "load_model_kwargs": None,
         "task_model_kwargs": None,
@@ -87,7 +87,7 @@ def lightning_text_classification_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
 def lightning_classification_kwargs(output_path: "TemporaryDirectory[str]") -> Dict[str, Any]:
     return {
         "output_path": output_path.name,
-        "embedding_name": "clarin-pl/roberta-polish-kgr10",
+        "model_name_or_path": "clarin-pl/roberta-polish-kgr10",
         "task_model_kwargs": None,
         "task_train_kwargs": None,
         "model_config_kwargs": None,

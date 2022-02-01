@@ -10,7 +10,7 @@ app = typer.Typer()
 
 
 def run(
-    embedding_name: str = typer.Option(
+    model_name_or_path: str = typer.Option(
         "clarin-pl/word2vec-kgr10", help="Hugging Face embedding model name or path."
     ),
     dataset_name: str = typer.Option(
@@ -26,11 +26,11 @@ def run(
 ) -> None:
     typer.echo(pprint.pformat(locals()))
 
-    output_path = build_output_path(root, embedding_name, dataset_name)
+    output_path = build_output_path(root, model_name_or_path, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
     pipeline = FlairClassificationPipeline(
-        embedding_name, dataset_name, input_column_name, target_column_name, output_path
+        model_name_or_path, dataset_name, input_column_name, target_column_name, output_path
     )
     result = pipeline.run()
     typer.echo(format_eval_result(result))

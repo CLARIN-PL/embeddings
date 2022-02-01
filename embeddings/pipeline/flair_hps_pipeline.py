@@ -75,15 +75,15 @@ class _OptimizedFlairClassificationPipelineDefaultsBase(
     def _pop_sampled_parameters(
         parameters: SampledParameters,
     ) -> Tuple[str, str, Dict[str, ParameterValues], Dict[str, ParameterValues]]:
-        embedding_name = parameters["embedding_name"]
-        assert isinstance(embedding_name, str)
+        model_name = parameters["model_name"]
+        assert isinstance(model_name, str)
         document_embedding = parameters["document_embedding"]
         assert isinstance(document_embedding, str)
         task_train_kwargs = parameters["task_train_kwargs"]
         assert isinstance(task_train_kwargs, dict)
         load_model_kwargs = parameters["load_model_kwargs"]
         assert isinstance(load_model_kwargs, dict)
-        return embedding_name, document_embedding, task_train_kwargs, load_model_kwargs
+        return model_name, document_embedding, task_train_kwargs, load_model_kwargs
 
 
 @dataclass
@@ -99,6 +99,7 @@ class OptimizedFlairClassificationPipeline(
 ):
     def __post_init__(self) -> None:
         self.dataset_path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
+        # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
         super().__init__(
             preprocessing_pipeline=FlairTextClassificationPreprocessingPipeline(
                 dataset_name=self.dataset_name,
@@ -108,7 +109,7 @@ class OptimizedFlairClassificationPipeline(
                 sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,
-            ),
+            ),  # type: ignore
             evaluation_pipeline=FlairTextClassificationEvaluationPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
@@ -121,13 +122,13 @@ class OptimizedFlairClassificationPipeline(
 
     def _get_metadata(self, parameters: SampledParameters) -> FlairClassificationPipelineMetadata:
         (
-            embedding_name,
+            model_name,
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: FlairClassificationPipelineMetadata = {
-            "embedding_name": embedding_name,
+            "model_name": model_name,
             "document_embedding_cls": document_embedding_cls,
             "dataset_name": self.dataset_name,
             "load_dataset_kwargs": self.load_dataset_kwargs,
@@ -143,13 +144,13 @@ class OptimizedFlairClassificationPipeline(
         self, parameters: SampledParameters
     ) -> FlairClassificationEvaluationPipelineMetadata:
         (
-            embedding_name,
+            model_name,
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: FlairClassificationEvaluationPipelineMetadata = {
-            "embedding_name": embedding_name,
+            "model_name": model_name,
             "document_embedding_cls": document_embedding_cls,
             "dataset_path": str(self.dataset_path),
             "persist_path": None,
@@ -180,6 +181,7 @@ class OptimizedFlairPairClassificationPipeline(
 ):
     def __post_init__(self) -> None:
         self.dataset_path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
+        # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
         super().__init__(
             preprocessing_pipeline=FlairTextPairClassificationPreprocessingPipeline(
                 dataset_name=self.dataset_name,
@@ -189,7 +191,7 @@ class OptimizedFlairPairClassificationPipeline(
                 sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,
-            ),
+            ),  # type: ignore
             evaluation_pipeline=FlairTextPairClassificationEvaluationPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
@@ -204,13 +206,13 @@ class OptimizedFlairPairClassificationPipeline(
         self, parameters: SampledParameters
     ) -> FlairPairClassificationPipelineMetadata:
         (
-            embedding_name,
+            model_name,
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: FlairPairClassificationPipelineMetadata = {
-            "embedding_name": embedding_name,
+            "model_name": model_name,
             "document_embedding_cls": document_embedding_cls,
             "dataset_name": self.dataset_name,
             "load_dataset_kwargs": self.load_dataset_kwargs,
@@ -226,13 +228,13 @@ class OptimizedFlairPairClassificationPipeline(
         self, parameters: SampledParameters
     ) -> FlairClassificationEvaluationPipelineMetadata:
         (
-            embedding_name,
+            model_name,
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: FlairClassificationEvaluationPipelineMetadata = {
-            "embedding_name": embedding_name,
+            "model_name": model_name,
             "dataset_path": str(self.dataset_path),
             "document_embedding_cls": document_embedding_cls,
             "task_model_kwargs": None,
@@ -279,6 +281,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         self.metric_name = SequenceLabelingEvaluator.get_metric_name(
             evaluation_mode=self.evaluation_mode, tagging_scheme=self.tagging_scheme
         )
+        # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
         super().__init__(
             preprocessing_pipeline=FlairSequenceLabelingPreprocessingPipeline(
                 dataset_name=self.dataset_name,
@@ -288,7 +291,7 @@ class OptimizedFlairSequenceLabelingPipeline(
                 sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,
-            ),
+            ),  # type: ignore
             config_space=self.config_space,
             evaluation_pipeline=FlairSequenceLabelingEvaluationPipeline,
             metric_name=self.metric_name,
@@ -303,25 +306,25 @@ class OptimizedFlairSequenceLabelingPipeline(
         self,
         parameters: SampledParameters,
     ) -> Tuple[str, int, Dict[str, ParameterValues], Dict[str, ParameterValues]]:
-        embedding_name = parameters["embedding_name"]
-        assert isinstance(embedding_name, str)
+        model_name = parameters["model_name"]
+        assert isinstance(model_name, str)
         hidden_size = parameters["hidden_size"]
         assert isinstance(hidden_size, int)
         task_train_kwargs = parameters["task_train_kwargs"]
         assert isinstance(task_train_kwargs, dict)
         task_model_kwargs = parameters["task_model_kwargs"]
         assert isinstance(task_model_kwargs, dict)
-        return embedding_name, hidden_size, task_train_kwargs, task_model_kwargs
+        return model_name, hidden_size, task_train_kwargs, task_model_kwargs
 
     def _get_metadata(self, parameters: SampledParameters) -> FlairSequenceLabelingPipelineMetadata:
         (
-            embedding_name,
+            model_name,
             hidden_size,
             task_train_kwargs,
             task_model_kwargs,
         ) = self._pop_sampled_parameters(parameters)
         metadata: FlairSequenceLabelingPipelineMetadata = {
-            "embedding_name": embedding_name,
+            "model_name": model_name,
             "hidden_size": hidden_size,
             "dataset_name": self.dataset_name,
             "load_dataset_kwargs": self.load_dataset_kwargs,
@@ -338,14 +341,14 @@ class OptimizedFlairSequenceLabelingPipeline(
         self, parameters: SampledParameters
     ) -> FlairSequenceLabelingEvaluationPipelineMetadata:
         (
-            embedding_name,
+            model_name,
             hidden_size,
             task_train_kwargs,
             task_model_kwargs,
         ) = self._pop_sampled_parameters(parameters)
 
         metadata: FlairSequenceLabelingEvaluationPipelineMetadata = {
-            "embedding_name": embedding_name,
+            "model_name": model_name,
             "hidden_size": hidden_size,
             "dataset_path": self.dataset_path.name,
             "persist_path": None,
