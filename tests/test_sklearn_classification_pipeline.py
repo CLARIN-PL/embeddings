@@ -4,9 +4,9 @@ from typing import Any, Dict, Tuple
 
 import datasets
 import numpy as np
-from numpy import typing as nptyping
 import pandas as pd
 import pytest
+from numpy import typing as nptyping
 from sklearn.ensemble import AdaBoostClassifier
 
 from embeddings.pipeline.sklearn_classification import SklearnClassificationPipeline
