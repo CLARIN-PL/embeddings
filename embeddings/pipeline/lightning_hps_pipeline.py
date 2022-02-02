@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, Optional, Tuple
 
+from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.evaluator.sequence_labeling_evaluator import (
     EvaluationMode,
     SequenceLabelingEvaluator,
@@ -68,7 +69,7 @@ class OptimizedLightingPipeline(
 
     def _get_evaluation_metadata(self, parameters: SampledParameters) -> LightningMetadata:
         metadata = self._get_metadata(parameters)
-        metadata["predict_subset"] = "dev"
+        metadata["predict_subset"] = LightingDataModuleSubset.VALIDATION
         metadata["dataset_name_or_path"] = self.tmp_dataset_dir.name
         metadata["output_path"] = self.tmp_model_output_dir.name
         return metadata
@@ -175,7 +176,7 @@ class OptimizedLightingClassificationPipeline(
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
             "model_config_kwargs": model_config_kwargs,
-            "predict_subset": "test",
+            "predict_subset": LightingDataModuleSubset.TEST,
         }
         return metadata
 
@@ -244,6 +245,6 @@ class OptimizedLightingSequenceLabelingPipeline(
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
             "model_config_kwargs": model_config_kwargs,
-            "predict_subset": "test",
+            "predict_subset": LightingDataModuleSubset.TEST,
         }
         return metadata
