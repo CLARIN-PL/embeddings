@@ -5,8 +5,8 @@ from flair.embeddings import WordEmbeddings
 
 from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding, FlairEmbedding
 from embeddings.embedding.static.config import SingleFileConfig, StaticModelHubConfig
-from experimental.embeddings.static.flair import WordEmbeddingsPL
 from embeddings.utils.utils import import_from_string
+from experimental.embeddings.static.flair import WordEmbeddingsPL
 
 
 class StaticEmbedding(FlairEmbedding, ABC):
