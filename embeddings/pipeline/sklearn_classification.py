@@ -1,25 +1,23 @@
-from typing import Dict, Optional, Any
+from typing import Any, Dict, Optional
 
+import datasets
 import pandas as pd
-from sklearn.base import (
-    ClassifierMixin as AnySklearnClassifier,
-    BaseEstimator as AnySklearnVectorizer,
-)
+from sklearn.base import BaseEstimator as AnySklearnVectorizer
+from sklearn.base import ClassifierMixin as AnySklearnClassifier
 from sklearn.feature_extraction.text import CountVectorizer
 from typing_extensions import Literal
-import datasets
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.data.io import T_path
 from embeddings.embedding.sklearn_embedding import SklearnEmbedding
+from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
+from embeddings.model.sklearn_model import SklearnModel
+from embeddings.pipeline.standard_pipeline import StandardPipeline
+from embeddings.task.sklearn_task.text_classification import TextClassification
 from embeddings.transformation.hf_transformation.to_pandas_transformation import (
     ToPandasHuggingFaceCorpusTransformation,
 )
-from embeddings.pipeline.standard_pipeline import StandardPipeline
-from embeddings.task.sklearn_task.text_classification import TextClassification
-from embeddings.model.sklearn_model import SklearnModel
-from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.utils.json_dict_persister import JsonPersister
 
 

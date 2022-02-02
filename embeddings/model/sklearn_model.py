@@ -1,12 +1,12 @@
-from typing import Dict, Any, Union
+from typing import Any, Dict, Union
 
-from numpy import typing as nptyping
 import pandas as pd
+from numpy import typing as nptyping
 from typing_extensions import Literal
 
+from embeddings.embedding.sklearn_embedding import SklearnEmbedding
 from embeddings.model.model import Model
 from embeddings.task.sklearn_task.text_classification import TextClassification
-from embeddings.embedding.sklearn_embedding import SklearnEmbedding
 
 
 class SklearnModel(Model[Union[pd.DataFrame, nptyping.NDArray[Any]], Dict]):

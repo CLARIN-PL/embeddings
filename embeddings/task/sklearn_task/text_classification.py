@@ -1,11 +1,11 @@
 from typing import Any, Dict, Optional, Union
 
-from numpy import typing as nptyping
 import pandas as pd
+from numpy import typing as nptyping
 from sklearn.base import ClassifierMixin as AnySklearnClassifier
 
-from embeddings.task.sklearn_task.sklearn_task import SklearnTask
 from embeddings.embedding.sklearn_embedding import SklearnEmbedding
+from embeddings.task.sklearn_task.sklearn_task import SklearnTask
 
 
 class TextClassification(SklearnTask):
