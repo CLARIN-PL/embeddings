@@ -17,8 +17,16 @@ class SklearnTask(Task[pd.DataFrame, Dict[str, Any]]):
     ) -> None:
         pass
 
-    def predict(self, x: Union[pd.DataFrame, nptyping.NDArray[Any]]) -> None:
+    def predict(
+        self,
+        data: Dict[str, Union[pd.DataFrame, nptyping.NDArray[Any]]],
+        predict_subset: str = "test",
+    ) -> Dict[str, nptyping.NDArray[Any]]:
         pass
 
-    def fit_predict(self, data: Any) -> Dict[str, Any]:
-        super().fit_predict(data)
+    def fit_predict(
+        self,
+        data: Dict[str, Union[pd.DataFrame, nptyping.NDArray[Any]]],
+        predict_subset: str = "test",
+    ) -> Dict[str, nptyping.NDArray[Any]]:
+        pass

@@ -29,15 +29,26 @@ class TextClassification(SklearnTask):
 
         self.classifier.fit(x_train, y_train)
 
-    def predict(self, x: Union[pd.DataFrame, nptyping.NDArray[Any]]) -> nptyping.NDArray[Any]:
-        return self.classifier.predict(x)
+    def predict(
+        self,
+        data: Dict[str, Union[pd.DataFrame, nptyping.NDArray[Any]]],
+        predict_subset: str = "test",
+    ) -> Dict[str, nptyping.NDArray[Any]]:
+        # result: nptyping.NDArray[Any] = self.classifier.predict(x)
+        # return result
+        predictions = self.classifier.predict(self.embedding.embed(data[predict_subset]["x"]))
+        model_result = {
+            "y_pred": predictions,
+            "y_true": data[predict_subset]["y"].values,
+        }
+        return model_result
 
-    def fit_predict(self, data: Dict[str, Any], predict_subset: str = "test"):
+    def fit_predict(
+        self,
+        data: Dict[str, Union[pd.DataFrame, nptyping.NDArray[Any]]],
+        predict_subset: str = "test",
+    ) -> Dict[str, nptyping.NDArray[Any]]:
         x_train = self.embedding.embed(data["train"]["x"])
         y_train = data["train"]["y"]
-
         self.fit(x_train, y_train)
-
-        predictions = self.predict(self.embedding.embed(data[predict_subset]["x"]))
-
-        return predictions
+        return self.predict(data)

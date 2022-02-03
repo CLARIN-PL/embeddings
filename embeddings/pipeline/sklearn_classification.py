@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 import datasets
@@ -17,6 +18,9 @@ from embeddings.pipeline.standard_pipeline import StandardPipeline
 from embeddings.task.sklearn_task.text_classification import TextClassification
 from embeddings.transformation.hf_transformation.to_pandas_transformation import (
     ToPandasHuggingFaceCorpusTransformation,
+)
+from embeddings.transformation.pandas_transformation.rename_input_columns_transformation import (
+    RenameInputColumnsTransformation,
 )
 from embeddings.utils.json_dict_persister import JsonPersister
 
@@ -48,11 +52,14 @@ class SklearnClassificationPipeline(
             dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
         data_loader = HuggingFaceDataLoader()
-        transformation = ToPandasHuggingFaceCorpusTransformation()
+        transformation = ToPandasHuggingFaceCorpusTransformation().then(
+            RenameInputColumnsTransformation(input_column_name, target_column_name)
+        )
         classifier_kwargs = classifier_kwargs if classifier_kwargs else {}
-        embedding = SklearnEmbedding(embedding_kwargs, vectorizer=vectorizer)
+        embedding = SklearnEmbedding(embedding_kwargs=embedding_kwargs, vectorizer=vectorizer)
         task = TextClassification(classifier=classifier, classifier_kwargs=classifier_kwargs)
         model = SklearnModel(embedding, task, predict_subset=predict_subset)
+        output_path = Path(output_path)
         evaluator = TextClassificationEvaluator().persisting(
             JsonPersister(path=output_path.joinpath(evaluation_filename))
         )
@@ -60,20 +67,11 @@ class SklearnClassificationPipeline(
 
         self.input_column_name = input_column_name
         self.target_column_name = target_column_name
+        self.predict_subset = predict_subset
 
-    def run(self):
-        data = self.data_loader.load(self.dataset)
-        data = self.transformation.transform(data)
-        for subset in data:
-            data[subset].rename(
-                {self.input_column_name: "x", self.target_column_name: "y"},
-                axis="columns",
-                inplace=True,
-            )
-
-        model_result = {
-            "y_pred": self.model.execute(data),
-            "y_true": data[self.model.predict_subset]["y"].values,
-        }
-        evaluation_result = self.evaluator.evaluate(model_result)
-        return evaluation_result
+    # def run(self) -> Dict[str, Any]:
+    #     loaded_data = self.data_loader.load(self.dataset)
+    #     transformed_data = self.transformation.transform(loaded_data)
+    #     model_result = self.model.execute(transformed_data)
+    #     evaluation_result = self.evaluator.evaluate(model_result)
+    #     return evaluation_result
