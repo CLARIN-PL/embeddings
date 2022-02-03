@@ -34,7 +34,7 @@ def result_path() -> "TemporaryDirectory[str]":
 
 
 @pytest.fixture(scope="module")
-def model_name() -> str:
+def embedding_name() -> str:
     return "allegro/herbert-base-cased"
 
 
@@ -75,7 +75,7 @@ def sequence_labeling_preprocessing_pipeline(
 @pytest.fixture(scope="module")
 def sequence_labeling_evaluation_pipeline(
     result_path: "TemporaryDirectory[str]",
-    model_name: str,
+    embedding_name: str,
     ner_dataset_name: str,
     hidden_size: int,
     task_train_kwargs: Dict[str, int],
@@ -86,7 +86,7 @@ def sequence_labeling_evaluation_pipeline(
 
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,
-        model_name=model_name,
+        embedding_name=embedding_name,
         output_path=result_path.name,
         hidden_size=hidden_size,
         persist_path=None,

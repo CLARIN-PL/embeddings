@@ -31,7 +31,7 @@ class FlairClassificationPipeline(
 ):
     def __init__(
         self,
-        model_name: str,
+        embedding_name: str,
         dataset_name: str,
         input_column_name: str,
         target_column_name: str,
@@ -60,7 +60,7 @@ class FlairClassificationPipeline(
             )
 
         embedding = AutoFlairDocumentPoolEmbedding.from_hub(
-            repo_id=model_name,
+            repo_id=embedding_name,
             document_embedding_cls=document_embedding_cls,
             **load_model_kwargs if load_model_kwargs else {}
         )

@@ -126,7 +126,7 @@ class FlairSequenceLabelingEvaluationPipeline(
     def __init__(
         self,
         dataset_path: T_path,
-        model_name: str,
+        embedding_name: str,
         output_path: T_path,
         hidden_size: int,
         evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = DEFAULT_EVAL_MODE,
@@ -139,7 +139,7 @@ class FlairSequenceLabelingEvaluationPipeline(
     ):
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = ConllFlairCorpusDataLoader()
-        embedding = AutoFlairWordEmbedding.from_hub(model_name, kwargs=word_embedding_kwargs)
+        embedding = AutoFlairWordEmbedding.from_hub(embedding_name, kwargs=word_embedding_kwargs)
         task = SequenceLabeling(
             output_path=output_path,
             hidden_size=hidden_size,

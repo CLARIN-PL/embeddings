@@ -17,7 +17,7 @@ class EmbeddingPipelineBaseMetadata(PathMetadata):
 
 
 class FlairEmbeddingPipelineMetadata(EmbeddingPipelineBaseMetadata):
-    model_name: str
+    embedding_name: str
     dataset_name: str
     load_dataset_kwargs: Optional[Dict[str, Any]]
 
@@ -45,7 +45,7 @@ class FlairSequenceLabelingPipelineMetadata(FlairEmbeddingPipelineMetadata):
 
 
 class FlairEvaluationPipelineMetadata(EmbeddingPipelineBaseMetadata):
-    model_name: str
+    embedding_name: str
     dataset_path: str
     persist_path: Optional[str]
     predict_subset: Literal["dev", "test"]
@@ -63,7 +63,7 @@ class FlairClassificationEvaluationPipelineMetadata(FlairEvaluationPipelineMetad
 
 
 class LightningPipelineMetadata(EmbeddingPipelineBaseMetadata):
-    model_name_or_path: T_path
+    embedding_name_or_path: T_path
     dataset_name_or_path: T_path
     input_column_name: str
     target_column_name: str

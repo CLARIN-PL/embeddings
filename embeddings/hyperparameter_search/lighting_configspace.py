@@ -16,11 +16,11 @@ from embeddings.hyperparameter_search.parameters import (
 
 @dataclass
 class LightingConfigSpace(BaseConfigSpace):
-    model_name_or_path: InitVar[Union[T_path, List[T_path]]]
+    embedding_name_or_path: InitVar[Union[T_path, List[T_path]]]
     devices: InitVar[Union[int, str, None, List[int]]] = field(default="auto")
     accelerator: InitVar[Union[str, None]] = field(default="auto")
 
-    param_model_name_or_path: Parameter = field(init=False)
+    param_embedding_name_or_path: Parameter = field(init=False)
     trainer_devices: Parameter = field(init=False)
     trainer_accelerator: Parameter = field(init=False)
 
@@ -74,20 +74,20 @@ class LightingConfigSpace(BaseConfigSpace):
 
     def __post_init__(
         self,
-        model_name_or_path: Union[str, List[str]],
+        embedding_name_or_path: Union[str, List[str]],
         devices: Union[int, str, None, List[int]],
         accelerator: Union[str, None],
     ) -> None:
-        if isinstance(model_name_or_path, str):
-            self.param_model_name_or_path: Parameter = ConstantParameter(
-                name="model_name_or_path",
-                value=model_name_or_path,
+        if isinstance(embedding_name_or_path, str):
+            self.param_embedding_name_or_path: Parameter = ConstantParameter(
+                name="embedding_name_or_path",
+                value=embedding_name_or_path,
             )
         else:
-            self.param_model_name_or_path: Parameter = SearchableParameter(
-                name="model_name_or_path",
+            self.param_embedding_name_or_path: Parameter = SearchableParameter(
+                name="embedding_name_or_path",
                 type="categorical",
-                choices=model_name_or_path,
+                choices=embedding_name_or_path,
             )
 
         self.trainer_devices = ConstantParameter(name="devices", value=devices)
@@ -95,7 +95,7 @@ class LightingConfigSpace(BaseConfigSpace):
 
     @classmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
-        pipeline_keys: Final = {"batch_size", "finetune_last_n_layers", "model_name_or_path"}
+        pipeline_keys: Final = {"batch_size", "finetune_last_n_layers", "embedding_name_or_path"}
         datamodule_keys: Final = {"max_seq_length"}
         task_model_keys: Final = {
             "learning_rate",

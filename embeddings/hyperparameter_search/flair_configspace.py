@@ -20,8 +20,8 @@ from embeddings.hyperparameter_search.parameters import (
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
 class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
-    model_name: InitVar[Union[str, List[str]]]
-    param_model_name: Parameter = field(init=False)
+    embedding_name: InitVar[Union[str, List[str]]]
+    param_embedding_name: Parameter = field(init=False)
     param_selection_mode: Parameter = field(
         init=False, default=ConstantParameter(name="param_selection_mode", value=True)
     )
@@ -38,17 +38,17 @@ class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
         name="max_epochs", type="int_uniform", low=1, high=5, step=1
     )
 
-    def __post_init__(self, model_name: Union[str, List[str]]) -> None:
-        if isinstance(model_name, str):
-            self.param_model_name: Parameter = ConstantParameter(
-                name="model_name",
-                value=model_name,
+    def __post_init__(self, embedding_name: Union[str, List[str]]) -> None:
+        if isinstance(embedding_name, str):
+            self.param_embedding_name: Parameter = ConstantParameter(
+                name="embedding_name",
+                value=embedding_name,
             )
         else:
-            self.param_model_name: Parameter = SearchableParameter(
-                name="model_name",
+            self.param_embedding_name: Parameter = SearchableParameter(
+                name="embedding_name",
                 type="categorical",
-                choices=model_name,
+                choices=embedding_name,
             )
 
     @staticmethod
@@ -71,13 +71,13 @@ class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
 class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
     @classmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
-        model_name = parameters.pop("model_name")
+        embedding_name = parameters.pop("embedding_name")
         (
             parameters,
             task_train_kwargs,
         ) = FlairModelTrainerConfigSpace._parse_model_trainer_parameters(parameters)
         BaseConfigSpace._check_unmapped_parameters(parameters=parameters)
-        return {"model_name": model_name, "task_train_kwargs": task_train_kwargs}
+        return {"embedding_name": embedding_name, "task_train_kwargs": task_train_kwargs}
 
 
 @dataclass
@@ -126,8 +126,8 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
 
     @classmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
-        model_name = parameters.pop("model_name")
-        assert isinstance(model_name, str)
+        embedding_name = parameters.pop("embedding_name")
+        assert isinstance(embedding_name, str)
         hidden_size = parameters.pop("hidden_size")
         assert isinstance(hidden_size, int)
         task_model_keys: Final = {
@@ -149,7 +149,7 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
         BaseConfigSpace._check_unmapped_parameters(parameters=parameters)
 
         return {
-            "model_name": model_name,
+            "embedding_name": embedding_name,
             "hidden_size": hidden_size,
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
@@ -218,10 +218,10 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
     )
 
     def get_embedding_type(self) -> str:
-        model_name_param: Parameter = self.__getattribute__("param_model_name")
-        model_name = model_name_param.value
-        assert isinstance(model_name, str)
-        embedding_type = self._retrieve_embedding_type(model_name=model_name)
+        embedding_name_param: Parameter = self.__getattribute__("param_embedding_name")
+        embedding_name = embedding_name_param.value
+        assert isinstance(embedding_name, str)
+        embedding_type = self._retrieve_embedding_type(embedding_name=embedding_name)
         assert isinstance(embedding_type, str)
         return embedding_type
 
@@ -238,27 +238,27 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
         }
         parameters = {}
 
-        model_name, model_name_val = self._parse_parameter(
-            trial=trial, param_name="param_model_name"
+        embedding_name, embedding_name_val = self._parse_parameter(
+            trial=trial, param_name="param_embedding_name"
         )
-        parameters[model_name] = model_name_val
+        parameters[embedding_name] = embedding_name_val
 
         embedding_type_param: str = self.get_embedding_type()
         assert embedding_type_param in ["dynamic", "static"]
 
-        document_model_name, document_embedding_val = self._parse_parameter(
+        document_embedding_name, document_embedding_val = self._parse_parameter(
             trial=trial, param_name=f"{embedding_type_param}_document_embedding"
         )
         if not isinstance(document_embedding_val, str):
             raise TypeError("Variable document_embedding_val must be a str!")
 
-        parameters[document_model_name] = document_embedding_val
+        parameters[document_embedding_name] = document_embedding_val
         parameter_names = param_names_mapping[document_embedding_val]
 
         parameters.update(self._map_parameters(parameters_names=list(parameter_names), trial=trial))
 
         mapped_parameters: Final[Set[str]] = {
-            "param_model_name",
+            "param_embedding_name",
             *list(self.__annotations__.keys()),
         }
 
@@ -266,8 +266,8 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
 
     @classmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
-        model_name = parameters.pop("model_name")
-        assert isinstance(model_name, str)
+        embedding_name = parameters.pop("embedding_name")
+        assert isinstance(embedding_name, str)
         document_embedding = parameters.pop("document_embedding")
         assert isinstance(document_embedding, str)
 
@@ -294,7 +294,7 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
         BaseConfigSpace._check_unmapped_parameters(parameters=parameters)
 
         return {
-            "model_name": model_name,
+            "embedding_name": embedding_name,
             "document_embedding": document_embedding,
             "task_model_kwargs": {},
             "task_train_kwargs": task_train_kwargs,

@@ -93,8 +93,8 @@ class BaseConfigSpace(ABC):
         pass
 
     @staticmethod
-    def _retrieve_embedding_type(model_name: str) -> str:
-        embedding = AutoFlairWordEmbedding.from_hub(repo_id=model_name)
+    def _retrieve_embedding_type(embedding_name: str) -> str:
+        embedding = AutoFlairWordEmbedding.from_hub(repo_id=embedding_name)
         if isinstance(embedding, FlairTransformerEmbedding):
             embedding_type = "dynamic"
         elif isinstance(embedding, StaticEmbedding):

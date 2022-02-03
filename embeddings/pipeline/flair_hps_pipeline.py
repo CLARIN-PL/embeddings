@@ -75,15 +75,15 @@ class _OptimizedFlairClassificationPipelineDefaultsBase(
     def _pop_sampled_parameters(
         parameters: SampledParameters,
     ) -> Tuple[str, str, Dict[str, ParameterValues], Dict[str, ParameterValues]]:
-        model_name = parameters["model_name"]
-        assert isinstance(model_name, str)
+        embedding_name = parameters["embedding_name"]
+        assert isinstance(embedding_name, str)
         document_embedding = parameters["document_embedding"]
         assert isinstance(document_embedding, str)
         task_train_kwargs = parameters["task_train_kwargs"]
         assert isinstance(task_train_kwargs, dict)
         load_model_kwargs = parameters["load_model_kwargs"]
         assert isinstance(load_model_kwargs, dict)
-        return model_name, document_embedding, task_train_kwargs, load_model_kwargs
+        return embedding_name, document_embedding, task_train_kwargs, load_model_kwargs
 
 
 @dataclass
@@ -122,13 +122,13 @@ class OptimizedFlairClassificationPipeline(
 
     def _get_metadata(self, parameters: SampledParameters) -> FlairClassificationPipelineMetadata:
         (
-            model_name,
+            embedding_name,
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: FlairClassificationPipelineMetadata = {
-            "model_name": model_name,
+            "embedding_name": embedding_name,
             "document_embedding_cls": document_embedding_cls,
             "dataset_name": self.dataset_name,
             "load_dataset_kwargs": self.load_dataset_kwargs,
@@ -144,13 +144,13 @@ class OptimizedFlairClassificationPipeline(
         self, parameters: SampledParameters
     ) -> FlairClassificationEvaluationPipelineMetadata:
         (
-            model_name,
+            embedding_name,
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: FlairClassificationEvaluationPipelineMetadata = {
-            "model_name": model_name,
+            "embedding_name": embedding_name,
             "document_embedding_cls": document_embedding_cls,
             "dataset_path": str(self.dataset_path),
             "persist_path": None,
@@ -206,13 +206,13 @@ class OptimizedFlairPairClassificationPipeline(
         self, parameters: SampledParameters
     ) -> FlairPairClassificationPipelineMetadata:
         (
-            model_name,
+            embedding_name,
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: FlairPairClassificationPipelineMetadata = {
-            "model_name": model_name,
+            "embedding_name": embedding_name,
             "document_embedding_cls": document_embedding_cls,
             "dataset_name": self.dataset_name,
             "load_dataset_kwargs": self.load_dataset_kwargs,
@@ -228,13 +228,13 @@ class OptimizedFlairPairClassificationPipeline(
         self, parameters: SampledParameters
     ) -> FlairClassificationEvaluationPipelineMetadata:
         (
-            model_name,
+            embedding_name,
             document_embedding_cls,
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: FlairClassificationEvaluationPipelineMetadata = {
-            "model_name": model_name,
+            "embedding_name": embedding_name,
             "dataset_path": str(self.dataset_path),
             "document_embedding_cls": document_embedding_cls,
             "task_model_kwargs": None,
@@ -306,25 +306,25 @@ class OptimizedFlairSequenceLabelingPipeline(
         self,
         parameters: SampledParameters,
     ) -> Tuple[str, int, Dict[str, ParameterValues], Dict[str, ParameterValues]]:
-        model_name = parameters["model_name"]
-        assert isinstance(model_name, str)
+        embedding_name = parameters["embedding_name"]
+        assert isinstance(embedding_name, str)
         hidden_size = parameters["hidden_size"]
         assert isinstance(hidden_size, int)
         task_train_kwargs = parameters["task_train_kwargs"]
         assert isinstance(task_train_kwargs, dict)
         task_model_kwargs = parameters["task_model_kwargs"]
         assert isinstance(task_model_kwargs, dict)
-        return model_name, hidden_size, task_train_kwargs, task_model_kwargs
+        return embedding_name, hidden_size, task_train_kwargs, task_model_kwargs
 
     def _get_metadata(self, parameters: SampledParameters) -> FlairSequenceLabelingPipelineMetadata:
         (
-            model_name,
+            embedding_name,
             hidden_size,
             task_train_kwargs,
             task_model_kwargs,
         ) = self._pop_sampled_parameters(parameters)
         metadata: FlairSequenceLabelingPipelineMetadata = {
-            "model_name": model_name,
+            "embedding_name": embedding_name,
             "hidden_size": hidden_size,
             "dataset_name": self.dataset_name,
             "load_dataset_kwargs": self.load_dataset_kwargs,
@@ -341,14 +341,14 @@ class OptimizedFlairSequenceLabelingPipeline(
         self, parameters: SampledParameters
     ) -> FlairSequenceLabelingEvaluationPipelineMetadata:
         (
-            model_name,
+            embedding_name,
             hidden_size,
             task_train_kwargs,
             task_model_kwargs,
         ) = self._pop_sampled_parameters(parameters)
 
         metadata: FlairSequenceLabelingEvaluationPipelineMetadata = {
-            "model_name": model_name,
+            "embedding_name": embedding_name,
             "hidden_size": hidden_size,
             "dataset_path": self.dataset_path.name,
             "persist_path": None,

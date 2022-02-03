@@ -29,7 +29,7 @@ class LightningSequenceLabelingPipeline(
 
     def __init__(
         self,
-        model_name_or_path: T_path,
+        embedding_name_or_path: T_path,
         dataset_name_or_path: T_path,
         input_column_name: str,
         target_column_name: str,
@@ -66,7 +66,7 @@ class LightningSequenceLabelingPipeline(
             {"train_batch_size": train_batch_size, "eval_batch_size": eval_batch_size}
         )
         tokenizer_name_or_path = (
-            tokenizer_name_or_path if tokenizer_name_or_path else model_name_or_path
+            tokenizer_name_or_path if tokenizer_name_or_path else embedding_name_or_path
         )
 
         output_path = Path(output_path)
@@ -83,7 +83,7 @@ class LightningSequenceLabelingPipeline(
             **self.datamodule_kwargs
         )
         task = SequenceLabelingTask(
-            model_name_or_path=model_name_or_path,
+            model_name_or_path=embedding_name_or_path,
             output_path=output_path,
             finetune_last_n_layers=finetune_last_n_layers,
             model_config_kwargs=self.model_config_kwargs,

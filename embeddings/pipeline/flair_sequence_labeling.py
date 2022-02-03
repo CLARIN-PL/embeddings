@@ -30,7 +30,7 @@ class FlairSequenceLabelingPipeline(
 ):
     def __init__(
         self,
-        model_name: str,
+        embedding_name: str,
         dataset_name: str,
         input_column_name: str,
         target_column_name: str,
@@ -59,7 +59,7 @@ class FlairSequenceLabelingPipeline(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
 
-        embedding = AutoFlairWordEmbedding.from_hub(model_name)
+        embedding = AutoFlairWordEmbedding.from_hub(embedding_name)
         task = SequenceLabeling(
             output_path,
             hidden_size=hidden_size,

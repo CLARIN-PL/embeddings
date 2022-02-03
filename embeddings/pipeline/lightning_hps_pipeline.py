@@ -93,8 +93,8 @@ class OptimizedLightingPipeline(
         Dict[str, ParameterValues],
         Dict[str, ParameterValues],
     ]:
-        model_name_or_path = parameters["model_name_or_path"]
-        assert isinstance(model_name_or_path, str)
+        embedding_name_or_path = parameters["embedding_name_or_path"]
+        assert isinstance(embedding_name_or_path, str)
         train_batch_size = parameters["train_batch_size"]
         assert isinstance(train_batch_size, int)
         eval_batch_size = parameters["eval_batch_size"]
@@ -111,7 +111,7 @@ class OptimizedLightingPipeline(
         assert isinstance(model_config_kwargs, dict)
 
         return (
-            model_name_or_path,
+            embedding_name_or_path,
             train_batch_size,
             eval_batch_size,
             finetune_last_n_layers,
@@ -152,7 +152,7 @@ class OptimizedLightingClassificationPipeline(
         self, parameters: SampledParameters
     ) -> LightningClassificationPipelineMetadata:
         (
-            model_name_or_path,
+            embedding_name_or_path,
             train_batch_size,
             eval_batch_size,
             finetune_last_n_layers,
@@ -162,7 +162,7 @@ class OptimizedLightingClassificationPipeline(
             model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: LightningClassificationPipelineMetadata = {
-            "model_name_or_path": model_name_or_path,
+            "embedding_name_or_path": embedding_name_or_path,
             "dataset_name_or_path": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
@@ -219,7 +219,7 @@ class OptimizedLightingSequenceLabelingPipeline(
         self, parameters: SampledParameters
     ) -> LightningSequenceLabelingPipelineMetadata:
         (
-            model_name_or_path,
+            embedding_name_or_path,
             train_batch_size,
             eval_batch_size,
             finetune_last_n_layers,
@@ -229,7 +229,7 @@ class OptimizedLightingSequenceLabelingPipeline(
             model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: LightningSequenceLabelingPipelineMetadata = {
-            "model_name_or_path": model_name_or_path,
+            "embedding_name_or_path": embedding_name_or_path,
             "dataset_name_or_path": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
