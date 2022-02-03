@@ -36,7 +36,8 @@ class BaseConfigSpace(ABC):
         else:
             raise ValueError(
                 f"Parameter type {type(param)} is not suported! "
-                f"Supported types are: {SearchableParameter.__name__} and {ConstantParameter.__name__}"
+                f"Supported types are: {SearchableParameter.__name__} and "
+                f"{ConstantParameter.__name__}"
             )
 
     def _map_parameters(
@@ -87,7 +88,8 @@ class BaseConfigSpace(ABC):
                 f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
             )
 
-    # classmethod instead of staticmethod omit the mypy error: Argument 2 for "super" not an instance of argument 1 (https://github.com/python/mypy/issues/9282)
+    # classmethod instead of staticmethod omit the mypy error: Argument 2 for "super" not an
+    # instance of argument 1 (https://github.com/python/mypy/issues/9282)
     @classmethod
     @abc.abstractmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
