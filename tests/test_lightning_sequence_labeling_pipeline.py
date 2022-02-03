@@ -21,7 +21,7 @@ def dataset_kwargs() -> Dict[str, Any]:
 
 @pytest.fixture(scope="module")
 def pipeline_kwargs() -> Dict[str, Any]:
-    return {"embedding_name": "allegro/herbert-base-cased", "finetune_last_n_layers": 0}
+    return {"embedding_name_or_path": "allegro/herbert-base-cased", "finetune_last_n_layers": 0}
 
 
 @pytest.fixture(scope="module")

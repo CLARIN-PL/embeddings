@@ -99,6 +99,7 @@ class OptimizedFlairClassificationPipeline(
 ):
     def __post_init__(self) -> None:
         self.dataset_path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
+        # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
         super().__init__(
             preprocessing_pipeline=FlairTextClassificationPreprocessingPipeline(
                 dataset_name=self.dataset_name,
@@ -108,7 +109,7 @@ class OptimizedFlairClassificationPipeline(
                 sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,
-            ),
+            ),  # type: ignore
             evaluation_pipeline=FlairTextClassificationEvaluationPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
@@ -180,6 +181,7 @@ class OptimizedFlairPairClassificationPipeline(
 ):
     def __post_init__(self) -> None:
         self.dataset_path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
+        # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
         super().__init__(
             preprocessing_pipeline=FlairTextPairClassificationPreprocessingPipeline(
                 dataset_name=self.dataset_name,
@@ -189,7 +191,7 @@ class OptimizedFlairPairClassificationPipeline(
                 sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,
-            ),
+            ),  # type: ignore
             evaluation_pipeline=FlairTextPairClassificationEvaluationPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
@@ -279,6 +281,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         self.metric_name = SequenceLabelingEvaluator.get_metric_name(
             evaluation_mode=self.evaluation_mode, tagging_scheme=self.tagging_scheme
         )
+        # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
         super().__init__(
             preprocessing_pipeline=FlairSequenceLabelingPreprocessingPipeline(
                 dataset_name=self.dataset_name,
@@ -288,7 +291,7 @@ class OptimizedFlairSequenceLabelingPipeline(
                 sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,
-            ),
+            ),  # type: ignore
             config_space=self.config_space,
             evaluation_pipeline=FlairSequenceLabelingEvaluationPipeline,
             metric_name=self.metric_name,

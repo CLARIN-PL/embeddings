@@ -9,6 +9,7 @@ from flair.data import Corpus
 from flair.datasets import ColumnDataset
 
 from embeddings.data.dataset import Dataset, HuggingFaceDataset, LocalDataset
+from embeddings.data.io import T_path
 
 Input = TypeVar("Input")
 Output = TypeVar("Output")
@@ -23,7 +24,7 @@ class DataLoader(ABC, Generic[Input, Output]):
 class HuggingFaceDataLoader(DataLoader[str, datasets.DatasetDict]):
     def load(self, dataset: Dataset[str]) -> datasets.DatasetDict:
         if isinstance(dataset, HuggingFaceDataset):
-            result = datasets.load_dataset(str(dataset.dataset), **dataset.load_dataset_kwargs)
+            result = datasets.load_dataset(dataset.dataset, **dataset.load_dataset_kwargs)
             assert isinstance(result, datasets.DatasetDict)
             return result
         else:
@@ -40,8 +41,8 @@ class HuggingFaceLocalDataLoader(DataLoader[str, datasets.DatasetDict]):
             raise ValueError("This DataLoader should be used with HuggingFaceDataset only.")
 
 
-class PickleFlairCorpusDataLoader(DataLoader[str, Corpus]):
-    def load(self, dataset: Dataset[str]) -> Corpus:
+class PickleFlairCorpusDataLoader(DataLoader[T_path, Corpus]):
+    def load(self, dataset: Dataset[T_path]) -> Corpus:
         assert isinstance(dataset, LocalDataset)
         with open(dataset.dataset, "rb") as file:
             corpus = pickle.load(file)
@@ -49,11 +50,11 @@ class PickleFlairCorpusDataLoader(DataLoader[str, Corpus]):
         return corpus
 
 
-class ConllFlairCorpusDataLoader(DataLoader[str, Corpus]):
+class ConllFlairCorpusDataLoader(DataLoader[T_path, Corpus]):
     DEFAULT_COLUMN_FORMAT = {0: "text", 1: "tag"}
     DEFAULT_FLAIR_SUBSET_NAMES = ["train", "dev", "test"]
 
-    def load(self, dataset: Dataset[str]) -> Corpus:
+    def load(self, dataset: Dataset[T_path]) -> Corpus:
         assert isinstance(dataset, LocalDataset)
         flair_datasets = {}
         dataset_dir = Path(dataset.dataset)
