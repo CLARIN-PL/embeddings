@@ -34,8 +34,6 @@ class TextClassification(SklearnTask):
         data: Dict[str, Union[pd.DataFrame, nptyping.NDArray[Any]]],
         predict_subset: str = "test",
     ) -> Dict[str, nptyping.NDArray[Any]]:
-        # result: nptyping.NDArray[Any] = self.classifier.predict(x)
-        # return result
         predictions = self.classifier.predict(self.embedding.embed(data[predict_subset]["x"]))
         model_result = {
             "y_pred": predictions,

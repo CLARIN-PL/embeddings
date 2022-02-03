@@ -68,10 +68,3 @@ class SklearnClassificationPipeline(
         self.input_column_name = input_column_name
         self.target_column_name = target_column_name
         self.predict_subset = predict_subset
-
-    # def run(self) -> Dict[str, Any]:
-    #     loaded_data = self.data_loader.load(self.dataset)
-    #     transformed_data = self.transformation.transform(loaded_data)
-    #     model_result = self.model.execute(transformed_data)
-    #     evaluation_result = self.evaluator.evaluate(model_result)
-    #     return evaluation_result
