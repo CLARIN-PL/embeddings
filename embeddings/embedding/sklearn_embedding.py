@@ -1,4 +1,4 @@
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 import pandas as pd
 from numpy import typing as nptyping
@@ -8,7 +8,9 @@ from embeddings.embedding.embedding import Embedding
 
 
 class SklearnEmbedding(Embedding[Union[pd.Series, nptyping.NDArray[Any]], pd.DataFrame]):
-    def __init__(self, embedding_kwargs: Dict[str, Any], vectorizer: AnySklearnVectorizer):
+    def __init__(
+        self, vectorizer: AnySklearnVectorizer, embedding_kwargs: Optional[Dict[str, Any]] = None
+    ):
         super().__init__()
         self.embedding_kwargs = embedding_kwargs if embedding_kwargs else {}
         self.vectorizer = vectorizer(**self.embedding_kwargs)
