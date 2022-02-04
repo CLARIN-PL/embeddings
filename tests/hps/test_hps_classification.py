@@ -1,13 +1,11 @@
-import collections
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, Tuple
 from unittest.mock import patch
 
 import pandas as pd
 import pytest
 import yaml
-from _pytest.tmpdir import TempdirFactory
 
 from embeddings.hyperparameter_search.lighting_configspace import (
     LightingTextClassificationConfigSpace,
@@ -17,8 +15,8 @@ from embeddings.pipeline.lightning_classification import LightningClassification
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingClassificationPipeline
 from embeddings.pipeline.pipelines_metadata import (
     LightningClassificationPipelineMetadata,
-    LightningPipelineMetadata,
 )
+from tests.hps.utils import _flatten
 
 TESTING_DATAMODULE_KWARGS: Dict[str, Any] = deepcopy(
     LightningClassificationPipeline.DEFAULT_DATAMODULE_KWARGS
@@ -30,32 +28,6 @@ TESTING_DATAMODULE_KWARGS.update(
         "downsample_test": 0.05,
     }
 )
-
-
-def _flatten(
-    d: Union[collections.MutableMapping[Any, Any], LightningPipelineMetadata]
-) -> Dict[Any, Any]:
-    items: List[tuple[Any, Any]] = []
-    for k, v in d.items():
-        new_key = k
-        if isinstance(v, collections.MutableMapping):
-            items.extend(_flatten(v).items())
-        else:
-            items.append((new_key, v))
-    return dict(items)
-
-
-@pytest.fixture(scope="module")
-def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
-    path = tmpdir_factory.mktemp(__name__)
-    return Path(path)
-
-
-@pytest.fixture(scope="module")
-def retrain_tmp_path(tmp_path_module: Path) -> Path:
-    path = tmp_path_module.joinpath("retrain")
-    path.mkdir()
-    return path
 
 
 @pytest.fixture(scope="module")
