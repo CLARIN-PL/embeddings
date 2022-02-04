@@ -27,8 +27,6 @@ class SklearnTask(Task[pd.DataFrame, Dict[str, Any]]):
 
     @abstractmethod
     def fit_predict(
-        self,
-        data: Dict[str, ArrayLike],
-        predict_subset: str = "test"
+        self, data: Dict[str, ArrayLike], predict_subset: str = "test"
     ) -> Dict[str, nptyping.NDArray[Any]]:
         pass
