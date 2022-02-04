@@ -123,6 +123,7 @@ class OptunaPipeline(
         pipeline = self.evaluation_pipeline(**args)
         results = pipeline.run()
         trial.set_user_attr('n_completed_epochs', pipeline.n_completed_epochs)
+        trial.set_user_attr('best_epoch', pipeline.best_epoch)
         metric = results[self.metric_name][self.metric_key]
         assert isinstance(metric, float)
         return metric
