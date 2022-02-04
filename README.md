@@ -19,7 +19,7 @@ from embeddings.pipeline.lightning_classification import LightningClassification
 
 pipeline = LightningClassificationPipeline(
     dataset_name_or_path="clarin-pl/polemo2-official",
-    embedding_name="allegro/herbert-base-cased",
+    embedding_name_or_path="allegro/herbert-base-cased",
     input_column_name="text",
     target_column_name="target",
     output_path="."
@@ -81,7 +81,7 @@ from embeddings.transformation.flair_transformation.classification_corpus_transf
 dataset = HuggingFaceDataset("clarin-pl/polemo2-official")
 data_loader = HuggingFaceDataLoader()
 transformation = ClassificationCorpusTransformation("text", "target")
-embedding = AutoFlairDocumentEmbedding.from_hub("allegro/herbert-base-cased")
+embedding = AutoFlairDocumentEmbedding.from_hub("clarin-pl/word2vec-kgr10")
 task = TextClassification(Path("."))
 model = FlairModel(embedding, task)
 evaluator = TextClassificationEvaluator()
@@ -104,7 +104,7 @@ The example with non-default arguments
 
 ```bash
 python evaluate_lightning_document_classification.py \
-    --embedding-name allegro/herbert-base-cased \
+    --embedding-name-or-path allegro/herbert-base-cased \
     --dataset-name clarin-pl/polemo2-official \
     --input-columns-name text \
     --target-column-name target
@@ -124,7 +124,7 @@ The example with static embedding model.
 
 ```bash
 python evaluate_document_pair_classification.py \
-    --embedding-name clarin-pl/word2vec-kgr10
+    --embedding-name-or-path clarin-pl/word2vec-kgr10
 ```
 
 
@@ -155,7 +155,7 @@ from embeddings.pipeline.flair_classification import FlairClassificationPipeline
 
 pipeline = FlairClassificationPipeline(
     dataset_name="clarin-pl/polemo2-official",
-    embedding_name="allegro/herbert-base-cased",
+    embedding_name="clarin-pl/word2vec-kgr10",
     input_column_name="text",
     target_column_name="target",
     output_path=".",
@@ -226,10 +226,10 @@ Instead of the `allegro/herbert-base-cased` model, user can pass any model from 
 
 ## Transformers embeddings
 
-| Task                          | Optimized Pipeline                                                                       |
-|-------------------------------|------------------------------------------------------------------------------------------|
-| Lightning Text Classification | [OptimizedLightingClassificationPipeline](embeddings/pipeline/lightning_hps_pipeline.py) | 
-| Lightning Sequence Labeling   | [OptimizedLightingSequenceLabelingPipeline](embeddings/pipeline/lightning_hps_pipeline.py)                                                                                        |
+| Task                          | Optimized Pipeline                                                                         |
+|-------------------------------|--------------------------------------------------------------------------------------------|
+| Lightning Text Classification | [OptimizedLightingClassificationPipeline](embeddings/pipeline/lightning_hps_pipeline.py)   | 
+| Lightning Sequence Labeling   | [OptimizedLightingSequenceLabelingPipeline](embeddings/pipeline/lightning_hps_pipeline.py) |
 
 
 
@@ -253,7 +253,7 @@ from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingClassifi
 
 pipeline = OptimizedLightingClassificationPipeline(
     config_space=LightingTextClassificationConfigSpace(
-        embedding_name="allegro/herbert-base-cased"
+        embedding_name_or_path="allegro/herbert-base-cased"
     ),
     dataset_name="clarin-pl/polemo2-official",
     input_column_name="text",
@@ -287,7 +287,7 @@ Instead of performing search with single embedding model we can search with mult
 ```python
 pipeline = OptimizedLightingClassificationPipeline(
     config_space=LightingTextClassificationConfigSpace(
-        embedding_name=["allegro/herbert-base-cased", "clarin-pl/roberta-polish-kgr10"]
+        embedding_name_or_path=["allegro/herbert-base-cased", "clarin-pl/roberta-polish-kgr10"]
     ),
     dataset_name="clarin-pl/polemo2-official",
     input_column_name="text",
