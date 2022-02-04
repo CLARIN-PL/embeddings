@@ -1,11 +1,11 @@
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
-import pandas as pd
 from numpy import typing as nptyping
 from sklearn.base import ClassifierMixin as AnySklearnClassifier
 
 from embeddings.embedding.sklearn_embedding import SklearnEmbedding
 from embeddings.task.sklearn_task.sklearn_task import SklearnTask
+from embeddings.utils.array_like import ArrayLike
 
 
 class TextClassification(SklearnTask):
@@ -23,15 +23,14 @@ class TextClassification(SklearnTask):
 
     def fit(
         self,
-        x_train: Union[pd.DataFrame, nptyping.NDArray[Any]],
-        y_train: Union[pd.Series, nptyping.NDArray[Any]],
+        x_train: ArrayLike,
+        y_train: ArrayLike,
     ) -> None:
-
         self.classifier.fit(x_train, y_train)
 
     def predict(
         self,
-        data: Dict[str, Union[pd.DataFrame, nptyping.NDArray[Any]]],
+        data: Dict[str, ArrayLike],
         predict_subset: str = "test",
     ) -> Dict[str, nptyping.NDArray[Any]]:
         predictions = self.classifier.predict(self.embedding.embed(data[predict_subset]["x"]))
@@ -43,7 +42,7 @@ class TextClassification(SklearnTask):
 
     def fit_predict(
         self,
-        data: Dict[str, Union[pd.DataFrame, nptyping.NDArray[Any]]],
+        data: Dict[str, ArrayLike],
         predict_subset: str = "test",
     ) -> Dict[str, nptyping.NDArray[Any]]:
         x_train = self.embedding.embed(data["train"]["x"])

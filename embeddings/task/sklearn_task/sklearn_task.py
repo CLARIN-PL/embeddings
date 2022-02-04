@@ -1,32 +1,35 @@
-from typing import Any, Dict, Union
+from abc import abstractmethod
+from typing import Any, Dict
 
 import pandas as pd
 from numpy import typing as nptyping
 
 from embeddings.task.task import Task
+from embeddings.utils.array_like import ArrayLike
 
 
 class SklearnTask(Task[pd.DataFrame, Dict[str, Any]]):
-    def __init__(self) -> None:
-        super().__init__()
 
+    @abstractmethod
     def fit(
         self,
-        x_train: Union[pd.DataFrame, nptyping.NDArray[Any]],
-        y_train: Union[pd.Series, nptyping.NDArray[Any]],
+        x_train: ArrayLike,
+        y_train: ArrayLike,
     ) -> None:
         pass
 
+    @abstractmethod
     def predict(
         self,
-        data: Dict[str, Union[pd.DataFrame, nptyping.NDArray[Any]]],
+        data: Dict[str, ArrayLike],
         predict_subset: str = "test",
     ) -> Dict[str, nptyping.NDArray[Any]]:
         pass
 
+    @abstractmethod
     def fit_predict(
         self,
-        data: Dict[str, Union[pd.DataFrame, nptyping.NDArray[Any]]],
-        predict_subset: str = "test",
+        data: Dict[str, ArrayLike],
+        predict_subset: str = "test"
     ) -> Dict[str, nptyping.NDArray[Any]]:
         pass

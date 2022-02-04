@@ -10,7 +10,4 @@ class ToPandasHuggingFaceCorpusTransformation(
     Transformation[datasets.DatasetDict, Dict[str, pd.DataFrame]]
 ):
     def transform(self, data: datasets.DatasetDict) -> Dict[str, pd.DataFrame]:
-        out = {}
-        for subset in data.keys():
-            out[subset] = data[subset].to_pandas()
-        return out
+        return {subset: data[subset].to_pandas() for subset in data.keys()}
