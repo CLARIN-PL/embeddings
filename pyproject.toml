@@ -90,6 +90,7 @@ profile = "black"
 python_version = "3.9"
 strict = true
 plugins = "numpy.typing.mypy_plugin"
+exclude = "experimental"
 
 [[tool.mypy.overrides]]
 module = [
