@@ -30,6 +30,8 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         self.task_train_kwargs = task_train_kwargs
         self.model: Optional[HuggingFaceLightningModule] = None
         self.trainer: Optional[pl.Trainer] = None
+        self.current_epoch: Optional[int] = None
+        self.best_epoch: Optional[int] = None
 
     def fit(
         self,
@@ -40,6 +42,8 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         self.trainer = pl.Trainer(default_root_dir=str(self.output_path), **self.task_train_kwargs)
         try:
             self.trainer.fit(self.model, data)
+            self.current_epoch = self.trainer.current_epoch
+            self.best_epoch = self.current_epoch - self.trainer.early_stopping_callback.patience
         except Exception as e:
             del self.trainer
             torch.cuda.empty_cache()  # type: ignore
