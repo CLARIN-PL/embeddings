@@ -192,10 +192,31 @@ def lightning_classification_config_dict(base_config_dict: Dict[str, Any]) -> Di
 
 
 @pytest.fixture()
+def lightning_classification_wrong_param_config_dict(
+    lightning_classification_config_dict: Dict[str, Any]
+) -> Dict[str, Any]:
+    config = deepcopy(lightning_classification_config_dict)
+    config["parameters"].update(
+        {"label_all_tokens": {"param_type": "constant", "name": "label_all_tokens", "value": False}}
+    )
+    return config
+
+
+@pytest.fixture()
+def base_yaml_config_file_path(
+    output_path: "TemporaryDirectory[str]", base_config_dict: Dict[str, Any]
+) -> Path:
+    output_path = Path(output_path.name).joinpath("config.yml")
+    with open(output_path, "w") as f:
+        yaml.dump(base_config_dict, f, default_flow_style=False)
+    return output_path
+
+
+@pytest.fixture()
 def flair_trainer_yaml_config_file_path(
     output_path: "TemporaryDirectory[str]", flair_trainer_config_dict: Dict[str, Any]
 ) -> Path:
-    output_path = Path(output_path.name).joinpath("config.yml")
+    output_path = Path(output_path.name).joinpath("flair_trainer_config.yml")
     with open(output_path, "w") as f:
         yaml.dump(flair_trainer_config_dict, f, default_flow_style=False)
     return output_path
@@ -203,11 +224,11 @@ def flair_trainer_yaml_config_file_path(
 
 @pytest.fixture()
 def flair_sequence_labeling_yaml_config_file_path(
-    output_path: "TemporaryDirectory[str]", flair_sequence_labeling_config: Dict[str, Any]
+    output_path: "TemporaryDirectory[str]", flair_sequence_labeling_config_dict: Dict[str, Any]
 ) -> Path:
     output_path = Path(output_path.name).joinpath("flair_sequence_labeling_config.yml")
     with open(output_path, "w") as f:
-        yaml.dump(flair_sequence_labeling_config, f, default_flow_style=False)
+        yaml.dump(flair_sequence_labeling_config_dict, f, default_flow_style=False)
     return output_path
 
 
@@ -218,6 +239,19 @@ def lightning_classification_yaml_config_file_path(
     output_path = Path(output_path.name).joinpath("lightning_classification_config.yml")
     with open(output_path, "w") as f:
         yaml.dump(lightning_classification_config_dict, f, default_flow_style=False)
+    return output_path
+
+
+@pytest.fixture()
+def lightning_classification_wrong_param_yaml_config_file_path(
+    output_path: "TemporaryDirectory[str]",
+    lightning_classification_wrong_param_config_dict: Dict[str, Any],
+) -> Path:
+    output_path = Path(output_path.name).joinpath(
+        "lightning_classification_no_embedding_name_config.yml"
+    )
+    with open(output_path, "w") as f:
+        yaml.dump(lightning_classification_wrong_param_config_dict, f, default_flow_style=False)
     return output_path
 
 
@@ -262,7 +296,7 @@ def test_flair_sequence_labeling_yaml_trainer_config(
 
 
 def test_flair_sequence_labeling_yaml_specific_config(
-    flair_sequence_labeling_config: Dict[str, Any],
+    flair_sequence_labeling_config_dict: Dict[str, Any],
     flair_sequence_labeling_yaml_config_file_path: Path,
 ) -> None:
     flair_sequence_labeling_config_space = FlairSequenceLabelingConfigSpace.from_yaml(
@@ -271,20 +305,58 @@ def test_flair_sequence_labeling_yaml_specific_config(
     assert hasattr(flair_sequence_labeling_config_space, "param_embedding_name")
     assert (
         flair_sequence_labeling_config_space.param_embedding_name.value
-        == flair_trainer_config_dict["embedding_name"]
+        == flair_sequence_labeling_config_dict["embedding_name"]
     )
-    compare_config_with_yaml(flair_sequence_labeling_config_space, flair_sequence_labeling_config)
+    compare_config_with_yaml(
+        flair_sequence_labeling_config_space, flair_sequence_labeling_config_dict
+    )
 
 
-# def test_lightning_classification_yaml_config(
-#     lightning_classification_config_dict: Dict[str, Any],
-#     lightning_classification_yaml_config_file_path: Path,
-# ) -> None:
-#     lightning_classification_config_space = LightingTextClassificationConfigSpace.from_yaml(
-#         lightning_classification_yaml_config_file_path
-#     )
-#     assert hasattr(lightning_classification_config_space, "param_embedding_name_or_path")
-#     assert (
-#         lightning_classification_config_space.param_embedding_name_or_path.value
-#         == flair_trainer_config_dict["embedding_name_or_path"]
-#     )
+def test_lightning_classification_yaml_config(
+    lightning_classification_config_dict: Dict[str, Any],
+    lightning_classification_yaml_config_file_path: Path,
+) -> None:
+    lightning_classification_config_space = LightingTextClassificationConfigSpace.from_yaml(
+        lightning_classification_yaml_config_file_path
+    )
+    assert hasattr(lightning_classification_config_space, "param_embedding_name_or_path")
+    assert (
+        lightning_classification_config_space.param_embedding_name_or_path.value
+        == lightning_classification_config_dict["embedding_name_or_path"]
+    )
+    compare_config_with_yaml(
+        lightning_classification_config_space, lightning_classification_config_dict
+    )
+
+
+def test_wrong_config_given(
+    lightning_classification_yaml_config_file_path: Path,
+    flair_sequence_labeling_yaml_config_file_path: Path,
+    flair_trainer_yaml_config_file_path: Path,
+):
+    with pytest.raises(KeyError):
+        LightingTextClassificationConfigSpace.from_yaml(
+            flair_sequence_labeling_yaml_config_file_path
+        )
+    with pytest.raises(KeyError):
+        LightingTextClassificationConfigSpace.from_yaml(flair_trainer_yaml_config_file_path)
+    with pytest.raises(KeyError):
+        FlairSequenceLabelingConfigSpace.from_yaml(lightning_classification_yaml_config_file_path)
+
+
+def test_no_embedding_name_given(
+    base_yaml_config_file_path: Path,
+):
+    with pytest.raises(KeyError):
+        LightingTextClassificationConfigSpace.from_yaml(base_yaml_config_file_path)
+    with pytest.raises(KeyError):
+        FlairSequenceLabelingConfigSpace.from_yaml(base_yaml_config_file_path)
+
+
+def test_wrong_param_given(
+    lightning_classification_wrong_param_yaml_config_file_path: Path,
+):
+    with pytest.raises(TypeError):
+        LightingTextClassificationConfigSpace.from_yaml(
+            lightning_classification_wrong_param_yaml_config_file_path
+        )
