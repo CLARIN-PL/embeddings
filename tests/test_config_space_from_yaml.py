@@ -1,3 +1,4 @@
+from copy import deepcopy
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict
@@ -10,6 +11,9 @@ from embeddings.hyperparameter_search.flair_configspace import FlairModelTrainer
 from embeddings.hyperparameter_search.flair_configspace import (
     SequenceLabelingConfigSpace as FlairSequenceLabelingConfigSpace,
 )
+from embeddings.hyperparameter_search.lighting_configspace import (
+    LightingTextClassificationConfigSpace,
+)
 
 
 @pytest.fixture(scope="module")
@@ -17,10 +21,9 @@ def output_path() -> "TemporaryDirectory[str]":
     return TemporaryDirectory()
 
 
-@pytest.fixture(scope="module")
-def flair_trainer_config() -> Dict[str, Any]:
+@pytest.fixture()
+def base_config_dict() -> Dict[str, Any]:
     config = {
-        "embedding_name": "herbert-base-cased",
         "parameters": {
             "learning_rate": {
                 "high": 0.1,
@@ -45,14 +48,22 @@ def flair_trainer_config() -> Dict[str, Any]:
                 "step": 1,
                 "type": "log_int_uniform",
             },
-        },
+        }
     }
     return config
 
 
-@pytest.fixture(scope="module")
-def flair_sequence_labeling_config(flair_trainer_config: Dict[str, Any]) -> Dict[str, Any]:
-    config = flair_trainer_config
+@pytest.fixture()
+def flair_trainer_config_dict(base_config_dict: Dict[str, Any]) -> Dict[str, Any]:
+    config = deepcopy(base_config_dict)
+    config["embedding_name"] = "allegro/herbert-base-case"
+    return config
+
+
+@pytest.fixture()
+def flair_sequence_labeling_config_dict(base_config_dict: Dict[str, Any]) -> Dict[str, Any]:
+    config = deepcopy(base_config_dict)
+    config["embedding_name"] = "allegro/herbert-base-case"
     config["parameters"].update(
         {
             "hidden_size": {
@@ -116,29 +127,101 @@ def flair_sequence_labeling_config(flair_trainer_config: Dict[str, Any]) -> Dict
     return config
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
+def lightning_classification_config_dict(base_config_dict: Dict[str, Any]) -> Dict[str, Any]:
+    config = deepcopy(base_config_dict)
+    config["embedding_name_or_path"] = "allegro/herbert-base-case"
+    config["parameters"].update(
+        {
+            "max_seq_length": {
+                "param_type": "constant",
+                "name": "max_seq_length",
+                "value": 128,
+            },
+            "optimizer": {
+                "param_type": "searchable",
+                "name": "optimizer",
+                "type": "categorical",
+                "choices": ["Adam", "AdamW"],
+            },
+            "use_scheduler": {
+                "param_type": "searchable",
+                "name": "use_scheduler",
+                "type": "categorical",
+                "choices": [False, True],
+            },
+            "warmup_steps": {
+                "param_type": "searchable",
+                "name": "warmup_steps",
+                "type": "int_uniform",
+                "low": 0,
+                "high": 200,
+                "step": 10,
+            },
+            "adam_epsilon": {
+                "param_type": "searchable",
+                "name": "adam_epsilon",
+                "type": "uniform",
+                "low": 0.0,
+                "high": 0.1,
+            },
+            "weight_decay": {
+                "param_type": "searchable",
+                "name": "weight_decay",
+                "type": "uniform",
+                "low": 0.0,
+                "high": 0.1,
+            },
+            "finetune_last_n_layers": {
+                "param_type": "searchable",
+                "name": "finetune_last_n_layers",
+                "type": "categorical",
+                "choices": [-1, 0, 1, 3, 5, 7, 9],
+            },
+            "classifier_dropout": {
+                "param_type": "searchable",
+                "name": "classifier_dropout",
+                "type": "discrete_uniform",
+                "low": 0.0,
+                "high": 0.5,
+                "q": 0.05,
+            },
+        }
+    )
+    return config
+
+
+@pytest.fixture()
 def flair_trainer_yaml_config_file_path(
-    output_path: "TemporaryDirectory[str]", flair_trainer_config: Dict[str, Any]
+    output_path: "TemporaryDirectory[str]", flair_trainer_config_dict: Dict[str, Any]
 ) -> Path:
     output_path = Path(output_path.name).joinpath("config.yml")
     with open(output_path, "w") as f:
-        yaml.dump(flair_trainer_config, f, default_flow_style=False)
+        yaml.dump(flair_trainer_config_dict, f, default_flow_style=False)
     return output_path
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def flair_sequence_labeling_yaml_config_file_path(
     output_path: "TemporaryDirectory[str]", flair_sequence_labeling_config: Dict[str, Any]
 ) -> Path:
-    output_path = Path(output_path.name).joinpath("config.yml")
+    output_path = Path(output_path.name).joinpath("flair_sequence_labeling_config.yml")
     with open(output_path, "w") as f:
         yaml.dump(flair_sequence_labeling_config, f, default_flow_style=False)
     return output_path
 
 
+@pytest.fixture()
+def lightning_classification_yaml_config_file_path(
+    output_path: "TemporaryDirectory[str]", lightning_classification_config_dict: Dict[str, Any]
+) -> Path:
+    output_path = Path(output_path.name).joinpath("lightning_classification_config.yml")
+    with open(output_path, "w") as f:
+        yaml.dump(lightning_classification_config_dict, f, default_flow_style=False)
+    return output_path
+
+
 def compare_config_with_yaml(config_space: BaseConfigSpace, config: Dict[str, Any]) -> None:
-    assert hasattr(config_space, "param_embedding_name")
-    assert config_space.param_embedding_name.value == config["embedding_name"]
     cs_params = config.pop("parameters")
     for param_name, param_values in cs_params.items():
         param_values.pop("param_type")
@@ -151,21 +234,31 @@ def compare_config_with_yaml(config_space: BaseConfigSpace, config: Dict[str, An
 
 
 def test_flair_trainer_yaml_config(
-    flair_trainer_config: Dict[str, Any], flair_trainer_yaml_config_file_path: Path
+    flair_trainer_config_dict: Dict[str, Any], flair_trainer_yaml_config_file_path: Path
 ) -> None:
     flair_trainer_config_space = FlairModelTrainerConfigSpace.from_yaml(
         flair_trainer_yaml_config_file_path
     )
-    compare_config_with_yaml(flair_trainer_config_space, flair_trainer_config)
+    assert hasattr(flair_trainer_config_space, "param_embedding_name")
+    assert (
+        flair_trainer_config_space.param_embedding_name.value
+        == flair_trainer_config_dict["embedding_name"]
+    )
+    compare_config_with_yaml(flair_trainer_config_space, flair_trainer_config_dict)
 
 
 def test_flair_sequence_labeling_yaml_trainer_config(
-    flair_trainer_config: Dict[str, Any], flair_trainer_yaml_config_file_path: Path
+    flair_trainer_config_dict: Dict[str, Any], flair_trainer_yaml_config_file_path: Path
 ) -> None:
     flair_trainer_config_space = FlairSequenceLabelingConfigSpace.from_yaml(
         flair_trainer_yaml_config_file_path
     )
-    compare_config_with_yaml(flair_trainer_config_space, flair_trainer_config)
+    assert hasattr(flair_trainer_config_space, "param_embedding_name")
+    assert (
+        flair_trainer_config_space.param_embedding_name.value
+        == flair_trainer_config_dict["embedding_name"]
+    )
+    compare_config_with_yaml(flair_trainer_config_space, flair_trainer_config_dict)
 
 
 def test_flair_sequence_labeling_yaml_specific_config(
@@ -175,4 +268,23 @@ def test_flair_sequence_labeling_yaml_specific_config(
     flair_sequence_labeling_config_space = FlairSequenceLabelingConfigSpace.from_yaml(
         flair_sequence_labeling_yaml_config_file_path
     )
+    assert hasattr(flair_sequence_labeling_config_space, "param_embedding_name")
+    assert (
+        flair_sequence_labeling_config_space.param_embedding_name.value
+        == flair_trainer_config_dict["embedding_name"]
+    )
     compare_config_with_yaml(flair_sequence_labeling_config_space, flair_sequence_labeling_config)
+
+
+# def test_lightning_classification_yaml_config(
+#     lightning_classification_config_dict: Dict[str, Any],
+#     lightning_classification_yaml_config_file_path: Path,
+# ) -> None:
+#     lightning_classification_config_space = LightingTextClassificationConfigSpace.from_yaml(
+#         lightning_classification_yaml_config_file_path
+#     )
+#     assert hasattr(lightning_classification_config_space, "param_embedding_name_or_path")
+#     assert (
+#         lightning_classification_config_space.param_embedding_name_or_path.value
+#         == flair_trainer_config_dict["embedding_name_or_path"]
+#     )
