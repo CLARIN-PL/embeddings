@@ -1,7 +1,7 @@
 import collections
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, Any, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 from unittest.mock import patch
 
 import pandas as pd
@@ -15,8 +15,10 @@ from embeddings.hyperparameter_search.lighting_configspace import (
 from embeddings.hyperparameter_search.parameters import ConstantParameter
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingClassificationPipeline
-from embeddings.pipeline.pipelines_metadata import Metadata, \
-    LightningClassificationPipelineMetadata, LightningPipelineMetadata
+from embeddings.pipeline.pipelines_metadata import (
+    LightningClassificationPipelineMetadata,
+    LightningPipelineMetadata,
+)
 
 TESTING_DATAMODULE_KWARGS: Dict[str, Any] = deepcopy(
     LightningClassificationPipeline.DEFAULT_DATAMODULE_KWARGS
@@ -30,7 +32,9 @@ TESTING_DATAMODULE_KWARGS.update(
 )
 
 
-def _flatten(d: Union[collections.MutableMapping[Any, Any], LightningPipelineMetadata]) -> Dict[Any, Any]:
+def _flatten(
+    d: Union[collections.MutableMapping[Any, Any], LightningPipelineMetadata]
+) -> Dict[Any, Any]:
     items: List[tuple[Any, Any]] = []
     for k, v in d.items():
         new_key = k
@@ -99,7 +103,7 @@ def test_common_keys(
     classification_config_space: LightingTextClassificationConfigSpace,
 ) -> None:
     df, metadata = classification_hps_run_result
-    assert _flatten(metadata).keys() & classification_config_space.__dict__.keys() == {
+    assert _flatten(metadata).keys() & classification_config_space._get_fields().keys() == {
         "learning_rate",
         "adam_epsilon",
         "max_epochs",
@@ -166,7 +170,9 @@ def retrain_model_result(
     return results
 
 
-def test_evaluation_json_exists(retrain_tmp_path: Path, retrain_model_result: Dict[str, Any]) -> None:
+def test_evaluation_json_exists(
+    retrain_tmp_path: Path, retrain_model_result: Dict[str, Any]
+) -> None:
     assert retrain_tmp_path.joinpath("evaluation.json").exists()
 
 
