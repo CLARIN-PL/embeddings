@@ -146,7 +146,7 @@ class LightingConfigSpace(BaseConfigSpace, ABC):
     def _parse_yaml(cls, path: T_path) -> Dict[str, Any]:
         config = read_yaml(path)
         variables = {
-            "embedding_name": config.pop("embedding_name"),
+            "embedding_name_or_path": config.pop("embedding_name_or_path"),
             "devices": config.pop("devices", DEFAULT_DEVICES),
             "accelerator": config.pop("accelerator", DEFAULT_ACCELERATOR),
         }
