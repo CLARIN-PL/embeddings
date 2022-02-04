@@ -20,13 +20,19 @@ jobs:
         id: cached-poetry-dependencies
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
+          key: ${{github.event.pull_request.head.ref}}-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            main-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
+            main-venv-${{ runner.os }}-${{matrix.python-version}}-
       - uses: actions/cache@v2
         name: Load cached HF
         id: cached-huggingface-data
         with:
           path: .hf
-          key: hf-${{ hashFiles('**/poetry.lock') }}
+          key: ${{github.event.pull_request.head.ref}}-hf-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            main-hf-${{ hashFiles('**/poetry.lock') }}
+            main-hf-
       - name: Install poetry
         uses: abatilo/actions-poetry@v2.0.0
         with:
@@ -60,7 +66,10 @@ jobs:
         id: cached-poetry-dependencies
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
+          key: ${{github.event.pull_request.head.ref}}-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            main-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
+            main-venv-${{ runner.os }}-${{matrix.python-version}}-
       - name: Install deps
         run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
       - name: Check
@@ -93,7 +102,7 @@ jobs:
         id: cached-poetry-dependencies
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
+          key: ${{github.event.pull_request.head.ref}}-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
       - name: Install deps
         run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
       - name: Build and publish

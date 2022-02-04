@@ -27,7 +27,10 @@ jobs:
         id: cached-poetry-dependencies
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
+          key: release-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            main-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
+            main-venv-${{ runner.os }}-${{matrix.python-version}}-
       - name: Install deps
         run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
       - name: Build and publish
