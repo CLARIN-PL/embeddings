@@ -1,10 +1,13 @@
 import collections
 from copy import deepcopy
 from pathlib import Path
+from typing import Dict, Any, List, Tuple, Union
 from unittest.mock import patch
 
+import pandas as pd
 import pytest
 import yaml
+from _pytest.tmpdir import TempdirFactory
 
 from embeddings.hyperparameter_search.lighting_configspace import (
     LightingTextClassificationConfigSpace,
@@ -12,8 +15,12 @@ from embeddings.hyperparameter_search.lighting_configspace import (
 from embeddings.hyperparameter_search.parameters import ConstantParameter
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingClassificationPipeline
+from embeddings.pipeline.pipelines_metadata import Metadata, \
+    LightningClassificationPipelineMetadata, LightningPipelineMetadata
 
-TESTING_DATAMODULE_KWARGS = deepcopy(LightningClassificationPipeline.DEFAULT_DATAMODULE_KWARGS)
+TESTING_DATAMODULE_KWARGS: Dict[str, Any] = deepcopy(
+    LightningClassificationPipeline.DEFAULT_DATAMODULE_KWARGS
+)
 TESTING_DATAMODULE_KWARGS.update(
     {
         "downsample_train": 0.01,
@@ -23,8 +30,8 @@ TESTING_DATAMODULE_KWARGS.update(
 )
 
 
-def _flatten(d):
-    items = []
+def _flatten(d: Union[collections.MutableMapping[Any, Any], LightningPipelineMetadata]) -> Dict[Any, Any]:
+    items: List[tuple[Any, Any]] = []
     for k, v in d.items():
         new_key = k
         if isinstance(v, collections.MutableMapping):
@@ -35,20 +42,20 @@ def _flatten(d):
 
 
 @pytest.fixture(scope="module")
-def tmp_path_module(tmpdir_factory):
+def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
     path = tmpdir_factory.mktemp(__name__)
     return Path(path)
 
 
 @pytest.fixture(scope="module")
-def retrain_tmp_path(tmp_path_module):
+def retrain_tmp_path(tmp_path_module: Path) -> Path:
     path = tmp_path_module.joinpath("retrain")
     path.mkdir()
     return path
 
 
 @pytest.fixture(scope="module")
-def classification_config_space():
+def classification_config_space() -> LightingTextClassificationConfigSpace:
     config_space = LightingTextClassificationConfigSpace(
         embedding_name="hf-internal-testing/tiny-albert",
         finetune_last_n_layers=ConstantParameter("finetune_last_n_layers", 0),
@@ -61,7 +68,9 @@ def classification_config_space():
 @patch.object(
     LightningClassificationPipeline, "DEFAULT_DATAMODULE_KWARGS", TESTING_DATAMODULE_KWARGS
 )
-def classification_hps_run_result(tmp_path_module, classification_config_space):
+def classification_hps_run_result(
+    tmp_path_module: Path, classification_config_space: LightingTextClassificationConfigSpace
+) -> Tuple[pd.DataFrame, LightningClassificationPipelineMetadata]:
     assert LightningClassificationPipeline.DEFAULT_DATAMODULE_KWARGS == TESTING_DATAMODULE_KWARGS
     pipeline = OptimizedLightingClassificationPipeline(
         config_space=classification_config_space,
@@ -77,12 +86,18 @@ def classification_hps_run_result(tmp_path_module, classification_config_space):
     return df, metadata
 
 
-def test_hps_output_files_exist(tmp_path_module, classification_hps_run_result):
+def test_hps_output_files_exist(
+    tmp_path_module: Path,
+    classification_hps_run_result: Tuple[pd.DataFrame, LightningClassificationPipelineMetadata],
+) -> None:
     assert tmp_path_module.joinpath("best_params.yaml").exists()
     assert tmp_path_module.joinpath("hps_log.pickle").exists()
 
 
-def test_common_keys(classification_hps_run_result, classification_config_space):
+def test_common_keys(
+    classification_hps_run_result: Tuple[pd.DataFrame, LightningClassificationPipelineMetadata],
+    classification_config_space: LightingTextClassificationConfigSpace,
+) -> None:
     df, metadata = classification_hps_run_result
     assert _flatten(metadata).keys() & classification_config_space.__dict__.keys() == {
         "learning_rate",
@@ -99,8 +114,9 @@ def test_common_keys(classification_hps_run_result, classification_config_space)
 
 
 def test_keys_allowed_in_metadata_but_not_in_config_space(
-    classification_hps_run_result, classification_config_space
-):
+    classification_hps_run_result: Tuple[pd.DataFrame, LightningClassificationPipelineMetadata],
+    classification_config_space: LightingTextClassificationConfigSpace,
+) -> None:
     df, metadata = classification_hps_run_result
     assert _flatten(metadata).keys() - classification_config_space.__dict__.keys() == {
         "tokenizer_kwargs",
@@ -120,8 +136,9 @@ def test_keys_allowed_in_metadata_but_not_in_config_space(
 
 
 def test_keys_allowed_in_config_space_but_not_in_metadata(
-    classification_hps_run_result, classification_config_space
-):
+    classification_hps_run_result: Tuple[pd.DataFrame, LightningClassificationPipelineMetadata],
+    classification_config_space: LightingTextClassificationConfigSpace,
+) -> None:
 
     df, metadata = classification_hps_run_result
     assert classification_config_space.__dict__.keys() - _flatten(metadata).keys() == {
@@ -137,21 +154,28 @@ def test_keys_allowed_in_config_space_but_not_in_metadata(
 @patch.object(
     LightningClassificationPipeline, "DEFAULT_DATAMODULE_KWARGS", TESTING_DATAMODULE_KWARGS
 )
-def retrain_model_result(retrain_tmp_path, classification_hps_run_result):
+def retrain_model_result(
+    retrain_tmp_path: Path,
+    classification_hps_run_result: Tuple[pd.DataFrame, LightningClassificationPipelineMetadata],
+) -> Dict[str, Any]:
     assert LightningClassificationPipeline.DEFAULT_DATAMODULE_KWARGS == TESTING_DATAMODULE_KWARGS
     df, metadata = classification_hps_run_result
-    pipeline = LightningClassificationPipeline(output_path=retrain_tmp_path, **metadata)
+    metadata["output_path"] = retrain_tmp_path
+    pipeline = LightningClassificationPipeline(**metadata)
     results = pipeline.run()
     return results
 
 
-def test_evaluation_json_exists(retrain_tmp_path, retrain_model_result):
+def test_evaluation_json_exists(retrain_tmp_path: Path, retrain_model_result: Dict[str, Any]) -> None:
     assert retrain_tmp_path.joinpath("evaluation.json").exists()
 
 
 def test_hparams_best_params_files_compatibility(
-    tmp_path_module, retrain_tmp_path, retrain_model_result, classification_hps_run_result
-):
+    tmp_path_module: Path,
+    retrain_tmp_path: Path,
+    retrain_model_result: Dict[str, Any],
+    classification_hps_run_result: Tuple[pd.DataFrame, LightningClassificationPipelineMetadata],
+) -> None:
     df, metadata = classification_hps_run_result
 
     with open(retrain_tmp_path / "lightning_logs" / "version_0" / "hparams.yaml") as f:
@@ -189,12 +213,11 @@ def test_hparams_best_params_files_compatibility(
         "target_column_name",
         "accelerator",
     }
-
     for k in common_keys:
         if k == "tokenizer_name":  # todo: remove
             continue
         if k in metadata:
-            assert hparams[k] == best_params[k] == metadata[k]
+            assert hparams[k] == best_params[k] == metadata[k]  # type: ignore
         else:
             assert hparams[k] == best_params[k]
 
