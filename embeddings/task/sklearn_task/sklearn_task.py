@@ -9,7 +9,6 @@ from embeddings.utils.array_like import ArrayLike
 
 
 class SklearnTask(Task[pd.DataFrame, Dict[str, Any]]):
-
     @abstractmethod
     def fit(
         self,
