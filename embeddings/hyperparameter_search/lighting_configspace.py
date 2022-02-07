@@ -152,7 +152,7 @@ class LightingConfigSpace(BaseConfigSpace, ABC):
         }
         parameters = cls._parse_yaml_params(config.pop("parameters"))
         cls._check_unmapped_parameters(config)
-        return variables | parameters
+        return {**variables, **parameters}
 
     @classmethod
     def from_yaml(cls, path: T_path) -> "LightingConfigSpace":
