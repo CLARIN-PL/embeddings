@@ -1,5 +1,5 @@
 import collections
-from typing import Union, Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from embeddings.pipeline.pipelines_metadata import LightningPipelineMetadata
 

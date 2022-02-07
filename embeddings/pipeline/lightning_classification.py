@@ -55,7 +55,7 @@ class LightningClassificationPipeline(
         self.model_config_kwargs = initialize_kwargs(
             self.DEFAULT_MODEL_CONFIG_KWARGS, model_config_kwargs
         )
-        self.task_model_kwargs = initialize_kwargs(
+        self.task_model_kwargs = task_model_kwargs = initialize_kwargs(
             self.DEFAULT_TASK_MODEL_KWARGS, task_model_kwargs
         )
         self.early_stopping_kwargs = initialize_kwargs(

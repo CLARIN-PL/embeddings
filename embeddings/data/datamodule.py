@@ -25,6 +25,10 @@ _logger = get_logger(__name__)
 class BaseDataModule(abc.ABC, pl.LightningDataModule, Generic[Data]):
     dataset: Data
 
+    def __init__(self) -> None:
+        super().__init__()  # type: ignore
+        self.save_hyperparameters()
+
 
 class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
     LOADER_COLUMNS = [
@@ -57,7 +61,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
     ) -> None:
         # ignoring the type to avoid calling to untyped function "__init__" in typed context error
         # caused by pl.LightningDataModule __init__ method not being typed
-        super().__init__()  # type: ignore
+        super().__init__()
         self.tokenizer_name_or_path = tokenizer_name_or_path
         self.dataset_name_or_path = dataset_name_or_path
         self.target_field = target_field
