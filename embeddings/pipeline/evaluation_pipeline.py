@@ -10,6 +10,7 @@ from embeddings.data.data_loader import (
     PickleFlairCorpusDataLoader,
 )
 from embeddings.data.dataset import Data, Dataset, LocalDataset
+from embeddings.data.io import T_path
 from embeddings.embedding.auto_flair import (
     AutoFlairDocumentPoolEmbedding,
     AutoFlairWordEmbedding,
@@ -52,15 +53,15 @@ class ModelEvaluationPipeline(
 
 
 class FlairTextClassificationEvaluationPipeline(
-    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
+    ModelEvaluationPipeline[T_path, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
     def __init__(
         self,
-        dataset_path: str,
-        embedding_name: str,
-        output_path: str,
+        dataset_path: T_path,
+        model_name: str,
+        output_path: T_path,
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
-        persist_path: Optional[str] = None,
+        persist_path: Optional[T_path] = None,
         predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
@@ -70,9 +71,7 @@ class FlairTextClassificationEvaluationPipeline(
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
         embedding = AutoFlairDocumentPoolEmbedding.from_hub(
-            repo_id=embedding_name,
-            document_embedding_cls=document_embedding_cls,
-            **load_model_kwargs
+            repo_id=model_name, document_embedding_cls=document_embedding_cls, **load_model_kwargs
         )
         task = TextClassification(
             output_path=output_path,
@@ -87,15 +86,15 @@ class FlairTextClassificationEvaluationPipeline(
 
 
 class FlairTextPairClassificationEvaluationPipeline(
-    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
+    ModelEvaluationPipeline[T_path, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
     def __init__(
         self,
-        dataset_path: str,
-        embedding_name: str,
-        output_path: str,
+        dataset_path: T_path,
+        model_name: str,
+        output_path: T_path,
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
-        persist_path: Optional[str] = None,
+        persist_path: Optional[T_path] = None,
         predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
@@ -105,9 +104,7 @@ class FlairTextPairClassificationEvaluationPipeline(
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
         embedding = AutoFlairDocumentPoolEmbedding.from_hub(
-            repo_id=embedding_name,
-            document_embedding_cls=document_embedding_cls,
-            **load_model_kwargs
+            repo_id=model_name, document_embedding_cls=document_embedding_cls, **load_model_kwargs
         )
         task = TextPairClassification(
             output_path=output_path,
@@ -122,19 +119,19 @@ class FlairTextPairClassificationEvaluationPipeline(
 
 
 class FlairSequenceLabelingEvaluationPipeline(
-    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
+    ModelEvaluationPipeline[T_path, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
     DEFAULT_EVAL_MODE = SequenceLabelingEvaluator.EvaluationMode.CONLL
 
     def __init__(
         self,
-        dataset_path: str,
+        dataset_path: T_path,
         embedding_name: str,
-        output_path: str,
+        output_path: T_path,
         hidden_size: int,
         evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = DEFAULT_EVAL_MODE,
         tagging_scheme: Optional[SequenceLabelingEvaluator.TaggingScheme] = None,
-        persist_path: Optional[str] = None,
+        persist_path: Optional[T_path] = None,
         predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
         task_train_kwargs: Optional[Dict[str, Any]] = None,

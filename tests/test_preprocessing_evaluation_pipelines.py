@@ -56,7 +56,6 @@ def task_train_kwargs() -> Dict[str, int]:
 @pytest.fixture(scope="module")
 def sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
-    embedding_name: str,
     ner_dataset_name: str,
 ) -> Tuple[PreprocessingPipeline[str, datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"]:
     dataset = HuggingFaceDataset(ner_dataset_name)
@@ -98,7 +97,6 @@ def sequence_labeling_evaluation_pipeline(
 
 def test_sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
-    embedding_name: str,
     ner_dataset_name: str,
     hidden_size: int,
     task_train_kwargs: Dict[str, int],

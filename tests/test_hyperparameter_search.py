@@ -5,6 +5,7 @@ import optuna
 import pytest
 from pydantic import create_model_from_typeddict
 
+from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.hyperparameter_search.parameters import SearchableParameter
 from embeddings.pipeline.flair_classification import FlairClassificationPipeline
 from embeddings.pipeline.flair_pair_classification import FlairPairClassificationPipeline
@@ -86,18 +87,18 @@ def lightning_text_classification_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
 def lightning_classification_kwargs(output_path: "TemporaryDirectory[str]") -> Dict[str, Any]:
     return {
         "output_path": output_path.name,
-        "embedding_name": "clarin-pl/roberta-polish-kgr10",
+        "embedding_name_or_path": "clarin-pl/roberta-polish-kgr10",
         "task_model_kwargs": None,
         "task_train_kwargs": None,
         "model_config_kwargs": None,
         "train_batch_size": 1,
         "eval_batch_size": 1,
         "finetune_last_n_layers": 0,
-        "tokenizer_name": None,
+        "tokenizer_name_or_path": None,
         "datamodule_kwargs": None,
         "tokenizer_kwargs": None,
         "batch_encoding_kwargs": None,
-        "predict_subset": "test",
+        "predict_subset": LightingDataModuleSubset.TEST,
     }
 
 

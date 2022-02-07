@@ -152,7 +152,7 @@ class OptimizedFlairClassificationPipeline(
         metadata: FlairClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
             "document_embedding_cls": document_embedding_cls,
-            "dataset_name_or_path": self.dataset_name_or_path,
+            "dataset_name": self.dataset_name,
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
@@ -263,7 +263,7 @@ class OptimizedFlairPairClassificationPipeline(
         metadata: FlairPairClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
             "document_embedding_cls": document_embedding_cls,
-            "dataset_name_or_path": self.dataset_name_or_path,
+            "dataset_name": self.dataset_name,
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "input_columns_names_pair": self.input_columns_names_pair,
             "target_column_name": self.target_column_name,
@@ -393,7 +393,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         metadata: FlairSequenceLabelingPipelineMetadata = {
             "embedding_name": embedding_name,
             "hidden_size": hidden_size,
-            "dataset_name_or_path": self.dataset_name_or_path,
+            "dataset_name": self.dataset_name,
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,

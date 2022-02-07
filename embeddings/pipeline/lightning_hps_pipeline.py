@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, Optional, Tuple
 
+from embeddings.data.dataset import LightingDataModuleSubset
+from embeddings.data.io import T_path
 from embeddings.evaluator.sequence_labeling_evaluator import (
     EvaluationMode,
     SequenceLabelingEvaluator,
@@ -41,7 +43,7 @@ class _OptimizedLightingPipelineBase(
     tmp_model_output_dir: TemporaryDirectory[str] = field(
         init=False, default_factory=TemporaryDirectory
     )
-    tokenizer_name: Optional[str] = None
+    tokenizer_name_or_path: Optional[T_path] = None
     tokenizer_kwargs: Optional[Dict[str, Any]] = None
     batch_encoding_kwargs: Optional[Dict[str, Any]] = None
 
@@ -68,7 +70,7 @@ class OptimizedLightingPipeline(
 
     def _get_evaluation_metadata(self, parameters: SampledParameters) -> LightningMetadata:
         metadata = self._get_metadata(parameters)
-        metadata["predict_subset"] = "dev"
+        metadata["predict_subset"] = LightingDataModuleSubset.VALIDATION
         metadata["dataset_name_or_path"] = self.tmp_dataset_dir.name
         metadata["output_path"] = self.tmp_model_output_dir.name
         return metadata
@@ -91,8 +93,8 @@ class OptimizedLightingPipeline(
         Dict[str, ParameterValues],
         Dict[str, ParameterValues],
     ]:
-        embedding_name = parameters["embedding_name"]
-        assert isinstance(embedding_name, str)
+        embedding_name_or_path = parameters["embedding_name_or_path"]
+        assert isinstance(embedding_name_or_path, str)
         train_batch_size = parameters["train_batch_size"]
         assert isinstance(train_batch_size, int)
         eval_batch_size = parameters["eval_batch_size"]
@@ -109,7 +111,7 @@ class OptimizedLightingPipeline(
         assert isinstance(model_config_kwargs, dict)
 
         return (
-            embedding_name,
+            embedding_name_or_path,
             train_batch_size,
             eval_batch_size,
             finetune_last_n_layers,
@@ -135,8 +137,8 @@ class OptimizedLightingClassificationPipeline(
                 sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,
-            ),
-            evaluation_pipeline=LightningClassificationPipeline,  # type: ignore
+            ),  # type: ignore
+            evaluation_pipeline=LightningClassificationPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
@@ -150,7 +152,7 @@ class OptimizedLightingClassificationPipeline(
         self, parameters: SampledParameters
     ) -> LightningClassificationPipelineMetadata:
         (
-            embedding_name,
+            embedding_name_or_path,
             train_batch_size,
             eval_batch_size,
             finetune_last_n_layers,
@@ -160,14 +162,14 @@ class OptimizedLightingClassificationPipeline(
             model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: LightningClassificationPipelineMetadata = {
-            "embedding_name": embedding_name,
+            "embedding_name_or_path": embedding_name_or_path,
             "dataset_name_or_path": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
             "train_batch_size": train_batch_size,
             "eval_batch_size": eval_batch_size,
             "finetune_last_n_layers": finetune_last_n_layers,
-            "tokenizer_name": self.tokenizer_name,
+            "tokenizer_name_or_path": self.tokenizer_name_or_path,
             "datamodule_kwargs": datamodule_kwargs,
             "tokenizer_kwargs": self.tokenizer_kwargs,
             "batch_encoding_kwargs": self.batch_encoding_kwargs,
@@ -175,7 +177,7 @@ class OptimizedLightingClassificationPipeline(
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
             "model_config_kwargs": model_config_kwargs,
-            "predict_subset": "test",
+            "predict_subset": LightingDataModuleSubset.TEST,
         }
         return metadata
 
@@ -202,8 +204,8 @@ class OptimizedLightingSequenceLabelingPipeline(
                 sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,
-            ),
-            evaluation_pipeline=LightningSequenceLabelingPipeline,  # type: ignore
+            ),  # type: ignore
+            evaluation_pipeline=LightningSequenceLabelingPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
@@ -217,7 +219,7 @@ class OptimizedLightingSequenceLabelingPipeline(
         self, parameters: SampledParameters
     ) -> LightningSequenceLabelingPipelineMetadata:
         (
-            embedding_name,
+            embedding_name_or_path,
             train_batch_size,
             eval_batch_size,
             finetune_last_n_layers,
@@ -227,7 +229,7 @@ class OptimizedLightingSequenceLabelingPipeline(
             model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: LightningSequenceLabelingPipelineMetadata = {
-            "embedding_name": embedding_name,
+            "embedding_name_or_path": embedding_name_or_path,
             "dataset_name_or_path": self.dataset_name,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
@@ -236,7 +238,7 @@ class OptimizedLightingSequenceLabelingPipeline(
             "train_batch_size": train_batch_size,
             "eval_batch_size": eval_batch_size,
             "finetune_last_n_layers": finetune_last_n_layers,
-            "tokenizer_name": self.tokenizer_name,
+            "tokenizer_name_or_path": self.tokenizer_name_or_path,
             "datamodule_kwargs": datamodule_kwargs,
             "tokenizer_kwargs": self.tokenizer_kwargs,
             "batch_encoding_kwargs": self.batch_encoding_kwargs,
@@ -244,6 +246,6 @@ class OptimizedLightingSequenceLabelingPipeline(
             "task_model_kwargs": task_model_kwargs,
             "task_train_kwargs": task_train_kwargs,
             "model_config_kwargs": model_config_kwargs,
-            "predict_subset": "test",
+            "predict_subset": LightingDataModuleSubset.TEST,
         }
         return metadata

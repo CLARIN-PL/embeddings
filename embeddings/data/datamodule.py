@@ -1,5 +1,4 @@
 import abc
-import pathlib
 from os.path import exists, isdir
 from typing import Any, Callable, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
@@ -42,7 +41,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
     def __init__(
         self,
         dataset_name_or_path: T_path,
-        tokenizer_name_or_path: str,
+        tokenizer_name_or_path: T_path,
         target_field: str,
         max_seq_length: Optional[int] = None,
         train_batch_size: int = 32,
@@ -112,7 +111,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
             if preparation_step:
                 return datasets.DatasetDict()
-            dataset = embeddings_dataset.HuggingFaceDataset(pathlib.Path(self.dataset_name_or_path))
+            dataset = embeddings_dataset.HuggingFaceDataset(str(self.dataset_name_or_path))
             loader = HuggingFaceLocalDataLoader()
         else:
             dataset = embeddings_dataset.HuggingFaceDataset(
@@ -206,7 +205,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
     def __init__(
         self,
         dataset_name_or_path: T_path,
-        tokenizer_name_or_path: str,
+        tokenizer_name_or_path: T_path,
         text_fields: Union[str, Sequence[str]],
         target_field: str,
         max_seq_length: Optional[int] = None,
@@ -283,7 +282,7 @@ class SequenceLabelingDataModule(HuggingFaceDataModule):
     def __init__(
         self,
         dataset_name_or_path: T_path,
-        tokenizer_name_or_path: str,
+        tokenizer_name_or_path: T_path,
         text_field: str,
         target_field: str,
         max_seq_length: Optional[int] = None,
