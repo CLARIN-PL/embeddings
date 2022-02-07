@@ -14,9 +14,7 @@ from embeddings.hyperparameter_search.lighting_configspace import (
 from embeddings.hyperparameter_search.parameters import ConstantParameter
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingSequenceLabelingPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
-from embeddings.pipeline.pipelines_metadata import (
-    LightningSequenceLabelingPipelineMetadata,
-)
+from embeddings.pipeline.pipelines_metadata import LightningSequenceLabelingPipelineMetadata
 from tests.hps.utils import _flatten
 
 TESTING_DATAMODULE_KWARGS: Dict[str, Any] = deepcopy(
@@ -34,7 +32,7 @@ TESTING_DATAMODULE_KWARGS.update(
 @pytest.fixture(scope="module")
 def sequence_labelling_config_space() -> LightingSequenceLabelingConfigSpace:
     config_space = LightingSequenceLabelingConfigSpace(
-        embedding_name="hf-internal-testing/tiny-albert",
+        embedding_name_or_path="hf-internal-testing/tiny-albert",
         finetune_last_n_layers=ConstantParameter("finetune_last_n_layers", 0),
         max_epochs=ConstantParameter("max_epochs", 1),
     )
@@ -114,8 +112,8 @@ def test_keys_allowed_in_metadata_but_not_in_config_space(
         "dataset_name_or_path",
         "eval_batch_size",
         "devices",
-        "embedding_name",
-        "tokenizer_name",
+        "embedding_name_or_path",
+        "tokenizer_name_or_path",
         "evaluation_mode",
         "tagging_scheme",
     }
@@ -131,7 +129,7 @@ def test_keys_allowed_in_config_space_but_not_in_metadata(
     df, metadata = sequence_labelling_hps_run_result
     assert sequence_labelling_config_space._get_fields().keys() - _flatten(metadata).keys() == {
         "trainer_devices",
-        "param_embedding_name",
+        "param_embedding_name_or_path",
         "trainer_accelerator",
         "classifier_dropout",  # todo: remove 'classifier_dropout'
         "mini_batch_size",
@@ -186,10 +184,10 @@ def test_hparams_best_params_files_compatibility(
     assert common_keys == {
         "train_batch_size",
         "batch_encoding_kwargs",
-        "tokenizer_name",
+        "tokenizer_name_or_path",
         "tokenizer_kwargs",
         "max_seq_length",
-        "embedding_name",
+        "embedding_name_or_path",
         "finetune_last_n_layers",
         "dataset_name_or_path",
         "input_column_name",
@@ -211,7 +209,7 @@ def test_hparams_best_params_files_compatibility(
         "tagging_scheme",
     }
     for k in common_keys:
-        if k == "tokenizer_name":  # todo: remove
+        if k == "tokenizer_name_or_path":  # todo: remove
             continue
         if k in metadata:
             if isinstance(metadata[k], Enum):  # type: ignore
@@ -222,9 +220,7 @@ def test_hparams_best_params_files_compatibility(
         else:
             assert hparams[k] == best_params[k]
 
-        if not k.endswith("_kwargs"):
-            if k in ["max_seq_length", "tagging_scheme"]:
-                continue
+        if not k.endswith("_kwargs") and k not in ["max_seq_length", "tagging_scheme"]:
             assert hparams[k] is not None
 
-    assert hparams["model_name_or_path"] == best_params["embedding_name"]
+    assert hparams["model_name_or_path"] == best_params["embedding_name_or_path"]
