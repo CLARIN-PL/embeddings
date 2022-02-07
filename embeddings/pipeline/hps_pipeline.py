@@ -139,12 +139,11 @@ class OptunaPipeline(
 
 @dataclass
 class _HuggingFaceOptimizedPipelineBase(ABC, Generic[ConfigSpace]):
-    dataset_name_or_path: str
+    dataset_name: str
     config_space: ConfigSpace
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
+@dataclass
 class _HuggingFaceOptimizedPipelineDefaultsBase(ABC):
     load_dataset_kwargs: Optional[Dict[str, Any]] = None
     n_warmup_steps: int = 10
@@ -159,11 +158,6 @@ class _HuggingFaceOptimizedPipelineDefaultsBase(ABC):
     )
     ignore_preprocessing_pipeline: bool = False
 
-    @cache
-    @abc.abstractmethod
-    def _get_dataset_path(self) -> T_path:
-        pass
-
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
@@ -171,8 +165,20 @@ class AbstractHuggingFaceOptimizedPipeline(
     _HuggingFaceOptimizedPipelineDefaultsBase,
     _HuggingFaceOptimizedPipelineBase[ConfigSpace],
     ABC,
-    Generic[ConfigSpace],
+    Generic[ConfigSpace, Data, LoaderResult, TransformationResult],
 ):
     @abc.abstractmethod
     def __post_init__(self) -> None:
+        pass
+
+    @cache
+    @abc.abstractmethod
+    def _get_dataset_path(self) -> T_path:
+        pass
+
+    @cache
+    @abc.abstractmethod
+    def _get_preprocessing_pipeline(
+        self,
+    ) -> Optional[PreprocessingPipeline[Data, LoaderResult, TransformationResult]]:
         pass
