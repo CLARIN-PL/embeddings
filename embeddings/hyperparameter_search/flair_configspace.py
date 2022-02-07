@@ -75,7 +75,7 @@ class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
         variables = {"embedding_name": config.pop("embedding_name")}
         parameters = cls._parse_yaml_params(config.pop("parameters"))
         cls._check_unmapped_parameters(config)
-        return variables | parameters
+        return {**variables, **parameters}
 
 
 class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
