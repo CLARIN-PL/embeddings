@@ -186,7 +186,7 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
         name="fine_tune_mode", type="categorical", choices=["none", "linear", "nonlinear"]
     )
     dynamic_fine_tune: Parameter = SearchableParameter(
-        name="fine_tune", type="categorical", choices=[False, True]
+        name="fine_tune", type="categorical", choices=[False]  # TODO: change
     )
     # Choices to Optuna can only take primitives;
     # This parameter results in Optuna warning but the library works properly

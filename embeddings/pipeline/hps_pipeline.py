@@ -2,6 +2,7 @@ import abc
 import logging
 from abc import ABC
 from dataclasses import dataclass, field
+from functools import cache, cached_property
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar, Union
@@ -59,7 +60,9 @@ class OptunaPipeline(
     def __init__(
         self,
         config_space: ConfigSpace,
-        preprocessing_pipeline: PreprocessingPipeline[Data, LoaderResult, TransformationResult],
+        preprocessing_pipeline: Optional[
+            PreprocessingPipeline[Data, LoaderResult, TransformationResult]
+        ],
         evaluation_pipeline: Union[
             Type[ModelEvaluationPipeline[Data, LoaderResult, ModelResult, EvaluationResult]],
             Type[LightningPipeline[Data, ModelResult, EvaluationResult]],
@@ -99,7 +102,8 @@ class OptunaPipeline(
         self,
     ) -> Tuple[pd.DataFrame, Metadata]:
         self._pre_run_hook()
-        self.preprocessing_pipeline.run()
+        if self.preprocessing_pipeline is not None:
+            self.preprocessing_pipeline.run()
         study: Study = optuna.create_study(
             direction="maximize",
             sampler=self.sampler,
@@ -135,11 +139,12 @@ class OptunaPipeline(
 
 @dataclass
 class _HuggingFaceOptimizedPipelineBase(ABC, Generic[ConfigSpace]):
-    dataset_name: str
+    dataset_name_or_path: str
     config_space: ConfigSpace
 
 
-@dataclass
+# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
+@dataclass  # type: ignore
 class _HuggingFaceOptimizedPipelineDefaultsBase(ABC):
     load_dataset_kwargs: Optional[Dict[str, Any]] = None
     n_warmup_steps: int = 10
@@ -152,6 +157,12 @@ class _HuggingFaceOptimizedPipelineDefaultsBase(ABC):
     sampler_cls: Type[optuna.samplers.TPESampler] = field(
         init=False, default=optuna.samplers.TPESampler
     )
+    ignore_preprocessing_pipeline: bool = False
+
+    @cache
+    @abc.abstractmethod
+    def _get_dataset_path(self) -> T_path:
+        pass
 
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374

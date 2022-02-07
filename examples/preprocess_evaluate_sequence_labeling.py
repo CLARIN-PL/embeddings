@@ -5,7 +5,10 @@ import typer
 
 from embeddings.defaults import DATASET_PATH, RESULTS_PATH
 from embeddings.pipeline.evaluation_pipeline import FlairSequenceLabelingEvaluationPipeline
-from embeddings.pipeline.preprocessing_pipeline import FlairSequenceLabelingPreprocessingPipeline
+from embeddings.pipeline.preprocessing_pipeline import (
+    FlairSequenceLabelingPreprocessingPipeline,
+    FlairTextClassificationPreprocessingPipeline,
+)
 from embeddings.utils.utils import build_output_path
 
 app = typer.Typer()
@@ -13,16 +16,16 @@ app = typer.Typer()
 
 def run(
     embedding_name: str = typer.Option(
-        "allegro/herbert-base-cased", help="Hugging Face embedding model name or path."
+        "clarin-pl/word2vec-kgr10", help="Hugging Face embedding model name or path."
     ),
     dataset_name: str = typer.Option(
-        "clarin-pl/kpwr-ner", help="Hugging Face dataset name or path."
+        "clarin-pl/polemo2-official", help="Hugging Face dataset name or path."
     ),
     input_column_name: str = typer.Option(
-        "tokens", help="Column name that contains text to classify."
+        "text", help="Column name that contains text to classify."
     ),
     target_column_name: str = typer.Option(
-        "ner", help="Column name that contains tag labels for POS tagging."
+        "target", help="Column name that contains tag labels for POS tagging."
     ),
     hidden_size: int = typer.Option(32, help="Number of hidden states in RNN."),
     evaluation_mode: str = typer.Option(
@@ -35,8 +38,9 @@ def run(
     typer.echo(pprint.pformat(locals()))
     dataset_path = build_output_path(DATASET_PATH, embedding_name, dataset_name)
     dataset_path.mkdir(parents=True, exist_ok=True)
+    dataset_path = dataset_path.joinpath("data.pickle")
 
-    preprocessing_pipeline = FlairSequenceLabelingPreprocessingPipeline(
+    preprocessing_pipeline = FlairTextClassificationPreprocessingPipeline(
         dataset_name=dataset_name,
         input_column_name=input_column_name,
         target_column_name=target_column_name,
