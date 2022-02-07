@@ -13,7 +13,6 @@ class SklearnTask(Task[pd.DataFrame, Dict[str, Any]]):
     def fit(
         self,
         data: Dict[str, ArrayLike],
-
     ) -> None:
         pass
 
