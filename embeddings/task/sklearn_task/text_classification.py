@@ -23,10 +23,12 @@ class TextClassification(SklearnTask):
 
     def fit(
         self,
-        x_train: ArrayLike,
-        y_train: ArrayLike,
+        data: Dict[str, ArrayLike],
     ) -> None:
-        self.classifier.fit(x_train, y_train)
+        self.classifier.fit(
+            self.embedding.embed(data["train"]["x"]),
+            data["train"]["y"],
+        )
 
     def predict(
         self,
@@ -45,7 +47,5 @@ class TextClassification(SklearnTask):
         data: Dict[str, ArrayLike],
         predict_subset: str = "test",
     ) -> Dict[str, nptyping.NDArray[Any]]:
-        x_train = self.embedding.embed(data["train"]["x"])
-        y_train = data["train"]["y"]
-        self.fit(x_train, y_train)
+        self.fit(data)
         return self.predict(data)

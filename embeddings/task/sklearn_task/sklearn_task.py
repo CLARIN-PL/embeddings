@@ -12,8 +12,7 @@ class SklearnTask(Task[pd.DataFrame, Dict[str, Any]]):
     @abstractmethod
     def fit(
         self,
-        x_train: ArrayLike,
-        y_train: ArrayLike,
+        data: Dict[str, ArrayLike],
     ) -> None:
         pass
 
