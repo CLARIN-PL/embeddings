@@ -1,10 +1,8 @@
-import abc
 from abc import ABC
 from dataclasses import dataclass, field
-from functools import cache, cached_property
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Dict, Generic, Optional, Tuple, TypeVar
+from typing import Dict, Generic, Optional, Tuple
 
 import datasets
 from flair.data import Corpus
@@ -63,15 +61,66 @@ class _OptimizedFlairPairClassificationPipelineBase(
     target_column_name: str
 
 
-
 @dataclass
-class _OptimizedFlairClassificationPipelineDefaultsBase(
-    _HuggingFaceOptimizedPipelineDefaultsBase, ABC
-):
+class _OptimizedFlairPipelineDefaultsBase(_HuggingFaceOptimizedPipelineDefaultsBase, ABC):
     tmp_dataset_dir: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
     tmp_model_output_dir: TemporaryDirectory[str] = field(
         init=False, default_factory=TemporaryDirectory
     )
+
+
+@dataclass
+class OptimizedFlairClassificationPipeline(
+    OptunaPipeline[
+        TextClassificationConfigSpace,
+        FlairClassificationPipelineMetadata,
+        FlairEvaluationPipelineMetadata,
+        str,
+        datasets.DatasetDict,
+        Corpus,
+    ],
+    AbstractHuggingFaceOptimizedPipeline[TextClassificationConfigSpace],
+    _OptimizedFlairPipelineDefaultsBase,
+    _OptimizedFlairPipelineBase[TextClassificationConfigSpace],
+):
+    def _init_dataset_path(self) -> None:
+        self.dataset_path: T_path
+        if self.ignore_preprocessing_pipeline:
+            self.dataset_path = Path(self.dataset_name_or_path)
+            if not self.dataset_path.exists():
+                raise FileNotFoundError("Dataset path not found")
+        else:
+            self.dataset_path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
+
+    def _init_preprocessing_pipeline(self) -> None:
+        self.preprocessing_pipeline: Optional[FlairTextClassificationPreprocessingPipeline]
+        if self.ignore_preprocessing_pipeline:
+            self.preprocessing_pipeline = None
+        else:
+            self.preprocessing_pipeline = FlairTextClassificationPreprocessingPipeline(
+                dataset_name=str(self.dataset_name_or_path),
+                input_column_name=self.input_column_name,
+                target_column_name=self.target_column_name,
+                persist_path=str(self.dataset_path),
+                sample_missing_splits=(self.sample_dev_split_fraction, None),
+                ignore_test_subset=True,
+                load_dataset_kwargs=self.load_dataset_kwargs,
+            )
+
+    def __post_init__(self) -> None:
+        self._init_dataset_path()
+        self._init_preprocessing_pipeline()
+        super().__init__(
+            preprocessing_pipeline=self.preprocessing_pipeline,
+            evaluation_pipeline=FlairTextClassificationEvaluationPipeline,  # type: ignore
+            pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
+            sampler=self.sampler_cls(seed=self.seed),
+            n_trials=self.n_trials,
+            dataset_path=self.dataset_path,
+            metric_name="f1__average_macro",
+            metric_key="f1",
+            config_space=self.config_space,
+        )
 
     @staticmethod
     def _pop_sampled_parameters(
@@ -87,60 +136,6 @@ class _OptimizedFlairClassificationPipelineDefaultsBase(
         assert isinstance(load_model_kwargs, dict)
         return embedding_name, document_embedding, task_train_kwargs, load_model_kwargs
 
-
-@dataclass
-class OptimizedFlairClassificationPipeline(
-    OptunaPipeline[
-        TextClassificationConfigSpace,
-        FlairClassificationPipelineMetadata,
-        FlairEvaluationPipelineMetadata,
-    ],
-    AbstractHuggingFaceOptimizedPipeline[
-        TextClassificationConfigSpace, str, datasets.DatasetDict, Corpus
-    ],
-    _OptimizedFlairClassificationPipelineDefaultsBase,
-    _OptimizedFlairPipelineBase[TextClassificationConfigSpace],
-):
-    @cache
-    def _get_dataset_path(self) -> T_path:
-        if self.ignore_preprocessing_pipeline:
-            assert hasattr(self, "dataset_name_or_path")
-            path = Path(getattr(self, "dataset_name_or_path"))
-            assert path.exists()
-        else:
-            path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
-        return path
-
-    @cache
-    def _get_preprocessing_pipeline(
-        self,
-    ) -> Optional[FlairTextClassificationPreprocessingPipeline]:
-        if self.ignore_preprocessing_pipeline:
-            return None
-        else:
-            return FlairTextClassificationPreprocessingPipeline(
-                dataset_name=self.dataset_name,
-                input_column_name=self.input_column_name,
-                target_column_name=self.target_column_name,
-                persist_path=str(self.dataset_path),
-                sample_missing_splits=(self.sample_dev_split_fraction, None),
-                ignore_test_subset=True,
-                load_dataset_kwargs=self.load_dataset_kwargs,
-            )
-
-    def __post_init__(self) -> None:
-        super().__init__(
-            preprocessing_pipeline=self._get_preprocessing_pipeline(),
-            evaluation_pipeline=FlairTextClassificationEvaluationPipeline,
-            pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
-            sampler=self.sampler_cls(seed=self.seed),
-            n_trials=self.n_trials,
-            dataset_path=self._get_dataset_path(),
-            metric_name="f1__average_macro",
-            metric_key="f1",
-            config_space=self.config_space,
-        )
-
     def _get_metadata(self, parameters: SampledParameters) -> FlairClassificationPipelineMetadata:
         (
             embedding_name,
@@ -151,7 +146,7 @@ class OptimizedFlairClassificationPipeline(
         metadata: FlairClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
             "document_embedding_cls": document_embedding_cls,
-            "dataset_name": self.dataset_name,
+            "dataset_name": str(self.dataset_name_or_path),
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
@@ -195,32 +190,30 @@ class OptimizedFlairPairClassificationPipeline(
         TextClassificationConfigSpace,
         FlairPairClassificationPipelineMetadata,
         FlairEvaluationPipelineMetadata,
+        str,
+        datasets.DatasetDict,
+        Corpus,
     ],
-    AbstractHuggingFaceOptimizedPipeline[
-        TextClassificationConfigSpace, str, datasets.DatasetDict, Corpus
-    ],
-    _OptimizedFlairClassificationPipelineDefaultsBase,
+    AbstractHuggingFaceOptimizedPipeline[TextClassificationConfigSpace],
+    _OptimizedFlairPipelineDefaultsBase,
     _OptimizedFlairPairClassificationPipelineBase[TextClassificationConfigSpace],
 ):
-    @cache
-    def _get_dataset_path(self) -> T_path:
+    def _init_dataset_path(self) -> None:
+        self.dataset_path: T_path
         if self.ignore_preprocessing_pipeline:
-            assert hasattr(self, "dataset_name_or_path")
-            path = Path(getattr(self, "dataset_name_or_path"))
-            assert path.exists()
+            self.dataset_path = Path(self.dataset_name_or_path)
+            if not self.dataset_path.exists():
+                raise FileNotFoundError("Dataset path not found")
         else:
-            path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
-        return path
+            self.dataset_path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
 
-    @cache
-    def _get_preprocessing_pipeline(
-        self,
-    ) -> Optional[FlairTextPairClassificationPreprocessingPipeline]:
+    def _init_preprocessing_pipeline(self) -> None:
+        self.preprocessing_pipeline: Optional[FlairTextPairClassificationPreprocessingPipeline]
         if self.ignore_preprocessing_pipeline:
-            return None
+            self.preprocessing_pipeline = None
         else:
-            return FlairTextPairClassificationPreprocessingPipeline(
-                dataset_name=self.dataset_name,
+            self.preprocessing_pipeline = FlairTextPairClassificationPreprocessingPipeline(
+                dataset_name=str(self.dataset_name_or_path),
                 input_column_names=self.input_columns_names_pair,
                 target_column_name=self.target_column_name,
                 persist_path=str(self.dataset_path),
@@ -230,17 +223,33 @@ class OptimizedFlairPairClassificationPipeline(
             )
 
     def __post_init__(self) -> None:
+        self._init_dataset_path()
+        self._init_preprocessing_pipeline()
         super().__init__(
-            preprocessing_pipeline=self._get_preprocessing_pipeline(),
-            evaluation_pipeline=FlairTextPairClassificationEvaluationPipeline,
+            preprocessing_pipeline=self.preprocessing_pipeline,
+            evaluation_pipeline=FlairTextPairClassificationEvaluationPipeline,  # type: ignore
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
-            dataset_path=self._get_dataset_path(),
+            dataset_path=self.dataset_path,
             metric_name="f1__average_macro",
             metric_key="f1",
             config_space=self.config_space,
         )
+
+    @staticmethod
+    def _pop_sampled_parameters(
+        parameters: SampledParameters,
+    ) -> Tuple[str, str, Dict[str, ParameterValues], Dict[str, ParameterValues]]:
+        embedding_name = parameters["embedding_name"]
+        assert isinstance(embedding_name, str)
+        document_embedding = parameters["document_embedding"]
+        assert isinstance(document_embedding, str)
+        task_train_kwargs = parameters["task_train_kwargs"]
+        assert isinstance(task_train_kwargs, dict)
+        load_model_kwargs = parameters["load_model_kwargs"]
+        assert isinstance(load_model_kwargs, dict)
+        return embedding_name, document_embedding, task_train_kwargs, load_model_kwargs
 
     def _get_metadata(
         self, parameters: SampledParameters
@@ -254,7 +263,7 @@ class OptimizedFlairPairClassificationPipeline(
         metadata: FlairPairClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
             "document_embedding_cls": document_embedding_cls,
-            "dataset_name": self.dataset_name,
+            "dataset_name": str(self.dataset_name_or_path),
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "input_columns_names_pair": self.input_columns_names_pair,
             "target_column_name": self.target_column_name,
@@ -292,43 +301,39 @@ class OptimizedFlairPairClassificationPipeline(
         self.tmp_model_output_dir.cleanup()
 
 
-
 @dataclass
 class OptimizedFlairSequenceLabelingPipeline(
     OptunaPipeline[
         SequenceLabelingConfigSpace,
         FlairSequenceLabelingPipelineMetadata,
         FlairSequenceLabelingEvaluationPipelineMetadata,
+        str,
+        datasets.DatasetDict,
+        Corpus,
     ],
     AbstractHuggingFaceOptimizedPipeline[SequenceLabelingConfigSpace],
+    _OptimizedFlairPipelineDefaultsBase,
     _OptimizedFlairPipelineBase[SequenceLabelingConfigSpace],
 ):
     evaluation_mode: EvaluationMode = EvaluationMode.CONLL
     tagging_scheme: Optional[TaggingScheme] = None
-    tmp_dataset_dir: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
-    tmp_model_output_dir: TemporaryDirectory[str] = field(
-        init=False, default_factory=TemporaryDirectory
-    )
 
-    @cache
-    def _get_dataset_path(self) -> T_path:
-        path: T_path
+    def _init_dataset_path(self) -> None:
+        self.dataset_path: T_path
         if self.ignore_preprocessing_pipeline:
-            path = Path(self.dataset_name)
-            assert path.exists()
+            self.dataset_path = Path(self.dataset_name_or_path)
+            if not self.dataset_path.exists():
+                raise FileNotFoundError("Dataset path not found")
         else:
-            path = self.tmp_dataset_dir.name
-        return path
+            self.dataset_path = self.tmp_dataset_dir.name
 
-    @cache
-    def _get_preprocessing_pipeline(
-        self,
-    ) -> Optional[FlairSequenceLabelingPreprocessingPipeline]:
+    def _init_preprocessing_pipeline(self) -> None:
+        self.preprocessing_pipeline: Optional[FlairSequenceLabelingPreprocessingPipeline]
         if self.ignore_preprocessing_pipeline:
-            return None
+            self.preprocessing_pipeline = None
         else:
-            return FlairSequenceLabelingPreprocessingPipeline(
-                dataset_name=self.dataset_name,
+            self.preprocessing_pipeline = FlairSequenceLabelingPreprocessingPipeline(
+                dataset_name=str(self.dataset_name_or_path),
                 input_column_name=self.input_column_name,
                 target_column_name=self.target_column_name,
                 persist_path=str(self.dataset_path),
@@ -338,16 +343,18 @@ class OptimizedFlairSequenceLabelingPipeline(
             )
 
     def __post_init__(self) -> None:
+        self._init_dataset_path()
+        self._init_preprocessing_pipeline()
         self.metric_name = SequenceLabelingEvaluator.get_metric_name(
             evaluation_mode=self.evaluation_mode, tagging_scheme=self.tagging_scheme
         )
         super().__init__(
-            preprocessing_pipeline=self._get_preprocessing_pipeline(),
-            evaluation_pipeline=FlairSequenceLabelingEvaluationPipeline,
+            preprocessing_pipeline=self.preprocessing_pipeline,
+            evaluation_pipeline=FlairSequenceLabelingEvaluationPipeline,  # type: ignore
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
-            dataset_path=self._get_dataset_path(),
+            dataset_path=self.dataset_path,
             metric_name=self.metric_name,
             metric_key="overall_f1",
             config_space=self.config_space,
@@ -377,7 +384,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         metadata: FlairSequenceLabelingPipelineMetadata = {
             "embedding_name": embedding_name,
             "hidden_size": hidden_size,
-            "dataset_name": self.dataset_name,
+            "dataset_name": str(self.dataset_name_or_path),
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
@@ -411,4 +418,3 @@ class OptimizedFlairSequenceLabelingPipeline(
             "task_model_kwargs": task_model_kwargs,
         }
         return metadata
-

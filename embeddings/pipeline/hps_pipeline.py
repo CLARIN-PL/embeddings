@@ -2,7 +2,6 @@ import abc
 import logging
 from abc import ABC
 from dataclasses import dataclass, field
-from functools import cache, cached_property
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar, Union
@@ -55,7 +54,8 @@ class PersistingPipeline(OptimizedPipeline[Metadata]):
 
 
 class OptunaPipeline(
-    OptimizedPipeline[Metadata], Generic[ConfigSpace, Metadata, EvaluationMetadata]
+    OptimizedPipeline[Metadata],
+    Generic[ConfigSpace, Metadata, EvaluationMetadata, Data, LoaderResult, TransformationResult],
 ):
     def __init__(
         self,
@@ -131,15 +131,15 @@ class OptunaPipeline(
         return metric
 
     def _pre_run_hook(self) -> None:
-        logging.getLogger("flair").setLevel(logging.WARNING)
+        logging.getLogger("optuna").setLevel(logging.WARNING)
 
     def _post_run_hook(self) -> None:
-        logging.getLogger("flair").setLevel(logging.INFO)
+        logging.getLogger("optuna").setLevel(logging.INFO)
 
 
 @dataclass
 class _HuggingFaceOptimizedPipelineBase(ABC, Generic[ConfigSpace]):
-    dataset_name: str
+    dataset_name_or_path: T_path
     config_space: ConfigSpace
 
 
@@ -165,20 +165,16 @@ class AbstractHuggingFaceOptimizedPipeline(
     _HuggingFaceOptimizedPipelineDefaultsBase,
     _HuggingFaceOptimizedPipelineBase[ConfigSpace],
     ABC,
-    Generic[ConfigSpace, Data, LoaderResult, TransformationResult],
+    Generic[ConfigSpace],
 ):
     @abc.abstractmethod
     def __post_init__(self) -> None:
         pass
 
-    @cache
     @abc.abstractmethod
-    def _get_dataset_path(self) -> T_path:
+    def _init_dataset_path(self) -> None:
         pass
 
-    @cache
     @abc.abstractmethod
-    def _get_preprocessing_pipeline(
-        self,
-    ) -> Optional[PreprocessingPipeline[Data, LoaderResult, TransformationResult]]:
+    def _init_preprocessing_pipeline(self) -> None:
         pass
