@@ -32,6 +32,9 @@ from embeddings.pipeline.pipelines_metadata import (
     LightningMetadata,
     LightningSequenceLabelingPipelineMetadata,
 )
+from embeddings.utils.loggers import get_logger
+
+_logger = get_logger(__name__)
 
 
 @dataclass
@@ -141,8 +144,14 @@ class OptimizedLightingPipeline(
 
     def _post_run_hook(self) -> None:
         super()._post_run_hook()
-        self.tmp_dataset_dir.cleanup()
-        self.tmp_model_output_dir.cleanup()
+
+        for tmp_dir in [self.tmp_dataset_dir, self.tmp_model_output_dir]:
+            try:
+                tmp_dir.cleanup()
+            except Exception as e:
+                _logger.error(
+                    f"Cleanup of {self.tmp_dataset_dir} raised exception {e}. Skipping it."
+                )
 
 
 @dataclass
