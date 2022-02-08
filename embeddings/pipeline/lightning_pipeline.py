@@ -22,11 +22,7 @@ class LightningPipeline(
         self.datamodule = datamodule
         self.model = model
         self.evaluator = evaluator
-        self.n_completed_epochs: Optional[int] = None
-        self.best_epoch: Optional[int] = None
 
     def run(self) -> EvaluationResult:
         model_result = self.model.execute(data=self.datamodule)
-        self.n_completed_epochs = self.model.task.current_epoch
-        self.best_epoch = self.model.best_epoch
         return self.evaluator.evaluate(model_result)
