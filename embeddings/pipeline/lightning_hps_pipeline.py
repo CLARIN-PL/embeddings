@@ -41,8 +41,10 @@ class _OptimizedLightingPipelineBase(
     input_column_name: str
     target_column_name: str
 
-    tmp_dataset_dir: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
-    tmp_model_output_dir: TemporaryDirectory[str] = field(
+    tmp_dataset_dir: "TemporaryDirectory[str]" = field(
+        init=False, default_factory=TemporaryDirectory
+    )
+    tmp_model_output_dir: "TemporaryDirectory[str]" = field(
         init=False, default_factory=TemporaryDirectory
     )
     tokenizer_name_or_path: Optional[T_path] = None
@@ -50,7 +52,8 @@ class _OptimizedLightingPipelineBase(
     batch_encoding_kwargs: Optional[Dict[str, Any]] = None
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
+# Mypy currently properly don't handle dataclasses with abstract methods
+# https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
 class OptimizedLightingPipeline(
     OptunaPipeline[

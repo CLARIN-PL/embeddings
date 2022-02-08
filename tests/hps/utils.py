@@ -5,7 +5,7 @@ from embeddings.pipeline.pipelines_metadata import LightningPipelineMetadata
 
 
 def _flatten(
-    d: Union[collections.MutableMapping[Any, Any], LightningPipelineMetadata]
+    d: Union["collections.MutableMapping[Any, Any]", LightningPipelineMetadata]
 ) -> Dict[Any, Any]:
     items: List[tuple[Any, Any]] = []
     for k, v in d.items():
