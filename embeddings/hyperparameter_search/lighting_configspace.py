@@ -1,4 +1,5 @@
 from abc import ABC
+from copy import deepcopy
 from dataclasses import InitVar, dataclass, field
 from typing import Any, Dict, Final, List, Union
 
@@ -143,20 +144,25 @@ class LightingConfigSpace(BaseConfigSpace, ABC):
         }
 
     @classmethod
-    def _parse_yaml(cls, path: T_path) -> Dict[str, Any]:
-        config = read_yaml(path)
+    def _parse_config(cls, config: Dict[str, Any]) -> Dict[str, Any]:
         variables = {
             "embedding_name_or_path": config.pop("embedding_name_or_path"),
             "devices": config.pop("devices", DEFAULT_DEVICES),
             "accelerator": config.pop("accelerator", DEFAULT_ACCELERATOR),
         }
-        parameters = cls._parse_yaml_params(config.pop("parameters"))
+        parameters = cls._parse_config_params(config.pop("parameters"))
         cls._check_unmapped_parameters(config)
         return {**variables, **parameters}
 
     @classmethod
     def from_yaml(cls, path: T_path) -> "LightingConfigSpace":
-        return cls(**cls._parse_yaml(path))
+        config = read_yaml(path)
+        return cls(**cls._parse_config(config))
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "LightingConfigSpace":
+        config = deepcopy(d)
+        return cls(**cls._parse_config(config))
 
 
 @dataclass
