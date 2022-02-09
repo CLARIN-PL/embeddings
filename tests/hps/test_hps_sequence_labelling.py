@@ -88,7 +88,6 @@ def test_common_keys(
         "warmup_steps",
         "use_scheduler",
         "optimizer",
-        # "classifier_dropout",  # todo: uncomment
         "label_all_tokens",
     }
 
@@ -131,7 +130,6 @@ def test_keys_allowed_in_config_space_but_not_in_metadata(
         "trainer_devices",
         "param_embedding_name_or_path",
         "trainer_accelerator",
-        "classifier_dropout",  # todo: remove 'classifier_dropout'
         "mini_batch_size",
     }
 
@@ -209,8 +207,6 @@ def test_hparams_best_params_files_compatibility(
         "tagging_scheme",
     }
     for k in common_keys:
-        if k == "tokenizer_name_or_path":  # todo: remove
-            continue
         if k in metadata:
             if isinstance(metadata[k], Enum):  # type: ignore
                 enum_hparam = getattr(type(metadata[k]), hparams[k])  # type: ignore
