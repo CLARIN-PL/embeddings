@@ -1,16 +1,12 @@
 import pprint
 
-import flair
-import torch
 import typer
 
-from embeddings.defaults import RESOURCES_PATH, RESULTS_PATH
+from embeddings.defaults import RESULTS_PATH
 from embeddings.pipeline.flair_classification import FlairClassificationPipeline
 from embeddings.utils.utils import build_output_path, format_eval_result
 
 app = typer.Typer()
-
-flair.device = torch.device("cpu")  # TODO: remove
 
 
 def run(
@@ -33,11 +29,6 @@ def run(
     output_path = build_output_path(root, embedding_name_or_path, dataset_name)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    dataset_name = str(
-        RESOURCES_PATH.joinpath(
-            "datasets", "clarin-pl__word2vec-kgr10", "clarin-pl__polemo2-official", "data.pickle"
-        )
-    )
     pipeline = FlairClassificationPipeline(
         embedding_name=embedding_name_or_path,
         dataset_name=dataset_name,

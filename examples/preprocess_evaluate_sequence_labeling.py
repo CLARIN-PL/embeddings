@@ -13,7 +13,7 @@ app = typer.Typer()
 
 def run(
     embedding_name_or_path: str = typer.Option(
-        "allegro/herbert-base-cased", help="Hugging Face embedding model name or path."
+        "clarin-pl/word2vec-kgr10", help="Hugging Face embedding model name or path."
     ),
     dataset_name: str = typer.Option(
         "clarin-pl/kpwr-ner", help="Hugging Face dataset name or path."
