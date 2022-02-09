@@ -1,4 +1,5 @@
 from abc import ABC
+from copy import deepcopy
 from dataclasses import InitVar, dataclass, field
 from typing import Any, Dict, List, Set, Tuple, Union
 
@@ -70,10 +71,9 @@ class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
         return parameters, task_train_kwargs
 
     @classmethod
-    def _parse_yaml(cls, path: T_path) -> Dict[str, Any]:
-        config = read_yaml(path)
+    def _parse_config(cls, config: Dict[str, Any]) -> Dict[str, Any]:
         variables = {"embedding_name": config.pop("embedding_name")}
-        parameters = cls._parse_yaml_params(config.pop("parameters"))
+        parameters = cls._parse_config_params(config.pop("parameters"))
         cls._check_unmapped_parameters(config)
         return {**variables, **parameters}
 
@@ -91,7 +91,13 @@ class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
 
     @classmethod
     def from_yaml(cls, path: T_path) -> "FlairModelTrainerConfigSpace":
-        return cls(**cls._parse_yaml(path))
+        config = read_yaml(path)
+        return cls(**cls._parse_config(config))
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "FlairModelTrainerConfigSpace":
+        config = deepcopy(d)
+        return cls(**cls._parse_config(config))
 
 
 @dataclass
@@ -171,7 +177,13 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
 
     @classmethod
     def from_yaml(cls, path: T_path) -> "SequenceLabelingConfigSpace":
-        return cls(**cls._parse_yaml(path))
+        config = read_yaml(path)
+        return cls(**cls._parse_config(config))
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "SequenceLabelingConfigSpace":
+        config = deepcopy(d)
+        return cls(**cls._parse_config(config))
 
 
 @dataclass
@@ -321,4 +333,10 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
 
     @classmethod
     def from_yaml(cls, path: T_path) -> "TextClassificationConfigSpace":
-        return cls(**cls._parse_yaml(path))
+        config = read_yaml(path)
+        return cls(**cls._parse_config(config))
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "TextClassificationConfigSpace":
+        config = deepcopy(d)
+        return cls(**cls._parse_config(config))
