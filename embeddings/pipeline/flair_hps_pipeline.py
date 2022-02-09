@@ -69,19 +69,12 @@ class _OptimizedFlairPipelineDefaultsBase(_HuggingFaceOptimizedPipelineDefaultsB
     )
 
 
-@dataclass
-class OptimizedFlairClassificationPipeline(
-    OptunaPipeline[
-        TextClassificationConfigSpace,
-        FlairClassificationPipelineMetadata,
-        FlairEvaluationPipelineMetadata,
-        str,
-        datasets.DatasetDict,
-        Corpus,
-    ],
+# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
+@dataclass  # type: ignore
+class AbstractOptimizedFlairClassificationPipeline(
     AbstractHuggingFaceOptimizedPipeline[TextClassificationConfigSpace],
     _OptimizedFlairPipelineDefaultsBase,
-    _OptimizedFlairPipelineBase[TextClassificationConfigSpace],
+    ABC,
 ):
     def _init_dataset_path(self) -> None:
         self.dataset_path: T_path
@@ -92,6 +85,34 @@ class OptimizedFlairClassificationPipeline(
         else:
             self.dataset_path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
 
+    @staticmethod
+    def _pop_sampled_parameters(
+        parameters: SampledParameters,
+    ) -> Tuple[str, str, Dict[str, ParameterValues], Dict[str, ParameterValues]]:
+        embedding_name = parameters["embedding_name"]
+        assert isinstance(embedding_name, str)
+        document_embedding = parameters["document_embedding"]
+        assert isinstance(document_embedding, str)
+        task_train_kwargs = parameters["task_train_kwargs"]
+        assert isinstance(task_train_kwargs, dict)
+        load_model_kwargs = parameters["load_model_kwargs"]
+        assert isinstance(load_model_kwargs, dict)
+        return embedding_name, document_embedding, task_train_kwargs, load_model_kwargs
+
+
+@dataclass
+class OptimizedFlairClassificationPipeline(
+    OptunaPipeline[
+        TextClassificationConfigSpace,
+        FlairClassificationPipelineMetadata,
+        FlairEvaluationPipelineMetadata,
+        str,
+        datasets.DatasetDict,
+        Corpus,
+    ],
+    AbstractOptimizedFlairClassificationPipeline,
+    _OptimizedFlairPipelineBase[TextClassificationConfigSpace],
+):
     def _init_preprocessing_pipeline(self) -> None:
         self.preprocessing_pipeline: Optional[FlairTextClassificationPreprocessingPipeline]
         if self.ignore_preprocessing_pipeline:
@@ -121,20 +142,6 @@ class OptimizedFlairClassificationPipeline(
             metric_key="f1",
             config_space=self.config_space,
         )
-
-    @staticmethod
-    def _pop_sampled_parameters(
-        parameters: SampledParameters,
-    ) -> Tuple[str, str, Dict[str, ParameterValues], Dict[str, ParameterValues]]:
-        embedding_name = parameters["embedding_name"]
-        assert isinstance(embedding_name, str)
-        document_embedding = parameters["document_embedding"]
-        assert isinstance(document_embedding, str)
-        task_train_kwargs = parameters["task_train_kwargs"]
-        assert isinstance(task_train_kwargs, dict)
-        load_model_kwargs = parameters["load_model_kwargs"]
-        assert isinstance(load_model_kwargs, dict)
-        return embedding_name, document_embedding, task_train_kwargs, load_model_kwargs
 
     def _get_metadata(self, parameters: SampledParameters) -> FlairClassificationPipelineMetadata:
         (
@@ -194,19 +201,9 @@ class OptimizedFlairPairClassificationPipeline(
         datasets.DatasetDict,
         Corpus,
     ],
-    AbstractHuggingFaceOptimizedPipeline[TextClassificationConfigSpace],
-    _OptimizedFlairPipelineDefaultsBase,
+    AbstractOptimizedFlairClassificationPipeline,
     _OptimizedFlairPairClassificationPipelineBase[TextClassificationConfigSpace],
 ):
-    def _init_dataset_path(self) -> None:
-        self.dataset_path: T_path
-        if self.ignore_preprocessing_pipeline:
-            self.dataset_path = Path(self.dataset_name_or_path)
-            if not self.dataset_path.exists():
-                raise FileNotFoundError("Dataset path not found")
-        else:
-            self.dataset_path = Path(self.tmp_dataset_dir.name).joinpath("ds.pkl")
-
     def _init_preprocessing_pipeline(self) -> None:
         self.preprocessing_pipeline: Optional[FlairTextPairClassificationPreprocessingPipeline]
         if self.ignore_preprocessing_pipeline:
@@ -236,20 +233,6 @@ class OptimizedFlairPairClassificationPipeline(
             metric_key="f1",
             config_space=self.config_space,
         )
-
-    @staticmethod
-    def _pop_sampled_parameters(
-        parameters: SampledParameters,
-    ) -> Tuple[str, str, Dict[str, ParameterValues], Dict[str, ParameterValues]]:
-        embedding_name = parameters["embedding_name"]
-        assert isinstance(embedding_name, str)
-        document_embedding = parameters["document_embedding"]
-        assert isinstance(document_embedding, str)
-        task_train_kwargs = parameters["task_train_kwargs"]
-        assert isinstance(task_train_kwargs, dict)
-        load_model_kwargs = parameters["load_model_kwargs"]
-        assert isinstance(load_model_kwargs, dict)
-        return embedding_name, document_embedding, task_train_kwargs, load_model_kwargs
 
     def _get_metadata(
         self, parameters: SampledParameters

@@ -2,7 +2,6 @@ import abc
 import logging
 from abc import ABC
 from dataclasses import dataclass, field
-from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar, Union
 
@@ -70,7 +69,7 @@ class OptunaPipeline(
         pruner: optuna.pruners.BasePruner,
         sampler: optuna.samplers.BaseSampler,
         n_trials: int,
-        dataset_path: Union[str, Path, "TemporaryDirectory[str]"],
+        dataset_path: T_path,
         metric_name: str,
         metric_key: str,
     ):
