@@ -26,7 +26,7 @@ class LightningSequenceLabelingPipeline(
     DEFAULT_TASK_MODEL_KWARGS = {"use_scheduler": True}
     DEFAULT_DATAMODULE_KWARGS = {"max_seq_length": None, "label_all_tokens": False}
     DEFAULT_MODEL_CONFIG_KWARGS = {"classifier_dropout": None}
-    DEFAULT_EARLY_STOPPING_KWARGS = {"monitor": "val/Loss", "mode": "min", "patience": 1}
+    DEFAULT_EARLY_STOPPING_KWARGS = {"monitor": "val/Loss", "mode": "min", "patience": 3}
 
     def __init__(
         self,
