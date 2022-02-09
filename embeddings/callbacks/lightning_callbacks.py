@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Final
 
 import numpy as np
 import pytorch_lightning as pl
@@ -6,12 +6,11 @@ import torch
 
 
 class BestEpochCallback(pl.callbacks.Callback):
-    mode_dict = {"min": torch.lt, "max": torch.gt}
-    order_dict = {"min": "<", "max": ">"}
+    MODE_DICT: Final = {"min": torch.lt, "max": torch.gt}
 
     def __init__(self, monitor="val/Loss", mode="min", **kwargs):
         super().__init__(**kwargs)
-        assert mode in self.order_dict
+        assert mode in BestEpochCallback.MODE_DICT
 
         self.monitor = monitor
         self.mode = mode
@@ -21,7 +20,7 @@ class BestEpochCallback(pl.callbacks.Callback):
 
     @property
     def monitor_op(self) -> Callable:
-        return self.mode_dict[self.mode]
+        return BestEpochCallback.MODE_DICT[self.mode]
 
     def on_validation_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
         self._update_best_epoch(trainer)
