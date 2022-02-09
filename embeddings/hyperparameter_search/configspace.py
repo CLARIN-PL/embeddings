@@ -115,7 +115,7 @@ class BaseConfigSpace(ABC):
             elif param_type == "searchable":
                 param = SearchableParameter(**param_values)
             else:
-                raise ValueError(f"Unrecognized parameter type {param_type}")
+                raise ValueError(f"Unrecognized parameter type for parameter {param_key}")
             parsed_parameters.update({param_key: param})
         return parsed_parameters
 
