@@ -61,7 +61,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
             raise self.MODEL_UNDEFINED_EXCEPTION
 
         callbacks = []
-        if "validation" in data:
+        if "validation" in data.dataset:
             callbacks.append(BestEpochCallback())
             callbacks.append(EarlyStopping(**self.early_stopping_kwargs))
 
