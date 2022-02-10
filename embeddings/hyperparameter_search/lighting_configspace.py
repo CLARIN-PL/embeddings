@@ -1,3 +1,4 @@
+import abc
 from abc import ABC
 from copy import deepcopy
 from dataclasses import InitVar, dataclass, field
@@ -20,7 +21,8 @@ DEFAULT_DEVICES = "auto"
 DEFAULT_ACCELERATOR = "auto"
 
 
-@dataclass
+# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
+@dataclass  # type: ignore
 class LightingConfigSpace(BaseConfigSpace, ABC):
     embedding_name_or_path: InitVar[Union[T_path, List[T_path]]]
     devices: InitVar[Union[int, str, None, List[int]]] = field(default=DEFAULT_DEVICES)
@@ -155,19 +157,27 @@ class LightingConfigSpace(BaseConfigSpace, ABC):
         return {**variables, **parameters}
 
     @classmethod
+    @abc.abstractmethod
     def from_yaml(cls, path: T_path) -> "LightingConfigSpace":
-        config = read_yaml(path)
-        return cls(**cls._parse_config(config))
+        pass
 
     @classmethod
+    @abc.abstractmethod
     def from_dict(cls, d: Dict[str, Any]) -> "LightingConfigSpace":
-        config = deepcopy(d)
-        return cls(**cls._parse_config(config))
+        pass
 
 
 @dataclass
 class LightingTextClassificationConfigSpace(LightingConfigSpace):
-    pass
+    @classmethod
+    def from_yaml(cls, path: T_path) -> "LightingTextClassificationConfigSpace":
+        config = read_yaml(path)
+        return cls(**cls._parse_config(config))
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "LightingTextClassificationConfigSpace":
+        config = deepcopy(d)
+        return cls(**cls._parse_config(config))
 
 
 @dataclass
@@ -188,3 +198,13 @@ class LightingSequenceLabelingConfigSpace(LightingConfigSpace):
         sampled_parameters["datamodule_kwargs"].update(extra_datamodule_kwargs)
 
         return sampled_parameters
+
+    @classmethod
+    def from_yaml(cls, path: T_path) -> "LightingSequenceLabelingConfigSpace":
+        config = read_yaml(path)
+        return cls(**cls._parse_config(config))
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "LightingSequenceLabelingConfigSpace":
+        config = deepcopy(d)
+        return cls(**cls._parse_config(config))
