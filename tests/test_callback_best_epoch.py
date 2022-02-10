@@ -94,16 +94,14 @@ def test_lightning_classification_pipeline(
     # val/Loss epoch 1: 1.3253
     # val/Loss epoch 2: 1.3278
 
-    np.testing.assert_equal(
-        pipeline.model.task.best_epoch, 1
-    )
+    np.testing.assert_equal(pipeline.model.task.best_epoch, 1)
     np.testing.assert_almost_equal(
         pipeline.model.task.best_validation_score, 1.325, decimal=pytest.decimal
     )
     path.cleanup()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_lightning_classification_pipeline(
         lightning_classification_pipeline(
             pipeline_kwargs(),
@@ -111,6 +109,6 @@ if __name__ == '__main__':
             datamodule_kwargs(),
             task_train_kwargs(),
             task_model_kwargs(),
-            TemporaryDirectory()
+            TemporaryDirectory(),
         )
     )
