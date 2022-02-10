@@ -94,7 +94,7 @@ class LightningSequenceLabelingPipeline(
             model_config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
             task_train_kwargs=self.task_train_kwargs,
-            early_stopping_kwargs=self.early_stopping_kwargs
+            early_stopping_kwargs=self.early_stopping_kwargs,
         )
         model = LightningModel(task=task, predict_subset=predict_subset)
         evaluator = SequenceLabelingEvaluator(

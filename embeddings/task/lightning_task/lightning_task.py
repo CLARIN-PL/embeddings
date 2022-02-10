@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import torch
 from numpy import typing as nptyping
+from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from torch.utils.data import DataLoader
 
 from embeddings.callbacks.lightning_callbacks import BestEpochCallback
@@ -62,7 +62,8 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         self.trainer = pl.Trainer(
             default_root_dir=str(self.output_path),
             callbacks=[BestEpochCallback(), EarlyStopping(**self.early_stopping_kwargs)],
-            **self.task_train_kwargs)
+            **self.task_train_kwargs
+        )
         try:
             self.trainer.fit(self.model, data)
         except Exception as e:

@@ -122,8 +122,8 @@ class OptunaPipeline(
         args = self._get_evaluation_metadata(parsed_params)
         pipeline = self.evaluation_pipeline(**args)
         results = pipeline.run()
-        trial.set_user_attr('best_epoch', pipeline.model.task.best_epoch)
-        trial.set_user_attr('best_validation_score', pipeline.model.task.best_validation_score)
+        trial.set_user_attr("best_epoch", pipeline.model.task.best_epoch)
+        trial.set_user_attr("best_validation_score", pipeline.model.task.best_validation_score)
         metric = results[self.metric_name][self.metric_key]
         assert isinstance(metric, float)
         return metric
