@@ -1,4 +1,4 @@
-from typing import Callable, Final
+from typing import Callable, Final, Optional
 
 import numpy as np
 import pytorch_lightning as pl
@@ -16,7 +16,7 @@ class BestEpochCallback(pl.callbacks.Callback):
         self.mode = mode
         torch_inf = torch.tensor(np.Inf)
         self.best_score = torch_inf if self.mode == "min" else -torch_inf
-        self.best_epoch = 0
+        self.best_epoch: Optional[int] = None
 
     @property
     def monitor_op(self) -> Callable[[torch.Tensor, torch.Tensor], bool]:
@@ -27,6 +27,9 @@ class BestEpochCallback(pl.callbacks.Callback):
 
     def _update_best_epoch(self, trainer: pl.Trainer) -> None:
         logs = trainer.callback_metrics
+        if self.monitor not in logs:
+            return
+
         current = logs[self.monitor].squeeze()
 
         if self.monitor_op(current, self.best_score.to(current.device)):
