@@ -2,7 +2,6 @@ import abc
 import logging
 from abc import ABC
 from dataclasses import dataclass, field
-from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar, Union
 
@@ -54,12 +53,15 @@ class PersistingPipeline(OptimizedPipeline[Metadata]):
 
 
 class OptunaPipeline(
-    OptimizedPipeline[Metadata], Generic[ConfigSpace, Metadata, EvaluationMetadata]
+    OptimizedPipeline[Metadata],
+    Generic[ConfigSpace, Metadata, EvaluationMetadata, Data, LoaderResult, TransformationResult],
 ):
     def __init__(
         self,
         config_space: ConfigSpace,
-        preprocessing_pipeline: PreprocessingPipeline[Data, LoaderResult, TransformationResult],
+        preprocessing_pipeline: Optional[
+            PreprocessingPipeline[Data, LoaderResult, TransformationResult]
+        ],
         evaluation_pipeline: Union[
             Type[ModelEvaluationPipeline[Data, LoaderResult, ModelResult, EvaluationResult]],
             Type[LightningPipeline[Data, ModelResult, EvaluationResult]],
@@ -67,7 +69,7 @@ class OptunaPipeline(
         pruner: optuna.pruners.BasePruner,
         sampler: optuna.samplers.BaseSampler,
         n_trials: int,
-        dataset_path: Union[str, Path, "TemporaryDirectory[str]"],
+        dataset_path: T_path,
         metric_name: str,
         metric_key: str,
     ):
@@ -99,7 +101,8 @@ class OptunaPipeline(
         self,
     ) -> Tuple[pd.DataFrame, Metadata]:
         self._pre_run_hook()
-        self.preprocessing_pipeline.run()
+        if self.preprocessing_pipeline is not None:
+            self.preprocessing_pipeline.run()
         study: Study = optuna.create_study(
             direction="maximize",
             sampler=self.sampler,
@@ -129,15 +132,15 @@ class OptunaPipeline(
         return metric
 
     def _pre_run_hook(self) -> None:
-        logging.getLogger("flair").setLevel(logging.WARNING)
+        logging.getLogger("optuna").setLevel(logging.WARNING)
 
     def _post_run_hook(self) -> None:
-        logging.getLogger("flair").setLevel(logging.INFO)
+        logging.getLogger("optuna").setLevel(logging.INFO)
 
 
 @dataclass
 class _HuggingFaceOptimizedPipelineBase(ABC, Generic[ConfigSpace]):
-    dataset_name: str
+    dataset_name_or_path: T_path
     config_space: ConfigSpace
 
 
@@ -154,6 +157,7 @@ class _HuggingFaceOptimizedPipelineDefaultsBase(ABC):
     sampler_cls: Type[optuna.samplers.TPESampler] = field(
         init=False, default=optuna.samplers.TPESampler
     )
+    ignore_preprocessing_pipeline: bool = False
 
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
@@ -166,4 +170,12 @@ class AbstractHuggingFaceOptimizedPipeline(
 ):
     @abc.abstractmethod
     def __post_init__(self) -> None:
+        pass
+
+    @abc.abstractmethod
+    def _init_dataset_path(self) -> None:
+        pass
+
+    @abc.abstractmethod
+    def _init_preprocessing_pipeline(self) -> None:
         pass

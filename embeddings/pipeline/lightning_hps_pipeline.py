@@ -1,8 +1,10 @@
-import abc
 from abc import ABC
 from dataclasses import dataclass, field
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, Optional, Tuple
+
+import datasets
 
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
@@ -55,30 +57,43 @@ class OptimizedLightingPipeline(
         ConfigSpace,
         LightningMetadata,
         LightningMetadata,
+        str,
+        datasets.DatasetDict,
+        datasets.DatasetDict,
     ],
     AbstractHuggingFaceOptimizedPipeline[ConfigSpace],
     _OptimizedLightingPipelineBase[ConfigSpace],
+    ABC,
     Generic[ConfigSpace, LightningMetadata],
 ):
-    @abc.abstractmethod
-    def __post_init__(self) -> None:
-        pass
-
-    @abc.abstractmethod
-    def _get_metadata(self, parameters: SampledParameters) -> LightningMetadata:
-        pass
-
     def _get_evaluation_metadata(self, parameters: SampledParameters) -> LightningMetadata:
         metadata = self._get_metadata(parameters)
         metadata["predict_subset"] = LightingDataModuleSubset.VALIDATION
-        metadata["dataset_name_or_path"] = self.tmp_dataset_dir.name
+        metadata["dataset_name_or_path"] = str(self.dataset_path)
         metadata["output_path"] = self.tmp_model_output_dir.name
         return metadata
 
-    def _post_run_hook(self) -> None:
-        super()._post_run_hook()
-        self.tmp_dataset_dir.cleanup()
-        self.tmp_model_output_dir.cleanup()
+    def _init_dataset_path(self) -> None:
+        self.dataset_path: T_path
+        if self.ignore_preprocessing_pipeline:
+            self.dataset_path = Path(self.dataset_name_or_path)
+            if not self.dataset_path.exists():
+                raise FileNotFoundError("Dataset path not found")
+        else:
+            self.dataset_path = self.tmp_dataset_dir.name
+
+    def _init_preprocessing_pipeline(self) -> None:
+        self.preprocessing_pipeline: Optional[HuggingFacePreprocessingPipeline]
+        if self.ignore_preprocessing_pipeline:
+            self.preprocessing_pipeline = None
+        else:
+            self.preprocessing_pipeline = HuggingFacePreprocessingPipeline(
+                dataset_name=str(self.dataset_name_or_path),
+                persist_path=self.tmp_dataset_dir.name,
+                sample_missing_splits=(self.sample_dev_split_fraction, None),
+                ignore_test_subset=True,
+                load_dataset_kwargs=self.load_dataset_kwargs,
+            )
 
     @staticmethod
     def _pop_sampled_parameters(
@@ -121,6 +136,11 @@ class OptimizedLightingPipeline(
             model_config_kwargs,
         )
 
+    def _post_run_hook(self) -> None:
+        super()._post_run_hook()
+        self.tmp_dataset_dir.cleanup()
+        self.tmp_model_output_dir.cleanup()
+
 
 @dataclass
 class OptimizedLightingClassificationPipeline(
@@ -130,19 +150,15 @@ class OptimizedLightingClassificationPipeline(
 ):
     def __post_init__(self) -> None:
         # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
+        self._init_dataset_path()
+        self._init_preprocessing_pipeline()
         super(OptimizedLightingPipeline, self).__init__(
-            preprocessing_pipeline=HuggingFacePreprocessingPipeline(
-                dataset_name=self.dataset_name,
-                persist_path=self.tmp_dataset_dir.name,
-                sample_missing_splits=(self.sample_dev_split_fraction, None),
-                ignore_test_subset=True,
-                load_dataset_kwargs=self.load_dataset_kwargs,
-            ),  # type: ignore
-            evaluation_pipeline=LightningClassificationPipeline,
+            preprocessing_pipeline=self.preprocessing_pipeline,
+            evaluation_pipeline=LightningClassificationPipeline,  # type: ignore
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
-            dataset_path=self.tmp_dataset_dir.name,
+            dataset_path=self.dataset_path,
             metric_name="f1__average_macro",
             metric_key="f1",
             config_space=self.config_space,
@@ -163,7 +179,7 @@ class OptimizedLightingClassificationPipeline(
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: LightningClassificationPipelineMetadata = {
             "embedding_name_or_path": embedding_name_or_path,
-            "dataset_name_or_path": self.dataset_name,
+            "dataset_name_or_path": self.dataset_name_or_path,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
             "train_batch_size": train_batch_size,
@@ -198,18 +214,12 @@ class OptimizedLightingSequenceLabelingPipeline(
         )
         # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
         super(OptimizedLightingPipeline, self).__init__(
-            preprocessing_pipeline=HuggingFacePreprocessingPipeline(
-                dataset_name=self.dataset_name,
-                persist_path=self.tmp_dataset_dir.name,
-                sample_missing_splits=(self.sample_dev_split_fraction, None),
-                ignore_test_subset=True,
-                load_dataset_kwargs=self.load_dataset_kwargs,
-            ),  # type: ignore
-            evaluation_pipeline=LightningSequenceLabelingPipeline,
+            preprocessing_pipeline=self.preprocessing_pipeline,
+            evaluation_pipeline=LightningSequenceLabelingPipeline,  # type: ignore
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
-            dataset_path=self.tmp_dataset_dir.name,
+            dataset_path=self.dataset_path,
             metric_name=self.metric_name,
             metric_key="overall_f1",
             config_space=self.config_space,
@@ -230,7 +240,7 @@ class OptimizedLightingSequenceLabelingPipeline(
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: LightningSequenceLabelingPipelineMetadata = {
             "embedding_name_or_path": embedding_name_or_path,
-            "dataset_name_or_path": self.dataset_name,
+            "dataset_name_or_path": self.dataset_name_or_path,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
             "evaluation_mode": self.evaluation_mode,
