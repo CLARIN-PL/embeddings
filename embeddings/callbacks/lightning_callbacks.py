@@ -19,7 +19,7 @@ class BestEpochCallback(pl.callbacks.Callback):
         self.best_epoch = 0
 
     @property
-    def monitor_op(self) -> Callable:
+    def monitor_op(self) -> Callable[[torch.Tensor, torch.Tensor], bool]:
         return BestEpochCallback.MODE_DICT[self.mode]
 
     def on_validation_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
