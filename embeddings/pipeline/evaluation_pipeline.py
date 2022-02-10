@@ -58,7 +58,7 @@ class FlairTextClassificationEvaluationPipeline(
     def __init__(
         self,
         dataset_path: T_path,
-        model_name: str,
+        embedding_name: str,
         output_path: T_path,
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         persist_path: Optional[T_path] = None,
@@ -71,7 +71,9 @@ class FlairTextClassificationEvaluationPipeline(
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
         embedding = AutoFlairDocumentPoolEmbedding.from_hub(
-            repo_id=model_name, document_embedding_cls=document_embedding_cls, **load_model_kwargs
+            repo_id=embedding_name,
+            document_embedding_cls=document_embedding_cls,
+            **load_model_kwargs
         )
         task = TextClassification(
             output_path=output_path,
@@ -91,7 +93,7 @@ class FlairTextPairClassificationEvaluationPipeline(
     def __init__(
         self,
         dataset_path: T_path,
-        model_name: str,
+        embedding_name: str,
         output_path: T_path,
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         persist_path: Optional[T_path] = None,
@@ -104,7 +106,9 @@ class FlairTextPairClassificationEvaluationPipeline(
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
         embedding = AutoFlairDocumentPoolEmbedding.from_hub(
-            repo_id=model_name, document_embedding_cls=document_embedding_cls, **load_model_kwargs
+            repo_id=embedding_name,
+            document_embedding_cls=document_embedding_cls,
+            **load_model_kwargs
         )
         task = TextPairClassification(
             output_path=output_path,
@@ -139,7 +143,9 @@ class FlairSequenceLabelingEvaluationPipeline(
     ):
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = ConllFlairCorpusDataLoader()
-        embedding = AutoFlairWordEmbedding.from_hub(embedding_name, kwargs=word_embedding_kwargs)
+        embedding = AutoFlairWordEmbedding.from_hub(
+            repo_id=embedding_name, kwargs=word_embedding_kwargs
+        )
         task = SequenceLabeling(
             output_path=output_path,
             hidden_size=hidden_size,
