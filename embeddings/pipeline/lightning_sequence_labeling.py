@@ -22,11 +22,7 @@ from embeddings.utils.utils import initialize_kwargs
 class LightningSequenceLabelingPipeline(
     LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
-    DEFAULT_TASK_TRAIN_KWARGS = {"devices": "auto", "accelerator": "auto"}
-    DEFAULT_TASK_MODEL_KWARGS = {"use_scheduler": True}
     DEFAULT_DATAMODULE_KWARGS = {"max_seq_length": None, "label_all_tokens": False}
-    DEFAULT_MODEL_CONFIG_KWARGS = {"classifier_dropout": None}
-    DEFAULT_EARLY_STOPPING_KWARGS = {"monitor": "val/Loss", "mode": "min", "patience": 3}
 
     def __init__(
         self,

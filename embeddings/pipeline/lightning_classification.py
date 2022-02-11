@@ -18,12 +18,6 @@ from embeddings.utils.utils import initialize_kwargs
 class LightningClassificationPipeline(
     LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
-    DEFAULT_TASK_TRAIN_KWARGS = {"devices": "auto", "accelerator": "auto"}
-    DEFAULT_TASK_MODEL_KWARGS = {"use_scheduler": True}
-    DEFAULT_DATAMODULE_KWARGS = {"max_seq_length": None}
-    DEFAULT_MODEL_CONFIG_KWARGS = {"classifier_dropout": None}
-    DEFAULT_EARLY_STOPPING_KWARGS = {"monitor": "val/Loss", "mode": "min", "patience": 3}
-
     def __init__(
         self,
         embedding_name_or_path: T_path,
@@ -44,6 +38,7 @@ class LightningClassificationPipeline(
         task_train_kwargs: Optional[Dict[str, Any]] = None,
         model_config_kwargs: Optional[Dict[str, Any]] = None,
         early_stopping_kwargs: Optional[Dict[str, Any]] = None,
+        logging_kwargs: Optional[Dict[str, Any]] = None,
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
     ):
         self.datamodule_kwargs = initialize_kwargs(
@@ -64,6 +59,8 @@ class LightningClassificationPipeline(
         self.task_model_kwargs.update(
             {"train_batch_size": train_batch_size, "eval_batch_size": eval_batch_size}
         )
+        self.logging_kwargs = initialize_kwargs(self.DEFAULT_LOGGING_KWARGS, logging_kwargs)
+
         tokenizer_name_or_path = (
             tokenizer_name_or_path if tokenizer_name_or_path else embedding_name_or_path
         )
@@ -89,6 +86,7 @@ class LightningClassificationPipeline(
             task_model_kwargs=self.task_model_kwargs,
             task_train_kwargs=self.task_train_kwargs,
             early_stopping_kwargs=self.early_stopping_kwargs,
+            logging_kwargs=self.logging_kwargs
         )
         model = LightningModel(task=task, predict_subset=predict_subset)
         evaluator = TextClassificationEvaluator().persisting(
