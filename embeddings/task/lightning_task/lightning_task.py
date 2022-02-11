@@ -60,10 +60,13 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
 
+        callbacks = []
+        if "validation" in data.load_dataset().keys():
+            callbacks.append(BestEpochCallback())
+            callbacks.append(EarlyStopping(**self.early_stopping_kwargs))
+
         self.trainer = pl.Trainer(
-            default_root_dir=str(self.output_path),
-            callbacks=[BestEpochCallback(), EarlyStopping(**self.early_stopping_kwargs)],
-            **self.task_train_kwargs
+            default_root_dir=str(self.output_path), callbacks=callbacks, **self.task_train_kwargs
         )
         try:
             self.trainer.fit(self.model, data)
