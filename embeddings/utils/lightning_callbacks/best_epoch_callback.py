@@ -1,4 +1,4 @@
-from typing import Callable, Final, Optional
+from typing import Any, Callable, Dict, Final, Optional, Union
 
 import numpy as np
 import pytorch_lightning as pl
@@ -6,9 +6,12 @@ import torch
 
 
 class BestEpochCallback(pl.callbacks.Callback):
-    MODE_DICT: Final = {"min": torch.lt, "max": torch.gt}
+    MODE_DICT: Final = {
+        "min": lambda x, y: (x < y).item(),
+        "max": lambda x, y: (x > y).item(),
+    }
 
-    def __init__(self, monitor="val/Loss", mode="min", **kwargs):
+    def __init__(self, monitor: str = "val/Loss", mode: str = "min", **kwargs: Dict[str, Any]):
         super().__init__(**kwargs)
         assert mode in BestEpochCallback.MODE_DICT
 
