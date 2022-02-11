@@ -1,11 +1,15 @@
-import pathlib
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Any, Type, Union
 
 from flair.embeddings import WordEmbeddings
 
 from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding, FlairEmbedding
-from embeddings.embedding.static.config import SingleFileConfig, StaticModelHubConfig, StaticModelLocalFileConfig
+from embeddings.embedding.static.config import (
+    SingleFileConfig,
+    StaticModelHubConfig,
+    StaticModelLocalFileConfig,
+)
 from embeddings.utils.utils import import_from_string
 from experimental.embeddings.static.flair import WordEmbeddingsPL
 
@@ -40,7 +44,7 @@ class LocalFileStaticEmbedding(FlairEmbedding, ABC):
 
     @staticmethod
     @abstractmethod
-    def from_file(file_path: pathlib.Path, **kwargs: Any) -> "LocalFileStaticEmbedding":
+    def from_file(file_path: Path, **kwargs: Any) -> "LocalFileStaticEmbedding":
         pass
 
 
@@ -51,7 +55,7 @@ class SingleFileEmbedding(StaticEmbedding, ABC):
 
 
 class SingleLocalFileEmbedding(LocalFileStaticEmbedding, ABC):
-    def __init__(self, file_path: pathlib.Path, **load_model_kwargs: Any):
+    def __init__(self, file_path: Path, **load_model_kwargs: Any):
         super().__init__(str(file_path), **load_model_kwargs)
         self.config = self.create_config()
 
@@ -127,7 +131,7 @@ class LocalFileAutoStaticEmbedding(ABC):
     @staticmethod
     @abstractmethod
     def from_file(
-        file_path: pathlib.Path, model_type_reference: str, **kwargs: Any
+        file_path: Path, model_type_reference: str, **kwargs: Any
     ) -> Union[LocalFileStaticEmbedding, FlairDocumentPoolEmbedding]:
         """Returns a static embedding model initialised using the provided file path."""
         pass
@@ -135,8 +139,12 @@ class LocalFileAutoStaticEmbedding(ABC):
 
 class LocalFileAutoStaticWordEmbedding(LocalFileAutoStaticEmbedding):
     @staticmethod
-    def from_file(file_path: pathlib.Path, model_type_reference: str, **kwargs: Any) -> LocalFileStaticEmbedding:
-        return LocalFileAutoStaticWordEmbedding._get_model_cls(model_type_reference).from_file(file_path, **kwargs)
+    def from_file(
+        file_path: Path, model_type_reference: str, **kwargs: Any
+    ) -> LocalFileStaticEmbedding:
+        return LocalFileAutoStaticWordEmbedding._get_model_cls(model_type_reference).from_file(
+            file_path, **kwargs
+        )
 
     @staticmethod
     def _get_model_cls(model_type_reference: str) -> Type[LocalFileStaticEmbedding]:
@@ -150,6 +158,10 @@ class LocalFileAutoStaticWordEmbedding(LocalFileAutoStaticEmbedding):
 
 class LocalFileAutoStaticDocumentEmbedding(LocalFileAutoStaticEmbedding):
     @staticmethod
-    def from_file(file_path: pathlib.Path, model_type_reference: str, **kwargs: Any) -> FlairDocumentPoolEmbedding:
-        embedding = LocalFileAutoStaticEmbedding.from_file(file_path, model_type_reference, **kwargs)
+    def from_file(
+        file_path: Path, model_type_reference: str, **kwargs: Any
+    ) -> FlairDocumentPoolEmbedding:
+        embedding = LocalFileAutoStaticWordEmbedding.from_file(
+            file_path, model_type_reference, **kwargs
+        )
         return FlairDocumentPoolEmbedding(embedding)

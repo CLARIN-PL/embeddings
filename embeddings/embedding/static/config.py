@@ -1,6 +1,6 @@
 import os
-import pathlib
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict
 from urllib.error import HTTPError
 from urllib.request import urlopen
@@ -88,7 +88,7 @@ class GensimFileConfig(SingleFileConfig):
 
 @dataclass
 class StaticModelLocalFileConfig:
-    model_file_path: pathlib.Path
+    model_file_path: Path
     model_type_reference: str
 
     def file_exists(self) -> bool:
@@ -96,9 +96,7 @@ class StaticModelLocalFileConfig:
 
     def __post_init__(self) -> None:
         if not self.file_exists():
-            raise ValueError(
-                f"There is no file located at: {self.model_file_path}"
-            )
+            raise ValueError(f"There is no file located at: {self.model_file_path}")
 
 
 @dataclass

@@ -1,3 +1,4 @@
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple
 
@@ -66,4 +67,52 @@ def test_text_classification_pipeline(
     np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.3333333)
     np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.1666666)
     np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.1111111)
+    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.3333333)
+
+
+@pytest.fixture(scope="module")
+def text_classification_pipeline_local_embedding(
+    result_path: "TemporaryDirectory[str]",
+    embedding_path: Path = Path("../wiki-forms-all-100-cbow-ns-30-it100.txt.gz"),
+    model_type_reference: str = "embeddings.embedding.static.word2vec.IPIPANWord2VecEmbedding",
+) -> Tuple[
+    StandardPipeline[
+        str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+    ],
+    "TemporaryDirectory[str]",
+]:
+    dataset = HuggingFaceDataset(
+        "clarin-pl/polemo2-official",
+        train_domains=["reviews"],
+        dev_domains=["reviews"],
+        test_domains=["reviews"],
+        text_cfg="sentence",
+    )
+    data_loader = HuggingFaceDataLoader()
+    transformation = ClassificationCorpusTransformation("text", "target").then(
+        DownsampleFlairCorpusTransformation(percentage=0.01, stratify=False)
+    )
+    embedding = AutoFlairDocumentEmbedding.from_file(embedding_path, model_type_reference)
+    task = TextClassification(result_path.name, task_train_kwargs={"max_epochs": 1})
+    model = FlairModel(embedding, task)
+    evaluator = TextClassificationEvaluator()
+    pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)
+    return pipeline, result_path
+
+
+def test_text_classification_pipeline_local_embedding(
+    text_classification_pipeline_local_embedding: Tuple[
+        StandardPipeline[
+            str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+        ],
+        "TemporaryDirectory[str]",
+    ],
+) -> None:
+    flair.set_seed(441)
+    pipeline, path = text_classification_pipeline_local_embedding
+    result = pipeline.run()
+    path.cleanup()
+    np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.3333333)
+    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.3333333)
+    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.3333333)
     np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.3333333)

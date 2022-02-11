@@ -1,4 +1,3 @@
-import pathlib
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Type, Union
 
@@ -35,7 +34,7 @@ class FlairPairClassificationPipeline(
 ):
     def __init__(
         self,
-        embedding_name: Union[str, pathlib.Path, pathlib.PosixPath],
+        embedding_name: Union[str, Path],
         dataset_name: str,
         input_columns_names_pair: Tuple[str, str],
         target_column_name: str,
@@ -66,9 +65,11 @@ class FlairPairClassificationPipeline(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
 
-        if isinstance(embedding_name, pathlib.Path):
+        if isinstance(embedding_name, Path):
             if not model_type_reference:
-                _logger.error("For embedding loaded directly from file model_type_reference must be provided!")
+                _logger.error(
+                    "For embedding loaded directly from file model_type_reference must be provided!"
+                )
 
             embedding = AutoFlairDocumentPoolEmbedding.from_file(
                 file_path=embedding_name,

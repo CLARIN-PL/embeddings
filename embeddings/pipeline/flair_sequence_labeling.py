@@ -1,4 +1,3 @@
-import pathlib
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Union
 
@@ -34,7 +33,7 @@ class FlairSequenceLabelingPipeline(
 ):
     def __init__(
         self,
-        embedding_name: Union[str, pathlib.Path],
+        embedding_name: Union[str, Path],
         dataset_name: str,
         input_column_name: str,
         target_column_name: str,
@@ -64,9 +63,11 @@ class FlairSequenceLabelingPipeline(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
 
-        if isinstance(embedding_name, pathlib.Path):
+        if isinstance(embedding_name, Path):
             if not model_type_reference:
-                _logger.error("For embedding loaded directly from file model_type_reference must be provided!")
+                _logger.error(
+                    "For embedding loaded directly from file model_type_reference must be provided!"
+                )
 
             embedding = AutoFlairWordEmbedding.from_file(embedding_name, model_type_reference)
         else:

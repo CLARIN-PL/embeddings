@@ -1,5 +1,5 @@
-import pathlib
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Any, Type, Union
 
 from typing_extensions import Final
@@ -17,8 +17,8 @@ from embeddings.embedding.flair_embedding import (
 from embeddings.embedding.static.embedding import (
     AutoStaticDocumentEmbedding,
     AutoStaticWordEmbedding,
-    LocalFileAutoStaticWordEmbedding,
     LocalFileAutoStaticDocumentEmbedding,
+    LocalFileAutoStaticWordEmbedding,
 )
 from embeddings.utils.loggers import get_logger
 
@@ -48,7 +48,9 @@ class AutoFlairEmbedding(ABC):
 
     @staticmethod
     @abstractmethod
-    def from_file(file_path: pathlib.Path, model_type_reference: str, *args: Any, **kwargs: Any) -> FlairEmbedding:
+    def from_file(
+        file_path: Path, model_type_reference: str, *args: Any, **kwargs: Any
+    ) -> FlairEmbedding:
         """Loads an embedding model from file that is stored locally, if the model is compatible with
         Transformers or the current library.
 
@@ -65,7 +67,7 @@ class AutoFlairEmbedding(ABC):
         )
 
     @staticmethod
-    def _log_info_static_local_file(file_path: pathlib.Path) -> None:
+    def _log_info_static_local_file(file_path: Path) -> None:
         _logger.info(
             f"{file_path.name} not compatible with Transformers, trying to initialise as "
             f"static embedding."
@@ -82,12 +84,16 @@ class AutoFlairWordEmbedding(AutoFlairEmbedding):
             return AutoStaticWordEmbedding.from_default_config(repo_id, **kwargs)
 
     @staticmethod
-    def from_file(file_path: pathlib.Path, model_type_reference: str, *args: Any, **kwargs: Any) -> FlairEmbedding:
+    def from_file(
+        file_path: Path, model_type_reference: str, *args: Any, **kwargs: Any
+    ) -> FlairEmbedding:
         try:
             return FlairTransformerWordEmbedding(str(file_path), **kwargs)
         except EnvironmentError:
             AutoFlairWordEmbedding._log_info_static_local_file(file_path)
-            return LocalFileAutoStaticWordEmbedding.from_file(file_path, model_type_reference, **kwargs)
+            return LocalFileAutoStaticWordEmbedding.from_file(
+                file_path, model_type_reference, **kwargs
+            )
 
 
 class AutoFlairDocumentEmbedding(AutoFlairEmbedding):
@@ -103,7 +109,9 @@ class AutoFlairDocumentEmbedding(AutoFlairEmbedding):
             return AutoStaticDocumentEmbedding.from_default_config(repo_id, **kwargs)
 
     @staticmethod
-    def from_file(file_path: pathlib.Path, model_type_reference: str, *args: Any, **kwargs: Any) -> FlairEmbedding:
+    def from_file(
+        file_path: Path, model_type_reference: str, *args: Any, **kwargs: Any
+    ) -> FlairEmbedding:
         """In case of StaticWordEmbedding, mean pooling on such embeddings is performed to obtain a
         document's embedding.
         """
@@ -111,7 +119,9 @@ class AutoFlairDocumentEmbedding(AutoFlairEmbedding):
             return FlairTransformerDocumentEmbedding(str(file_path), **kwargs)
         except EnvironmentError:
             AutoFlairDocumentEmbedding._log_info_static_local_file(file_path)
-            return LocalFileAutoStaticDocumentEmbedding.from_file(file_path, model_type_reference, **kwargs)
+            return LocalFileAutoStaticDocumentEmbedding.from_file(
+                file_path=file_path, model_type_reference=model_type_reference, **kwargs
+            )
 
 
 class AutoFlairDocumentPoolEmbedding(AutoFlairEmbedding):
@@ -154,7 +164,7 @@ class AutoFlairDocumentPoolEmbedding(AutoFlairEmbedding):
 
     @staticmethod
     def from_file(
-        file_path: pathlib.Path,
+        file_path: Path,
         model_type_reference: str,
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         *args: Any,
@@ -183,7 +193,10 @@ class AutoFlairDocumentPoolEmbedding(AutoFlairEmbedding):
                 document_embedding = document_embedding_cls(name=str(file_path), **kwargs)
             else:
                 document_embedding = document_embedding_cls(
-                    word_embedding=AutoFlairWordEmbedding.from_file(file_path=file_path, model_type_reference=model_type_reference), **kwargs
+                    word_embedding=AutoFlairWordEmbedding.from_file(
+                        file_path=file_path, model_type_reference=model_type_reference
+                    ),
+                    **kwargs,
                 )
         else:
             raise ValueError(pooling_value_error_msg)

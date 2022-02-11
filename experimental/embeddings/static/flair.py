@@ -30,12 +30,6 @@ class WordEmbeddingsPL(WordEmbeddings):
         force_cpu: bool = True,
         stable: bool = False,
     ):
-        """
-        Initializes classic word embeddings. Constructor downloads required files if not there.
-        :param embeddings: one of: 'glove', 'extvec', 'crawl' or two-letter language code or custom
-        If you want to use a custom embedding file, just pass the path to the embeddings as embeddings variable.
-        set stable=True to use the stable embeddings as described in https://arxiv.org/abs/2110.02861
-        """
         super(WordEmbeddings, self).__init__()
         self.embeddings = embeddings
 

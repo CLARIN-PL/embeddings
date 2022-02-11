@@ -1,11 +1,20 @@
-import pathlib
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Optional
 
 from typing_extensions import Literal
 
-from embeddings.embedding.static.config import GensimFileConfig, StaticModelHubConfig, StaticModelLocalFileConfig, GensimLocalFileConfig
-from embeddings.embedding.static.embedding import SingleFileEmbedding, StandardStaticWordEmbedding, LocalFileStaticEmbedding, StandardStaticWordEmbeddingPL
+from embeddings.embedding.static.config import (
+    GensimFileConfig,
+    GensimLocalFileConfig,
+    StaticModelHubConfig,
+)
+from embeddings.embedding.static.embedding import (
+    LocalFileStaticEmbedding,
+    SingleFileEmbedding,
+    StandardStaticWordEmbedding,
+    StandardStaticWordEmbeddingPL,
+)
 
 
 @dataclass
@@ -67,8 +76,8 @@ class IPIPANWord2VecConfig(GensimLocalFileConfig):
     type: str = field(init=False)
     subtype: str = field(init=False)
     dimension: int = field(init=False)
-    method:  str = field(init=False)
-    algorithm:  str = field(init=False)
+    method: str = field(init=False)
+    algorithm: str = field(init=False)
     model_name: str = field(init=False)
     reduced_vocabulary: bool = False
     model_type_reference: str = "embeddings.embedding.static.word2vec.IPIPANWord2VecEmbedding"
@@ -77,11 +86,13 @@ class IPIPANWord2VecConfig(GensimLocalFileConfig):
         self.model_name = self.model_file_path.name.split(".")[0]
 
         metadata = self.model_name.split("-")
+        # IPIPan model are named according to convention that allow to get metadata about embedding from its name.
+        # Embedding name contain between 6 and 8 elements after splitting it with "-"
         assert len(metadata) in [
             6,
             7,
             8,
-        ], 'Model filename is not consistent with IPIPAN rules.'
+        ], "Model filename is not consistent with IPIPAN rules."
 
         self.corpus = metadata[0]
         self.type = metadata[1]
@@ -95,7 +106,7 @@ class IPIPANWord2VecConfig(GensimLocalFileConfig):
 
 class IPIPANWord2VecEmbedding(LocalFileStaticEmbedding, StandardStaticWordEmbeddingPL):
     @staticmethod
-    def from_file(file_path: pathlib.Path, **kwargs: Any) -> "IPIPANWord2VecEmbedding":
+    def from_file(file_path: Path, **kwargs: Any) -> "IPIPANWord2VecEmbedding":
         return IPIPANWord2VecEmbedding(str(file_path))
 
     @staticmethod
@@ -103,5 +114,5 @@ class IPIPANWord2VecEmbedding(LocalFileStaticEmbedding, StandardStaticWordEmbedd
         return IPIPANWord2VecConfig(**kwargs)
 
     @staticmethod
-    def create_config(file_path: pathlib.Path, **kwargs: Any) -> IPIPANWord2VecConfig:
+    def create_config(file_path: Path, **kwargs: Any) -> IPIPANWord2VecConfig:
         return IPIPANWord2VecConfig(file_path)
