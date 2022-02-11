@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Final, Optional, Union
+from typing import Any, Callable, Dict, Final, Optional
 
 import numpy as np
 import pytorch_lightning as pl

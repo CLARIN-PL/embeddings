@@ -1,6 +1,6 @@
 import abc
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import pytorch_lightning as pl
 import torch

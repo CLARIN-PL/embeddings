@@ -1,4 +1,4 @@
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from embeddings.data.datamodule import BaseDataModule, Data
 from embeddings.evaluator.evaluator import Evaluator
