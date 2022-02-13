@@ -183,7 +183,7 @@ class LightingTextClassificationConfigSpace(LightingConfigSpace):
 @dataclass
 class LightingSequenceLabelingConfigSpace(LightingConfigSpace):
     label_all_tokens: Parameter = field(
-        init=False, default=ConstantParameter(name="label_all_tokens", value=False)
+        init=True, default=ConstantParameter(name="label_all_tokens", value=False)
     )
 
     @classmethod
