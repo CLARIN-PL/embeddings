@@ -99,16 +99,3 @@ def test_lightning_classification_pipeline(
         pipeline.model.task.best_validation_score, 1.325, decimal=pytest.decimal
     )
     path.cleanup()
-
-
-if __name__ == "__main__":
-    test_lightning_classification_pipeline(
-        lightning_classification_pipeline(
-            pipeline_kwargs(),
-            dataset_kwargs(),
-            datamodule_kwargs(),
-            task_train_kwargs(),
-            task_model_kwargs(),
-            TemporaryDirectory(),
-        )
-    )
