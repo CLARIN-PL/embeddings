@@ -34,14 +34,14 @@ class FlairClassificationPipeline(
 ):
     def __init__(
         self,
-        embedding_name: Union[str, Path],
+        embedding_name: T_path,
         dataset_name: str,
         input_column_name: str,
         target_column_name: str,
         output_path: T_path,
         evaluation_filename: str = "evaluation.json",
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
-        model_type_reference: str = None,
+        model_type_reference: Optional[str] = None,
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
         task_model_kwargs: Optional[Dict[str, Any]] = None,

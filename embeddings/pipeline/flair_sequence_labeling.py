@@ -33,7 +33,7 @@ class FlairSequenceLabelingPipeline(
 ):
     def __init__(
         self,
-        embedding_name: Union[str, Path],
+        embedding_name: T_path,
         dataset_name: str,
         input_column_name: str,
         target_column_name: str,
@@ -41,7 +41,7 @@ class FlairSequenceLabelingPipeline(
         hidden_size: int,
         evaluation_filename: str = "evaluation.json",
         evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = SequenceLabelingEvaluator.EvaluationMode.CONLL,
-        model_type_reference: str = None,
+        model_type_reference: Optional[str] = None,
         tagging_scheme: Optional[SequenceLabelingEvaluator.TaggingScheme] = None,
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
