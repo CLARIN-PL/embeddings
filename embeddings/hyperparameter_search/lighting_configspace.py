@@ -135,8 +135,6 @@ class LightingConfigSpace(BaseConfigSpace, ABC):
         batch_size = pipeline_kwargs.pop("batch_size")
         pipeline_kwargs["train_batch_size"] = pipeline_kwargs["eval_batch_size"] = batch_size
 
-        cls._check_unmapped_parameters(parameters=parameters)
-
         return {
             "datamodule_kwargs": datamodule_kwargs,
             "task_model_kwargs": task_model_kwargs,
@@ -170,6 +168,12 @@ class LightingConfigSpace(BaseConfigSpace, ABC):
 @dataclass
 class LightingTextClassificationConfigSpace(LightingConfigSpace):
     @classmethod
+    def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
+        sampled_parameters = super().parse_parameters(parameters=parameters)
+        cls._check_unmapped_parameters(parameters=parameters)
+        return sampled_parameters
+
+    @classmethod
     def from_yaml(cls, path: T_path) -> "LightingTextClassificationConfigSpace":
         config = read_yaml(path)
         return cls(**cls._parse_config(config))
@@ -189,14 +193,13 @@ class LightingSequenceLabelingConfigSpace(LightingConfigSpace):
     @classmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
         sampled_parameters = super().parse_parameters(parameters=parameters)
-
         extra_datamodule_keys: Final = {"label_all_tokens"}
         extra_datamodule_kwargs = BaseConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=extra_datamodule_keys
         )
         assert isinstance(sampled_parameters["datamodule_kwargs"], dict)
         sampled_parameters["datamodule_kwargs"].update(extra_datamodule_kwargs)
-
+        cls._check_unmapped_parameters(parameters=parameters)
         return sampled_parameters
 
     @classmethod
