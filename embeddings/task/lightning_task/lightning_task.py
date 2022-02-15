@@ -1,10 +1,12 @@
 import abc
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import pytorch_lightning as pl
 import torch
 from numpy import typing as nptyping
+from pytorch_lightning.callbacks import Callback
+from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from torch.utils.data import DataLoader
 
 from embeddings.data.datamodule import HuggingFaceDataModule
@@ -12,6 +14,7 @@ from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.task.task import Task
+from embeddings.utils.lightning_callbacks.best_epoch_callback import BestEpochCallback
 from embeddings.utils.loggers import get_logger
 
 _logger = get_logger(__name__)
@@ -24,12 +27,34 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         self,
         output_path: T_path,
         task_train_kwargs: Dict[str, Any],
+        early_stopping_kwargs: Dict[str, Any],
     ):
         super().__init__()
         self.output_path: Path = Path(output_path)
         self.task_train_kwargs = task_train_kwargs
+        self.early_stopping_kwargs = early_stopping_kwargs
         self.model: Optional[HuggingFaceLightningModule] = None
         self.trainer: Optional[pl.Trainer] = None
+
+    @property
+    def best_epoch(self) -> Optional[float]:
+        if self.trainer is None:
+            return None
+
+        for callback in self.trainer.callbacks:
+            if isinstance(callback, BestEpochCallback):
+                return callback.best_epoch
+        return None
+
+    @property
+    def best_validation_score(self) -> Optional[float]:
+        if self.trainer is None:
+            return None
+
+        for callback in self.trainer.callbacks:
+            if isinstance(callback, BestEpochCallback):
+                return callback.best_score.item()
+        return None
 
     def fit(
         self,
@@ -37,7 +62,15 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
     ) -> None:
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
-        self.trainer = pl.Trainer(default_root_dir=str(self.output_path), **self.task_train_kwargs)
+
+        callbacks: List[Callback] = []
+        if "validation" in data.load_dataset().keys():
+            callbacks.append(BestEpochCallback())
+            callbacks.append(EarlyStopping(**self.early_stopping_kwargs))
+
+        self.trainer = pl.Trainer(
+            default_root_dir=str(self.output_path), callbacks=callbacks, **self.task_train_kwargs
+        )
         try:
             self.trainer.fit(self.model, data)
         except Exception as e:
