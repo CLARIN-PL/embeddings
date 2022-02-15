@@ -101,7 +101,7 @@ class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
 
 
 @dataclass
-class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
+class FlairSequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
     hidden_size: Parameter = SearchableParameter(
         name="hidden_size", type="int_uniform", low=128, high=2048, step=128
     )
@@ -163,9 +163,10 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
         task_model_kwargs = cls._pop_parameters(
             parameters=parameters, parameters_keys=task_model_keys
         )
-        parameters, task_train_kwargs = SequenceLabelingConfigSpace._parse_model_trainer_parameters(
-            parameters=parameters
-        )
+        (
+            parameters,
+            task_train_kwargs,
+        ) = FlairSequenceLabelingConfigSpace._parse_model_trainer_parameters(parameters=parameters)
         cls._check_unmapped_parameters(parameters=parameters)
 
         return {
@@ -176,18 +177,18 @@ class SequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
         }
 
     @classmethod
-    def from_yaml(cls, path: T_path) -> "SequenceLabelingConfigSpace":
+    def from_yaml(cls, path: T_path) -> "FlairSequenceLabelingConfigSpace":
         config = read_yaml(path)
         return cls(**cls._parse_config(config))
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "SequenceLabelingConfigSpace":
+    def from_dict(cls, d: Dict[str, Any]) -> "FlairSequenceLabelingConfigSpace":
         config = deepcopy(d)
         return cls(**cls._parse_config(config))
 
 
 @dataclass
-class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
+class FlairTextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
     dynamic_document_embedding: Parameter = SearchableParameter(
         name="document_embedding",
         type="categorical",
@@ -318,9 +319,10 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
             parameters=parameters, parameters_keys=load_model_keys
         )
 
-        parameters, task_train_kwargs = SequenceLabelingConfigSpace._parse_model_trainer_parameters(
-            parameters=parameters
-        )
+        (
+            parameters,
+            task_train_kwargs,
+        ) = FlairSequenceLabelingConfigSpace._parse_model_trainer_parameters(parameters=parameters)
         cls._check_unmapped_parameters(parameters=parameters)
 
         return {
@@ -332,11 +334,11 @@ class TextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
         }
 
     @classmethod
-    def from_yaml(cls, path: T_path) -> "TextClassificationConfigSpace":
+    def from_yaml(cls, path: T_path) -> "FlairTextClassificationConfigSpace":
         config = read_yaml(path)
         return cls(**cls._parse_config(config))
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "TextClassificationConfigSpace":
+    def from_dict(cls, d: Dict[str, Any]) -> "FlairTextClassificationConfigSpace":
         config = deepcopy(d)
         return cls(**cls._parse_config(config))
