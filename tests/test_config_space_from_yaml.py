@@ -7,9 +7,9 @@ import yaml
 from _pytest.tmpdir import TempdirFactory
 
 from embeddings.hyperparameter_search.configspace import BaseConfigSpace
-from embeddings.hyperparameter_search.flair_configspace import FlairModelTrainerConfigSpace
 from embeddings.hyperparameter_search.flair_configspace import (
-    SequenceLabelingConfigSpace as FlairSequenceLabelingConfigSpace,
+    FlairModelTrainerConfigSpace,
+    FlairSequenceLabelingConfigSpace,
 )
 from embeddings.hyperparameter_search.lighting_configspace import (
     LightingTextClassificationConfigSpace,

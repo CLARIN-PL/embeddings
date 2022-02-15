@@ -15,8 +15,8 @@ from embeddings.evaluator.sequence_labeling_evaluator import (
 )
 from embeddings.hyperparameter_search.configspace import ConfigSpace, SampledParameters
 from embeddings.hyperparameter_search.flair_configspace import (
-    SequenceLabelingConfigSpace,
-    TextClassificationConfigSpace,
+    FlairSequenceLabelingConfigSpace,
+    FlairTextClassificationConfigSpace,
 )
 from embeddings.hyperparameter_search.parameters import ParameterValues
 from embeddings.pipeline.evaluation_pipeline import (
@@ -72,7 +72,7 @@ class _OptimizedFlairPipelineDefaultsBase(_HuggingFaceOptimizedPipelineDefaultsB
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
 class AbstractOptimizedFlairClassificationPipeline(
-    AbstractHuggingFaceOptimizedPipeline[TextClassificationConfigSpace],
+    AbstractHuggingFaceOptimizedPipeline[FlairTextClassificationConfigSpace],
     _OptimizedFlairPipelineDefaultsBase,
     ABC,
 ):
@@ -103,7 +103,7 @@ class AbstractOptimizedFlairClassificationPipeline(
 @dataclass
 class OptimizedFlairClassificationPipeline(
     OptunaPipeline[
-        TextClassificationConfigSpace,
+        FlairTextClassificationConfigSpace,
         FlairClassificationPipelineMetadata,
         FlairEvaluationPipelineMetadata,
         str,
@@ -111,7 +111,7 @@ class OptimizedFlairClassificationPipeline(
         Corpus,
     ],
     AbstractOptimizedFlairClassificationPipeline,
-    _OptimizedFlairPipelineBase[TextClassificationConfigSpace],
+    _OptimizedFlairPipelineBase[FlairTextClassificationConfigSpace],
 ):
     def _init_preprocessing_pipeline(self) -> None:
         self.preprocessing_pipeline: Optional[FlairTextClassificationPreprocessingPipeline]
@@ -194,7 +194,7 @@ class OptimizedFlairClassificationPipeline(
 @dataclass
 class OptimizedFlairPairClassificationPipeline(
     OptunaPipeline[
-        TextClassificationConfigSpace,
+        FlairTextClassificationConfigSpace,
         FlairPairClassificationPipelineMetadata,
         FlairEvaluationPipelineMetadata,
         str,
@@ -202,7 +202,7 @@ class OptimizedFlairPairClassificationPipeline(
         Corpus,
     ],
     AbstractOptimizedFlairClassificationPipeline,
-    _OptimizedFlairPairClassificationPipelineBase[TextClassificationConfigSpace],
+    _OptimizedFlairPairClassificationPipelineBase[FlairTextClassificationConfigSpace],
 ):
     def _init_preprocessing_pipeline(self) -> None:
         self.preprocessing_pipeline: Optional[FlairTextPairClassificationPreprocessingPipeline]
@@ -287,16 +287,16 @@ class OptimizedFlairPairClassificationPipeline(
 @dataclass
 class OptimizedFlairSequenceLabelingPipeline(
     OptunaPipeline[
-        SequenceLabelingConfigSpace,
+        FlairSequenceLabelingConfigSpace,
         FlairSequenceLabelingPipelineMetadata,
         FlairSequenceLabelingEvaluationPipelineMetadata,
         str,
         datasets.DatasetDict,
         Corpus,
     ],
-    AbstractHuggingFaceOptimizedPipeline[SequenceLabelingConfigSpace],
+    AbstractHuggingFaceOptimizedPipeline[FlairSequenceLabelingConfigSpace],
     _OptimizedFlairPipelineDefaultsBase,
-    _OptimizedFlairPipelineBase[SequenceLabelingConfigSpace],
+    _OptimizedFlairPipelineBase[FlairSequenceLabelingConfigSpace],
 ):
     evaluation_mode: EvaluationMode = EvaluationMode.CONLL
     tagging_scheme: Optional[TaggingScheme] = None
