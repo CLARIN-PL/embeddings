@@ -1,4 +1,4 @@
-from tempfile import TemporaryDirectory
+from pathlib import Path
 from typing import Any, Dict, Tuple
 
 import datasets
@@ -63,34 +63,30 @@ def lightning_sequence_labeling_pipeline(
     dataset_kwargs: Tuple[Dict[str, Any], "TemporaryDirectory[str]"],
     datamodule_kwargs: Dict[str, Any],
     task_train_kwargs: Dict[str, Any],
-    result_path: "TemporaryDirectory[str]",
-) -> Tuple[
-    LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]],
-    "TemporaryDirectory[str]",
-]:
+    tmp_path: Path,
+) -> Tuple[LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]], Path]:
     datamodule_kwargs["max_seq_length"] = 64
     return (
         LightningSequenceLabelingPipeline(
-            output_path=result_path.name,
+            output_path=tmp_path,
             datamodule_kwargs=datamodule_kwargs,
             task_train_kwargs=task_train_kwargs,
             **pipeline_kwargs,
             **dataset_kwargs[0],
         ),
-        result_path,
+        tmp_path,
     )
 
 
 def test_lightning_sequence_labeling_pipeline(
     lightning_sequence_labeling_pipeline: Tuple[
         LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]],
-        "TemporaryDirectory[str]",
+        Path,
     ],
 ) -> None:
     pl.seed_everything(441)
     pipeline, path = lightning_sequence_labeling_pipeline
     result = pipeline.run()
-    path.cleanup()
     np.testing.assert_almost_equal(
         result["seqeval__mode_None__scheme_None"]["overall_accuracy"],
         0.0015690,

@@ -41,6 +41,7 @@ typer = ">=0.3.2"
 types-PyYAML = ">=5.4.10"
 typing-extensions = ">=4.0.1"
 intel-openmp = {version="^2022.0.3", platform="win32"}
+wandb = ">=0.12.10"
 
 [tool.poetry.dev-dependencies]
 black = "21.12b0"
@@ -50,7 +51,8 @@ poethepoet = "0.11.0"
 pyflakes = "2.4.0"
 pytest = "6.2.5"
 types-requests = "2.26.1"
-coverage = {extras = ["toml"], version = "^6.2"}
+coverage = {extras = ["toml"], version = "6.2"}
+pytest-env = "0.6.2"
 
 [tool.poe.tasks]
 black = "black --check ./"
@@ -77,6 +79,9 @@ build-backend = "poetry.masonry.api"
 [tool.pytest.ini_options]
 testpaths = "tests"
 addopts = "--maxfail=100"
+env = [
+    "WANDB_MODE = disabled",
+]
 
 [tool.black]
 line-length = 100
