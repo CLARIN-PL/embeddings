@@ -1,4 +1,5 @@
 import pprint
+from typing import Optional
 
 import typer
 
@@ -21,6 +22,12 @@ def run(
         "target", help="Column name that contains label for classification."
     ),
     root: str = typer.Option(RESULTS_PATH.joinpath("lightning_sequence_classification")),
+    run_name: Optional[str] = typer.Option(None, help="Name of run used for logging."),
+    wandb: bool = typer.Option(False, help="Flag for using wandb."),
+    tensorboard: bool = typer.Option(False, help="Flag for using tensorboard."),
+    csv: bool = typer.Option(False, help="Flag for using csv."),
+    wandb_project: Optional[str] = typer.Option(None, help="Name of wandb project."),
+    wandb_entity: Optional[str] = typer.Option(None, help="Name of entity project"),
 ) -> None:
     typer.echo(pprint.pformat(locals()))
 
@@ -33,9 +40,16 @@ def run(
         input_column_name=input_columns_name,
         target_column_name=target_column_name,
         output_path=output_path,
+        logging_kwargs={
+            "use_tensorboard": tensorboard,
+            "use_wandb": wandb,
+            "use_csv": csv,
+            "wandb_project": wandb_project,
+            "wandb_entity": wandb_entity,
+        },
     )
 
-    result = pipeline.run()
+    result = pipeline.run(run_name=run_name)
     typer.echo(format_eval_result(result))
 
 

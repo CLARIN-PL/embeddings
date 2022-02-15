@@ -19,7 +19,7 @@ class SklearnModel(Model[Dict[str, Any], Dict[str, Any]]):
         self.task = task
         self.predict_subset = predict_subset
 
-    def execute(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(self, data: Dict[str, Any], **kwargs: Any) -> Dict[str, Any]:
         self.embedding.fit(data["train"]["x"])
         self.task.build_task_model(self.embedding)
         return self.task.fit_predict(data, self.predict_subset)

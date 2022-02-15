@@ -22,7 +22,7 @@ from embeddings.utils.utils import initialize_kwargs
 class LightningSequenceLabelingPipeline(
     LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
-    DEFAULT_DATAMODULE_KWARGS = {"max_seq_length": None, "label_all_tokens": False}
+    DEFAULT_DATAMODULE_KWARGS: Dict[str, Any] = {"max_seq_length": None, "label_all_tokens": False}
 
     def __init__(
         self,
@@ -46,6 +46,7 @@ class LightningSequenceLabelingPipeline(
         task_train_kwargs: Optional[Dict[str, Any]] = None,
         model_config_kwargs: Optional[Dict[str, Any]] = None,
         early_stopping_kwargs: Optional[Dict[str, Any]] = None,
+        logging_kwargs: Optional[Dict[str, Any]] = None,
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
     ):
         self.datamodule_kwargs = initialize_kwargs(
@@ -66,6 +67,7 @@ class LightningSequenceLabelingPipeline(
         self.task_model_kwargs.update(
             {"train_batch_size": train_batch_size, "eval_batch_size": eval_batch_size}
         )
+        self.logging_kwargs = initialize_kwargs(self.DEFAULT_LOGGING_KWARGS, logging_kwargs)
         tokenizer_name_or_path = (
             tokenizer_name_or_path if tokenizer_name_or_path else embedding_name_or_path
         )
@@ -90,6 +92,7 @@ class LightningSequenceLabelingPipeline(
             model_config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
             task_train_kwargs=self.task_train_kwargs,
+            logging_kwargs=self.logging_kwargs,
             early_stopping_kwargs=self.early_stopping_kwargs,
         )
         model = LightningModel(task=task, predict_subset=predict_subset)

@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from embeddings.embedding.embedding import Embedding
 from embeddings.model.model import Model
@@ -16,6 +16,6 @@ class BaseModel(Model[Input, Output], Generic[Input, EmbeddingResult, Output]):
         self.embedding = embedding
         self.task = task
 
-    def execute(self, data: Input) -> Output:
+    def execute(self, data: Input, **kwargs: Any) -> Output:
         embedded = self.embedding.embed(data)
         return self.task.fit_predict(embedded)

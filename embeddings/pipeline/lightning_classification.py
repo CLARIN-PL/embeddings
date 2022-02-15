@@ -60,7 +60,6 @@ class LightningClassificationPipeline(
             {"train_batch_size": train_batch_size, "eval_batch_size": eval_batch_size}
         )
         self.logging_kwargs = initialize_kwargs(self.DEFAULT_LOGGING_KWARGS, logging_kwargs)
-
         tokenizer_name_or_path = (
             tokenizer_name_or_path if tokenizer_name_or_path else embedding_name_or_path
         )
@@ -86,7 +85,7 @@ class LightningClassificationPipeline(
             task_model_kwargs=self.task_model_kwargs,
             task_train_kwargs=self.task_train_kwargs,
             early_stopping_kwargs=self.early_stopping_kwargs,
-            logging_kwargs=self.logging_kwargs
+            logging_kwargs=self.logging_kwargs,
         )
         model = LightningModel(task=task, predict_subset=predict_subset)
         evaluator = TextClassificationEvaluator().persisting(
