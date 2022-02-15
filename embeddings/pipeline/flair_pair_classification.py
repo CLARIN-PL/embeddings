@@ -8,8 +8,9 @@ from numpy import typing as nptyping
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.data.io import T_path
-from embeddings.embedding.auto_flair import AutoFlairDocumentPoolEmbedding, DocumentEmbedding
+from embeddings.embedding.auto_flair import DocumentEmbedding
 from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
+from embeddings.embedding.flair_loader import FlairDocumentPoolEmbeddingLoader
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -65,24 +66,10 @@ class FlairPairClassificationPipeline(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
 
-        if isinstance(embedding_name, Path):
-            if not model_type_reference:
-                _logger.error(
-                    "For embedding loaded directly from file model_type_reference must be provided!"
-                )
-
-            embedding = AutoFlairDocumentPoolEmbedding.from_file(
-                file_path=embedding_name,
-                model_type_reference=model_type_reference,
-                document_embedding_cls=document_embedding_cls,
-                **load_model_kwargs if load_model_kwargs else {}
-            )
-        else:
-            embedding = AutoFlairDocumentPoolEmbedding.from_hub(
-                repo_id=embedding_name,
-                document_embedding_cls=document_embedding_cls,
-                **load_model_kwargs if load_model_kwargs else {}
-            )
+        embedding_loader = FlairDocumentPoolEmbeddingLoader(embedding_name, model_type_reference)
+        embedding = embedding_loader.get_embedding(
+            document_embedding_cls, **load_model_kwargs or {}
+        )
 
         task = TextPairClassification(
             output_path,

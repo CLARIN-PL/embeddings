@@ -8,7 +8,7 @@ from numpy import typing as nptyping
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.data.io import T_path
-from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
+from embeddings.embedding.flair_loader import FlairWordEmbeddingLoader
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -63,15 +63,8 @@ class FlairSequenceLabelingPipeline(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
 
-        if isinstance(embedding_name, Path):
-            if not model_type_reference:
-                _logger.error(
-                    "For embedding loaded directly from file model_type_reference must be provided!"
-                )
-
-            embedding = AutoFlairWordEmbedding.from_file(embedding_name, model_type_reference)
-        else:
-            embedding = AutoFlairWordEmbedding.from_hub(embedding_name)
+        embedding_loader = FlairWordEmbeddingLoader(embedding_name, model_type_reference)
+        embedding = embedding_loader.get_embedding()
 
         task = SequenceLabeling(
             output_path,
