@@ -66,9 +66,13 @@ class SampleSplitsHuggingFaceTransformation(
             sampled_dataset = self._train_test_split(data["train"], self.dev_fraction)
             dataset["train"] = sampled_dataset["train"]
             dataset["validation"] = sampled_dataset["test"]
+            if "test" in data:
+                dataset["test"] = data["test"]
 
         elif self.test_fraction and "test" not in data:
             dataset = self._train_test_split(data["train"], self.test_fraction)
+            if "validation" in data:
+                dataset["validation"] = data["validation"]
         else:
             _logger.warning(
                 "Sampling transformation wrongly defined. "

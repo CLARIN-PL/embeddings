@@ -209,6 +209,8 @@ class OptimizedLightingSequenceLabelingPipeline(
     tagging_scheme: Optional[TaggingScheme] = None
 
     def __post_init__(self) -> None:
+        self._init_dataset_path()
+        self._init_preprocessing_pipeline()
         self.metric_name = SequenceLabelingEvaluator.get_metric_name(
             evaluation_mode=self.evaluation_mode, tagging_scheme=self.tagging_scheme
         )
