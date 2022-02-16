@@ -99,7 +99,7 @@ def download_file(url: str, chunk_size: int = 1024) -> Tuple[Any, str]:
     filesize = int(r.headers.get("Content-Length", "0"))
 
     pbar = tqdm(total=filesize, unit="iB", unit_scale=True)
-    tmp_file = NamedTemporaryFile()
+    tmp_file = NamedTemporaryFile(delete=False)
 
     for data in r.iter_content(chunk_size=chunk_size):
         tmp_file.write(data)

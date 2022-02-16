@@ -23,6 +23,7 @@ def pytest_sessionstart():
     if not os.path.exists(STATIC_EMBEDDING_PATH):
         tmp_file, _ = download_file(STATIC_EMBEDDING_URL)
         shutil.copy(tmp_file.name, STATIC_EMBEDDING_PATH)
+        tmp_file.close()
         #with gzip.open(tmp_file.name, "rb") as f_in:
         #    with open(STATIC_EMBEDDING_PATH, "wb") as f_out:
         #        shutil.copyfileobj(f_in, f_out)
