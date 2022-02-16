@@ -13,7 +13,7 @@ from embeddings.utils.utils import download_file
 STATIC_EMBEDDING_URL = (
     "http://dsmodels.nlp.ipipan.waw.pl/dsmodels/wiki-forms-all-100-cbow-ns-30-it100.txt.gz"
 )
-STATIC_EMBEDDING_PATH = Path("tests/models/wiki-forms-all-100-cbow-ns-30-it100.txt")
+STATIC_EMBEDDING_PATH = Path("tests/models/wiki-forms-all-100-cbow-ns-30-it100.txt.gz")
 
 
 def pytest_sessionstart():
@@ -22,9 +22,10 @@ def pytest_sessionstart():
 
     if not os.path.exists(STATIC_EMBEDDING_PATH):
         tmp_file, _ = download_file(STATIC_EMBEDDING_URL)
-        with gzip.open(tmp_file.name, "rb") as f_in:
-            with open(STATIC_EMBEDDING_PATH, "wb") as f_out:
-                shutil.copyfileobj(f_in, f_out)
+        shutil.copy(tmp_file.name, STATIC_EMBEDDING_PATH)
+        #with gzip.open(tmp_file.name, "rb") as f_in:
+        #    with open(STATIC_EMBEDDING_PATH, "wb") as f_out:
+        #        shutil.copyfileobj(f_in, f_out)
 
 
 @pytest.fixture(scope="session")
