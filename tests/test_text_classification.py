@@ -1,4 +1,3 @@
-from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple
 
@@ -22,6 +21,7 @@ from embeddings.transformation.flair_transformation.classification_corpus_transf
 from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
     DownsampleFlairCorpusTransformation,
 )
+from tests.conftest import STATIC_EMBEDDING_PATH
 
 
 @pytest.fixture(scope="module")
@@ -73,7 +73,6 @@ def test_text_classification_pipeline(
 @pytest.fixture(scope="module")
 def text_classification_pipeline_local_embedding(
     result_path: "TemporaryDirectory[str]",
-    embedding_path: Path = Path("../wiki-forms-all-100-cbow-ns-30-it100.txt.gz"),
     model_type_reference: str = "embeddings.embedding.static.word2vec.IPIPANWord2VecEmbedding",
 ) -> Tuple[
     StandardPipeline[
@@ -92,7 +91,7 @@ def text_classification_pipeline_local_embedding(
     transformation = ClassificationCorpusTransformation("text", "target").then(
         DownsampleFlairCorpusTransformation(percentage=0.01, stratify=False)
     )
-    embedding = AutoFlairDocumentEmbedding.from_file(embedding_path, model_type_reference)
+    embedding = AutoFlairDocumentEmbedding.from_file(STATIC_EMBEDDING_PATH, model_type_reference)
     task = TextClassification(result_path.name, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(embedding, task)
     evaluator = TextClassificationEvaluator()

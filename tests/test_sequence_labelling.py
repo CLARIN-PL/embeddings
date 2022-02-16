@@ -1,4 +1,3 @@
-from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple
 
@@ -27,6 +26,7 @@ from embeddings.transformation.flair_transformation.downsample_corpus_transforma
 from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
     SampleSplitsFlairCorpusTransformation,
 )
+from tests.conftest import STATIC_EMBEDDING_PATH
 
 
 @pytest.fixture()
@@ -36,10 +36,9 @@ def embedding() -> FlairEmbedding:
 
 @pytest.fixture()
 def embedding_local_file(
-    embedding_path: Path = Path("../wiki-forms-all-100-cbow-ns-30-it100.txt.gz"),
     model_type_reference: str = "embeddings.embedding.static.word2vec.IPIPANWord2VecEmbedding",
 ) -> FlairEmbedding:
-    return AutoFlairWordEmbedding.from_file(embedding_path, model_type_reference)
+    return AutoFlairWordEmbedding.from_file(STATIC_EMBEDDING_PATH, model_type_reference)
 
 
 @pytest.fixture()
