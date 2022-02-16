@@ -161,9 +161,7 @@ class WordEmbeddingsPL(WordEmbeddings):
             self.vocab = {k: v.index for k, v in precomputed_word_embeddings.vocab.items()}
 
         if stable:
-            self.layer_norm: Optional[nn.LayerNorm] = nn.LayerNorm(
-                self.embedding_length, elementwise_affine=fine_tune
-            )
+            self.layer_norm = nn.LayerNorm(self.embedding_length, elementwise_affine=fine_tune)
         else:
             self.layer_norm = None
 

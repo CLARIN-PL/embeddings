@@ -39,7 +39,7 @@ class LocalFileStaticEmbedding(FlairEmbedding, ABC):
 
     @staticmethod
     @abstractmethod
-    def create_config(**kwargs: Any) -> StaticModelLocalFileConfig:
+    def create_config(file_path: Path, **kwargs: Any) -> StaticModelLocalFileConfig:
         pass
 
     @staticmethod
