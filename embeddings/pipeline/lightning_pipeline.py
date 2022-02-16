@@ -22,6 +22,11 @@ class LightningPipeline(
         "use_wandb": True,
         "use_csv": True,
     }
+    DEFAULT_EARLY_STOPPING_KWARGS: Dict[str, Any] = {
+        "monitor": "val/Loss",
+        "mode": "min",
+        "patience": 3,
+    }
 
     def __init__(
         self,

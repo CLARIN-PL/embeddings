@@ -61,11 +61,11 @@ class LightningSequenceLabelingPipeline(
         self.task_model_kwargs = task_model_kwargs = initialize_kwargs(
             self.DEFAULT_TASK_MODEL_KWARGS, task_model_kwargs
         )
-        self.early_stopping_kwargs = initialize_kwargs(
-            self.DEFAULT_EARLY_STOPPING_KWARGS, early_stopping_kwargs
-        )
         self.task_model_kwargs.update(
             {"train_batch_size": train_batch_size, "eval_batch_size": eval_batch_size}
+        )
+        self.early_stopping_kwargs = initialize_kwargs(
+            self.DEFAULT_EARLY_STOPPING_KWARGS, early_stopping_kwargs
         )
         self.logging_kwargs = initialize_kwargs(self.DEFAULT_LOGGING_KWARGS, logging_kwargs)
         tokenizer_name_or_path = (

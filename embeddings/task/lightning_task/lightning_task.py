@@ -6,9 +6,9 @@ import pytorch_lightning as pl
 import torch
 import wandb
 from numpy import typing as nptyping
+from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.callbacks import Callback
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.loggers import LightningLoggerBase
 from torch.utils.data import DataLoader
 
@@ -30,8 +30,8 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         self,
         output_path: T_path,
         task_train_kwargs: Dict[str, Any],
-        logging_kwargs: Dict[str, Any],
         early_stopping_kwargs: Dict[str, Any],
+        logging_kwargs: Dict[str, Any],
     ):
         super().__init__()
         self.output_path: Path = Path(output_path)
