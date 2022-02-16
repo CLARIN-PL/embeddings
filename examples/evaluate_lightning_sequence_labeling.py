@@ -1,5 +1,4 @@
 import pprint
-from pathlib import Path
 from typing import Optional
 
 import typer
@@ -31,6 +30,12 @@ def run(
         None, help="Tagging scheme. Supported schemes: [IOB1, IOB2, IOE1, IOE2, IOBES, BILOU]"
     ),
     root: str = typer.Option(RESULTS_PATH.joinpath("lightning_sequence_classification")),
+    run_name: Optional[str] = typer.Option(None, help="Name of run used for logging."),
+    wandb: bool = typer.Option(False, help="Flag for using wandb."),
+    tensorboard: bool = typer.Option(False, help="Flag for using tensorboard."),
+    csv: bool = typer.Option(False, help="Flag for using csv."),
+    wandb_project: Optional[str] = typer.Option(None, help="Name of wandb project."),
+    wandb_entity: Optional[str] = typer.Option(None, help="Name of entity project"),
 ) -> None:
     typer.echo(pprint.pformat(locals()))
 
@@ -45,6 +50,13 @@ def run(
         output_path=root,
         evaluation_mode=evaluation_mode,
         tagging_scheme=tagging_scheme,
+        logging_kwargs={
+            "use_tensorboard": tensorboard,
+            "use_wandb": wandb,
+            "use_csv": csv,
+            "wandb_project": wandb_project,
+            "wandb_entity": wandb_entity,
+        },
     )
 
     result = pipeline.run()
