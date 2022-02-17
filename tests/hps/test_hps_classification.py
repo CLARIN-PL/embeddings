@@ -49,7 +49,6 @@ def classification_hps_run_result(
     assert LightningClassificationPipeline.DEFAULT_DATAMODULE_KWARGS == TESTING_DATAMODULE_KWARGS
     pipeline = OptimizedLightingClassificationPipeline(
         config_space=classification_config_space,
-        tokenizer_name_or_path=classification_config_space.param_embedding_name_or_path.value,
         dataset_name_or_path="clarin-pl/polemo2-official",
         input_column_name="text",
         target_column_name="target",

@@ -189,6 +189,9 @@ class OptimizedLightingClassificationPipeline(
             task_train_kwargs,
             model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
+        tokenizer_name_or_path = (
+            self.tokenizer_name_or_path if self.tokenizer_name_or_path else embedding_name_or_path
+        )
         metadata: LightningClassificationPipelineMetadata = {
             "embedding_name_or_path": embedding_name_or_path,
             "dataset_name_or_path": self.dataset_name_or_path,
@@ -197,7 +200,7 @@ class OptimizedLightingClassificationPipeline(
             "train_batch_size": train_batch_size,
             "eval_batch_size": eval_batch_size,
             "finetune_last_n_layers": finetune_last_n_layers,
-            "tokenizer_name_or_path": self.tokenizer_name_or_path,
+            "tokenizer_name_or_path": tokenizer_name_or_path,
             "datamodule_kwargs": datamodule_kwargs,
             "tokenizer_kwargs": self.tokenizer_kwargs,
             "batch_encoding_kwargs": self.batch_encoding_kwargs,
@@ -252,6 +255,9 @@ class OptimizedLightingSequenceLabelingPipeline(
             task_train_kwargs,
             model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
+        tokenizer_name_or_path = (
+            self.tokenizer_name_or_path if self.tokenizer_name_or_path else embedding_name_or_path
+        )
         metadata: LightningSequenceLabelingPipelineMetadata = {
             "embedding_name_or_path": embedding_name_or_path,
             "dataset_name_or_path": self.dataset_name_or_path,
@@ -262,7 +268,7 @@ class OptimizedLightingSequenceLabelingPipeline(
             "train_batch_size": train_batch_size,
             "eval_batch_size": eval_batch_size,
             "finetune_last_n_layers": finetune_last_n_layers,
-            "tokenizer_name_or_path": self.tokenizer_name_or_path,
+            "tokenizer_name_or_path": tokenizer_name_or_path,
             "datamodule_kwargs": datamodule_kwargs,
             "tokenizer_kwargs": self.tokenizer_kwargs,
             "batch_encoding_kwargs": self.batch_encoding_kwargs,
