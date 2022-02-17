@@ -128,7 +128,7 @@ class OptimizedLightingPipeline(
         assert isinstance(task_model_kwargs, dict)
         task_train_kwargs = parameters["task_train_kwargs"]
         assert isinstance(task_train_kwargs, dict)
-        model_config_kwargs = parameters["task_train_kwargs"]
+        model_config_kwargs = parameters["model_config_kwargs"]
         assert isinstance(model_config_kwargs, dict)
 
         return (
