@@ -50,7 +50,7 @@ def classification_hps_run_result(
     pipeline = OptimizedLightingClassificationPipeline(
         config_space=classification_config_space,
         tokenizer_name_or_path=classification_config_space.param_embedding_name_or_path.value,
-        dataset_name="clarin-pl/polemo2-official",
+        dataset_name_or_path="clarin-pl/polemo2-official",
         input_column_name="text",
         target_column_name="target",
         n_trials=1,

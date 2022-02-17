@@ -50,7 +50,7 @@ def sequence_labelling_hps_run_result(
     pipeline = OptimizedLightingSequenceLabelingPipeline(
         config_space=sequence_labelling_config_space,
         tokenizer_name_or_path=sequence_labelling_config_space.param_embedding_name_or_path.value,
-        dataset_name="clarin-pl/kpwr-ner",
+        dataset_name_or_path="clarin-pl/kpwr-ner",
         input_column_name="tokens",
         target_column_name="ner",
         n_trials=1,
