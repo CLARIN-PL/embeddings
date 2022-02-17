@@ -28,7 +28,7 @@ class OptimizedPipeline(ABC, Generic[Metadata]):
         pass
 
     @abc.abstractmethod
-    def run(self) -> Tuple[pd.DataFrame, Metadata]:
+    def run(self, **kwargs: Any) -> Tuple[pd.DataFrame, Metadata]:
         pass
 
     def persisting(
@@ -46,15 +46,24 @@ class PersistingPipeline(OptimizedPipeline[Metadata]):
             best_params_path=best_params_path, log_path=log_path
         )
 
-    def run(self) -> Tuple[pd.DataFrame, Metadata]:
-        result = self.base_pipeline.run()
+    def run(self, **kwargs: Any) -> Tuple[pd.DataFrame, Metadata]:
+        result = self.base_pipeline.run(**kwargs)
         self.persister.persist(result)
         return result
 
 
 class OptunaPipeline(
     OptimizedPipeline[Metadata],
-    Generic[ConfigSpace, Metadata, EvaluationMetadata, Data, LoaderResult, TransformationResult],
+    Generic[
+        ConfigSpace,
+        Metadata,
+        EvaluationMetadata,
+        Data,
+        LoaderResult,
+        TransformationResult,
+        ModelResult,
+        EvaluationResult,
+    ],
 ):
     def __init__(
         self,
@@ -64,7 +73,7 @@ class OptunaPipeline(
         ],
         evaluation_pipeline: Union[
             Type[ModelEvaluationPipeline[Data, LoaderResult, ModelResult, EvaluationResult]],
-            Type[LightningPipeline[Data, ModelResult, EvaluationResult]],
+            Type[LightningPipeline[TransformationResult, ModelResult, EvaluationResult]],
         ],
         pruner: optuna.pruners.BasePruner,
         sampler: optuna.samplers.BaseSampler,
@@ -97,20 +106,14 @@ class OptunaPipeline(
         parsed_params = self.config_space.parse_parameters(dict(best_params, **constant_params))
         return self._get_metadata(parsed_params)
 
-    def run(
-        self,
-    ) -> Tuple[pd.DataFrame, Metadata]:
+    def run(self, run_name: Optional[str] = None, **kwargs: Any) -> Tuple[pd.DataFrame, Metadata]:
         self._pre_run_hook()
         if self.preprocessing_pipeline is not None:
             self.preprocessing_pipeline.run()
         study: Study = optuna.create_study(
-            direction="maximize",
-            sampler=self.sampler,
-            pruner=self.pruner,
+            direction="maximize", sampler=self.sampler, pruner=self.pruner, study_name=run_name
         )
-        study.optimize(
-            self.objective, n_trials=self.n_trials, show_progress_bar=True, catch=(Exception,)
-        )
+        study.optimize(self.objective, n_trials=self.n_trials, show_progress_bar=True)
 
         if isinstance(self.dataset_path, TemporaryDirectory):
             self.dataset_path.cleanup()
@@ -122,12 +125,20 @@ class OptunaPipeline(
     def objective(self, trial: optuna.trial.Trial) -> float:
         parameters = self.config_space.sample_parameters(trial=trial)
         parsed_params = self.config_space.parse_parameters(parameters)
-        args = self._get_evaluation_metadata(parsed_params)
-        pipeline = self.evaluation_pipeline(**args)
-        results = pipeline.run()
+        kwargs = self._get_evaluation_metadata(parsed_params)
+        pipeline = self._init_evaluation_pipeline(**kwargs)
+        results = pipeline.run(run_name=f"study_{trial.study.study_name}_trial_{trial.number}")
         metric = results[self.metric_name][self.metric_key]
         assert isinstance(metric, float)
         return metric
+
+    def _init_evaluation_pipeline(
+        self, **kwargs: Any
+    ) -> Union[
+        ModelEvaluationPipeline[Data, LoaderResult, ModelResult, EvaluationResult],
+        LightningPipeline[TransformationResult, ModelResult, EvaluationResult],
+    ]:
+        return self.evaluation_pipeline(**kwargs)
 
     def _pre_run_hook(self) -> None:
         logging.getLogger("optuna").setLevel(logging.WARNING)

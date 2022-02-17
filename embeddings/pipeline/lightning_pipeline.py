@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from typing import Any, Dict, Generic, Optional, TypeVar
 
 from embeddings.data.datamodule import BaseDataModule, Data
@@ -33,6 +34,7 @@ class LightningPipeline(
         datamodule: BaseDataModule[Data],
         model: Model[BaseDataModule[Data], ModelResult],
         evaluator: Evaluator[ModelResult, EvaluationResult],
+        **kwargs: Any
     ) -> None:
         self.datamodule = datamodule
         self.model = model
@@ -41,3 +43,8 @@ class LightningPipeline(
     def run(self, run_name: Optional[str] = None) -> EvaluationResult:
         model_result = self.model.execute(data=self.datamodule, run_name=run_name)
         return self.evaluator.evaluate(model_result)
+
+    @property
+    @abstractmethod
+    def logging_kwargs(self) -> Dict[str, Any]:
+        pass

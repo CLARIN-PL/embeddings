@@ -5,6 +5,7 @@ from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, Optional, Tuple
 
 import datasets
+from numpy import typing as nptyping
 
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
@@ -26,6 +27,7 @@ from embeddings.pipeline.hps_pipeline import (
     _HuggingFaceOptimizedPipelineBase,
 )
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
+from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
 from embeddings.pipeline.pipelines_metadata import (
     LightningClassificationPipelineMetadata,
@@ -53,6 +55,7 @@ class _OptimizedLightingPipelineBase(
     tokenizer_name_or_path: Optional[T_path] = None
     tokenizer_kwargs: Optional[Dict[str, Any]] = None
     batch_encoding_kwargs: Optional[Dict[str, Any]] = None
+    logging_kwargs: Optional[Dict[str, Any]] = None
 
 
 # Mypy currently properly don't handle dataclasses with abstract methods
@@ -66,6 +69,8 @@ class OptimizedLightingPipeline(
         str,
         datasets.DatasetDict,
         datasets.DatasetDict,
+        Dict[str, nptyping.NDArray[Any]],
+        Dict[str, Any],
     ],
     AbstractHuggingFaceOptimizedPipeline[ConfigSpace],
     _OptimizedLightingPipelineBase[ConfigSpace],
@@ -100,6 +105,12 @@ class OptimizedLightingPipeline(
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,
             )
+
+    def _init_evaluation_pipeline(
+        self, **kwargs: Any
+    ) -> LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]:
+        assert issubclass(self.evaluation_pipeline, LightningPipeline)
+        return self.evaluation_pipeline(logging_kwargs=self.logging_kwargs, **kwargs)
 
     @staticmethod
     def _pop_sampled_parameters(
@@ -161,12 +172,11 @@ class OptimizedLightingClassificationPipeline(
     ]
 ):
     def __post_init__(self) -> None:
-        # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
         self._init_dataset_path()
         self._init_preprocessing_pipeline()
         super(OptimizedLightingPipeline, self).__init__(
             preprocessing_pipeline=self.preprocessing_pipeline,
-            evaluation_pipeline=LightningClassificationPipeline,  # type: ignore
+            evaluation_pipeline=LightningClassificationPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
@@ -229,10 +239,9 @@ class OptimizedLightingSequenceLabelingPipeline(
         self.metric_name = SequenceLabelingEvaluator.get_metric_name(
             evaluation_mode=self.evaluation_mode, tagging_scheme=self.tagging_scheme
         )
-        # Type: ignore is temporal solution due to issue #152 https://github.com/CLARIN-PL/embeddings/issues/152
         super(OptimizedLightingPipeline, self).__init__(
             preprocessing_pipeline=self.preprocessing_pipeline,
-            evaluation_pipeline=LightningSequenceLabelingPipeline,  # type: ignore
+            evaluation_pipeline=LightningSequenceLabelingPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,

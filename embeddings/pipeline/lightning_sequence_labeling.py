@@ -67,7 +67,7 @@ class LightningSequenceLabelingPipeline(
         self.early_stopping_kwargs = initialize_kwargs(
             self.DEFAULT_EARLY_STOPPING_KWARGS, early_stopping_kwargs
         )
-        self.logging_kwargs = initialize_kwargs(self.DEFAULT_LOGGING_KWARGS, logging_kwargs)
+        self._logging_kwargs = initialize_kwargs(self.DEFAULT_LOGGING_KWARGS, logging_kwargs)
         tokenizer_name_or_path = (
             tokenizer_name_or_path if tokenizer_name_or_path else embedding_name_or_path
         )
@@ -100,3 +100,7 @@ class LightningSequenceLabelingPipeline(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         ).persisting(JsonPersister(path=output_path.joinpath(evaluation_filename)))
         super().__init__(datamodule, model, evaluator)
+
+    @property
+    def logging_kwargs(self) -> Dict[str, Any]:
+        return self._logging_kwargs

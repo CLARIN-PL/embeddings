@@ -30,8 +30,8 @@ class LightningClassificationPipeline(
         eval_batch_size: int = 32,
         finetune_last_n_layers: int = -1,
         tokenizer_name_or_path: Optional[T_path] = None,
-        datamodule_kwargs: Optional[Dict[str, Any]] = None,
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
+        datamodule_kwargs: Optional[Dict[str, Any]] = None,
         batch_encoding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
@@ -59,7 +59,7 @@ class LightningClassificationPipeline(
         self.early_stopping_kwargs = initialize_kwargs(
             self.DEFAULT_EARLY_STOPPING_KWARGS, early_stopping_kwargs
         )
-        self.logging_kwargs = initialize_kwargs(self.DEFAULT_LOGGING_KWARGS, logging_kwargs)
+        self._logging_kwargs = initialize_kwargs(self.DEFAULT_LOGGING_KWARGS, logging_kwargs)
         tokenizer_name_or_path = (
             tokenizer_name_or_path if tokenizer_name_or_path else embedding_name_or_path
         )
@@ -92,3 +92,7 @@ class LightningClassificationPipeline(
             JsonPersister(path=output_path.joinpath(evaluation_filename))
         )
         super().__init__(datamodule, model, evaluator)
+
+    @property
+    def logging_kwargs(self) -> Dict[str, Any]:
+        return self._logging_kwargs
