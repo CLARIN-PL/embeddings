@@ -49,6 +49,7 @@ def sequence_labelling_hps_run_result(
     assert LightningSequenceLabelingPipeline.DEFAULT_DATAMODULE_KWARGS == TESTING_DATAMODULE_KWARGS
     pipeline = OptimizedLightingSequenceLabelingPipeline(
         config_space=sequence_labelling_config_space,
+        tokenizer_name_or_path=sequence_labelling_config_space.param_embedding_name_or_path.value,
         dataset_name="clarin-pl/kpwr-ner",
         input_column_name="tokens",
         target_column_name="ner",
@@ -89,6 +90,7 @@ def test_common_keys(
         "use_scheduler",
         "optimizer",
         "label_all_tokens",
+        "classifier_dropout",
     }
 
 
@@ -205,6 +207,7 @@ def test_hparams_best_params_files_compatibility(
         "evaluation_mode",
         "label_all_tokens",
         "tagging_scheme",
+        "classifier_dropout",
     }
     for k in common_keys:
         if k in metadata:

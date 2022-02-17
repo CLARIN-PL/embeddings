@@ -49,6 +49,7 @@ def classification_hps_run_result(
     assert LightningClassificationPipeline.DEFAULT_DATAMODULE_KWARGS == TESTING_DATAMODULE_KWARGS
     pipeline = OptimizedLightingClassificationPipeline(
         config_space=classification_config_space,
+        tokenizer_name_or_path=classification_config_space.param_embedding_name_or_path.value,
         dataset_name="clarin-pl/polemo2-official",
         input_column_name="text",
         target_column_name="target",
@@ -84,7 +85,7 @@ def test_common_keys(
         "warmup_steps",
         "use_scheduler",
         "optimizer",
-        "classifier_dropout"
+        "classifier_dropout",
     }
 
 
@@ -188,6 +189,7 @@ def test_hparams_best_params_files_compatibility(
         "warmup_steps",
         "target_column_name",
         "accelerator",
+        "classifier_dropout",
     }
     for k in common_keys:
         if k in metadata:
