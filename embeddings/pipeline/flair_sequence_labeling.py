@@ -21,9 +21,6 @@ from embeddings.transformation.flair_transformation.split_sample_corpus_transfor
 )
 from embeddings.transformation.transformation import Transformation
 from embeddings.utils.json_dict_persister import JsonPersister
-from embeddings.utils.loggers import get_logger
-
-_logger = get_logger(__name__)
 
 
 class FlairSequenceLabelingPipeline(
@@ -41,7 +38,7 @@ class FlairSequenceLabelingPipeline(
         hidden_size: int,
         evaluation_filename: str = "evaluation.json",
         evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = SequenceLabelingEvaluator.EvaluationMode.CONLL,
-        model_type_reference: Optional[str] = None,
+        model_type_reference: str = "",
         tagging_scheme: Optional[SequenceLabelingEvaluator.TaggingScheme] = None,
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,

@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from pathlib import Path
-from typing import Any, Optional, Type, Union
+from typing import Any, Type, Union
 
 from embeddings.data.io import T_path
 from embeddings.embedding.auto_flair import (
@@ -10,13 +10,10 @@ from embeddings.embedding.auto_flair import (
     DocumentEmbedding,
 )
 from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding, FlairEmbedding
-from embeddings.utils.loggers import get_logger
-
-_logger = get_logger(__name__)
 
 
 class FlairEmbeddingLoader:
-    def __init__(self, embedding_name: T_path, model_type_reference: Optional[str] = None):
+    def __init__(self, embedding_name: T_path, model_type_reference: str):
         self.embedding_name = embedding_name
         self.model_type_reference = model_type_reference
 
@@ -41,11 +38,6 @@ class FlairDocumentPoolEmbeddingLoader(FlairEmbeddingLoader):
                 **load_model_kwargs or {}
             )
 
-        if not self.model_type_reference:
-            _logger.error(
-                "For embedding loaded directly from file model_type_reference must be provided!"
-            )
-
         return AutoFlairDocumentPoolEmbedding.from_file(
             file_path=self.embedding_name,
             model_type_reference=self.model_type_reference,
@@ -61,11 +53,6 @@ class FlairDocumentEmbeddingLoader(FlairEmbeddingLoader):
                 repo_id=self.embedding_name, **load_model_kwargs or {}
             )
 
-        if not self.model_type_reference:
-            _logger.error(
-                "For embedding loaded directly from file model_type_reference must be provided!"
-            )
-
         return AutoFlairDocumentEmbedding.from_file(
             file_path=self.embedding_name,
             model_type_reference=self.model_type_reference,
@@ -77,11 +64,6 @@ class FlairWordEmbeddingLoader(FlairEmbeddingLoader):
     def get_embedding(self, **load_model_kwargs: Any) -> FlairEmbedding:
         if not isinstance(self.embedding_name, Path):
             return AutoFlairWordEmbedding.from_hub(self.embedding_name, **load_model_kwargs or {})
-
-        if not self.model_type_reference:
-            _logger.error(
-                "For embedding loaded directly from file model_type_reference must be provided!"
-            )
 
         return AutoFlairWordEmbedding.from_file(
             self.embedding_name, self.model_type_reference, **load_model_kwargs or {}

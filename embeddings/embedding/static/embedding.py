@@ -57,7 +57,7 @@ class SingleFileEmbedding(StaticEmbedding, ABC):
 class SingleLocalFileEmbedding(LocalFileStaticEmbedding, ABC):
     def __init__(self, file_path: Path, **load_model_kwargs: Any):
         super().__init__(str(file_path), **load_model_kwargs)
-        self.config = self.create_config()
+        self.config = self.create_config(file_path)
 
 
 class StandardStaticWordEmbedding(FlairEmbedding):
