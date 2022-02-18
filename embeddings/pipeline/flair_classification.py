@@ -23,9 +23,6 @@ from embeddings.transformation.flair_transformation.split_sample_corpus_transfor
 )
 from embeddings.transformation.transformation import Transformation
 from embeddings.utils.json_dict_persister import JsonPersister
-from embeddings.utils.loggers import get_logger
-
-_logger = get_logger(__name__)
 
 
 class FlairClassificationPipeline(

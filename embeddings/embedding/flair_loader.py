@@ -16,7 +16,7 @@ _logger = get_logger(__name__)
 
 
 class FlairEmbeddingLoader:
-    def __init__(self, embedding_name: T_path, model_type_reference: str = ""):
+    def __init__(self, embedding_name: T_path, model_type_reference: Optional[str] = None):
         self.embedding_name = embedding_name
         self.model_type_reference = model_type_reference
 
