@@ -33,9 +33,7 @@ class FlairDocumentPoolEmbeddingLoader(FlairEmbeddingLoader):
     ) -> FlairEmbedding:
         if not isinstance(self.embedding_name, Path):
             return AutoFlairDocumentPoolEmbedding.from_hub(
-                repo_id=self.embedding_name,
-                document_embedding_cls=document_embedding_cls,
-                **kwargs
+                repo_id=self.embedding_name, document_embedding_cls=document_embedding_cls, **kwargs
             )
 
         return AutoFlairDocumentPoolEmbedding.from_file(
@@ -49,14 +47,10 @@ class FlairDocumentPoolEmbeddingLoader(FlairEmbeddingLoader):
 class FlairDocumentEmbeddingLoader(FlairEmbeddingLoader):
     def get_embedding(self, **kwargs: Any) -> FlairEmbedding:
         if not isinstance(self.embedding_name, Path):
-            return AutoFlairDocumentEmbedding.from_hub(
-                repo_id=self.embedding_name, **kwargs
-            )
+            return AutoFlairDocumentEmbedding.from_hub(repo_id=self.embedding_name, **kwargs)
 
         return AutoFlairDocumentEmbedding.from_file(
-            file_path=self.embedding_name,
-            model_type_reference=self.model_type_reference,
-            **kwargs
+            file_path=self.embedding_name, model_type_reference=self.model_type_reference, **kwargs
         )
 
 
