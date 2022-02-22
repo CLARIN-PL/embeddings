@@ -1,3 +1,4 @@
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple
 
@@ -26,25 +27,25 @@ from embeddings.transformation.flair_transformation.downsample_corpus_transforma
 from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
     SampleSplitsFlairCorpusTransformation,
 )
-from tests.conftest import STATIC_EMBEDDING_PATH
 
 
 @pytest.fixture()
-def embedding() -> FlairEmbedding:
+def allegro_embedding() -> FlairEmbedding:
     return AutoFlairWordEmbedding.from_hub("allegro/herbert-base-cased")
 
 
 @pytest.fixture()
-def embedding_local_file(
+def ipipan_embedding_local_file(
+    local_embedding_filepath: Path,
     model_type_reference: str = "embeddings.embedding.static.word2vec.IPIPANWord2VecEmbedding",
 ) -> FlairEmbedding:
-    return AutoFlairWordEmbedding.from_file(STATIC_EMBEDDING_PATH, model_type_reference)
+    return AutoFlairWordEmbedding.from_file(local_embedding_filepath, model_type_reference)
 
 
 @pytest.fixture()
 def pos_tagging_pipeline(
     result_path: "TemporaryDirectory[str]",
-    embedding: FlairEmbedding,
+    allegro_embedding: FlairEmbedding,
 ) -> Tuple[
     StandardPipeline[
         str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
@@ -57,7 +58,7 @@ def pos_tagging_pipeline(
         DownsampleFlairCorpusTransformation(percentage=0.001)
     )
     task = SequenceLabeling(result_path.name, hidden_size=256, task_train_kwargs={"max_epochs": 1})
-    model = FlairModel(embedding, task)
+    model = FlairModel(allegro_embedding, task)
     evaluator = SequenceLabelingEvaluator(
         evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.UNIT
     )
@@ -69,7 +70,7 @@ def pos_tagging_pipeline(
 @pytest.fixture()
 def ner_tagging_pipeline(
     result_path: "TemporaryDirectory[str]",
-    embedding: FlairEmbedding,
+    allegro_embedding: FlairEmbedding,
 ) -> Tuple[
     StandardPipeline[
         str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
@@ -88,7 +89,7 @@ def ner_tagging_pipeline(
         hidden_size=256,
         task_train_kwargs={"max_epochs": 1, "mini_batch_size": 256},
     )
-    model = FlairModel(embedding, task)
+    model = FlairModel(allegro_embedding, task)
     evaluator = SequenceLabelingEvaluator()
 
     pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)
@@ -98,7 +99,7 @@ def ner_tagging_pipeline(
 @pytest.fixture()
 def pos_tagging_pipeline_local_embedding(
     result_path: "TemporaryDirectory[str]",
-    embedding_local_file: FlairEmbedding,
+    ipipan_embedding_local_file: FlairEmbedding,
 ) -> Tuple[
     StandardPipeline[
         str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
@@ -111,7 +112,7 @@ def pos_tagging_pipeline_local_embedding(
         DownsampleFlairCorpusTransformation(percentage=0.001)
     )
     task = SequenceLabeling(result_path.name, hidden_size=256, task_train_kwargs={"max_epochs": 1})
-    model = FlairModel(embedding_local_file, task)
+    model = FlairModel(ipipan_embedding_local_file, task)
     evaluator = SequenceLabelingEvaluator(
         evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.UNIT
     )
@@ -123,7 +124,7 @@ def pos_tagging_pipeline_local_embedding(
 @pytest.fixture()
 def ner_tagging_pipeline_local_embedding(
     result_path: "TemporaryDirectory[str]",
-    embedding_local_file: FlairEmbedding,
+    ipipan_embedding_local_file: FlairEmbedding,
 ) -> Tuple[
     StandardPipeline[
         str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
@@ -142,7 +143,7 @@ def ner_tagging_pipeline_local_embedding(
         hidden_size=256,
         task_train_kwargs={"max_epochs": 1, "mini_batch_size": 256},
     )
-    model = FlairModel(embedding_local_file, task)
+    model = FlairModel(ipipan_embedding_local_file, task)
     evaluator = SequenceLabelingEvaluator()
 
     pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)

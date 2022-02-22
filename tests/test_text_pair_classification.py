@@ -1,3 +1,4 @@
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple
 
@@ -24,7 +25,6 @@ from embeddings.transformation.flair_transformation.pair_classification_corpus_t
 from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
     SampleSplitsFlairCorpusTransformation,
 )
-from tests.conftest import STATIC_EMBEDDING_PATH
 
 
 @pytest.fixture(scope="module")
@@ -71,6 +71,7 @@ def test_text_pair_classification_pipeline(
 
 @pytest.fixture(scope="module")
 def text_pair_classification_pipeline_local_embedding(
+    local_embedding_filepath: Path,
     result_path: "TemporaryDirectory[str]",
     model_type_reference: str = "embeddings.embedding.static.word2vec.IPIPANWord2VecEmbedding",
 ) -> Tuple[
@@ -86,7 +87,7 @@ def text_pair_classification_pipeline_local_embedding(
         .then(DownsampleFlairCorpusTransformation(percentage=0.1, stratify=True))
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, seed=441, stratify=True))
     )
-    embedding = AutoFlairDocumentEmbedding.from_file(STATIC_EMBEDDING_PATH, model_type_reference)
+    embedding = AutoFlairDocumentEmbedding.from_file(local_embedding_filepath, model_type_reference)
     task = TextPairClassification(result_path.name, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(embedding, task)
     evaluator = TextClassificationEvaluator()

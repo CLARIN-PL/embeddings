@@ -49,14 +49,14 @@ class LocalFileStaticEmbedding(FlairEmbedding, ABC):
 
 
 class SingleFileEmbedding(StaticEmbedding, ABC):
-    def __init__(self, config: SingleFileConfig, **load_model_kwargs: Any):
-        super().__init__(config.cached_model, **load_model_kwargs)
+    def __init__(self, config: SingleFileConfig, **kwargs: Any):
+        super().__init__(config.cached_model, **kwargs)
         self.config = config
 
 
 class SingleLocalFileEmbedding(LocalFileStaticEmbedding, ABC):
-    def __init__(self, file_path: Path, **load_model_kwargs: Any):
-        super().__init__(str(file_path), **load_model_kwargs)
+    def __init__(self, file_path: Path, **kwargs: Any):
+        super().__init__(str(file_path), **kwargs)
         self.config = self.create_config(file_path)
 
 

@@ -1,28 +1,21 @@
-import os
-import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pytest
+from gdown import cached_download
 
 from embeddings.embedding.static.fasttext import KGR10FastTextConfig
 from embeddings.embedding.static.word2vec import KGR10Word2VecConfig
-from embeddings.utils.utils import download_file
 
 STATIC_EMBEDDING_URL = (
     "http://dsmodels.nlp.ipipan.waw.pl/dsmodels/wiki-forms-all-100-cbow-ns-30-it100.txt.gz"
 )
-STATIC_EMBEDDING_PATH = Path("tests/models/wiki-forms-all-100-cbow-ns-30-it100.txt.gz")
 
 
-def pytest_sessionstart():
-    if not os.path.exists(STATIC_EMBEDDING_PATH.parent):
-        os.mkdir(STATIC_EMBEDDING_PATH.parent)
-
-    if not os.path.exists(STATIC_EMBEDDING_PATH):
-        tmp_file, _ = download_file(STATIC_EMBEDDING_URL)
-        shutil.copy(tmp_file.name, STATIC_EMBEDDING_PATH)
-        tmp_file.close()
+@pytest.fixture(scope="session")
+def local_embedding_filepath() -> Path:
+    str_filepath = cached_download(STATIC_EMBEDDING_URL)
+    return Path(str_filepath)
 
 
 @pytest.fixture(scope="session")

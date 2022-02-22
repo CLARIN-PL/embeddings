@@ -91,11 +91,8 @@ class StaticModelLocalFileConfig:
     model_file_path: Path
     model_type_reference: str
 
-    def file_exists(self) -> bool:
-        return os.path.exists(self.model_file_path)
-
     def __post_init__(self) -> None:
-        if not self.file_exists():
+        if not self.model_file_path.exists():
             raise ValueError(f"There is no file located at: {self.model_file_path}")
 
 

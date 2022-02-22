@@ -83,7 +83,10 @@ class IPIPANWord2VecConfig(GensimLocalFileConfig):
     model_type_reference: str = "embeddings.embedding.static.word2vec.IPIPANWord2VecEmbedding"
 
     def __post_init__(self) -> None:
-        self.model_name = self.model_file_path.name.split(".")[0]
+        if "-SLASH-" in self.model_file_path.name:
+            self.model_name = self.model_file_path.name.split("-SLASH-")[-1].split(".")[0]
+        else:
+            self.model_name = self.model_file_path.name.split(".")[0]
 
         metadata = self.model_name.split("-")
         # IPIPan model are named according to convention that allow to get metadata about embedding from its name.

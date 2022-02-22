@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Type
 
 import pytest
@@ -16,7 +17,6 @@ from embeddings.embedding.static.word2vec import (
     KGR10Word2VecEmbedding,
 )
 from embeddings.utils.utils import import_from_string
-from tests.conftest import STATIC_EMBEDDING_PATH
 
 
 def test_default_config() -> None:
@@ -95,8 +95,8 @@ def assert_close_embedding(embedding: KGR10Word2VecEmbedding) -> None:
 
 
 @pytest.fixture()
-def ipipan_embedding_config():
-    return IPIPANWord2VecConfig(STATIC_EMBEDDING_PATH)
+def ipipan_embedding_config(local_embedding_filepath: Path):
+    return IPIPANWord2VecConfig(local_embedding_filepath)
 
 
 def test_ipipan_default_config(ipipan_embedding_config: IPIPANWord2VecConfig) -> None:
@@ -110,16 +110,17 @@ def test_ipipan_word2vec_embeddings_equal(ipipan_embedding_config: IPIPANWord2Ve
     assert_close_ipipan_embedding(embedding)
 
 
-def test_init_ipipan_word2vec_from_file() -> None:
-    embedding = IPIPANWord2VecEmbedding.from_file(STATIC_EMBEDDING_PATH)
+def test_init_ipipan_word2vec_from_file(local_embedding_filepath: Path) -> None:
+    embedding = IPIPANWord2VecEmbedding.from_file(local_embedding_filepath)
     assert_close_ipipan_embedding(embedding)
 
 
 def test_static_automodel_ipipan_word2vec(
+    local_embedding_filepath: Path,
     model_type_reference: str = "embeddings.embedding.static.word2vec.IPIPANWord2VecEmbedding",
 ) -> None:
     embedding = LocalFileAutoStaticWordEmbedding.from_file(
-        STATIC_EMBEDDING_PATH, model_type_reference
+        local_embedding_filepath, model_type_reference
     )
     assert isinstance(embedding, IPIPANWord2VecEmbedding)
     assert_close_ipipan_embedding(embedding)

@@ -29,42 +29,42 @@ class FlairDocumentPoolEmbeddingLoader(FlairEmbeddingLoader):
     def get_embedding(
         self,
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
-        **load_model_kwargs: Any
+        **kwargs: Any
     ) -> FlairEmbedding:
         if not isinstance(self.embedding_name, Path):
             return AutoFlairDocumentPoolEmbedding.from_hub(
                 repo_id=self.embedding_name,
                 document_embedding_cls=document_embedding_cls,
-                **load_model_kwargs or {}
+                **kwargs
             )
 
         return AutoFlairDocumentPoolEmbedding.from_file(
             file_path=self.embedding_name,
             model_type_reference=self.model_type_reference,
             document_embedding_cls=document_embedding_cls,
-            **load_model_kwargs or {}
+            **kwargs
         )
 
 
 class FlairDocumentEmbeddingLoader(FlairEmbeddingLoader):
-    def get_embedding(self, **load_model_kwargs: Any) -> FlairEmbedding:
+    def get_embedding(self, **kwargs: Any) -> FlairEmbedding:
         if not isinstance(self.embedding_name, Path):
             return AutoFlairDocumentEmbedding.from_hub(
-                repo_id=self.embedding_name, **load_model_kwargs or {}
+                repo_id=self.embedding_name, **kwargs
             )
 
         return AutoFlairDocumentEmbedding.from_file(
             file_path=self.embedding_name,
             model_type_reference=self.model_type_reference,
-            **load_model_kwargs or {}
+            **kwargs
         )
 
 
 class FlairWordEmbeddingLoader(FlairEmbeddingLoader):
-    def get_embedding(self, **load_model_kwargs: Any) -> FlairEmbedding:
+    def get_embedding(self, **kwargs: Any) -> FlairEmbedding:
         if not isinstance(self.embedding_name, Path):
-            return AutoFlairWordEmbedding.from_hub(self.embedding_name, **load_model_kwargs or {})
+            return AutoFlairWordEmbedding.from_hub(self.embedding_name, **kwargs)
 
         return AutoFlairWordEmbedding.from_file(
-            self.embedding_name, self.model_type_reference, **load_model_kwargs or {}
+            self.embedding_name, self.model_type_reference, **kwargs
         )
