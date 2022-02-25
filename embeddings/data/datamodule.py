@@ -26,6 +26,8 @@ class BaseDataModule(abc.ABC, pl.LightningDataModule, Generic[Data]):
     dataset: Data
 
     def __init__(self) -> None:
+        # ignoring the type to avoid calling to untyped function "__init__" in typed context error
+        # caused by pl.LightningDataModule __init__ method not being typed
         super().__init__()  # type: ignore
         self.save_hyperparameters()
 
