@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Union, Optional, List
+from typing import List, Optional, Union
 
 from pytorch_lightning.accelerators import Accelerator
 
