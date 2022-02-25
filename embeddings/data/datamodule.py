@@ -59,8 +59,6 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         seed: int = 441,
         **kwargs: Any,
     ) -> None:
-        # ignoring the type to avoid calling to untyped function "__init__" in typed context error
-        # caused by pl.LightningDataModule __init__ method not being typed
         super().__init__()
         self.tokenizer_name_or_path = tokenizer_name_or_path
         self.dataset_name_or_path = dataset_name_or_path
