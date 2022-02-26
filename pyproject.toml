@@ -44,7 +44,7 @@ typing-extensions = ">=4.0.1"
 [tool.poetry.dev-dependencies]
 black = "21.12b0"
 isort = { version = "5.10.1", extras = ["pyproject"] }
-mypy = "0.920"
+mypy = "0.931"
 poethepoet = "0.11.0"
 pyflakes = "2.4.0"
 pytest = "6.2.5"
@@ -128,8 +128,9 @@ implicit_reexport = true
 # due to https://github.com/huggingface/transformers/issues/13390#issuecomment-934830946
 [[tool.mypy.overrides]]
 module = [
-    "transformers",
-    "experimental"
+    "experimental",
+    "experimental.*",
+    "transformers.*"
 ]
 follow_imports = "skip"
 

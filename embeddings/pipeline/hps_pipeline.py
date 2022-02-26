@@ -94,7 +94,7 @@ class OptunaPipeline(
     def get_best_paramaters(self, study: Study) -> Metadata:
         best_params = study.best_params
         constant_params = study.best_trial.user_attrs
-        parsed_params = self.config_space.parse_parameters(best_params | constant_params)
+        parsed_params = self.config_space.parse_parameters(dict(best_params, **constant_params))
         return self._get_metadata(parsed_params)
 
     def run(

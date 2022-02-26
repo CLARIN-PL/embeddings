@@ -32,6 +32,9 @@ from embeddings.pipeline.pipelines_metadata import (
     LightningMetadata,
     LightningSequenceLabelingPipelineMetadata,
 )
+from embeddings.utils.loggers import get_logger
+
+_logger = get_logger(__name__)
 
 
 @dataclass
@@ -41,8 +44,10 @@ class _OptimizedLightingPipelineBase(
     input_column_name: str
     target_column_name: str
 
-    tmp_dataset_dir: TemporaryDirectory[str] = field(init=False, default_factory=TemporaryDirectory)
-    tmp_model_output_dir: TemporaryDirectory[str] = field(
+    tmp_dataset_dir: "TemporaryDirectory[str]" = field(
+        init=False, default_factory=TemporaryDirectory
+    )
+    tmp_model_output_dir: "TemporaryDirectory[str]" = field(
         init=False, default_factory=TemporaryDirectory
     )
     tokenizer_name_or_path: Optional[T_path] = None
@@ -50,7 +55,8 @@ class _OptimizedLightingPipelineBase(
     batch_encoding_kwargs: Optional[Dict[str, Any]] = None
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
+# Mypy currently properly don't handle dataclasses with abstract methods
+# https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
 class OptimizedLightingPipeline(
     OptunaPipeline[
@@ -122,7 +128,7 @@ class OptimizedLightingPipeline(
         assert isinstance(task_model_kwargs, dict)
         task_train_kwargs = parameters["task_train_kwargs"]
         assert isinstance(task_train_kwargs, dict)
-        model_config_kwargs = parameters["task_train_kwargs"]
+        model_config_kwargs = parameters["model_config_kwargs"]
         assert isinstance(model_config_kwargs, dict)
 
         return (
@@ -138,8 +144,14 @@ class OptimizedLightingPipeline(
 
     def _post_run_hook(self) -> None:
         super()._post_run_hook()
-        self.tmp_dataset_dir.cleanup()
-        self.tmp_model_output_dir.cleanup()
+
+        for tmp_dir in [self.tmp_dataset_dir, self.tmp_model_output_dir]:
+            try:
+                tmp_dir.cleanup()
+            except Exception as e:
+                _logger.error(
+                    f"Cleanup of {self.tmp_dataset_dir} raised exception {e}. Skipping it."
+                )
 
 
 @dataclass
@@ -177,6 +189,9 @@ class OptimizedLightingClassificationPipeline(
             task_train_kwargs,
             model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
+        tokenizer_name_or_path = (
+            self.tokenizer_name_or_path if self.tokenizer_name_or_path else embedding_name_or_path
+        )
         metadata: LightningClassificationPipelineMetadata = {
             "embedding_name_or_path": embedding_name_or_path,
             "dataset_name_or_path": self.dataset_name_or_path,
@@ -185,7 +200,7 @@ class OptimizedLightingClassificationPipeline(
             "train_batch_size": train_batch_size,
             "eval_batch_size": eval_batch_size,
             "finetune_last_n_layers": finetune_last_n_layers,
-            "tokenizer_name_or_path": self.tokenizer_name_or_path,
+            "tokenizer_name_or_path": tokenizer_name_or_path,
             "datamodule_kwargs": datamodule_kwargs,
             "tokenizer_kwargs": self.tokenizer_kwargs,
             "batch_encoding_kwargs": self.batch_encoding_kwargs,
@@ -240,6 +255,9 @@ class OptimizedLightingSequenceLabelingPipeline(
             task_train_kwargs,
             model_config_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
+        tokenizer_name_or_path = (
+            self.tokenizer_name_or_path if self.tokenizer_name_or_path else embedding_name_or_path
+        )
         metadata: LightningSequenceLabelingPipelineMetadata = {
             "embedding_name_or_path": embedding_name_or_path,
             "dataset_name_or_path": self.dataset_name_or_path,
@@ -250,7 +268,7 @@ class OptimizedLightingSequenceLabelingPipeline(
             "train_batch_size": train_batch_size,
             "eval_batch_size": eval_batch_size,
             "finetune_last_n_layers": finetune_last_n_layers,
-            "tokenizer_name_or_path": self.tokenizer_name_or_path,
+            "tokenizer_name_or_path": tokenizer_name_or_path,
             "datamodule_kwargs": datamodule_kwargs,
             "tokenizer_kwargs": self.tokenizer_kwargs,
             "batch_encoding_kwargs": self.batch_encoding_kwargs,
