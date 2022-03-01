@@ -5,8 +5,8 @@ import optuna
 import pytest
 from pydantic import create_model_from_typeddict
 
+from embeddings.config.parameters import SearchableParameter
 from embeddings.data.dataset import LightingDataModuleSubset
-from embeddings.hyperparameter_search.parameters import SearchableParameter
 from embeddings.pipeline.flair_classification import FlairClassificationPipeline
 from embeddings.pipeline.flair_pair_classification import FlairPairClassificationPipeline
 from embeddings.pipeline.flair_sequence_labeling import FlairSequenceLabelingPipeline

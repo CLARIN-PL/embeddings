@@ -7,6 +7,12 @@ from typing import Any, Dict, Generic, Optional, Tuple
 import datasets
 from numpy import typing as nptyping
 
+from embeddings.config.optimized_config_space import OptimizedConfig, SampledParameters
+from embeddings.config.optimized_lighting_config_space import (
+    OptimizedLightingSequenceLabelingConfigSpace,
+    OptimizedLightingTextClassificationConfigSpace,
+)
+from embeddings.config.parameters import ParameterValues
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.evaluator.sequence_labeling_evaluator import (
@@ -14,12 +20,6 @@ from embeddings.evaluator.sequence_labeling_evaluator import (
     SequenceLabelingEvaluator,
     TaggingScheme,
 )
-from embeddings.hyperparameter_search.configspace import ConfigSpace, SampledParameters
-from embeddings.hyperparameter_search.lighting_configspace import (
-    LightingSequenceLabelingConfigSpace,
-    LightingTextClassificationConfigSpace,
-)
-from embeddings.hyperparameter_search.parameters import ParameterValues
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.hps_pipeline import (
     AbstractHuggingFaceOptimizedPipeline,
@@ -42,7 +42,7 @@ _logger = get_logger(__name__)
 
 @dataclass
 class _OptimizedLightingPipelineBase(
-    _HuggingFaceOptimizedPipelineBase[ConfigSpace], ABC, Generic[ConfigSpace]
+    _HuggingFaceOptimizedPipelineBase[OptimizedConfig], ABC, Generic[OptimizedConfig]
 ):
     input_column_name: str
     target_column_name: str
@@ -64,7 +64,7 @@ class _OptimizedLightingPipelineBase(
 @dataclass  # type: ignore
 class OptimizedLightingPipeline(
     OptunaPipeline[
-        ConfigSpace,
+        OptimizedConfig,
         LightningMetadata,
         LightningMetadata,
         str,
@@ -73,10 +73,10 @@ class OptimizedLightingPipeline(
         Dict[str, nptyping.NDArray[Any]],
         Dict[str, Any],
     ],
-    AbstractHuggingFaceOptimizedPipeline[ConfigSpace],
-    _OptimizedLightingPipelineBase[ConfigSpace],
+    AbstractHuggingFaceOptimizedPipeline[OptimizedConfig],
+    _OptimizedLightingPipelineBase[OptimizedConfig],
     ABC,
-    Generic[ConfigSpace, LightningMetadata],
+    Generic[OptimizedConfig, LightningMetadata],
 ):
     def _get_evaluation_metadata(
         self, parameters: SampledParameters, trial_name: str = "", **kwargs: Any
@@ -176,7 +176,7 @@ class OptimizedLightingPipeline(
 @dataclass
 class OptimizedLightingClassificationPipeline(
     OptimizedLightingPipeline[
-        LightingTextClassificationConfigSpace, LightningClassificationPipelineMetadata
+        OptimizedLightingTextClassificationConfigSpace, LightningClassificationPipelineMetadata
     ]
 ):
     def __post_init__(self) -> None:
@@ -234,7 +234,7 @@ class OptimizedLightingClassificationPipeline(
 @dataclass
 class OptimizedLightingSequenceLabelingPipeline(
     OptimizedLightingPipeline[
-        LightingSequenceLabelingConfigSpace,
+        OptimizedLightingSequenceLabelingConfigSpace,
         LightningSequenceLabelingPipelineMetadata,
     ]
 ):

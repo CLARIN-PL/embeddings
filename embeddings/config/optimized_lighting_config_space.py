@@ -4,17 +4,14 @@ from copy import deepcopy
 from dataclasses import InitVar, dataclass, field
 from typing import Any, Dict, Final, List, Union
 
-from embeddings.data.io import T_path
-from embeddings.hyperparameter_search.configspace import (
-    BaseConfigSpace,
+from embeddings.config.lightning_config_space import LightningConfigKeys
+from embeddings.config.optimized_config_space import (
+    OptimizedConfigSpace,
     Parameter,
     SampledParameters,
 )
-from embeddings.hyperparameter_search.parameters import (
-    ConstantParameter,
-    ParameterValues,
-    SearchableParameter,
-)
+from embeddings.config.parameters import ConstantParameter, ParameterValues, SearchableParameter
+from embeddings.data.io import T_path
 from embeddings.utils.utils import read_yaml
 
 DEFAULT_DEVICES = "auto"
@@ -23,7 +20,7 @@ DEFAULT_ACCELERATOR = "auto"
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
-class LightingConfigSpace(BaseConfigSpace, ABC):
+class OptimizedLightingConfigSpace(OptimizedConfigSpace, LightningConfigKeys, ABC):
     embedding_name_or_path: InitVar[Union[T_path, List[T_path]]]
     devices: InitVar[Union[int, str, None, List[int]]] = field(default=DEFAULT_DEVICES)
     accelerator: InitVar[Union[str, None]] = field(default=DEFAULT_ACCELERATOR)
@@ -103,33 +100,20 @@ class LightingConfigSpace(BaseConfigSpace, ABC):
 
     @classmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
-        pipeline_keys: Final = {"batch_size", "finetune_last_n_layers", "embedding_name_or_path"}
-        datamodule_keys: Final = {"max_seq_length"}
-        task_model_keys: Final = {
-            "learning_rate",
-            "optimizer",
-            "use_scheduler",
-            "warmup_steps",
-            "adam_epsilon",
-            "weight_decay",
-        }
-        task_train_keys: Final = {"max_epochs", "devices", "accelerator"}
-        model_config_keys: Final = {"classifier_dropout"}
-
-        pipeline_kwargs = BaseConfigSpace._pop_parameters(
-            parameters=parameters, parameters_keys=pipeline_keys
+        pipeline_kwargs = OptimizedConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=cls.PIPELINE_KEYS
         )
-        datamodule_kwargs = BaseConfigSpace._pop_parameters(
-            parameters=parameters, parameters_keys=datamodule_keys
+        datamodule_kwargs = OptimizedConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=cls.DATAMODULE_KEYS
         )
-        task_model_kwargs = BaseConfigSpace._pop_parameters(
-            parameters=parameters, parameters_keys=task_model_keys
+        task_model_kwargs = OptimizedConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=cls.TASK_MODEL_KEYS
         )
-        task_train_kwargs = BaseConfigSpace._pop_parameters(
-            parameters=parameters, parameters_keys=task_train_keys
+        task_train_kwargs = OptimizedConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=cls.TASK_TRAIN_KEYS
         )
-        model_config_kwargs = BaseConfigSpace._pop_parameters(
-            parameters=parameters, parameters_keys=model_config_keys
+        model_config_kwargs = OptimizedConfigSpace._pop_parameters(
+            parameters=parameters, parameters_keys=cls.MODEL_CONFIG_KEYS
         )
 
         batch_size = pipeline_kwargs.pop("batch_size")
@@ -156,17 +140,17 @@ class LightingConfigSpace(BaseConfigSpace, ABC):
 
     @classmethod
     @abc.abstractmethod
-    def from_yaml(cls, path: T_path) -> "LightingConfigSpace":
+    def from_yaml(cls, path: T_path) -> "OptimizedLightingConfigSpace":
         pass
 
     @classmethod
     @abc.abstractmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "LightingConfigSpace":
+    def from_dict(cls, d: Dict[str, Any]) -> "OptimizedLightingConfigSpace":
         pass
 
 
 @dataclass
-class LightingTextClassificationConfigSpace(LightingConfigSpace):
+class OptimizedLightingTextClassificationConfigSpace(OptimizedLightingConfigSpace):
     @classmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
         sampled_parameters = super().parse_parameters(parameters=parameters)
@@ -174,18 +158,18 @@ class LightingTextClassificationConfigSpace(LightingConfigSpace):
         return sampled_parameters
 
     @classmethod
-    def from_yaml(cls, path: T_path) -> "LightingTextClassificationConfigSpace":
+    def from_yaml(cls, path: T_path) -> "OptimizedLightingTextClassificationConfigSpace":
         config = read_yaml(path)
         return cls(**cls._parse_config(config))
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "LightingTextClassificationConfigSpace":
+    def from_dict(cls, d: Dict[str, Any]) -> "OptimizedLightingTextClassificationConfigSpace":
         config = deepcopy(d)
         return cls(**cls._parse_config(config))
 
 
 @dataclass
-class LightingSequenceLabelingConfigSpace(LightingConfigSpace):
+class OptimizedLightingSequenceLabelingConfigSpace(OptimizedLightingConfigSpace):
     label_all_tokens: Parameter = field(
         init=True, default=ConstantParameter(name="label_all_tokens", value=False)
     )
@@ -194,7 +178,7 @@ class LightingSequenceLabelingConfigSpace(LightingConfigSpace):
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
         sampled_parameters = super().parse_parameters(parameters=parameters)
         extra_datamodule_keys: Final = {"label_all_tokens"}
-        extra_datamodule_kwargs = BaseConfigSpace._pop_parameters(
+        extra_datamodule_kwargs = OptimizedConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=extra_datamodule_keys
         )
         assert isinstance(sampled_parameters["datamodule_kwargs"], dict)
@@ -203,11 +187,11 @@ class LightingSequenceLabelingConfigSpace(LightingConfigSpace):
         return sampled_parameters
 
     @classmethod
-    def from_yaml(cls, path: T_path) -> "LightingSequenceLabelingConfigSpace":
+    def from_yaml(cls, path: T_path) -> "OptimizedLightingSequenceLabelingConfigSpace":
         config = read_yaml(path)
         return cls(**cls._parse_config(config))
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "LightingSequenceLabelingConfigSpace":
+    def from_dict(cls, d: Dict[str, Any]) -> "OptimizedLightingSequenceLabelingConfigSpace":
         config = deepcopy(d)
         return cls(**cls._parse_config(config))
