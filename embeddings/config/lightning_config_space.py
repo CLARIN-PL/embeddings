@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from types import MappingProxyType
-from typing import Any, ClassVar, Dict, FrozenSet, List, Optional, Union
+from typing import Any, ClassVar, Dict, List, Optional, Set, Union
 
 from pytorch_lightning.accelerators import Accelerator
 
@@ -9,7 +9,6 @@ from embeddings.data.io import T_path
 from embeddings.utils.loggers import get_logger
 from embeddings.utils.utils import read_yaml
 
-T_key = FrozenSet[str]
 T_kwarg = MappingProxyType[str, Any]
 
 _logger = get_logger(__name__)
@@ -17,27 +16,23 @@ _logger = get_logger(__name__)
 
 @dataclass
 class LightningConfigKeys:
-    PIPELINE_KEYS: ClassVar[T_key] = frozenset(
-        {
-            "batch_size",
-            "finetune_last_n_layers",
-            "embedding_name_or_path",
-        }
-    )
-    DATAMODULE_KEYS: ClassVar[T_key] = frozenset({"max_seq_length"})
-    TASK_MODEL_KEYS: ClassVar[T_key] = frozenset(
-        {
-            "learning_rate",
-            "optimizer",
-            "use_scheduler",
-            "warmup_steps",
-            "adam_epsilon",
-            "weight_decay",
-        }
-    )
-    TASK_TRAIN_KEYS: ClassVar[T_key] = frozenset({"max_epochs", "devices", "accelerator"})
-    MODEL_CONFIG_KEYS: ClassVar[T_key] = frozenset({"classifier_dropout"})
-    EARLY_STOPPING_KEYS: ClassVar[T_key] = frozenset({"monitor", "mode", "patience"})
+    PIPELINE_KEYS: ClassVar[Set[str]] = {
+        "batch_size",
+        "finetune_last_n_layers",
+        "embedding_name_or_path",
+    }
+    DATAMODULE_KEYS: ClassVar[Set[str]] = {"max_seq_length"}
+    TASK_MODEL_KEYS: ClassVar[Set[str]] = {
+        "learning_rate",
+        "optimizer",
+        "use_scheduler",
+        "warmup_steps",
+        "adam_epsilon",
+        "weight_decay",
+    }
+    TASK_TRAIN_KEYS: ClassVar[Set[str]] = {"max_epochs", "devices", "accelerator"}
+    MODEL_CONFIG_KEYS: ClassVar[Set[str]] = {"classifier_dropout"}
+    EARLY_STOPPING_KEYS: ClassVar[Set[str]] = {"monitor", "mode", "patience"}
 
 
 @dataclass

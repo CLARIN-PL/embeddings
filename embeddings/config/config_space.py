@@ -1,7 +1,7 @@
 import abc
 from abc import ABC
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Set
 
 from embeddings.data.io import T_path
 from embeddings.utils.loggers import get_logger
@@ -35,7 +35,7 @@ class BasicConfigSpace(ConfigSpace, ABC):
     def __post_init__(self) -> None:
         pass
 
-    def _parse_fields(self, keys: Iterable[str]) -> Dict[str, Any]:
+    def _parse_fields(self, keys: Set[str]) -> Dict[str, Any]:
         return {field_name: getattr(self, field_name) for field_name in keys}
 
 
