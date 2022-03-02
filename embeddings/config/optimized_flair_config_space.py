@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Set, Tuple, Union
 import optuna
 from typing_extensions import Final
 
+from embeddings.config.flair_config_space import FlairSequenceLabelingConfigKeys
 from embeddings.config.optimized_config_space import (
     OptimizedConfigSpace,
     Parameter,
@@ -97,7 +98,9 @@ class OptimizedFlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace
 
 
 @dataclass
-class OptimizedFlairSequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
+class OptimizedFlairSequenceLabelingConfigSpace(
+    AbstractFlairModelTrainerConfigSpace, FlairSequenceLabelingConfigKeys
+):
     hidden_size: Parameter = SearchableParameter(
         name="hidden_size", type="int_uniform", low=128, high=2048, step=128
     )
@@ -146,18 +149,8 @@ class OptimizedFlairSequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigS
         assert isinstance(embedding_name, str)
         hidden_size = parameters.pop("hidden_size")
         assert isinstance(hidden_size, int)
-        task_model_keys: Final = {
-            "use_rnn",
-            "dropout",
-            "word_dropout",
-            "locked_dropout",
-            "reproject_embeddings",
-            "use_crf",
-            "rnn_layers",
-            "rnn_type",
-        }
         task_model_kwargs = cls._pop_parameters(
-            parameters=parameters, parameters_keys=task_model_keys
+            parameters=parameters, parameters_keys=cls.TASK_MODEL_KEYS
         )
         (
             parameters,
