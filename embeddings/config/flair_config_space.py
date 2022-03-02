@@ -60,6 +60,7 @@ class FlairBasicConfigSpace(BasicConfigSpace):
 
     task_model_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
     task_train_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
+    load_dataset_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
 
     def __post_init__(self) -> None:
         self.task_train_kwargs = self._parse_fields(self.TASK_TRAIN_KEYS)
@@ -74,6 +75,36 @@ class FlairBasicConfigSpace(BasicConfigSpace):
 
 
 @dataclass
+class FlairAdvancedConfigSpace(BasicConfigSpace):
+    DEFAULT_TASK_TRAIN_KWARGS: ClassVar[MappingProxyType[str, Any]] = MappingProxyType(
+        {
+            "learning_rate": 1e-3,
+            "mini_batch_size": 32,
+            "max_epochs": 20,
+        }
+    )
+
+    task_model_kwargs: Dict[str, Any] = field(default_factory=dict)
+    task_train_kwargs: Dict[str, Any] = field(default_factory=dict)
+    load_dataset_kwargs: Dict[str, Any] = field(default_factory=dict)
+    load_model_kwargs: Dict[str, Any] = field(default_factory=dict)  # classification task
+    hidden_size: int = field(init=False)  # sequence labeling task
+
+    def __post_init__(self) -> None:
+        self.task_model_kwargs = {**self.DEFAULT_TASK_TRAIN_KWARGS, **self.task_model_kwargs}
+        if "hidden_size" in self.task_model_kwargs:
+            self.hidden_size = self.task_model_kwargs["hidden_size"]
+
+    @classmethod
+    def from_yaml(cls, path: T_path) -> "FlairAdvancedConfigSpace":
+        pass
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "FlairAdvancedConfigSpace":
+        pass
+
+
+@dataclass
 class FlairSequenceLabelingBasicConfigSpace(FlairBasicConfigSpace, FlairSequenceLabelingConfigKeys):
     hidden_size: int = 256
     use_crf: bool = True
@@ -84,9 +115,6 @@ class FlairSequenceLabelingBasicConfigSpace(FlairBasicConfigSpace, FlairSequence
     word_dropout: float = 0.05
     locked_dropout: float = 0.5
     reproject_embeddings: bool = True
-
-    task_model_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-    task_train_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
 
     def __post_init__(self) -> None:
         self.task_train_kwargs = self._parse_fields(self.TASK_TRAIN_KEYS)
@@ -117,9 +145,6 @@ class FlairTextClassificationBasicConfigSpace(
     dropout: float = 0.0
     word_dropout: float = 0.05
     reproject_words: bool = True
-
-    task_model_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-    task_train_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
 
     def __post_init__(self) -> None:
         task_model_keys = self.TASK_MODEL_KEYS_MAPPING[self.document_embedding]
