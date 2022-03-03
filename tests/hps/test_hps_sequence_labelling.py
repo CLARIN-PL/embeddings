@@ -6,6 +6,7 @@ from typing import Any, Dict, Tuple
 import pandas as pd
 import pytest
 import yaml
+from _pytest.tmpdir import TempdirFactory
 
 from embeddings.hyperparameter_search.lighting_configspace import (
     LightingSequenceLabelingConfigSpace,
@@ -54,6 +55,19 @@ def dataset_path(dataset_name: str) -> "TemporaryDirectory[str]":
     )
     pipeline.run()
 
+    return path
+
+
+@pytest.fixture(scope="module")
+def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
+    path = tmpdir_factory.mktemp(__name__)
+    return Path(path)
+
+
+@pytest.fixture(scope="module")
+def retrain_tmp_path(tmp_path_module: Path) -> Path:
+    path = tmp_path_module.joinpath("retrain")
+    path.mkdir()
     return path
 
 
@@ -194,7 +208,7 @@ def test_hparams_best_params_files_compatibility(
 ) -> None:
     df, metadata = sequence_labelling_hps_run_result
 
-    with open(retrain_tmp_path / "lightning_logs" / "version_0" / "hparams.yaml") as f:
+    with open(retrain_tmp_path / "csv" / "version_0" / "hparams.yaml") as f:
         hparams = yaml.load(f, Loader=yaml.Loader)
 
     with open(tmp_path_module / "best_params.yaml") as f:
