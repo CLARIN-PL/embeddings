@@ -4,7 +4,7 @@ from typing import Any, ClassVar, Dict, List, Optional, Set, Union
 
 from pytorch_lightning.accelerators import Accelerator
 
-from embeddings.config.config_space import AdvancedConfigSpace, BasicConfigSpace
+from embeddings.config.base_config import AdvancedConfig, BasicConfig
 from embeddings.data.io import T_path
 from embeddings.utils.loggers import get_logger
 from embeddings.utils.utils import read_yaml
@@ -56,7 +56,7 @@ class LightningConfigDefaultKwargs:
 
 
 @dataclass
-class LightningBasicConfigSpace(BasicConfigSpace, LightningConfigKeys):
+class LightningBasicConfig(BasicConfig, LightningConfigKeys):
     use_scheduler: bool = True
     optimizer: str = "Adam"
     warmup_steps: int = 100
@@ -97,17 +97,17 @@ class LightningBasicConfigSpace(BasicConfigSpace, LightningConfigKeys):
         )
 
     @classmethod
-    def from_yaml(cls, path: T_path) -> "LightningBasicConfigSpace":
+    def from_yaml(cls, path: T_path) -> "LightningBasicConfig":
         config = read_yaml(path)
         return cls(**config)
 
     @classmethod
-    def from_dict(cls, config: Dict[str, Any]) -> "LightningBasicConfigSpace":
+    def from_dict(cls, config: Dict[str, Any]) -> "LightningBasicConfig":
         return cls(**config)
 
 
 @dataclass
-class LightningAdvancedConfigSpace(AdvancedConfigSpace, LightningConfigDefaultKwargs):
+class LightningAdvancedConfig(AdvancedConfig, LightningConfigDefaultKwargs):
     train_batch_size: int = 32
     eval_batch_size: int = 32
     finetune_last_n_layers: int = -1
@@ -134,13 +134,13 @@ class LightningAdvancedConfigSpace(AdvancedConfigSpace, LightningConfigDefaultKw
         )
 
     @classmethod
-    def from_yaml(cls, path: T_path) -> "LightningAdvancedConfigSpace":
+    def from_yaml(cls, path: T_path) -> "LightningAdvancedConfig":
         config = read_yaml(path)
         return cls(**config)
 
     @classmethod
-    def from_dict(cls, config: Dict[str, Any]) -> "LightningAdvancedConfigSpace":
+    def from_dict(cls, config: Dict[str, Any]) -> "LightningAdvancedConfig":
         return cls(**config)
 
 
-LightningConfigSpace = Union[LightningBasicConfigSpace, LightningAdvancedConfigSpace]
+LightningConfig = Union[LightningBasicConfig, LightningAdvancedConfig]

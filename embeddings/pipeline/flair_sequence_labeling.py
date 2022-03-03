@@ -5,6 +5,10 @@ import datasets
 from flair.data import Corpus
 from numpy import typing as nptyping
 
+from embeddings.config.flair_config import (
+    FlairSequenceLabelingBasicConfig,
+    FlairSequenceLabelingConfig,
+)
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import Dataset
 from embeddings.data.io import T_path
@@ -35,15 +39,13 @@ class FlairSequenceLabelingPipeline(
         input_column_name: str,
         target_column_name: str,
         output_path: T_path,
-        hidden_size: int,
         evaluation_filename: str = "evaluation.json",
         evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = SequenceLabelingEvaluator.EvaluationMode.CONLL,
         model_type_reference: str = "",
         tagging_scheme: Optional[SequenceLabelingEvaluator.TaggingScheme] = None,
+        config: FlairSequenceLabelingConfig = FlairSequenceLabelingBasicConfig(),
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
-        task_model_kwargs: Optional[Dict[str, Any]] = None,
-        task_train_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         output_path = Path(output_path)
@@ -63,9 +65,9 @@ class FlairSequenceLabelingPipeline(
 
         task = SequenceLabeling(
             output_path,
-            hidden_size=hidden_size,
-            task_model_kwargs=task_model_kwargs,
-            task_train_kwargs=task_train_kwargs,
+            hidden_size=config.hidden_size,
+            task_model_kwargs=config.task_model_kwargs,
+            task_train_kwargs=config.task_train_kwargs,
         )
         model = FlairModel(embedding, task)
         evaluator = SequenceLabelingEvaluator(

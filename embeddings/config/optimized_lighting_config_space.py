@@ -1,10 +1,9 @@
-import abc
 from abc import ABC
 from copy import deepcopy
 from dataclasses import InitVar, dataclass, field
 from typing import Any, Dict, Final, List, Union
 
-from embeddings.config.lightning_config_space import LightningConfigKeys
+from embeddings.config.lightning_config import LightningConfigKeys
 from embeddings.config.optimized_config_space import (
     OptimizedConfigSpace,
     Parameter,
@@ -18,8 +17,7 @@ DEFAULT_DEVICES = "auto"
 DEFAULT_ACCELERATOR = "auto"
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
+@dataclass
 class OptimizedLightingConfigSpace(OptimizedConfigSpace, LightningConfigKeys, ABC):
     embedding_name_or_path: InitVar[Union[T_path, List[T_path]]]
     devices: InitVar[Union[int, str, None, List[int]]] = field(default=DEFAULT_DEVICES)
@@ -139,14 +137,14 @@ class OptimizedLightingConfigSpace(OptimizedConfigSpace, LightningConfigKeys, AB
         return {**variables, **parameters}
 
     @classmethod
-    @abc.abstractmethod
     def from_yaml(cls, path: T_path) -> "OptimizedLightingConfigSpace":
-        pass
+        config = read_yaml(path)
+        return cls(**cls._parse_config(config))
 
     @classmethod
-    @abc.abstractmethod
     def from_dict(cls, d: Dict[str, Any]) -> "OptimizedLightingConfigSpace":
-        pass
+        config = deepcopy(d)
+        return cls(**cls._parse_config(config))
 
 
 @dataclass
@@ -156,16 +154,6 @@ class OptimizedLightingTextClassificationConfigSpace(OptimizedLightingConfigSpac
         sampled_parameters = super().parse_parameters(parameters=parameters)
         cls._check_unmapped_parameters(parameters=parameters)
         return sampled_parameters
-
-    @classmethod
-    def from_yaml(cls, path: T_path) -> "OptimizedLightingTextClassificationConfigSpace":
-        config = read_yaml(path)
-        return cls(**cls._parse_config(config))
-
-    @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "OptimizedLightingTextClassificationConfigSpace":
-        config = deepcopy(d)
-        return cls(**cls._parse_config(config))
 
 
 @dataclass
@@ -185,13 +173,3 @@ class OptimizedLightingSequenceLabelingConfigSpace(OptimizedLightingConfigSpace)
         sampled_parameters["datamodule_kwargs"].update(extra_datamodule_kwargs)
         cls._check_unmapped_parameters(parameters=parameters)
         return sampled_parameters
-
-    @classmethod
-    def from_yaml(cls, path: T_path) -> "OptimizedLightingSequenceLabelingConfigSpace":
-        config = read_yaml(path)
-        return cls(**cls._parse_config(config))
-
-    @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "OptimizedLightingSequenceLabelingConfigSpace":
-        config = deepcopy(d)
-        return cls(**cls._parse_config(config))

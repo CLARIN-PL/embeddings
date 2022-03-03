@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Set, Tuple, Type, TypeVar, Union
 
 import optuna
 
-from embeddings.config.config_space import ConfigSpace
+from embeddings.config.base_config import Config
 from embeddings.config.parameters import ConstantParameter, ParameterValues, SearchableParameter
 from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
 from embeddings.embedding.flair_embedding import FlairTransformerEmbedding
@@ -18,7 +18,7 @@ SampledParameters = Dict[str, Union[ParameterValues, Dict[str, ParameterValues]]
 OptimizedConfig = TypeVar("OptimizedConfig", bound="OptimizedConfigSpace")
 
 
-class OptimizedConfigSpace(ConfigSpace, ABC):
+class OptimizedConfigSpace(Config, ABC):
     def _parse_parameter(
         self, param_name: str, trial: optuna.trial.Trial
     ) -> Tuple[str, ParameterValues]:

@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Sequence, Union
 import datasets
 from numpy import typing as nptyping
 
-from embeddings.config.lightning_config_space import LightningBasicConfigSpace, LightningConfigSpace
+from embeddings.config.lightning_config import LightningBasicConfig, LightningConfig
 from embeddings.data.datamodule import TextClassificationDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
@@ -28,10 +28,11 @@ class LightningClassificationPipeline(
         target_column_name: str,
         output_path: T_path,
         evaluation_filename: str = "evaluation.json",
-        config_space: LightningConfigSpace = LightningBasicConfigSpace(),
+        config_space: LightningConfig = LightningBasicConfig(),
         logging_config: LightningLoggingConfig = LightningLoggingConfig(),
         tokenizer_name_or_path: Optional[T_path] = None,
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
+        load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         tokenizer_name_or_path = tokenizer_name_or_path or embedding_name_or_path
         output_path = Path(output_path)
@@ -46,7 +47,7 @@ class LightningClassificationPipeline(
             eval_batch_size=config_space.eval_batch_size,
             tokenizer_kwargs=config_space.tokenizer_kwargs,
             batch_encoding_kwargs=config_space.batch_encoding_kwargs,
-            load_dataset_kwargs=config_space.load_dataset_kwargs,
+            load_dataset_kwargs=load_dataset_kwargs,
             **config_space.datamodule_kwargs
         )
         task = TextClassificationTask(

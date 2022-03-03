@@ -9,28 +9,21 @@ from embeddings.utils.loggers import get_logger
 _logger = get_logger(__name__)
 
 
-class ConfigSpace(ABC):
+class Config(ABC):
     @classmethod
     @abc.abstractmethod
-    def from_yaml(cls, path: T_path) -> "ConfigSpace":
+    def from_yaml(cls, path: T_path) -> "Config":
         pass
 
     @classmethod
     @abc.abstractmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "ConfigSpace":
+    def from_dict(cls, d: Dict[str, Any]) -> "Config":
         pass
-
-    @staticmethod
-    def _check_unmapped_parameters(parameters: Dict[str, Any]) -> None:
-        if len(parameters):
-            raise ValueError(
-                f"Some of the parameters are not mapped. Unmapped parameters: {parameters}"
-            )
 
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
-class BasicConfigSpace(ConfigSpace, ABC):
+class BasicConfig(Config, ABC):
     @abc.abstractmethod
     def __post_init__(self) -> None:
         pass
@@ -41,7 +34,7 @@ class BasicConfigSpace(ConfigSpace, ABC):
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
-class AdvancedConfigSpace(ConfigSpace, ABC):
+class AdvancedConfig(Config, ABC):
     @abc.abstractmethod
     def __post_init__(self) -> None:
         pass

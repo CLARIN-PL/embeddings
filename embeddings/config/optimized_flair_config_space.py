@@ -6,7 +6,10 @@ from typing import Any, Dict, List, Set, Tuple, Union
 import optuna
 from typing_extensions import Final
 
-from embeddings.config.flair_config_space import FlairSequenceLabelingConfigKeys
+from embeddings.config.flair_config import (
+    FlairSequenceLabelingConfigKeys,
+    FlairTextClassificationConfigMapping,
+)
 from embeddings.config.optimized_config_space import (
     OptimizedConfigSpace,
     Parameter,
@@ -179,7 +182,9 @@ class OptimizedFlairSequenceLabelingConfigSpace(
 
 
 @dataclass
-class OptimizedFlairTextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
+class OptimizedFlairTextClassificationConfigSpace(
+    AbstractFlairModelTrainerConfigSpace, FlairTextClassificationConfigMapping
+):
     dynamic_document_embedding: Parameter = SearchableParameter(
         name="document_embedding",
         type="categorical",
@@ -250,14 +255,6 @@ class OptimizedFlairTextClassificationConfigSpace(AbstractFlairModelTrainerConfi
     def _map_task_specific_parameters(
         self, trial: optuna.trial.Trial
     ) -> Tuple[Dict[str, ParameterValues], Set[str]]:
-        shared_params = ("dropout", "word_dropout", "reproject_words")
-        param_names_mapping: Final = {
-            "FlairDocumentCNNEmbeddings": ("cnn_pool_kernels",) + shared_params,
-            "FlairDocumentRNNEmbeddings": ("hidden_size", "rnn_type", "rnn_layers", "bidirectional")
-            + shared_params,
-            "FlairTransformerDocumentEmbedding": ("dynamic_pooling", "dynamic_fine_tune"),
-            "FlairDocumentPoolEmbedding": ("static_pooling", "static_fine_tune_mode"),
-        }
         parameters = {}
 
         embedding_name, embedding_name_val = self._parse_parameter(
@@ -275,7 +272,7 @@ class OptimizedFlairTextClassificationConfigSpace(AbstractFlairModelTrainerConfi
             raise TypeError("Variable document_embedding_val must be a str!")
 
         parameters[document_embedding_name] = document_embedding_val
-        parameter_names = param_names_mapping[document_embedding_val]
+        parameter_names = self.TASK_MODEL_KEYS_MAPPING[document_embedding_val]
 
         parameters.update(self._map_parameters(parameters_names=list(parameter_names), trial=trial))
 
