@@ -91,7 +91,11 @@ class OptimizedLightingPipeline(
             if not self.dataset_path.exists():
                 raise FileNotFoundError("Dataset path not found")
         else:
-            self.dataset_path = self.tmp_dataset_dir.name
+            path = Path(self.tmp_dataset_dir.name).joinpath(
+                str(self.dataset_name_or_path).replace("/", "__")
+            )
+            path.mkdir()
+            self.dataset_path = path
 
     def _init_preprocessing_pipeline(self) -> None:
         self.preprocessing_pipeline: Optional[HuggingFacePreprocessingPipeline]
@@ -100,7 +104,7 @@ class OptimizedLightingPipeline(
         else:
             self.preprocessing_pipeline = HuggingFacePreprocessingPipeline(
                 dataset_name=str(self.dataset_name_or_path),
-                persist_path=self.tmp_dataset_dir.name,
+                persist_path=str(self.dataset_path),
                 sample_missing_splits=(self.sample_dev_split_fraction, None),
                 ignore_test_subset=True,
                 load_dataset_kwargs=self.load_dataset_kwargs,

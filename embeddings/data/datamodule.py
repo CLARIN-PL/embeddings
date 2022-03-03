@@ -28,7 +28,7 @@ _logger = get_logger(__name__)
 class BaseDataModule(abc.ABC, pl.LightningDataModule, Generic[Data]):
     dataset: Data
 
-    def __init__(self) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         # ignoring the type to avoid calling to untyped function "__init__" in typed context error
         # caused by pl.LightningDataModule __init__ method not being typed
         super().__init__()  # type: ignore
@@ -64,9 +64,8 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         seed: int = 441,
         **kwargs: Any,
     ) -> None:
-        super().__init__()
-        self.tokenizer_name_or_path = tokenizer_name_or_path
         self.dataset_name_or_path = dataset_name_or_path
+        self.tokenizer_name_or_path = tokenizer_name_or_path
         self.target_field = target_field
         self.max_seq_length = max_seq_length
         self.train_batch_size = train_batch_size
@@ -82,6 +81,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         )
         self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
         self.seed = seed
+        super().__init__(dataset_info=self.load_dataset()["train"].info)
 
     @abc.abstractmethod
     def prepare_labels(self) -> None:
