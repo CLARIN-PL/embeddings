@@ -62,7 +62,6 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         seed: int = 441,
-        **kwargs: Any,
     ) -> None:
         self.dataset_name_or_path = dataset_name_or_path
         self.tokenizer_name_or_path = tokenizer_name_or_path

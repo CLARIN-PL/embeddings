@@ -8,6 +8,7 @@ from numpy import typing as nptyping
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.nn.functional import softmax
 from torch.optim import AdamW, Optimizer
+from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from torchmetrics import MetricCollection
 from transformers import get_linear_schedule_with_warmup
@@ -21,6 +22,7 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
     def __init__(
         self,
         metrics: Optional[MetricCollection] = None,
+        optimizer: str = "AdamW",
         learning_rate: float = 1e-4,
         adam_epsilon: float = 1e-8,
         warmup_steps: int = 100,
@@ -119,7 +121,10 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
                 "weight_decay": 0.0,
             },
         ]
-        optimizer = AdamW(
+        optimizer_cls = getattr(torch.optim, self.hparams.optimizer)
+        assert hasattr(optimizer_cls, "lr")
+        assert hasattr(optimizer_cls, "eps")
+        optimizer = optimizer_cls(
             optimizer_grouped_parameters,
             lr=self.hparams.learning_rate,
             eps=self.hparams.adam_epsilon,
