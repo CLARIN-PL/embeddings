@@ -1,6 +1,7 @@
 import abc
-from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar
 from inspect import signature
+from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar
+
 import numpy as np
 import pytorch_lightning as pl
 import torch
