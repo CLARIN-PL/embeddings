@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import datasets
+import wandb
 from numpy import typing as nptyping
 
 from embeddings.data.datamodule import SequenceLabelingDataModule
@@ -72,7 +73,9 @@ class LightningSequenceLabelingPipeline(
             tokenizer_name_or_path if tokenizer_name_or_path else embedding_name_or_path
         )
 
-        output_path = Path(output_path)
+        self.output_path: Path = Path(output_path)
+        self.evaluation_filename = evaluation_filename
+
         datamodule = SequenceLabelingDataModule(
             tokenizer_name_or_path=tokenizer_name_or_path,
             dataset_name_or_path=dataset_name_or_path,
@@ -87,7 +90,7 @@ class LightningSequenceLabelingPipeline(
         )
         task = SequenceLabelingTask(
             model_name_or_path=embedding_name_or_path,
-            output_path=output_path,
+            output_path=self.output_path,
             finetune_last_n_layers=finetune_last_n_layers,
             model_config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
@@ -98,9 +101,21 @@ class LightningSequenceLabelingPipeline(
         model = LightningModel(task=task, predict_subset=predict_subset)
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
-        ).persisting(JsonPersister(path=output_path.joinpath(evaluation_filename)))
+        ).persisting(JsonPersister(path=self.output_path.joinpath(evaluation_filename)))
         super().__init__(datamodule, model, evaluator)
 
     @property
     def logging_kwargs(self) -> Dict[str, Any]:
         return self._logging_kwargs
+
+    def run(self, run_name: Optional[str] = None) -> Dict[str, Any]:
+        result = super().run(run_name)
+        if self.logging_kwargs["use_wandb"]:
+            wandb.log_artifact(
+                str(self.output_path.joinpath(self.evaluation_filename)),
+                name=self.evaluation_filename,
+                type="output",
+            )
+            wandb.finish()
+
+        return result

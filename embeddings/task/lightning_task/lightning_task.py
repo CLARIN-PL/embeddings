@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional
 
 import pytorch_lightning as pl
 import torch
-import wandb
 from numpy import typing as nptyping
 from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.callbacks import Callback
@@ -103,7 +102,6 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         dataloader = data.get_subset(subset=predict_subset)
         assert isinstance(dataloader, DataLoader)
         result = self.predict(dataloader=dataloader)
-        wandb.finish()
         return result
 
     @abc.abstractmethod
