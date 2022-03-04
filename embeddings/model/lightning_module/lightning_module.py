@@ -1,6 +1,6 @@
 import abc
 from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar
-
+from inspect import signature
 import numpy as np
 import pytorch_lightning as pl
 import torch
@@ -121,9 +121,10 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
                 "weight_decay": 0.0,
             },
         ]
+
         optimizer_cls = getattr(torch.optim, self.hparams.optimizer)
-        assert hasattr(optimizer_cls, "lr")
-        assert hasattr(optimizer_cls, "eps")
+        assert "lr" in signature(optimizer_cls).parameters
+        assert "eps" in signature(optimizer_cls).parameters
         optimizer = optimizer_cls(
             optimizer_grouped_parameters,
             lr=self.hparams.learning_rate,
