@@ -123,11 +123,13 @@ class OptunaPipeline(
         return study.trials_dataframe(), metadata
 
     def objective(self, trial: optuna.trial.Trial) -> float:
+        run_name = f"study_{trial.study.study_name}_trial_{trial.number}".replace("/", "__")
+
         parameters = self.config_space.sample_parameters(trial=trial)
         parsed_params = self.config_space.parse_parameters(parameters)
         kwargs = self._get_evaluation_metadata(parsed_params)
         pipeline = self._init_evaluation_pipeline(**kwargs)
-        results = pipeline.run(run_name=f"study_{trial.study.study_name}_trial_{trial.number}")
+        results = pipeline.run(run_name=run_name)
         metric = results[self.metric_name][self.metric_key]
         assert isinstance(metric, float)
         return metric

@@ -105,7 +105,7 @@ class LightningClassificationPipeline(
         if self.logging_kwargs["use_wandb"]:
             wandb.log_artifact(
                 str(self.output_path.joinpath(self.evaluation_filename)),
-                name=self.evaluation_filename,
+                name=f"{run_name}_{self.evaluation_filename}",
                 type="output",
             )
             wandb.finish()
