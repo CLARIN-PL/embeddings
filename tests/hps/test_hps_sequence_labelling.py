@@ -8,11 +8,11 @@ import pytest
 import yaml
 from _pytest.tmpdir import TempdirFactory
 
-from embeddings.hyperparameter_search.lighting_configspace import (
+from embeddings.config.lighting_config_space import (
     LightingSequenceLabelingConfigSpace,
 )
-from embeddings.hyperparameter_search.parameters import ConstantParameter
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
+from embeddings.config.parameters import ConstantParameter
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingSequenceLabelingPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
 from embeddings.pipeline.pipelines_metadata import LightningSequenceLabelingPipelineMetadata
@@ -121,7 +121,9 @@ def test_common_keys(
     sequence_labelling_config_space: LightingSequenceLabelingConfigSpace,
 ) -> None:
     df, metadata = sequence_labelling_hps_run_result
-    assert _flatten(metadata).keys() & sequence_labelling_config_space._get_fields().keys() == {
+    metadata_config_keys = _flatten(metadata["config"].__dict__)
+    config_space_keys = sequence_labelling_config_space._get_fields().keys()
+    assert metadata_config_keys & config_space_keys == {
         "learning_rate",
         "adam_epsilon",
         "max_epochs",
@@ -143,22 +145,28 @@ def test_keys_allowed_in_metadata_but_not_in_config_space(
     sequence_labelling_config_space: LightingSequenceLabelingConfigSpace,
 ) -> None:
     df, metadata = sequence_labelling_hps_run_result
-    assert _flatten(metadata).keys() - sequence_labelling_config_space._get_fields().keys() == {
-        "tokenizer_kwargs",
-        "batch_encoding_kwargs",
-        "train_batch_size",
-        "predict_subset",
-        "input_column_name",
-        "load_dataset_kwargs",
-        "target_column_name",
-        "accelerator",
-        "dataset_name_or_path",
-        "eval_batch_size",
-        "devices",
+    metadata_keys = {**metadata, **metadata["config"].__dict__}.keys()
+    config_space_keys = sequence_labelling_config_space.__dict__.keys()
+    assert metadata_keys - config_space_keys == {
+        "task_train_kwargs",
         "embedding_name_or_path",
+        "config",
+        "predict_subset",
+        "model_config_kwargs",
+        "input_column_name",
+        "early_stopping_kwargs",
+        "load_dataset_kwargs",
+        "tokenizer_kwargs",
+        "dataset_name_or_path",
         "tokenizer_name_or_path",
-        "evaluation_mode",
+        "batch_encoding_kwargs",
+        "datamodule_kwargs",
+        "eval_batch_size",
+        "train_batch_size",
         "tagging_scheme",
+        "task_model_kwargs",
+        "evaluation_mode",
+        "target_column_name",
     }
 
 
@@ -168,9 +176,10 @@ def test_keys_allowed_in_config_space_but_not_in_metadata(
     ],
     sequence_labelling_config_space: LightingSequenceLabelingConfigSpace,
 ) -> None:
-
     df, metadata = sequence_labelling_hps_run_result
-    assert sequence_labelling_config_space._get_fields().keys() - _flatten(metadata).keys() == {
+    metadata_keys = {**metadata, **_flatten(metadata["config"].__dict__)}.keys()
+    config_space_keys = sequence_labelling_config_space.__dict__.keys()
+    assert config_space_keys - metadata_keys == {
         "trainer_devices",
         "param_embedding_name_or_path",
         "trainer_accelerator",
@@ -218,53 +227,24 @@ def test_hparams_best_params_files_compatibility(
     with open(tmp_path_module / "best_params.yaml") as f:
         best_params = yaml.load(f, Loader=yaml.Loader)
 
-    hparams = _flatten(hparams)
-    best_params = _flatten(best_params)
-
-    common_keys = hparams.keys() & best_params.keys()
-
-    assert common_keys == {
-        "train_batch_size",
-        "batch_encoding_kwargs",
-        "tokenizer_name_or_path",
-        "tokenizer_kwargs",
-        "max_seq_length",
-        "embedding_name_or_path",
-        "finetune_last_n_layers",
-        "dataset_name_or_path",
-        "input_column_name",
-        "weight_decay",
-        "use_scheduler",
-        "devices",
-        "eval_batch_size",
-        "adam_epsilon",
-        "optimizer",
-        "learning_rate",
-        "load_dataset_kwargs",
-        "max_epochs",
-        "predict_subset",
-        "warmup_steps",
-        "target_column_name",
-        "accelerator",
-        "evaluation_mode",
-        "label_all_tokens",
-        "tagging_scheme",
-        "classifier_dropout",
-    }
-
-    for k in common_keys:
-        if k == "dataset_name_or_path":
-            continue
-        if k in metadata:
-            if isinstance(metadata[k], Enum):  # type: ignore
-                enum_hparam = getattr(type(metadata[k]), hparams[k])  # type: ignore
-                assert enum_hparam == best_params[k] == metadata[k]  # type: ignore
-            else:
-                assert hparams[k] == best_params[k] == metadata[k]  # type: ignore
-        else:
-            assert hparams[k] == best_params[k]
-
-        if not k.endswith("_kwargs") and k not in ["max_seq_length", "tagging_scheme"]:
-            assert hparams[k] is not None
+    # compare config keys
+    assert (
+        best_params["config"].__dict__.keys()
+        == hparams["config"].__dict__.keys()
+        == metadata["config"].__dict__.keys()
+    )
+    # compare config values
+    assert (
+        _flatten(best_params["config"].__dict__)
+        == _flatten(hparams["config"].__dict__)
+        == _flatten(metadata["config"].__dict__)
+    )
 
     assert hparams["model_name_or_path"] == best_params["embedding_name_or_path"]
+    hparams = {k: v for k, v in hparams.items() if k in best_params.keys() and k != "config"}
+    for k in hparams.keys():
+        if isinstance(metadata[k], Enum):  # type: ignore
+            enum_hparam = getattr(type(metadata[k]), hparams[k])  # type: ignore
+            assert enum_hparam == best_params[k] == metadata[k]  # type: ignore
+        else:
+            assert hparams[k] == best_params[k] == metadata[k]  # type: ignore
