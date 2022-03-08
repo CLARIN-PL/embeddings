@@ -83,7 +83,6 @@ class LightningBasicConfig(BasicConfig, LightningConfigKeys):
     early_stopping_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
     tokenizer_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
     batch_encoding_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-    load_dataset_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
 
     def __post_init__(self) -> None:
         self.train_batch_size = self.eval_batch_size = self.mini_batch_size
@@ -118,7 +117,6 @@ class LightningAdvancedConfig(AdvancedConfig, LightningConfigDefaultKwargs):
     early_stopping_kwargs: Dict[str, Any] = field(default_factory=dict)
     tokenizer_kwargs: Dict[str, Any] = field(default_factory=dict)
     batch_encoding_kwargs: Dict[str, Any] = field(default_factory=dict)
-    load_dataset_kwargs: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self.datamodule_kwargs = {**self.DEFAULT_DATAMODULE_KWARGS, **self.datamodule_kwargs}

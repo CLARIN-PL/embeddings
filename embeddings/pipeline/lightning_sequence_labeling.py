@@ -36,7 +36,7 @@ class LightningSequenceLabelingPipeline(
         evaluation_filename: str = "evaluation.json",
         evaluation_mode: EvaluationMode = EvaluationMode.CONLL,
         tagging_scheme: Optional[TaggingScheme] = None,
-        config_space: LightningConfig = LightningBasicConfig(),
+        config: LightningConfig = LightningBasicConfig(),
         logging_config: LightningLoggingConfig = LightningLoggingConfig(),
         tokenizer_name_or_path: Optional[T_path] = None,
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
@@ -50,22 +50,22 @@ class LightningSequenceLabelingPipeline(
             dataset_name_or_path=dataset_name_or_path,
             text_field=input_column_name,
             target_field=target_column_name,
-            train_batch_size=config_space.train_batch_size,
-            eval_batch_size=config_space.eval_batch_size,
-            tokenizer_kwargs=config_space.tokenizer_kwargs,
-            batch_encoding_kwargs=config_space.batch_encoding_kwargs,
+            train_batch_size=config.train_batch_size,
+            eval_batch_size=config.eval_batch_size,
+            tokenizer_kwargs=config.tokenizer_kwargs,
+            batch_encoding_kwargs=config.batch_encoding_kwargs,
             load_dataset_kwargs=load_dataset_kwargs,
-            **config_space.datamodule_kwargs
+            **config.datamodule_kwargs
         )
         task = SequenceLabelingTask(
             model_name_or_path=embedding_name_or_path,
             output_path=output_path,
-            finetune_last_n_layers=config_space.finetune_last_n_layers,
-            model_config_kwargs=config_space.model_config_kwargs,
-            task_model_kwargs=config_space.task_model_kwargs,
-            task_train_kwargs=config_space.task_train_kwargs,
+            finetune_last_n_layers=config.finetune_last_n_layers,
+            model_config_kwargs=config.model_config_kwargs,
+            task_model_kwargs=config.task_model_kwargs,
+            task_train_kwargs=config.task_train_kwargs,
+            early_stopping_kwargs=config.early_stopping_kwargs,
             logging_config=logging_config,
-            early_stopping_kwargs=config_space.early_stopping_kwargs,
         )
         model = LightningModel(task=task, predict_subset=predict_subset)
         evaluator = SequenceLabelingEvaluator(

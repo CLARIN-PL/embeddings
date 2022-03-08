@@ -272,7 +272,7 @@ class OptimizedFlairTextClassificationConfigSpace(
             raise TypeError("Variable document_embedding_val must be a str!")
 
         parameters[document_embedding_name] = document_embedding_val
-        parameter_names = self.TASK_MODEL_KEYS_MAPPING[document_embedding_val]
+        parameter_names = self.LOAD_MODEL_KEYS_MAPPING[document_embedding_val]
 
         parameters.update(self._map_parameters(parameters_names=list(parameter_names), trial=trial))
 
@@ -290,21 +290,8 @@ class OptimizedFlairTextClassificationConfigSpace(
         document_embedding = parameters.pop("document_embedding")
         assert isinstance(document_embedding, str)
 
-        load_model_keys: Final = {
-            "pooling",
-            "fine_tune_mode",
-            "fine_tune",
-            "kernels",
-            "hidden_size",
-            "rnn_type",
-            "rnn_layers",
-            "bidirectional",
-            "dropout",
-            "word_dropout",
-            "reproject_words",
-        }
         load_model_kwargs = cls._pop_parameters(
-            parameters=parameters, parameters_keys=load_model_keys
+            parameters=parameters, parameters_keys=cls.LOAD_MODEL_KEYS
         )
 
         (

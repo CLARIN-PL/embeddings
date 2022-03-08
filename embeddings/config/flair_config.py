@@ -25,7 +25,21 @@ class FlairSequenceLabelingConfigKeys:
 
 @dataclass
 class FlairTextClassificationConfigMapping:
-    TASK_MODEL_KEYS_MAPPING: ClassVar[MappingProxyType[str, Any]] = MappingProxyType(
+    LOAD_MODEL_KEYS: ClassVar[Set[str]] = {
+        "pooling",
+        "fine_tune_mode",
+        "fine_tune",
+        "kernels",
+        "hidden_size",
+        "rnn_type",
+        "rnn_layers",
+        "bidirectional",
+        "dropout",
+        "word_dropout",
+        "reproject_words",
+    }
+
+    LOAD_MODEL_KEYS_MAPPING: ClassVar[MappingProxyType[str, Any]] = MappingProxyType(
         {
             "FlairDocumentCNNEmbeddings": {
                 "cnn_pool_kernels",
@@ -62,7 +76,6 @@ class FlairBasicConfig(BasicConfig):
 
     task_model_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
     task_train_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-    load_dataset_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
 
     def __post_init__(self) -> None:
         self.task_train_kwargs = self._parse_fields(self.TASK_TRAIN_KEYS)
@@ -93,14 +106,6 @@ class FlairSequenceLabelingBasicConfig(FlairBasicConfig, FlairSequenceLabelingCo
         self.task_train_kwargs = self._parse_fields(self.TASK_TRAIN_KEYS)
         self.task_model_kwargs = self._parse_fields(self.TASK_MODEL_KEYS)
 
-    @classmethod
-    def from_yaml(cls, path: T_path) -> "FlairSequenceLabelingBasicConfig":
-        pass
-
-    @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "FlairSequenceLabelingBasicConfig":
-        pass
-
 
 @dataclass
 class FlairTextClassificationBasicConfig(FlairBasicConfig, FlairTextClassificationConfigMapping):
@@ -119,17 +124,9 @@ class FlairTextClassificationBasicConfig(FlairBasicConfig, FlairTextClassificati
     load_model_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
 
     def __post_init__(self) -> None:
-        task_model_keys = self.TASK_MODEL_KEYS_MAPPING[self.document_embedding_cls]
+        load_model_keys = self.LOAD_MODEL_KEYS_MAPPING[self.document_embedding_cls]
         self.task_train_kwargs = self._parse_fields(self.TASK_TRAIN_KEYS)
-        self.task_model_kwargs = self._parse_fields(task_model_keys)
-
-    @classmethod
-    def from_yaml(cls, path: T_path) -> "FlairTextClassificationBasicConfig":
-        pass
-
-    @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "FlairTextClassificationBasicConfig":
-        pass
+        self.load_model_kwargs = self._parse_fields(load_model_keys)
 
 
 @dataclass
@@ -141,13 +138,12 @@ class FlairAdvancedConfig(AdvancedConfig, ABC):
             "max_epochs": 20,
         }
     )
-    document_embedding_cls: str = "FlairDocumentPoolEmbedding"
 
     task_model_kwargs: Dict[str, Any] = field(default_factory=dict)
     task_train_kwargs: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        self.task_model_kwargs = {**self.DEFAULT_TASK_TRAIN_KWARGS, **self.task_model_kwargs}
+        self.task_train_kwargs = {**self.DEFAULT_TASK_TRAIN_KWARGS, **self.task_train_kwargs}
 
     @classmethod
     def from_yaml(cls, path: T_path) -> "FlairAdvancedConfig":
@@ -159,11 +155,14 @@ class FlairAdvancedConfig(AdvancedConfig, ABC):
         return cls(**config)
 
 
+@dataclass
 class FlairSequenceLabelingAdvancedConfig(FlairAdvancedConfig):
     hidden_size: int = 256
 
 
+@dataclass
 class FlairTextClassificationAdvancedConfig(FlairAdvancedConfig):
+    document_embedding_cls: str = "FlairDocumentPoolEmbedding"
     load_model_kwargs: Dict[str, Any] = field(default_factory=dict)
 
 

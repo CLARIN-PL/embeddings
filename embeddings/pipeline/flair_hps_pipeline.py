@@ -8,6 +8,10 @@ import datasets
 from flair.data import Corpus
 from numpy import typing as nptyping
 
+from embeddings.config.flair_config import (
+    FlairSequenceLabelingAdvancedConfig,
+    FlairTextClassificationAdvancedConfig,
+)
 from embeddings.config.optimized_config_space import OptimizedConfig, SampledParameters
 from embeddings.config.optimized_flair_config_space import (
     OptimizedFlairSequenceLabelingConfigSpace,
@@ -155,15 +159,17 @@ class OptimizedFlairClassificationPipeline(
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: FlairClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
-            "document_embedding_cls": document_embedding_cls,
             "dataset_name": str(self.dataset_name_or_path),
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
-            "task_model_kwargs": None,
-            "task_train_kwargs": task_train_kwargs,
-            "load_model_kwargs": load_model_kwargs,
+            "config": FlairTextClassificationAdvancedConfig(
+                document_embedding_cls=document_embedding_cls,
+                task_train_kwargs=task_train_kwargs,
+                load_model_kwargs=load_model_kwargs,
+            ),
         }
+
         return metadata
 
     def _get_evaluation_metadata(
@@ -177,14 +183,15 @@ class OptimizedFlairClassificationPipeline(
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: FlairClassificationEvaluationPipelineMetadata = {
             "embedding_name": embedding_name,
-            "document_embedding_cls": document_embedding_cls,
             "dataset_path": str(self.dataset_path),
             "persist_path": None,
             "predict_subset": "dev",
             "output_path": self.tmp_model_output_dir.name,
-            "task_model_kwargs": None,
-            "task_train_kwargs": task_train_kwargs,
-            "load_model_kwargs": load_model_kwargs,
+            "config": FlairTextClassificationAdvancedConfig(
+                document_embedding_cls=document_embedding_cls,
+                task_train_kwargs=task_train_kwargs,
+                load_model_kwargs=load_model_kwargs,
+            ),
         }
         return metadata
 
@@ -250,14 +257,15 @@ class OptimizedFlairPairClassificationPipeline(
         ) = self._pop_sampled_parameters(parameters=parameters)
         metadata: FlairPairClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
-            "document_embedding_cls": document_embedding_cls,
             "dataset_name": str(self.dataset_name_or_path),
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "input_columns_names_pair": self.input_columns_names_pair,
             "target_column_name": self.target_column_name,
-            "task_model_kwargs": None,
-            "task_train_kwargs": task_train_kwargs,
-            "load_model_kwargs": load_model_kwargs,
+            "config": FlairTextClassificationAdvancedConfig(
+                document_embedding_cls=document_embedding_cls,
+                task_train_kwargs=task_train_kwargs,
+                load_model_kwargs=load_model_kwargs,
+            ),
         }
         return metadata
 
@@ -273,13 +281,14 @@ class OptimizedFlairPairClassificationPipeline(
         metadata: FlairClassificationEvaluationPipelineMetadata = {
             "embedding_name": embedding_name,
             "dataset_path": str(self.dataset_path),
-            "document_embedding_cls": document_embedding_cls,
-            "task_model_kwargs": None,
-            "task_train_kwargs": task_train_kwargs,
-            "load_model_kwargs": load_model_kwargs,
             "persist_path": None,
             "predict_subset": "dev",
             "output_path": self.tmp_model_output_dir.name,
+            "config": FlairTextClassificationAdvancedConfig(
+                document_embedding_cls=document_embedding_cls,
+                task_train_kwargs=task_train_kwargs,
+                load_model_kwargs=load_model_kwargs,
+            ),
         }
         return metadata
 
@@ -373,15 +382,17 @@ class OptimizedFlairSequenceLabelingPipeline(
         ) = self._pop_sampled_parameters(parameters)
         metadata: FlairSequenceLabelingPipelineMetadata = {
             "embedding_name": embedding_name,
-            "hidden_size": hidden_size,
             "dataset_name": str(self.dataset_name_or_path),
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
             "evaluation_mode": self.evaluation_mode,
             "tagging_scheme": self.tagging_scheme,
-            "task_train_kwargs": task_train_kwargs,
-            "task_model_kwargs": task_model_kwargs,
+            "config": FlairSequenceLabelingAdvancedConfig(
+                hidden_size=hidden_size,
+                task_train_kwargs=task_train_kwargs,
+                task_model_kwargs=task_model_kwargs,
+            ),
         }
         return metadata
 
@@ -397,14 +408,16 @@ class OptimizedFlairSequenceLabelingPipeline(
 
         metadata: FlairSequenceLabelingEvaluationPipelineMetadata = {
             "embedding_name": embedding_name,
-            "hidden_size": hidden_size,
             "dataset_path": str(self.dataset_path),
             "persist_path": None,
             "predict_subset": "dev",
             "output_path": self.tmp_model_output_dir.name,
             "evaluation_mode": self.evaluation_mode,
             "tagging_scheme": self.tagging_scheme,
-            "task_train_kwargs": task_train_kwargs,
-            "task_model_kwargs": task_model_kwargs,
+            "config": FlairSequenceLabelingAdvancedConfig(
+                hidden_size=hidden_size,
+                task_train_kwargs=task_train_kwargs,
+                task_model_kwargs=task_model_kwargs,
+            ),
         }
         return metadata
