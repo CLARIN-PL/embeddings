@@ -9,6 +9,17 @@ from embeddings.utils.utils import read_yaml
 
 
 @dataclass
+class FlairConfigKeys:
+    DEFAULT_TASK_TRAIN_KWARGS: ClassVar[MappingProxyType[str, Any]] = MappingProxyType(
+        {
+            "learning_rate": 1e-3,
+            "mini_batch_size": 32,
+            "max_epochs": 20,
+        }
+    )
+
+
+@dataclass
 class FlairSequenceLabelingConfigKeys:
     TASK_MODEL_KEYS: ClassVar[Set[str]] = {
         "hidden_size",
@@ -24,7 +35,7 @@ class FlairSequenceLabelingConfigKeys:
 
 
 @dataclass
-class FlairTextClassificationConfigMapping:
+class FlairTextClassificationConfigKeys:
     LOAD_MODEL_KEYS: ClassVar[Set[str]] = {
         "pooling",
         "fine_tune_mode",
@@ -39,6 +50,9 @@ class FlairTextClassificationConfigMapping:
         "reproject_words",
     }
 
+
+@dataclass
+class FlairTextClassificationConfigMapping:
     LOAD_MODEL_KEYS_MAPPING: ClassVar[MappingProxyType[str, Any]] = MappingProxyType(
         {
             "FlairDocumentCNNEmbeddings": {
@@ -130,15 +144,7 @@ class FlairTextClassificationBasicConfig(FlairBasicConfig, FlairTextClassificati
 
 
 @dataclass
-class FlairAdvancedConfig(AdvancedConfig, ABC):
-    DEFAULT_TASK_TRAIN_KWARGS: ClassVar[MappingProxyType[str, Any]] = MappingProxyType(
-        {
-            "learning_rate": 1e-3,
-            "mini_batch_size": 32,
-            "max_epochs": 20,
-        }
-    )
-
+class FlairAdvancedConfig(AdvancedConfig, FlairConfigKeys, ABC):
     task_model_kwargs: Dict[str, Any] = field(default_factory=dict)
     task_train_kwargs: Dict[str, Any] = field(default_factory=dict)
 

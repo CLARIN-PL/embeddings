@@ -8,6 +8,7 @@ from typing_extensions import Final
 
 from embeddings.config.flair_config import (
     FlairSequenceLabelingConfigKeys,
+    FlairTextClassificationConfigKeys,
     FlairTextClassificationConfigMapping,
 )
 from embeddings.config.optimized_config_space import (
@@ -183,7 +184,9 @@ class OptimizedFlairSequenceLabelingConfigSpace(
 
 @dataclass
 class OptimizedFlairTextClassificationConfigSpace(
-    AbstractFlairModelTrainerConfigSpace, FlairTextClassificationConfigMapping
+    AbstractFlairModelTrainerConfigSpace,
+    FlairTextClassificationConfigMapping,
+    FlairTextClassificationConfigKeys,
 ):
     dynamic_document_embedding: Parameter = SearchableParameter(
         name="document_embedding",
