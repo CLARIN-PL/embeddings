@@ -11,12 +11,12 @@ from embeddings.data.data_loader import (
 )
 from embeddings.data.dataset import Data, Dataset, LocalDataset
 from embeddings.data.io import T_path
-from embeddings.embedding.auto_flair import (
-    AutoFlairDocumentPoolEmbedding,
-    AutoFlairWordEmbedding,
-    DocumentEmbedding,
-)
+from embeddings.embedding.auto_flair import DocumentEmbedding
 from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
+from embeddings.embedding.flair_loader import (
+    FlairDocumentPoolEmbeddingLoader,
+    FlairWordEmbeddingLoader,
+)
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
@@ -58,9 +58,10 @@ class FlairTextClassificationEvaluationPipeline(
     def __init__(
         self,
         dataset_path: T_path,
-        embedding_name: str,
+        embedding_name: T_path,
         output_path: T_path,
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
+        model_type_reference: str = "",
         persist_path: Optional[T_path] = None,
         predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
@@ -70,11 +71,10 @@ class FlairTextClassificationEvaluationPipeline(
         load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
-        embedding = AutoFlairDocumentPoolEmbedding.from_hub(
-            repo_id=embedding_name,
-            document_embedding_cls=document_embedding_cls,
-            **load_model_kwargs
-        )
+
+        embedding_loader = FlairDocumentPoolEmbeddingLoader(embedding_name, model_type_reference)
+        embedding = embedding_loader.get_embedding(document_embedding_cls, **load_model_kwargs)
+
         task = TextClassification(
             output_path=output_path,
             task_train_kwargs=task_train_kwargs,
@@ -93,9 +93,10 @@ class FlairTextPairClassificationEvaluationPipeline(
     def __init__(
         self,
         dataset_path: T_path,
-        embedding_name: str,
+        embedding_name: T_path,
         output_path: T_path,
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
+        model_type_reference: str = "",
         persist_path: Optional[T_path] = None,
         predict_subset: Literal["dev", "test"] = "test",
         task_model_kwargs: Optional[Dict[str, Any]] = None,
@@ -105,11 +106,10 @@ class FlairTextPairClassificationEvaluationPipeline(
         load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
-        embedding = AutoFlairDocumentPoolEmbedding.from_hub(
-            repo_id=embedding_name,
-            document_embedding_cls=document_embedding_cls,
-            **load_model_kwargs
-        )
+
+        embedding_loader = FlairDocumentPoolEmbeddingLoader(embedding_name, model_type_reference)
+        embedding = embedding_loader.get_embedding(document_embedding_cls, **load_model_kwargs)
+
         task = TextPairClassification(
             output_path=output_path,
             task_train_kwargs=task_train_kwargs,
@@ -130,9 +130,10 @@ class FlairSequenceLabelingEvaluationPipeline(
     def __init__(
         self,
         dataset_path: T_path,
-        embedding_name: str,
+        embedding_name: T_path,
         output_path: T_path,
         hidden_size: int,
+        model_type_reference: str = "",
         evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = DEFAULT_EVAL_MODE,
         tagging_scheme: Optional[SequenceLabelingEvaluator.TaggingScheme] = None,
         persist_path: Optional[T_path] = None,
@@ -143,9 +144,10 @@ class FlairSequenceLabelingEvaluationPipeline(
     ):
         dataset = LocalDataset(dataset=dataset_path)
         data_loader = ConllFlairCorpusDataLoader()
-        embedding = AutoFlairWordEmbedding.from_hub(
-            repo_id=embedding_name, kwargs=word_embedding_kwargs
-        )
+
+        embedding_loader = FlairWordEmbeddingLoader(embedding_name, model_type_reference)
+        embedding = embedding_loader.get_embedding(**word_embedding_kwargs or {})
+
         task = SequenceLabeling(
             output_path=output_path,
             hidden_size=hidden_size,

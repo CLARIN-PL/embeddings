@@ -8,7 +8,7 @@ from numpy import typing as nptyping
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.data.io import T_path
-from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
+from embeddings.embedding.flair_loader import FlairWordEmbeddingLoader
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -30,7 +30,7 @@ class FlairSequenceLabelingPipeline(
 ):
     def __init__(
         self,
-        embedding_name: str,
+        embedding_name: T_path,
         dataset_name: str,
         input_column_name: str,
         target_column_name: str,
@@ -38,6 +38,7 @@ class FlairSequenceLabelingPipeline(
         hidden_size: int,
         evaluation_filename: str = "evaluation.json",
         evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = SequenceLabelingEvaluator.EvaluationMode.CONLL,
+        model_type_reference: str = "",
         tagging_scheme: Optional[SequenceLabelingEvaluator.TaggingScheme] = None,
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
@@ -59,7 +60,9 @@ class FlairSequenceLabelingPipeline(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
 
-        embedding = AutoFlairWordEmbedding.from_hub(embedding_name)
+        embedding_loader = FlairWordEmbeddingLoader(embedding_name, model_type_reference)
+        embedding = embedding_loader.get_embedding()
+
         task = SequenceLabeling(
             output_path,
             hidden_size=hidden_size,

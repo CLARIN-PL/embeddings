@@ -90,7 +90,12 @@ profile = "black"
 python_version = "3.9"
 strict = true
 plugins = "numpy.typing.mypy_plugin"
-exclude = "experimental"
+exclude = [
+    "experimental",
+    "experimental/*",
+    "experimental/embeddings",
+    "experimental.embeddings"
+]
 
 [[tool.mypy.overrides]]
 module = [
@@ -123,6 +128,8 @@ implicit_reexport = true
 # due to https://github.com/huggingface/transformers/issues/13390#issuecomment-934830946
 [[tool.mypy.overrides]]
 module = [
+    "experimental",
+    "experimental.*",
     "transformers.*"
 ]
 follow_imports = "skip"

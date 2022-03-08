@@ -8,8 +8,9 @@ from numpy import typing as nptyping
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import HuggingFaceDataset
 from embeddings.data.io import T_path
-from embeddings.embedding.auto_flair import AutoFlairDocumentPoolEmbedding, DocumentEmbedding
+from embeddings.embedding.auto_flair import DocumentEmbedding
 from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
+from embeddings.embedding.flair_loader import FlairDocumentPoolEmbeddingLoader
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -31,13 +32,14 @@ class FlairPairClassificationPipeline(
 ):
     def __init__(
         self,
-        embedding_name: str,
+        embedding_name: T_path,
         dataset_name: str,
         input_columns_names_pair: Tuple[str, str],
         target_column_name: str,
         output_path: T_path,
         evaluation_filename: str = "evaluation.json",
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
+        model_type_reference: str = "",
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
@@ -60,11 +62,12 @@ class FlairPairClassificationPipeline(
             transformation = transformation.then(
                 SampleSplitsFlairCorpusTransformation(*sample_missing_splits, seed=seed)
             )
-        embedding = AutoFlairDocumentPoolEmbedding.from_hub(
-            repo_id=embedding_name,
-            document_embedding_cls=document_embedding_cls,
-            **load_model_kwargs if load_model_kwargs else {}
+
+        embedding_loader = FlairDocumentPoolEmbeddingLoader(embedding_name, model_type_reference)
+        embedding = embedding_loader.get_embedding(
+            document_embedding_cls, **load_model_kwargs or {}
         )
+
         task = TextPairClassification(
             output_path,
             task_model_kwargs=task_model_kwargs,

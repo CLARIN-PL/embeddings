@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict
 from urllib.error import HTTPError
 from urllib.request import urlopen
@@ -82,3 +83,18 @@ class GensimFileConfig(SingleFileConfig):
             _logger.info(f"{self.model_name}.vectors.npy not found, skipping it.")
 
         return path
+
+
+@dataclass
+class StaticModelLocalFileConfig:
+    model_file_path: Path
+    model_type_reference: str
+
+    def __post_init__(self) -> None:
+        if not self.model_file_path.exists():
+            raise ValueError(f"There is no file located at: {self.model_file_path}")
+
+
+@dataclass
+class GensimLocalFileConfig(StaticModelLocalFileConfig):
+    model_name: str
