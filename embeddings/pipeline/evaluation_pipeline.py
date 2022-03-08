@@ -11,11 +11,7 @@ from embeddings.data.data_loader import (
 )
 from embeddings.data.dataset import Data, Dataset, LocalDataset
 from embeddings.data.io import T_path
-from embeddings.embedding.auto_flair import (
-    AutoFlairDocumentPoolEmbedding,
-    AutoFlairWordEmbedding,
-    DocumentEmbedding,
-)
+from embeddings.embedding.auto_flair import DocumentEmbedding
 from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
 from embeddings.embedding.flair_loader import (
     FlairDocumentPoolEmbeddingLoader,
