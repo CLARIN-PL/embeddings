@@ -1,9 +1,21 @@
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pytest
+from gdown import cached_download
 
 from embeddings.embedding.static.fasttext import KGR10FastTextConfig
 from embeddings.embedding.static.word2vec import KGR10Word2VecConfig
+
+STATIC_EMBEDDING_URL = (
+    "http://dsmodels.nlp.ipipan.waw.pl/dsmodels/wiki-forms-all-100-cbow-ns-30-it100.txt.gz"
+)
+
+
+@pytest.fixture(scope="session")
+def local_embedding_filepath() -> Path:
+    str_filepath = cached_download(STATIC_EMBEDDING_URL)
+    return Path(str_filepath)
 
 
 @pytest.fixture(scope="session")

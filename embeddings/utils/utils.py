@@ -3,11 +3,14 @@ import importlib
 import os.path
 import pprint
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from tempfile import NamedTemporaryFile
+from typing import Any, Dict, Optional, Tuple, Union
 
 import numpy as np
+import requests
 import yaml
 from numpy import typing as nptyping
+from tqdm.auto import tqdm
 
 from embeddings.data.io import T_path
 
@@ -81,3 +84,27 @@ def initialize_kwargs(
 def read_yaml(filepath: Union[str, Path]) -> Any:
     with open(filepath, "r") as f:
         return yaml.safe_load(f)
+
+
+def download_file(url: str, chunk_size: int = 1024) -> Tuple[Any, str]:
+    r = requests.get(url, stream=True)
+    if r.status_code != 200:
+        raise RuntimeError(
+            f"Error while downloading file, response code status: {r.status_code}. Check download url."
+        )
+
+    filename = (
+        r.headers.get("Content-Disposition", "filename=ds").split("filename=")[1].replace('"', "")
+    )
+    filesize = int(r.headers.get("Content-Length", "0"))
+
+    pbar = tqdm(total=filesize, unit="iB", unit_scale=True)
+    tmp_file = NamedTemporaryFile(delete=False)
+
+    for data in r.iter_content(chunk_size=chunk_size):
+        tmp_file.write(data)
+        pbar.update(len(data))
+
+    pbar.close()
+    tmp_file.seek(0)
+    return tmp_file, filename
