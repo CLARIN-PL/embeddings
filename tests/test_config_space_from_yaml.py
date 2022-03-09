@@ -6,13 +6,13 @@ import pytest
 import yaml
 from _pytest.tmpdir import TempdirFactory
 
-from embeddings.config.optimized_config_space import OptimizedConfigSpace
-from embeddings.config.optimized_flair_config_space import (
-    OptimizedFlairModelTrainerConfigSpace,
-    OptimizedFlairSequenceLabelingConfigSpace,
+from embeddings.config.config_space import ConfigSpace
+from embeddings.config.flair_config_space import (
+    FlairModelTrainerConfigSpace,
+    FlairSequenceLabelingConfigSpace,
 )
-from embeddings.config.optimized_lighting_config_space import (
-    OptimizedLightingTextClassificationConfigSpace,
+from embeddings.config.lighting_config_space import (
+    LightingTextClassificationConfigSpace,
 )
 
 
@@ -252,7 +252,7 @@ def lightning_classification_wrong_param_yaml_config_file_path(
     return output_path
 
 
-def assert_config_with_yaml(config_space: OptimizedConfigSpace, config: Dict[str, Any]) -> None:
+def assert_config_with_yaml(config_space: ConfigSpace, config: Dict[str, Any]) -> None:
     cs_params = config.pop("parameters")
     for param_name, param_values in cs_params.items():
         param_values.pop("param_type")
@@ -267,7 +267,7 @@ def assert_config_with_yaml(config_space: OptimizedConfigSpace, config: Dict[str
 def test_flair_trainer_from_yaml_config(
     flair_trainer_config_dict: Dict[str, Any], flair_trainer_yaml_config_file_path: Path
 ) -> None:
-    flair_trainer_config_space = OptimizedFlairModelTrainerConfigSpace.from_yaml(
+    flair_trainer_config_space = FlairModelTrainerConfigSpace.from_yaml(
         flair_trainer_yaml_config_file_path
     )
     assert hasattr(flair_trainer_config_space, "param_embedding_name")
@@ -281,7 +281,7 @@ def test_flair_trainer_from_yaml_config(
 def test_flair_sequence_labeling_from_yaml_trainer_config(
     flair_trainer_config_dict: Dict[str, Any], flair_trainer_yaml_config_file_path: Path
 ) -> None:
-    flair_trainer_config_space = OptimizedFlairSequenceLabelingConfigSpace.from_yaml(
+    flair_trainer_config_space = FlairSequenceLabelingConfigSpace.from_yaml(
         flair_trainer_yaml_config_file_path
     )
     assert hasattr(flair_trainer_config_space, "param_embedding_name")
@@ -296,7 +296,7 @@ def test_flair_sequence_labeling_from_yaml_specific_config(
     flair_sequence_labeling_config_dict: Dict[str, Any],
     flair_sequence_labeling_yaml_config_file_path: Path,
 ) -> None:
-    flair_sequence_labeling_config_space = OptimizedFlairSequenceLabelingConfigSpace.from_yaml(
+    flair_sequence_labeling_config_space = FlairSequenceLabelingConfigSpace.from_yaml(
         flair_sequence_labeling_yaml_config_file_path
     )
     assert hasattr(flair_sequence_labeling_config_space, "param_embedding_name")
@@ -314,7 +314,7 @@ def test_lightning_classification_from_yaml_config(
     lightning_classification_yaml_config_file_path: Path,
 ) -> None:
     lightning_classification_config_space = (
-        OptimizedLightingTextClassificationConfigSpace.from_yaml(
+        LightingTextClassificationConfigSpace.from_yaml(
             lightning_classification_yaml_config_file_path
         )
     )
@@ -334,15 +334,15 @@ def test_wrong_config_given(
     flair_trainer_yaml_config_file_path: Path,
 ):
     with pytest.raises(KeyError):
-        OptimizedLightingTextClassificationConfigSpace.from_yaml(
+        LightingTextClassificationConfigSpace.from_yaml(
             flair_sequence_labeling_yaml_config_file_path
         )
     with pytest.raises(KeyError):
-        OptimizedLightingTextClassificationConfigSpace.from_yaml(
+        LightingTextClassificationConfigSpace.from_yaml(
             flair_trainer_yaml_config_file_path
         )
     with pytest.raises(KeyError):
-        OptimizedFlairSequenceLabelingConfigSpace.from_yaml(
+        FlairSequenceLabelingConfigSpace.from_yaml(
             lightning_classification_yaml_config_file_path
         )
 
@@ -351,16 +351,16 @@ def test_no_embedding_name_given(
     base_yaml_config_file_path: Path,
 ):
     with pytest.raises(KeyError):
-        OptimizedLightingTextClassificationConfigSpace.from_yaml(base_yaml_config_file_path)
+        LightingTextClassificationConfigSpace.from_yaml(base_yaml_config_file_path)
     with pytest.raises(KeyError):
-        OptimizedFlairSequenceLabelingConfigSpace.from_yaml(base_yaml_config_file_path)
+        FlairSequenceLabelingConfigSpace.from_yaml(base_yaml_config_file_path)
 
 
 def test_wrong_param_given(
     lightning_classification_wrong_param_yaml_config_file_path: Path,
 ):
     with pytest.raises(TypeError):
-        OptimizedLightingTextClassificationConfigSpace.from_yaml(
+        LightingTextClassificationConfigSpace.from_yaml(
             lightning_classification_wrong_param_yaml_config_file_path
         )
 
@@ -369,10 +369,10 @@ def test_lightning_classification_from_dict_config(
     lightning_classification_config_dict: Dict[str, Any],
     lightning_classification_yaml_config_file_path: Path,
 ) -> None:
-    config_space_from_yaml = OptimizedLightingTextClassificationConfigSpace.from_yaml(
+    config_space_from_yaml = LightingTextClassificationConfigSpace.from_yaml(
         lightning_classification_yaml_config_file_path
     )
-    config_space_from_dict = OptimizedLightingTextClassificationConfigSpace.from_dict(
+    config_space_from_dict = LightingTextClassificationConfigSpace.from_dict(
         lightning_classification_config_dict
     )
     config_space_attributes_from_yaml = list(config_space_from_yaml._get_fields().keys())

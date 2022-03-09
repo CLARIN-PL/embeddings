@@ -4,8 +4,8 @@ from dataclasses import InitVar, dataclass, field
 from typing import Any, Dict, Final, List, Union
 
 from embeddings.config.lightning_config import LightningConfigKeys
-from embeddings.config.optimized_config_space import (
-    OptimizedConfigSpace,
+from embeddings.config.config_space import (
+    ConfigSpace,
     Parameter,
     SampledParameters,
 )
@@ -18,7 +18,7 @@ DEFAULT_ACCELERATOR = "auto"
 
 
 @dataclass
-class OptimizedLightingConfigSpace(OptimizedConfigSpace, LightningConfigKeys, ABC):
+class LightingConfigSpace(ConfigSpace, LightningConfigKeys, ABC):
     embedding_name_or_path: InitVar[Union[T_path, List[T_path]]]
     devices: InitVar[Union[int, str, None, List[int]]] = field(default=DEFAULT_DEVICES)
     accelerator: InitVar[Union[str, None]] = field(default=DEFAULT_ACCELERATOR)
@@ -98,19 +98,19 @@ class OptimizedLightingConfigSpace(OptimizedConfigSpace, LightningConfigKeys, AB
 
     @classmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
-        pipeline_kwargs = OptimizedConfigSpace._pop_parameters(
+        pipeline_kwargs = ConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=cls.PIPELINE_KEYS
         )
-        datamodule_kwargs = OptimizedConfigSpace._pop_parameters(
+        datamodule_kwargs = ConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=cls.DATAMODULE_KEYS
         )
-        task_model_kwargs = OptimizedConfigSpace._pop_parameters(
+        task_model_kwargs = ConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=cls.TASK_MODEL_KEYS
         )
-        task_train_kwargs = OptimizedConfigSpace._pop_parameters(
+        task_train_kwargs = ConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=cls.TASK_TRAIN_KEYS
         )
-        model_config_kwargs = OptimizedConfigSpace._pop_parameters(
+        model_config_kwargs = ConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=cls.MODEL_CONFIG_KEYS
         )
 
@@ -137,18 +137,18 @@ class OptimizedLightingConfigSpace(OptimizedConfigSpace, LightningConfigKeys, AB
         return {**variables, **parameters}
 
     @classmethod
-    def from_yaml(cls, path: T_path) -> "OptimizedLightingConfigSpace":
+    def from_yaml(cls, path: T_path) -> "LightingConfigSpace":
         config = read_yaml(path)
         return cls(**cls._parse_config(config))
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "OptimizedLightingConfigSpace":
+    def from_dict(cls, d: Dict[str, Any]) -> "LightingConfigSpace":
         config = deepcopy(d)
         return cls(**cls._parse_config(config))
 
 
 @dataclass
-class OptimizedLightingTextClassificationConfigSpace(OptimizedLightingConfigSpace):
+class LightingTextClassificationConfigSpace(LightingConfigSpace):
     @classmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
         sampled_parameters = super().parse_parameters(parameters=parameters)
@@ -157,7 +157,7 @@ class OptimizedLightingTextClassificationConfigSpace(OptimizedLightingConfigSpac
 
 
 @dataclass
-class OptimizedLightingSequenceLabelingConfigSpace(OptimizedLightingConfigSpace):
+class LightingSequenceLabelingConfigSpace(LightingConfigSpace):
     label_all_tokens: Parameter = field(
         init=True, default=ConstantParameter(name="label_all_tokens", value=False)
     )
@@ -166,7 +166,7 @@ class OptimizedLightingSequenceLabelingConfigSpace(OptimizedLightingConfigSpace)
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
         sampled_parameters = super().parse_parameters(parameters=parameters)
         extra_datamodule_keys: Final = {"label_all_tokens"}
-        extra_datamodule_kwargs = OptimizedConfigSpace._pop_parameters(
+        extra_datamodule_kwargs = ConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=extra_datamodule_keys
         )
         assert isinstance(sampled_parameters["datamodule_kwargs"], dict)

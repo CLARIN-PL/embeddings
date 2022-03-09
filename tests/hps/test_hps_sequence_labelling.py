@@ -8,6 +8,8 @@ import pytest
 import yaml
 from _pytest.tmpdir import TempdirFactory
 
+
+from embeddings.config.lightning_config import LightningConfigDefaultKwargs
 from embeddings.config.lighting_config_space import (
     LightingSequenceLabelingConfigSpace,
 )
@@ -26,6 +28,8 @@ def dataset_name() -> str:
 
 
 @pytest.fixture(scope="module")
+def sequence_labelling_config_space() -> LightingSequenceLabelingConfigSpace:
+    config_space = LightingSequenceLabelingConfigSpace(
 def hps_dataset_path(dataset_name: str) -> "TemporaryDirectory[str]":
     path = TemporaryDirectory()
     pipeline = HuggingFacePreprocessingPipeline(

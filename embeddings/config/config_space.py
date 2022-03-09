@@ -18,7 +18,7 @@ SampledParameters = Dict[str, Union[ParameterValues, Dict[str, ParameterValues]]
 OptimizedConfig = TypeVar("OptimizedConfig", bound="OptimizedConfigSpace")
 
 
-class OptimizedConfigSpace(Config, ABC):
+class ConfigSpace(Config, ABC):
     def _parse_parameter(
         self, param_name: str, trial: optuna.trial.Trial
     ) -> Tuple[str, ParameterValues]:

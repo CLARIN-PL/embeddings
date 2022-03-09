@@ -10,7 +10,7 @@ import optuna
 import pandas as pd
 from optuna import Study
 
-from embeddings.config.optimized_config_space import OptimizedConfig, SampledParameters
+from embeddings.config.config_space import OptimizedConfig, SampledParameters
 from embeddings.data.dataset import Data
 from embeddings.data.io import T_path
 from embeddings.pipeline.evaluation_pipeline import ModelEvaluationPipeline

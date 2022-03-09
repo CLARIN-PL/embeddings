@@ -11,8 +11,8 @@ from embeddings.config.flair_config import (
     FlairTextClassificationConfigKeys,
     FlairTextClassificationConfigMapping,
 )
-from embeddings.config.optimized_config_space import (
-    OptimizedConfigSpace,
+from embeddings.config.config_space import (
+    ConfigSpace,
     Parameter,
     SampledParameters,
 )
@@ -23,7 +23,7 @@ from embeddings.utils.utils import read_yaml
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
-class AbstractFlairModelTrainerConfigSpace(OptimizedConfigSpace, ABC):
+class AbstractFlairModelTrainerConfigSpace(ConfigSpace, ABC):
     embedding_name: InitVar[Union[str, List[str]]]
     param_embedding_name: Parameter = field(init=False)
     param_selection_mode: Parameter = field(
@@ -66,7 +66,7 @@ class AbstractFlairModelTrainerConfigSpace(OptimizedConfigSpace, ABC):
             "param_selection_mode",
             "save_final_model",
         }
-        task_train_kwargs = OptimizedConfigSpace._pop_parameters(
+        task_train_kwargs = ConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=task_train_keys
         )
         return parameters, task_train_kwargs
@@ -79,30 +79,30 @@ class AbstractFlairModelTrainerConfigSpace(OptimizedConfigSpace, ABC):
         return {**variables, **parameters}
 
 
-class OptimizedFlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
+class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
     @classmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
         embedding_name = parameters.pop("embedding_name")
         (
             parameters,
             task_train_kwargs,
-        ) = OptimizedFlairModelTrainerConfigSpace._parse_model_trainer_parameters(parameters)
-        OptimizedConfigSpace._check_unmapped_parameters(parameters=parameters)
+        ) = FlairModelTrainerConfigSpace._parse_model_trainer_parameters(parameters)
+        ConfigSpace._check_unmapped_parameters(parameters=parameters)
         return {"embedding_name": embedding_name, "task_train_kwargs": task_train_kwargs}
 
     @classmethod
-    def from_yaml(cls, path: T_path) -> "OptimizedFlairModelTrainerConfigSpace":
+    def from_yaml(cls, path: T_path) -> "FlairModelTrainerConfigSpace":
         config = read_yaml(path)
         return cls(**cls._parse_config(config))
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "OptimizedFlairModelTrainerConfigSpace":
+    def from_dict(cls, d: Dict[str, Any]) -> "FlairModelTrainerConfigSpace":
         config = deepcopy(d)
         return cls(**cls._parse_config(config))
 
 
 @dataclass
-class OptimizedFlairSequenceLabelingConfigSpace(
+class FlairSequenceLabelingConfigSpace(
     AbstractFlairModelTrainerConfigSpace, FlairSequenceLabelingConfigKeys
 ):
     hidden_size: Parameter = SearchableParameter(
@@ -159,7 +159,7 @@ class OptimizedFlairSequenceLabelingConfigSpace(
         (
             parameters,
             task_train_kwargs,
-        ) = OptimizedFlairSequenceLabelingConfigSpace._parse_model_trainer_parameters(
+        ) = FlairSequenceLabelingConfigSpace._parse_model_trainer_parameters(
             parameters=parameters
         )
         cls._check_unmapped_parameters(parameters=parameters)
@@ -172,18 +172,18 @@ class OptimizedFlairSequenceLabelingConfigSpace(
         }
 
     @classmethod
-    def from_yaml(cls, path: T_path) -> "OptimizedFlairSequenceLabelingConfigSpace":
+    def from_yaml(cls, path: T_path) -> "FlairSequenceLabelingConfigSpace":
         config = read_yaml(path)
         return cls(**cls._parse_config(config))
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "OptimizedFlairSequenceLabelingConfigSpace":
+    def from_dict(cls, d: Dict[str, Any]) -> "FlairSequenceLabelingConfigSpace":
         config = deepcopy(d)
         return cls(**cls._parse_config(config))
 
 
 @dataclass
-class OptimizedFlairTextClassificationConfigSpace(
+class FlairTextClassificationConfigSpace(
     AbstractFlairModelTrainerConfigSpace,
     FlairTextClassificationConfigMapping,
     FlairTextClassificationConfigKeys,
@@ -300,7 +300,7 @@ class OptimizedFlairTextClassificationConfigSpace(
         (
             parameters,
             task_train_kwargs,
-        ) = OptimizedFlairSequenceLabelingConfigSpace._parse_model_trainer_parameters(
+        ) = FlairSequenceLabelingConfigSpace._parse_model_trainer_parameters(
             parameters=parameters
         )
         cls._check_unmapped_parameters(parameters=parameters)
@@ -314,11 +314,11 @@ class OptimizedFlairTextClassificationConfigSpace(
         }
 
     @classmethod
-    def from_yaml(cls, path: T_path) -> "OptimizedFlairTextClassificationConfigSpace":
+    def from_yaml(cls, path: T_path) -> "FlairTextClassificationConfigSpace":
         config = read_yaml(path)
         return cls(**cls._parse_config(config))
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "OptimizedFlairTextClassificationConfigSpace":
+    def from_dict(cls, d: Dict[str, Any]) -> "FlairTextClassificationConfigSpace":
         config = deepcopy(d)
         return cls(**cls._parse_config(config))

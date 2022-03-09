@@ -8,10 +8,10 @@ import datasets
 from numpy import typing as nptyping
 
 from embeddings.config.lightning_config import LightningAdvancedConfig
-from embeddings.config.optimized_config_space import OptimizedConfig, SampledParameters
-from embeddings.config.optimized_lighting_config_space import (
-    OptimizedLightingSequenceLabelingConfigSpace,
-    OptimizedLightingTextClassificationConfigSpace,
+from embeddings.config.config_space import OptimizedConfig, SampledParameters
+from embeddings.config.lighting_config_space import (
+    LightingSequenceLabelingConfigSpace,
+    LightingTextClassificationConfigSpace,
 )
 from embeddings.config.parameters import ParameterValues
 from embeddings.data.dataset import LightingDataModuleSubset
@@ -177,7 +177,7 @@ class OptimizedLightingPipeline(
 @dataclass
 class OptimizedLightingClassificationPipeline(
     OptimizedLightingPipeline[
-        OptimizedLightingTextClassificationConfigSpace, LightningClassificationPipelineMetadata
+        LightingTextClassificationConfigSpace, LightningClassificationPipelineMetadata
     ]
 ):
     def __post_init__(self) -> None:
@@ -237,7 +237,7 @@ class OptimizedLightingClassificationPipeline(
 @dataclass
 class OptimizedLightingSequenceLabelingPipeline(
     OptimizedLightingPipeline[
-        OptimizedLightingSequenceLabelingConfigSpace,
+        LightingSequenceLabelingConfigSpace,
         LightningSequenceLabelingPipelineMetadata,
     ]
 ):

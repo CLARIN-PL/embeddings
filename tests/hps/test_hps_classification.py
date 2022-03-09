@@ -178,7 +178,7 @@ def test_keys_allowed_in_metadata_but_not_in_config_space(
 
 def test_keys_allowed_in_config_space_but_not_in_metadata(
     classification_hps_run_result: Tuple[pd.DataFrame, LightningClassificationPipelineMetadata],
-    classification_config_space: OptimizedLightingTextClassificationConfigSpace,
+    classification_config_space: LightingTextClassificationConfigSpace,
 ) -> None:
     df, metadata = classification_hps_run_result
     metadata_keys = {**metadata, **_flatten(metadata["config"].__dict__)}.keys()

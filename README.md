@@ -248,11 +248,11 @@ Optimized pipelines can be run via following snippet of code:
 
 ```python
 
-from embeddings.config.optimized_lighting_config_space import OptimizedLightingTextClassificationConfigSpace
+from embeddings.config.lighting_config_space import LightingTextClassificationConfigSpace
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingClassificationPipeline
 
 pipeline = OptimizedLightingClassificationPipeline(
-    config_space=OptimizedLightingTextClassificationConfigSpace(
+    config_space=LightingTextClassificationConfigSpace(
         embedding_name_or_path="allegro/herbert-base-cased"
     ),
     dataset_name="clarin-pl/polemo2-official",
