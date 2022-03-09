@@ -78,7 +78,7 @@ class LightningClassificationPipeline(
             tokenizer_kwargs=tokenizer_kwargs,
             batch_encoding_kwargs=batch_encoding_kwargs,
             load_dataset_kwargs=load_dataset_kwargs,
-            **self.datamodule_kwargs
+            **self.datamodule_kwargs,
         )
         task = TextClassificationTask(
             model_name_or_path=embedding_name_or_path,
