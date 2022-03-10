@@ -7,12 +7,12 @@ from typing import Any, Dict, Generic, Optional, Tuple
 import datasets
 from numpy import typing as nptyping
 
-from embeddings.config.lightning_config import LightningAdvancedConfig
 from embeddings.config.config_space import OptimizedConfig, SampledParameters
 from embeddings.config.lighting_config_space import (
     LightingSequenceLabelingConfigSpace,
     LightingTextClassificationConfigSpace,
 )
+from embeddings.config.lightning_config import LightningAdvancedConfig
 from embeddings.config.parameters import ParameterValues
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path

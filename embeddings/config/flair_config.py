@@ -1,5 +1,6 @@
 from abc import ABC
 from dataclasses import dataclass, field
+from itertools import chain
 from types import MappingProxyType
 from typing import Any, ClassVar, Dict, Set, Tuple, Union
 
@@ -10,17 +11,15 @@ from embeddings.utils.utils import read_yaml
 
 @dataclass
 class FlairConfigKeys:
-    DEFAULT_TASK_TRAIN_KWARGS: ClassVar[MappingProxyType[str, Any]] = MappingProxyType(
-        {
-            "learning_rate": 1e-3,
-            "mini_batch_size": 32,
-            "max_epochs": 20,
-        }
-    )
+    TASK_TRAIN_KEYS: ClassVar[Set[str]] = {
+        "learning_rate",
+        "mini_batch_size",
+        "max_epochs",
+    }
 
 
 @dataclass
-class FlairSequenceLabelingConfigKeys:
+class FlairSequenceLabelingConfigKeys(FlairConfigKeys):
     TASK_MODEL_KEYS: ClassVar[Set[str]] = {
         "hidden_size",
         "use_crf",
@@ -35,12 +34,14 @@ class FlairSequenceLabelingConfigKeys:
 
 
 @dataclass
-class FlairTextClassificationConfigKeys:
-    LOAD_MODEL_KEYS: ClassVar[Set[str]] = {
-        "pooling",
-        "fine_tune_mode",
-        "fine_tune",
-        "kernels",
+class FlairTextClassificationConfigKeys(FlairConfigKeys):
+    CNN_EMBEDDING_KEYS: ClassVar[Set[str]] = {
+        "cnn_pool_kernels",
+        "dropout",
+        "word_dropout",
+        "reproject_words",
+    }
+    RNN_EMBEDDING_KEYS: ClassVar[Set[str]] = {
         "hidden_size",
         "rnn_type",
         "rnn_layers",
@@ -49,41 +50,27 @@ class FlairTextClassificationConfigKeys:
         "word_dropout",
         "reproject_words",
     }
-
-
-@dataclass
-class FlairTextClassificationConfigMapping:
-    LOAD_MODEL_KEYS_MAPPING: ClassVar[MappingProxyType[str, Any]] = MappingProxyType(
+    LOAD_MODEL_CONFIG_KEYS_MAPPING: ClassVar[MappingProxyType[str, Any]] = MappingProxyType(
         {
-            "FlairDocumentCNNEmbeddings": {
-                "cnn_pool_kernels",
-                "dropout",
-                "word_dropout",
-                "reproject_words",
-            },
-            "FlairDocumentRNNEmbeddings": {
-                "hidden_size",
-                "rnn_type",
-                "rnn_layers",
-                "bidirectional",
-                "dropout",
-                "word_dropout",
-                "reproject_words",
-            },
+            "FlairDocumentCNNEmbeddings": RNN_EMBEDDING_KEYS,
+            "FlairDocumentRNNEmbeddings": CNN_EMBEDDING_KEYS,
+            "FlairTransformerDocumentEmbedding": {"pooling", "fine_tune"},
+            "FlairDocumentPoolEmbedding": {"pooling", "fine_tune_mode"},
+        }
+    )
+    LOAD_MODEL_CONFIG_SPACE_KEYS_MAPPING: ClassVar[MappingProxyType[str, Any]] = MappingProxyType(
+        {
+            "FlairDocumentCNNEmbeddings": RNN_EMBEDDING_KEYS,
+            "FlairDocumentRNNEmbeddings": CNN_EMBEDDING_KEYS,
             "FlairTransformerDocumentEmbedding": {"dynamic_pooling", "dynamic_fine_tune"},
             "FlairDocumentPoolEmbedding": {"static_pooling", "static_fine_tune_mode"},
         }
     )
+    LOAD_MODEL_CFG_KEYS: ClassVar[Set[str]] = set(chain(*LOAD_MODEL_CONFIG_KEYS_MAPPING.values()))
 
 
 @dataclass
-class FlairBasicConfig(BasicConfig):
-    TASK_TRAIN_KEYS: ClassVar[Set[str]] = {
-        "learning_rate",
-        "mini_batch_size",
-        "max_epochs",
-    }
-    document_embedding_cls: str = "FlairDocumentPoolEmbedding"
+class FlairBasicConfig(BasicConfig, FlairConfigKeys):
     learning_rate: float = 1e-3
     mini_batch_size: int = 32
     max_epochs: int = 20
@@ -122,7 +109,8 @@ class FlairSequenceLabelingBasicConfig(FlairBasicConfig, FlairSequenceLabelingCo
 
 
 @dataclass
-class FlairTextClassificationBasicConfig(FlairBasicConfig, FlairTextClassificationConfigMapping):
+class FlairTextClassificationBasicConfig(FlairBasicConfig, FlairTextClassificationConfigKeys):
+    document_embedding_cls: str = "FlairDocumentPoolEmbedding"
     pooling: str = "mean"
     fine_tune_mode: str = "none"
     fine_tune: bool = False
@@ -135,10 +123,10 @@ class FlairTextClassificationBasicConfig(FlairBasicConfig, FlairTextClassificati
     word_dropout: float = 0.05
     reproject_words: bool = True
 
-    load_model_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
+    load_model_kwargs: Dict[str, Any] = field(init=True, compare=False, default_factory=dict)
 
     def __post_init__(self) -> None:
-        load_model_keys = self.LOAD_MODEL_KEYS_MAPPING[self.document_embedding_cls]
+        load_model_keys = self.LOAD_MODEL_CONFIG_KEYS_MAPPING[self.document_embedding_cls]
         self.task_train_kwargs = self._parse_fields(self.TASK_TRAIN_KEYS)
         self.load_model_kwargs = self._parse_fields(load_model_keys)
 
@@ -149,7 +137,7 @@ class FlairAdvancedConfig(AdvancedConfig, FlairConfigKeys, ABC):
     task_train_kwargs: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        self.task_train_kwargs = {**self.DEFAULT_TASK_TRAIN_KWARGS, **self.task_train_kwargs}
+        pass
 
     @classmethod
     def from_yaml(cls, path: T_path) -> "FlairAdvancedConfig":

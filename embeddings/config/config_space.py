@@ -15,7 +15,7 @@ from embeddings.embedding.static.embedding import StaticEmbedding
 Parameter = Union[SearchableParameter, ConstantParameter]
 ParsedParameters = TypeVar("ParsedParameters")
 SampledParameters = Dict[str, Union[ParameterValues, Dict[str, ParameterValues]]]
-OptimizedConfig = TypeVar("OptimizedConfig", bound="OptimizedConfigSpace")
+OptimizedConfig = TypeVar("OptimizedConfig", bound="ConfigSpace")
 
 
 class ConfigSpace(Config, ABC):

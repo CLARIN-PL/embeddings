@@ -8,11 +8,11 @@ import datasets
 from flair.data import Corpus
 from numpy import typing as nptyping
 
+from embeddings.config.config_space import OptimizedConfig, SampledParameters
 from embeddings.config.flair_config import (
     FlairSequenceLabelingAdvancedConfig,
     FlairTextClassificationAdvancedConfig,
 )
-from embeddings.config.config_space import OptimizedConfig, SampledParameters
 from embeddings.config.flair_config_space import (
     FlairSequenceLabelingConfigSpace,
     FlairTextClassificationConfigSpace,

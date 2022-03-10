@@ -6,15 +6,10 @@ from typing import Any, Dict, List, Set, Tuple, Union
 import optuna
 from typing_extensions import Final
 
+from embeddings.config.config_space import ConfigSpace, Parameter, SampledParameters
 from embeddings.config.flair_config import (
     FlairSequenceLabelingConfigKeys,
     FlairTextClassificationConfigKeys,
-    FlairTextClassificationConfigMapping,
-)
-from embeddings.config.config_space import (
-    ConfigSpace,
-    Parameter,
-    SampledParameters,
 )
 from embeddings.config.parameters import ConstantParameter, ParameterValues, SearchableParameter
 from embeddings.data.io import T_path
@@ -159,9 +154,7 @@ class FlairSequenceLabelingConfigSpace(
         (
             parameters,
             task_train_kwargs,
-        ) = FlairSequenceLabelingConfigSpace._parse_model_trainer_parameters(
-            parameters=parameters
-        )
+        ) = FlairSequenceLabelingConfigSpace._parse_model_trainer_parameters(parameters=parameters)
         cls._check_unmapped_parameters(parameters=parameters)
 
         return {
@@ -184,9 +177,7 @@ class FlairSequenceLabelingConfigSpace(
 
 @dataclass
 class FlairTextClassificationConfigSpace(
-    AbstractFlairModelTrainerConfigSpace,
-    FlairTextClassificationConfigMapping,
-    FlairTextClassificationConfigKeys,
+    AbstractFlairModelTrainerConfigSpace, FlairTextClassificationConfigKeys
 ):
     dynamic_document_embedding: Parameter = SearchableParameter(
         name="document_embedding",
@@ -275,8 +266,7 @@ class FlairTextClassificationConfigSpace(
             raise TypeError("Variable document_embedding_val must be a str!")
 
         parameters[document_embedding_name] = document_embedding_val
-        parameter_names = self.LOAD_MODEL_KEYS_MAPPING[document_embedding_val]
-
+        parameter_names = self.LOAD_MODEL_CONFIG_SPACE_KEYS_MAPPING[document_embedding_val]
         parameters.update(self._map_parameters(parameters_names=list(parameter_names), trial=trial))
 
         mapped_parameters: Final[Set[str]] = {
@@ -294,15 +284,13 @@ class FlairTextClassificationConfigSpace(
         assert isinstance(document_embedding, str)
 
         load_model_kwargs = cls._pop_parameters(
-            parameters=parameters, parameters_keys=cls.LOAD_MODEL_KEYS
+            parameters=parameters, parameters_keys=cls.LOAD_MODEL_CFG_KEYS
         )
 
         (
             parameters,
             task_train_kwargs,
-        ) = FlairSequenceLabelingConfigSpace._parse_model_trainer_parameters(
-            parameters=parameters
-        )
+        ) = FlairSequenceLabelingConfigSpace._parse_model_trainer_parameters(parameters=parameters)
         cls._check_unmapped_parameters(parameters=parameters)
 
         return {

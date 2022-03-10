@@ -3,12 +3,8 @@ from copy import deepcopy
 from dataclasses import InitVar, dataclass, field
 from typing import Any, Dict, Final, List, Union
 
+from embeddings.config.config_space import ConfigSpace, Parameter, SampledParameters
 from embeddings.config.lightning_config import LightningConfigKeys
-from embeddings.config.config_space import (
-    ConfigSpace,
-    Parameter,
-    SampledParameters,
-)
 from embeddings.config.parameters import ConstantParameter, ParameterValues, SearchableParameter
 from embeddings.data.io import T_path
 from embeddings.utils.utils import read_yaml
@@ -98,19 +94,19 @@ class LightingConfigSpace(ConfigSpace, LightningConfigKeys, ABC):
 
     @classmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
-        pipeline_kwargs = ConfigSpace._pop_parameters(
+        pipeline_kwargs = cls._pop_parameters(
             parameters=parameters, parameters_keys=cls.PIPELINE_KEYS
         )
-        datamodule_kwargs = ConfigSpace._pop_parameters(
+        datamodule_kwargs = cls._pop_parameters(
             parameters=parameters, parameters_keys=cls.DATAMODULE_KEYS
         )
-        task_model_kwargs = ConfigSpace._pop_parameters(
+        task_model_kwargs = cls._pop_parameters(
             parameters=parameters, parameters_keys=cls.TASK_MODEL_KEYS
         )
-        task_train_kwargs = ConfigSpace._pop_parameters(
+        task_train_kwargs = cls._pop_parameters(
             parameters=parameters, parameters_keys=cls.TASK_TRAIN_KEYS
         )
-        model_config_kwargs = ConfigSpace._pop_parameters(
+        model_config_kwargs = cls._pop_parameters(
             parameters=parameters, parameters_keys=cls.MODEL_CONFIG_KEYS
         )
 
