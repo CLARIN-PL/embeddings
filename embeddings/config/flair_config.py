@@ -2,7 +2,7 @@ from abc import ABC
 from dataclasses import dataclass, field
 from itertools import chain
 from types import MappingProxyType
-from typing import Any, ClassVar, Dict, Set, Tuple, Union
+from typing import Any, ClassVar, Dict, Mapping, Set, Tuple, Union
 
 from embeddings.config.base_config import AdvancedConfig, BasicConfig
 from embeddings.data.io import T_path
@@ -50,7 +50,7 @@ class FlairTextClassificationConfigKeys(FlairConfigKeys):
         "word_dropout",
         "reproject_words",
     }
-    LOAD_MODEL_CONFIG_KEYS_MAPPING: ClassVar[MappingProxyType[str, Any]] = MappingProxyType(
+    LOAD_MODEL_CONFIG_KEYS_MAPPING: ClassVar[Mapping[str, Any]] = MappingProxyType(
         {
             "FlairDocumentCNNEmbeddings": RNN_EMBEDDING_KEYS,
             "FlairDocumentRNNEmbeddings": CNN_EMBEDDING_KEYS,
@@ -58,7 +58,7 @@ class FlairTextClassificationConfigKeys(FlairConfigKeys):
             "FlairDocumentPoolEmbedding": {"pooling", "fine_tune_mode"},
         }
     )
-    LOAD_MODEL_CONFIG_SPACE_KEYS_MAPPING: ClassVar[MappingProxyType[str, Any]] = MappingProxyType(
+    LOAD_MODEL_CONFIG_SPACE_KEYS_MAPPING: ClassVar[Mapping[str, Any]] = MappingProxyType(
         {
             "FlairDocumentCNNEmbeddings": RNN_EMBEDDING_KEYS,
             "FlairDocumentRNNEmbeddings": CNN_EMBEDDING_KEYS,
