@@ -45,7 +45,6 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         "end_positions",
         "labels",
     ]
-    DEFAULT_TOKENIZER_KWARGS = {"use_fast": True}
 
     def __init__(
         self,
@@ -61,6 +60,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         downsample_test: Optional[float] = None,
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
+        dataloader_kwargs: Optional[Dict[str, Any]] = None,
         seed: int = 441,
     ) -> None:
         self.dataset_name_or_path = dataset_name_or_path
@@ -73,12 +73,12 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.downsample_train = downsample_train
         self.downsample_val = downsample_val
         self.downsample_test = downsample_test
-        self.tokenizer_kwargs = initialize_kwargs(self.DEFAULT_TOKENIZER_KWARGS, tokenizer_kwargs)
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.tokenizer_name_or_path,
-            **self.tokenizer_kwargs,
+            **tokenizer_kwargs if tokenizer_kwargs else {},
         )
         self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
+        self.dataloader_kwargs = dataloader_kwargs if dataloader_kwargs else {}
         self.seed = seed
         dataset_info = self.load_dataset()["train"].info
         super().__init__(
@@ -139,6 +139,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
             batch_size=self.train_batch_size,
             collate_fn=self.collate_fn,
             shuffle=True,
+            **self.dataloader_kwargs,
         )
 
     # Ignoring the type of val_dataloader method from supertype "DataHooks" allowing for None
@@ -150,6 +151,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
                 batch_size=self.eval_batch_size,
                 collate_fn=self.collate_fn,
                 shuffle=False,
+                **self.dataloader_kwargs,
             )
         else:
             return None
@@ -160,6 +162,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
             batch_size=self.eval_batch_size,
             collate_fn=self.collate_fn,
             shuffle=False,
+            **self.dataloader_kwargs,
         )
 
     def get_subset(
