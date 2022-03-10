@@ -171,6 +171,7 @@ def test_keys_allowed_in_metadata_but_not_in_config_space(
         "early_stopping_kwargs",
         "input_column_name",
         "dataset_name_or_path",
+        "dataloader_kwargs"
     }
 
 

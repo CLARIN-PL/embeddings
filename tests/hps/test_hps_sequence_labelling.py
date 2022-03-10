@@ -169,6 +169,7 @@ def test_keys_allowed_in_metadata_but_not_in_config_space(
         "task_model_kwargs",
         "evaluation_mode",
         "target_column_name",
+        "dataloader_kwargs"
     }
 
 
