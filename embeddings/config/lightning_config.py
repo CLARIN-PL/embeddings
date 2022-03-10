@@ -53,7 +53,7 @@ class LightningConfigDefaultKwargs:
             "patience": 3,
         }
     )
-    DEFAULT_DATALOADER_KWARGS = {"shuffle": True}
+    DEFAULT_DATALOADER_KWARGS: ClassVar[T_kwarg] = MappingProxyType({"shuffle": True})
 
 
 @dataclass
