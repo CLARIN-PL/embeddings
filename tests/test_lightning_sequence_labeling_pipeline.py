@@ -8,6 +8,7 @@ import pytorch_lightning as pl
 from _pytest.tmpdir import TempdirFactory
 
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
+from embeddings.config.lightning_config import LightningAdvancedConfig
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
 
@@ -45,39 +46,36 @@ def pipeline_kwargs() -> Dict[str, Any]:
 
 
 @pytest.fixture(scope="module")
-def task_train_kwargs() -> Dict[str, Any]:
-    return {
-        "max_epochs": 1,
-        "devices": "auto",
-        "accelerator": "cpu",
-        "deterministic": True,
-    }
-
-
-@pytest.fixture(scope="module")
-def task_model_kwargs() -> Dict[str, Any]:
-    return {"learning_rate": 5e-4, "use_scheduler": False}
-
-
-@pytest.fixture(scope="module")
-def datamodule_kwargs() -> Dict[str, Any]:
-    return {"num_workers": 0}
+def config() -> LightningAdvancedConfig:
+    return LightningAdvancedConfig(
+        finetune_last_n_layers=0,
+        task_train_kwargs={
+            "max_epochs": 1,
+            "devices": "auto",
+            "accelerator": "cpu",
+            "deterministic": True,
+        },
+        datamodule_kwargs={
+            "max_seq_length": 64,
+            "downsample_train": 0.01,
+            "downsample_val": 0.01,
+            "downsample_test": 0.05,
+        },
+        dataloader_kwargs={"num_workers": 0},
+    )
 
 
 @pytest.fixture
 def lightning_sequence_labeling_pipeline(
     pipeline_kwargs: Dict[str, Any],
     dataset_kwargs: Dict[str, Any],
-    datamodule_kwargs: Dict[str, Any],
-    task_train_kwargs: Dict[str, Any],
+    config: LightningAdvancedConfig,
     tmp_path: Path,
 ) -> Tuple[LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]], Path]:
-    datamodule_kwargs["max_seq_length"] = 64
     return (
         LightningSequenceLabelingPipeline(
             output_path=tmp_path,
-            datamodule_kwargs=datamodule_kwargs,
-            task_train_kwargs=task_train_kwargs,
+            config=config,
             **pipeline_kwargs,
             **dataset_kwargs,
         ),
