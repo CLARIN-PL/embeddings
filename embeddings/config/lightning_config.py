@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from types import MappingProxyType
-from typing import Any, ClassVar, Dict, List, Optional, Set, Union
+from typing import Any, ClassVar, Dict, List, Mapping, Optional, Set, Union
 
 from pytorch_lightning.accelerators import Accelerator
 
@@ -9,7 +9,7 @@ from embeddings.data.io import T_path
 from embeddings.utils.loggers import get_logger
 from embeddings.utils.utils import read_yaml
 
-T_kwarg = MappingProxyType[str, Any]
+T_kwarg = Mapping[str, Any]
 
 _logger = get_logger(__name__)
 
@@ -53,7 +53,6 @@ class LightningConfigDefaultKwargs:
             "patience": 3,
         }
     )
-    DEFAULT_DATALOADER_KWARGS: ClassVar[T_kwarg] = MappingProxyType({"shuffle": True})
 
 
 @dataclass
@@ -130,7 +129,6 @@ class LightningAdvancedConfig(AdvancedConfig, LightningConfigDefaultKwargs):
             **self.DEFAULT_EARLY_STOPPING_KWARGS,
             **self.early_stopping_kwargs,
         }
-        self.dataloader_kwargs = {**self.DEFAULT_DATALOADER_KWARGS, **self.dataloader_kwargs}
         self.task_model_kwargs.update(
             {"train_batch_size": self.train_batch_size, "eval_batch_size": self.eval_batch_size}
         )
