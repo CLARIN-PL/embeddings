@@ -9,10 +9,8 @@ import yaml
 from _pytest.tmpdir import TempdirFactory
 
 
+from embeddings.config.lighting_config_space import LightingSequenceLabelingConfigSpace
 from embeddings.config.lightning_config import LightningConfigDefaultKwargs
-from embeddings.config.lighting_config_space import (
-    LightingSequenceLabelingConfigSpace,
-)
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.config.parameters import ConstantParameter
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingSequenceLabelingPipeline

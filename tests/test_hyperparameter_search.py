@@ -5,6 +5,11 @@ import optuna
 import pytest
 from pydantic import create_model_from_typeddict
 
+from embeddings.config.flair_config import (
+    FlairSequenceLabelingAdvancedConfig,
+    FlairTextClassificationAdvancedConfig,
+)
+from embeddings.config.lightning_config import LightningAdvancedConfig
 from embeddings.config.parameters import SearchableParameter
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.pipeline.flair_classification import FlairClassificationPipeline
@@ -58,19 +63,12 @@ def flair_sequence_labeling_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
 
 @pytest.fixture(scope="module")
 def flair_pipeline_kwargs(output_path: "TemporaryDirectory[str]") -> Dict[str, PrimitiveTypes]:
-    return {
-        "output_path": output_path.name,
-        "embedding_name": "clarin-pl/roberta-polish-kgr10",
-        "document_embedding_cls": "FlairDocumentPoolEmbedding",
-        "load_model_kwargs": None,
-        "task_model_kwargs": None,
-        "task_train_kwargs": None,
-    }
+    return {"output_path": output_path.name, "embedding_name": "clarin-pl/roberta-polish-kgr10"}
 
 
 @pytest.fixture(scope="module")
 def flair_sequence_labeling_pipeline_kwargs() -> Dict[str, PrimitiveTypes]:
-    return {"evaluation_mode": "conll", "tagging_scheme": None, "hidden_size": 128}
+    return {"evaluation_mode": "conll", "tagging_scheme": None}
 
 
 @pytest.fixture(scope="module")
@@ -88,16 +86,10 @@ def lightning_classification_kwargs(output_path: "TemporaryDirectory[str]") -> D
     return {
         "output_path": output_path.name,
         "embedding_name_or_path": "clarin-pl/roberta-polish-kgr10",
-        "task_model_kwargs": None,
-        "task_train_kwargs": None,
-        "model_config_kwargs": None,
-        "train_batch_size": 1,
-        "eval_batch_size": 1,
-        "finetune_last_n_layers": 0,
+        "config": LightningAdvancedConfig(
+            train_batch_size=1, eval_batch_size=1, finetune_last_n_layers=0
+        ),
         "tokenizer_name_or_path": None,
-        "datamodule_kwargs": None,
-        "tokenizer_kwargs": None,
-        "batch_encoding_kwargs": None,
         "predict_subset": LightingDataModuleSubset.TEST,
     }
 
@@ -110,6 +102,7 @@ def flair_classification_pipeline_metadata(
     return {
         **flair_pipeline_kwargs,
         **flair_text_classification_dataset_kwargs,
+        **{"config": FlairTextClassificationAdvancedConfig()},
     }
 
 
@@ -121,6 +114,7 @@ def flair_pair_classification_pipeline_metadata(
     return {
         **flair_pipeline_kwargs,
         **flair_text_pair_classification_dataset_kwargs,
+        **{"config": FlairTextClassificationAdvancedConfig()},
     }
 
 
@@ -134,6 +128,7 @@ def flair_sequence_labeling_pipeline_metadata(
         **flair_pipeline_kwargs,
         **flair_sequence_labeling_pipeline_kwargs,
         **flair_sequence_labeling_dataset_kwargs,
+        **{"config": FlairSequenceLabelingAdvancedConfig()},
     }
 
 
@@ -144,40 +139,31 @@ def lightning_classification_pipeline_metadata(
     return {**lightning_text_classification_dataset_kwargs, **lightning_classification_kwargs}
 
 
-# Pydantic create_model_from_typeddict in 1.8.2 is no compilant with mypy
-# https://github.com/samuelcolvin/pydantic/issues/3008
-# It should be fixed in further release of pydantic library
 def test_flair_classification_pipeline_metadata(flair_classification_pipeline_metadata) -> None:
-    metadata = create_model_from_typeddict(FlairClassificationPipelineMetadata)(  # type: ignore
-        **flair_classification_pipeline_metadata
-    ).dict()
+    metadata = FlairClassificationPipelineMetadata(**flair_classification_pipeline_metadata)
     FlairClassificationPipeline(**metadata)
 
 
 def test_flair_pair_classification_pipeline_metadata(
     flair_pair_classification_pipeline_metadata,
 ) -> None:
-    metadata = create_model_from_typeddict(FlairPairClassificationPipelineMetadata)(  # type: ignore
+    metadata = FlairPairClassificationPipelineMetadata(
         **flair_pair_classification_pipeline_metadata
-    ).dict()
+    )
     FlairPairClassificationPipeline(**metadata)
 
 
 def test_flair_sequence_labeling_pipeline_metadata(
     flair_sequence_labeling_pipeline_metadata,
 ) -> None:
-    metadata = create_model_from_typeddict(FlairSequenceLabelingPipelineMetadata)(  # type: ignore
-        **flair_sequence_labeling_pipeline_metadata
-    ).dict()
+    metadata = FlairSequenceLabelingPipelineMetadata(**flair_sequence_labeling_pipeline_metadata)
     FlairSequenceLabelingPipeline(**metadata)
 
 
 def test_lightning_classification_pipeline_metadata(
     lightning_classification_pipeline_metadata,
 ) -> None:
-    metadata = create_model_from_typeddict(LightningPipelineMetadata)(  # type: ignore
-        **lightning_classification_pipeline_metadata
-    ).dict()
+    metadata = LightningPipelineMetadata(**lightning_classification_pipeline_metadata)
     LightningPipelineMetadata(**metadata)
 
 

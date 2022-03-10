@@ -8,10 +8,8 @@ import pytest
 import yaml
 from _pytest.tmpdir import TempdirFactory
 
+from embeddings.config.lighting_config_space import LightingTextClassificationConfigSpace
 from embeddings.config.lightning_config import LightningConfigDefaultKwargs
-from embeddings.config.lighting_config_space import (
-    LightingTextClassificationConfigSpace,
-)
 from embeddings.config.parameters import ConstantParameter
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline

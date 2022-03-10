@@ -11,9 +11,7 @@ from embeddings.config.flair_config_space import (
     FlairModelTrainerConfigSpace,
     FlairSequenceLabelingConfigSpace,
 )
-from embeddings.config.lighting_config_space import (
-    LightingTextClassificationConfigSpace,
-)
+from embeddings.config.lighting_config_space import LightingTextClassificationConfigSpace
 
 
 @pytest.fixture(scope="module")
@@ -313,10 +311,8 @@ def test_lightning_classification_from_yaml_config(
     lightning_classification_config_dict: Dict[str, Any],
     lightning_classification_yaml_config_file_path: Path,
 ) -> None:
-    lightning_classification_config_space = (
-        LightingTextClassificationConfigSpace.from_yaml(
-            lightning_classification_yaml_config_file_path
-        )
+    lightning_classification_config_space = LightingTextClassificationConfigSpace.from_yaml(
+        lightning_classification_yaml_config_file_path
     )
     assert hasattr(lightning_classification_config_space, "param_embedding_name_or_path")
     assert (
@@ -338,13 +334,9 @@ def test_wrong_config_given(
             flair_sequence_labeling_yaml_config_file_path
         )
     with pytest.raises(KeyError):
-        LightingTextClassificationConfigSpace.from_yaml(
-            flair_trainer_yaml_config_file_path
-        )
+        LightingTextClassificationConfigSpace.from_yaml(flair_trainer_yaml_config_file_path)
     with pytest.raises(KeyError):
-        FlairSequenceLabelingConfigSpace.from_yaml(
-            lightning_classification_yaml_config_file_path
-        )
+        FlairSequenceLabelingConfigSpace.from_yaml(lightning_classification_yaml_config_file_path)
 
 
 def test_no_embedding_name_given(
