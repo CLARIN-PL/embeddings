@@ -8,6 +8,10 @@ import pytest
 import torch
 from flair.data import Corpus
 
+from embeddings.config.flair_config import (
+    FlairSequenceLabelingBasicConfig,
+    FlairSequenceLabelingConfig,
+)
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import Dataset
 from embeddings.pipeline.evaluation_pipeline import (
@@ -46,6 +50,11 @@ def default_hidden_size() -> int:
 
 
 @pytest.fixture(scope="module")
+def default_config() -> FlairSequenceLabelingConfig:
+    return FlairSequenceLabelingBasicConfig(hidden_size=256, max_epochs=1, mini_batch_size=32)
+
+
+@pytest.fixture(scope="module")
 def sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
@@ -69,16 +78,15 @@ def sequence_labeling_evaluation_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
     ner_dataset_name: str,
-    default_hidden_size: int,
+    default_config: FlairSequenceLabelingConfig,
 ) -> ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]]:
 
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,
         embedding_name=embedding_name,
         output_path=result_path.name,
-        hidden_size=default_hidden_size,
+        config=default_config,
         persist_path=None,
-        task_train_kwargs={"max_epochs": 1, "mini_batch_size": 32},
     )
     return pipeline
 

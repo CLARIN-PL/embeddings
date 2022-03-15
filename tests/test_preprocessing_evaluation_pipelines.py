@@ -9,6 +9,10 @@ import torch
 from flair.data import Corpus
 from numpy import typing as nptyping
 
+from embeddings.config.flair_config import (
+    FlairSequenceLabelingBasicConfig,
+    FlairSequenceLabelingConfig,
+)
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import Dataset
 from embeddings.pipeline.evaluation_pipeline import (
@@ -54,6 +58,11 @@ def task_train_kwargs() -> Dict[str, int]:
 
 
 @pytest.fixture(scope="module")
+def default_config() -> FlairSequenceLabelingConfig:
+    return FlairSequenceLabelingBasicConfig(hidden_size=256, max_epochs=1, mini_batch_size=256)
+
+
+@pytest.fixture(scope="module")
 def sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
     ner_dataset_name: str,
@@ -77,20 +86,17 @@ def sequence_labeling_evaluation_pipeline(
     result_path: "TemporaryDirectory[str]",
     embedding_name: str,
     ner_dataset_name: str,
-    hidden_size: int,
-    task_train_kwargs: Dict[str, int],
+    default_config: FlairSequenceLabelingConfig,
 ) -> Tuple[
     ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]],
     "TemporaryDirectory[str]",
 ]:
-
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,
         embedding_name=embedding_name,
         output_path=result_path.name,
-        hidden_size=hidden_size,
+        config=default_config,
         persist_path=None,
-        task_train_kwargs=task_train_kwargs,
     )
     return pipeline, result_path
 
@@ -98,8 +104,6 @@ def sequence_labeling_evaluation_pipeline(
 def test_sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
     ner_dataset_name: str,
-    hidden_size: int,
-    task_train_kwargs: Dict[str, int],
     sequence_labeling_preprocessing_pipeline: Tuple[
         PreprocessingPipeline[str, datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"
     ],
