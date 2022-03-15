@@ -1,9 +1,15 @@
-from typing import Any, Dict, Generic, Optional, Type, Union
+from typing import Any, Dict, Generic, Optional
 
 from flair.data import Corpus
 from numpy import typing as nptyping
 from typing_extensions import Literal
 
+from embeddings.config.flair_config import (
+    FlairSequenceLabelingBasicConfig,
+    FlairSequenceLabelingConfig,
+    FlairTextClassificationBasicConfig,
+    FlairTextClassificationConfig,
+)
 from embeddings.data.data_loader import (
     ConllFlairCorpusDataLoader,
     DataLoader,
@@ -11,8 +17,6 @@ from embeddings.data.data_loader import (
 )
 from embeddings.data.dataset import BaseDataset, Data, Dataset
 from embeddings.data.io import T_path
-from embeddings.embedding.auto_flair import DocumentEmbedding
-from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
 from embeddings.embedding.flair_loader import (
     FlairDocumentPoolEmbeddingLoader,
     FlairWordEmbeddingLoader,
@@ -60,25 +64,23 @@ class FlairTextClassificationEvaluationPipeline(
         dataset_path: str,
         embedding_name: str,
         output_path: T_path,
-        document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         model_type_reference: str = "",
+        config: FlairTextClassificationConfig = FlairTextClassificationBasicConfig(),
         persist_path: Optional[T_path] = None,
         predict_subset: Literal["dev", "test"] = "test",
-        task_model_kwargs: Optional[Dict[str, Any]] = None,
-        task_train_kwargs: Optional[Dict[str, Any]] = None,
-        load_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
         dataset = Dataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
 
         embedding_loader = FlairDocumentPoolEmbeddingLoader(embedding_name, model_type_reference)
-        embedding = embedding_loader.get_embedding(document_embedding_cls, **load_model_kwargs)
+        embedding = embedding_loader.get_embedding(
+            config.document_embedding_cls, **config.load_model_kwargs
+        )
 
         task = TextClassification(
-            output_path=output_path,
-            task_train_kwargs=task_train_kwargs,
-            task_model_kwargs=task_model_kwargs,
+            output_path,
+            task_model_kwargs=config.task_model_kwargs,
+            task_train_kwargs=config.task_train_kwargs,
         )
         model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
         evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = TextClassificationEvaluator()
@@ -95,25 +97,23 @@ class FlairTextPairClassificationEvaluationPipeline(
         dataset_path: str,
         embedding_name: T_path,
         output_path: T_path,
-        document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         model_type_reference: str = "",
+        config: FlairTextClassificationConfig = FlairTextClassificationBasicConfig(),
         persist_path: Optional[T_path] = None,
         predict_subset: Literal["dev", "test"] = "test",
-        task_model_kwargs: Optional[Dict[str, Any]] = None,
-        task_train_kwargs: Optional[Dict[str, Any]] = None,
-        load_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
         dataset = Dataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
 
         embedding_loader = FlairDocumentPoolEmbeddingLoader(embedding_name, model_type_reference)
-        embedding = embedding_loader.get_embedding(document_embedding_cls, **load_model_kwargs)
+        embedding = embedding_loader.get_embedding(
+            config.document_embedding_cls, **config.load_model_kwargs
+        )
 
         task = TextPairClassification(
-            output_path=output_path,
-            task_train_kwargs=task_train_kwargs,
-            task_model_kwargs=task_model_kwargs,
+            output_path,
+            task_model_kwargs=config.task_model_kwargs,
+            task_train_kwargs=config.task_train_kwargs,
         )
         model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
         evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = TextClassificationEvaluator()
@@ -132,14 +132,12 @@ class FlairSequenceLabelingEvaluationPipeline(
         dataset_path: str,
         embedding_name: T_path,
         output_path: T_path,
-        hidden_size: int,
         model_type_reference: str = "",
         evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = DEFAULT_EVAL_MODE,
         tagging_scheme: Optional[SequenceLabelingEvaluator.TaggingScheme] = None,
+        config: FlairSequenceLabelingConfig = FlairSequenceLabelingBasicConfig(),
         persist_path: Optional[T_path] = None,
         predict_subset: Literal["dev", "test"] = "test",
-        task_model_kwargs: Optional[Dict[str, Any]] = None,
-        task_train_kwargs: Optional[Dict[str, Any]] = None,
         word_embedding_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = Dataset(dataset=dataset_path)
@@ -149,10 +147,10 @@ class FlairSequenceLabelingEvaluationPipeline(
         embedding = embedding_loader.get_embedding(**word_embedding_kwargs or {})
 
         task = SequenceLabeling(
-            output_path=output_path,
-            hidden_size=hidden_size,
-            task_train_kwargs=task_train_kwargs,
-            task_model_kwargs=task_model_kwargs,
+            output_path,
+            hidden_size=config.hidden_size,
+            task_model_kwargs=config.task_model_kwargs,
+            task_train_kwargs=config.task_train_kwargs,
         )
         model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
         evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = SequenceLabelingEvaluator(
