@@ -1,19 +1,42 @@
 from abc import ABC
 from copy import deepcopy
 from dataclasses import InitVar, dataclass, field
-from typing import Any, Dict, List, Set, Tuple, Union
+from types import MappingProxyType
+from typing import Any, ClassVar, Dict, List, Mapping, Set, Tuple, Union
 
 import optuna
 from typing_extensions import Final
 
 from embeddings.config.config_space import ConfigSpace, Parameter, SampledParameters
-from embeddings.config.flair_config import (
-    FlairSequenceLabelingConfigKeys,
-    FlairTextClassificationConfigKeys,
-)
+from embeddings.config.flair_config import FlairSequenceLabelingBasicConfig
 from embeddings.config.parameters import ConstantParameter, ParameterValues, SearchableParameter
 from embeddings.data.io import T_path
 from embeddings.utils.utils import read_yaml
+
+
+@dataclass
+class FlairTextClassificationConfigSpaceKeysMapping:
+    LOAD_MODEL_KEYS_MAPPING: ClassVar[Mapping[str, Any]] = MappingProxyType(
+        {
+            "FlairDocumentCNNEmbeddings": {
+                "hidden_size",
+                "rnn_type",
+                "rnn_layers",
+                "bidirectional",
+                "dropout",
+                "word_dropout",
+                "reproject_words",
+            },
+            "FlairDocumentRNNEmbeddings": {
+                "cnn_pool_kernels",
+                "dropout",
+                "word_dropout",
+                "reproject_words",
+            },
+            "FlairTransformerDocumentEmbedding": {"dynamic_pooling", "dynamic_fine_tune"},
+            "FlairDocumentPoolEmbedding": {"static_pooling", "static_fine_tune_mode"},
+        }
+    )
 
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
@@ -97,9 +120,7 @@ class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
 
 
 @dataclass
-class FlairSequenceLabelingConfigSpace(
-    AbstractFlairModelTrainerConfigSpace, FlairSequenceLabelingConfigKeys
-):
+class FlairSequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
     hidden_size: Parameter = SearchableParameter(
         name="hidden_size", type="int_uniform", low=128, high=2048, step=128
     )
@@ -148,8 +169,9 @@ class FlairSequenceLabelingConfigSpace(
         assert isinstance(embedding_name, str)
         hidden_size = parameters.pop("hidden_size")
         assert isinstance(hidden_size, int)
+        task_model_keys = FlairSequenceLabelingBasicConfig.get_config_keys()
         task_model_kwargs = cls._pop_parameters(
-            parameters=parameters, parameters_keys=cls.TASK_MODEL_KEYS
+            parameters=parameters, parameters_keys=task_model_keys
         )
         (
             parameters,
@@ -177,7 +199,7 @@ class FlairSequenceLabelingConfigSpace(
 
 @dataclass
 class FlairTextClassificationConfigSpace(
-    AbstractFlairModelTrainerConfigSpace, FlairTextClassificationConfigKeys
+    AbstractFlairModelTrainerConfigSpace, FlairTextClassificationConfigSpaceKeysMapping
 ):
     dynamic_document_embedding: Parameter = SearchableParameter(
         name="document_embedding",
@@ -266,7 +288,7 @@ class FlairTextClassificationConfigSpace(
             raise TypeError("Variable document_embedding_val must be a str!")
 
         parameters[document_embedding_name] = document_embedding_val
-        parameter_names = self.LOAD_MODEL_CONFIG_SPACE_KEYS_MAPPING[document_embedding_val]
+        parameter_names = self.LOAD_MODEL_KEYS_MAPPING[document_embedding_val]
         parameters.update(self._map_parameters(parameters_names=list(parameter_names), trial=trial))
 
         mapped_parameters: Final[Set[str]] = {

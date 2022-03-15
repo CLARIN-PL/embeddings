@@ -1,5 +1,4 @@
 import abc
-from abc import ABC
 from dataclasses import dataclass
 from typing import Any, Dict, Set
 
@@ -9,7 +8,7 @@ from embeddings.utils.loggers import get_logger
 _logger = get_logger(__name__)
 
 
-class Config(ABC):
+class Config(abc.ABC):
     @classmethod
     @abc.abstractmethod
     def from_yaml(cls, path: T_path) -> "Config":
@@ -23,7 +22,7 @@ class Config(ABC):
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
-class BasicConfig(Config, ABC):
+class BasicConfig(Config, abc.ABC):
     @abc.abstractmethod
     def __post_init__(self) -> None:
         pass
@@ -31,10 +30,15 @@ class BasicConfig(Config, ABC):
     def _parse_fields(self, keys: Set[str]) -> Dict[str, Any]:
         return {field_name: getattr(self, field_name) for field_name in keys}
 
+    @classmethod
+    def get_config_keys(cls) -> Set[str]:
+        config_keys = {key for key in cls.__annotations__.keys() if not key.endswith("_kwargs")}
+        return config_keys
+
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
-class AdvancedConfig(Config, ABC):
+class AdvancedConfig(Config, abc.ABC):
     @abc.abstractmethod
     def __post_init__(self) -> None:
         pass
