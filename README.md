@@ -146,19 +146,16 @@ As most datasets in HuggingFace repository should be compatible with our pipelin
 
 # Passing task model and task training parameters to predefined flair pipelines
 Model and training parameters can be controlled via `task_model_kwargs` and 
-`task_train_kwargs` parameters. 
+`task_train_kwargs` parameters that can be populated using the advanced config. 
+Tutorial on how to use configs can be found in `/tutorials` directory of the repository.
 
 ## Example with `polemo2` dataset.
 
 ```python
 from embeddings.pipeline.flair_classification import FlairClassificationPipeline
+from embeddings.config.flair_config import FlairTextClassificationAdvancedConfig
 
-pipeline = FlairClassificationPipeline(
-    dataset_name="clarin-pl/polemo2-official",
-    embedding_name="clarin-pl/word2vec-kgr10",
-    input_column_name="text",
-    target_column_name="target",
-    output_path=".",
+config = FlairTextClassificationAdvancedConfig(
     task_model_kwargs={
         "loss_weights": {
             "plus": 2.0,
@@ -169,6 +166,14 @@ pipeline = FlairClassificationPipeline(
         "learning_rate": 0.01,
         "max_epochs": 20
     }
+)
+pipeline = FlairClassificationPipeline(
+    dataset_name="clarin-pl/polemo2-official",
+    embedding_name="clarin-pl/word2vec-kgr10",
+    input_column_name="text",
+    target_column_name="target",
+    output_path=".",
+    config=config
 )
 
 print(pipeline.run())
@@ -255,7 +260,7 @@ pipeline = OptimizedLightingClassificationPipeline(
     config_space=LightingTextClassificationConfigSpace(
         embedding_name_or_path="allegro/herbert-base-cased"
     ),
-    dataset_name="clarin-pl/polemo2-official",
+    dataset_name_or_path="clarin-pl/polemo2-official",
     input_column_name="text",
     target_column_name="target",
 ).persisting(best_params_path="best_prams.yaml", log_path="hps_log.pickle")
@@ -289,7 +294,7 @@ pipeline = OptimizedLightingClassificationPipeline(
     config_space=LightingTextClassificationConfigSpace(
         embedding_name_or_path=["allegro/herbert-base-cased", "clarin-pl/roberta-polish-kgr10"]
     ),
-    dataset_name="clarin-pl/polemo2-official",
+    dataset_name_or_path="clarin-pl/polemo2-official",
     input_column_name="text",
     target_column_name="target",
 ).persisting(best_params_path="best_prams.yaml", log_path="hps_log.pickle")
