@@ -48,16 +48,6 @@ def ner_dataset_name() -> str:
 
 
 @pytest.fixture(scope="module")
-def hidden_size() -> int:
-    return 256
-
-
-@pytest.fixture(scope="module")
-def task_train_kwargs() -> Dict[str, int]:
-    return {"max_epochs": 1, "mini_batch_size": 256}
-
-
-@pytest.fixture(scope="module")
 def default_config() -> FlairSequenceLabelingConfig:
     return FlairSequenceLabelingBasicConfig(hidden_size=256, max_epochs=1, mini_batch_size=256)
 
@@ -121,7 +111,7 @@ def test_sequence_labeling_preprocessing_pipeline(
     result = evaluation_pipeline.run()
 
     np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.7881773
+        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.0024630
     )
     np.testing.assert_almost_equal(result["seqeval__mode_None__scheme_None"]["overall_f1"], 0)
 

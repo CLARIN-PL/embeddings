@@ -169,7 +169,7 @@ class FlairSequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
         assert isinstance(embedding_name, str)
         hidden_size = parameters.pop("hidden_size")
         assert isinstance(hidden_size, int)
-        task_model_keys = FlairSequenceLabelingBasicConfig.get_config_keys()
+        task_model_keys = FlairSequenceLabelingBasicConfig.get_task_model_keys()
         task_model_kwargs = cls._pop_parameters(
             parameters=parameters, parameters_keys=task_model_keys
         )

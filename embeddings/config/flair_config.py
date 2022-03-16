@@ -43,7 +43,14 @@ class FlairBasicConfig(BasicConfig):
     task_train_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
 
     def __post_init__(self) -> None:
-        self.task_train_kwargs = self._parse_fields(self.get_config_keys())
+        self.task_train_kwargs = self._parse_fields(self.get_task_train_kwargs())
+
+    @staticmethod
+    def get_task_train_kwargs() -> Set[str]:
+        task_train_kwargs = {
+            key for key in FlairBasicConfig.__annotations__.keys() if not key.endswith("_kwargs")
+        }
+        return task_train_kwargs
 
     @classmethod
     def from_yaml(cls, path: T_path) -> "FlairBasicConfig":
@@ -68,8 +75,14 @@ class FlairSequenceLabelingBasicConfig(FlairBasicConfig):
     reproject_embeddings: bool = True
 
     def __post_init__(self) -> None:
-        self.task_model_kwargs = self._parse_fields(self.get_config_keys())
+        self.task_model_kwargs = self._parse_fields(self.get_task_model_keys())
         super().__post_init__()
+
+    @classmethod
+    def get_task_model_keys(cls) -> Set[str]:
+        task_model_keys = set(FlairSequenceLabelingBasicConfig.__annotations__.keys())
+        task_model_keys.remove("hidden_size")
+        return task_model_keys
 
 
 @dataclass
@@ -90,11 +103,13 @@ class FlairTextClassificationBasicConfig(FlairBasicConfig, FlairTextClassificati
     load_model_kwargs: Dict[str, Any] = field(init=True, compare=False, default_factory=dict)
 
     def __post_init__(self) -> None:
-        self.load_model_kwargs = self._parse_fields(self.get_config_keys())
+        load_model_keys = self.get_load_model_keys(self.document_embedding_cls)
+        self.load_model_kwargs = self._parse_fields(load_model_keys)
         super().__post_init__()
 
-    def get_config_keys(self) -> Set[str]:
-        return self.LOAD_MODEL_KEYS_MAPPING[self.document_embedding_cls]
+    @classmethod
+    def get_load_model_keys(cls, document_embedding_cls: str) -> Set[str]:
+        return cls.LOAD_MODEL_KEYS_MAPPING[document_embedding_cls]
 
 
 @dataclass
