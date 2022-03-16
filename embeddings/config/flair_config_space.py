@@ -15,7 +15,7 @@ from embeddings.utils.utils import read_yaml
 
 
 @dataclass
-class FlairTextClassificationConfigSpaceKeysMapping:
+class FlairTextClassificationConfigSpaceMapping:
     LOAD_MODEL_KEYS_MAPPING: ClassVar[Mapping[str, Any]] = MappingProxyType(
         {
             "FlairDocumentCNNEmbeddings": {
@@ -37,6 +37,23 @@ class FlairTextClassificationConfigSpaceKeysMapping:
             "FlairDocumentPoolEmbedding": {"static_pooling", "static_fine_tune_mode"},
         }
     )
+    LOAD_MODEL_KEYS: ClassVar[Set[str]] = {
+        "cnn_pool_kernels",
+        "fine_tune_mode",
+        "reproject_words",
+        "pooling",
+        "rnn_type",
+        "dropout",
+        "bidirectional",
+        "fine_tune",
+        "word_dropout",
+        "rnn_layers",
+        "hidden_size",
+    }
+
+    @classmethod
+    def map_load_model_keys(cls, document_embedding_cls: str) -> Set[str]:
+        return cls.LOAD_MODEL_KEYS_MAPPING[document_embedding_cls]
 
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
@@ -199,7 +216,7 @@ class FlairSequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
 
 @dataclass
 class FlairTextClassificationConfigSpace(
-    AbstractFlairModelTrainerConfigSpace, FlairTextClassificationConfigSpaceKeysMapping
+    AbstractFlairModelTrainerConfigSpace, FlairTextClassificationConfigSpaceMapping
 ):
     dynamic_document_embedding: Parameter = SearchableParameter(
         name="document_embedding",
@@ -288,7 +305,7 @@ class FlairTextClassificationConfigSpace(
             raise TypeError("Variable document_embedding_val must be a str!")
 
         parameters[document_embedding_name] = document_embedding_val
-        parameter_names = self.LOAD_MODEL_KEYS_MAPPING[document_embedding_val]
+        parameter_names = self.map_load_model_keys(document_embedding_val)
         parameters.update(self._map_parameters(parameters_names=list(parameter_names), trial=trial))
 
         mapped_parameters: Final[Set[str]] = {
@@ -306,7 +323,7 @@ class FlairTextClassificationConfigSpace(
         assert isinstance(document_embedding, str)
 
         load_model_kwargs = cls._pop_parameters(
-            parameters=parameters, parameters_keys=cls.LOAD_MODEL_CFG_KEYS
+            parameters=parameters, parameters_keys=cls.LOAD_MODEL_KEYS
         )
 
         (

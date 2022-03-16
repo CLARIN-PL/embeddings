@@ -1,5 +1,6 @@
 from abc import ABC
 from dataclasses import dataclass, field
+from itertools import chain
 from types import MappingProxyType
 from typing import Any, ClassVar, Dict, Mapping, Set, Tuple, Union
 
@@ -32,6 +33,14 @@ class FlairTextClassificationConfigMapping:
         }
     )
 
+    @classmethod
+    def map_load_model_keys(cls, document_embedding_cls: str) -> Set[str]:
+        return cls.LOAD_MODEL_KEYS_MAPPING[document_embedding_cls]
+
+    @classmethod
+    def get_load_model_keys(cls) -> Set[str]:
+        return set(chain(*cls.LOAD_MODEL_KEYS_MAPPING.values()))
+
 
 @dataclass
 class FlairBasicConfig(BasicConfig):
@@ -43,10 +52,10 @@ class FlairBasicConfig(BasicConfig):
     task_train_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
 
     def __post_init__(self) -> None:
-        self.task_train_kwargs = self._parse_fields(self.get_task_train_kwargs())
+        self.task_train_kwargs = self._parse_fields(self.get_task_train_keys())
 
     @staticmethod
-    def get_task_train_kwargs() -> Set[str]:
+    def get_task_train_keys() -> Set[str]:
         task_train_kwargs = {
             key for key in FlairBasicConfig.__annotations__.keys() if not key.endswith("_kwargs")
         }
@@ -103,13 +112,13 @@ class FlairTextClassificationBasicConfig(FlairBasicConfig, FlairTextClassificati
     load_model_kwargs: Dict[str, Any] = field(init=True, compare=False, default_factory=dict)
 
     def __post_init__(self) -> None:
-        load_model_keys = self.get_load_model_keys(self.document_embedding_cls)
+        load_model_keys = self.get_map_load_model_keys(self.document_embedding_cls)
         self.load_model_kwargs = self._parse_fields(load_model_keys)
         super().__post_init__()
 
     @classmethod
-    def get_load_model_keys(cls, document_embedding_cls: str) -> Set[str]:
-        return cls.LOAD_MODEL_KEYS_MAPPING[document_embedding_cls]
+    def get_map_load_model_keys(cls, document_embedding_cls: str) -> Set[str]:
+        return cls.map_load_model_keys(document_embedding_cls)
 
 
 @dataclass
