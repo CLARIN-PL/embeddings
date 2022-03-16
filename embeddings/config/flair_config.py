@@ -11,7 +11,7 @@ from embeddings.utils.utils import read_yaml
 
 @dataclass
 class FlairTextClassificationConfigMapping:
-    LOAD_MODEL_KEYS_MAPPING: ClassVar[Mapping[str, Any]] = MappingProxyType(
+    LOAD_MODEL_KEYS_MAPPING: ClassVar[Mapping[str, Set[str]]] = MappingProxyType(
         {
             "FlairDocumentCNNEmbeddings": {
                 "hidden_size",
