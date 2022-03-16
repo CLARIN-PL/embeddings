@@ -39,6 +39,7 @@ torch = ">=1.9"
 transformers = ">=4.12.5"
 typer = ">=0.3.2"
 types-PyYAML = ">=5.4.10"
+types-setuptools = ">=57.4.11"
 typing-extensions = ">=4.0.1"
 intel-openmp = {version="^2022.0.3", platform="win32"}
 wandb = ">=0.12.10"

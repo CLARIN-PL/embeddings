@@ -1,10 +1,15 @@
 from abc import abstractmethod
+from pathlib import Path
 from typing import Any, Dict, Generic, Optional, TypeVar
+
+import srsly
+import wandb
 
 from embeddings.data.datamodule import BaseDataModule, Data
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.model.model import Model
 from embeddings.pipeline.pipeline import Pipeline
+from embeddings.utils.utils import get_installed_packages
 
 EvaluationResult = TypeVar("EvaluationResult")
 ModelResult = TypeVar("ModelResult")
@@ -34,17 +39,31 @@ class LightningPipeline(
         datamodule: BaseDataModule[Data],
         model: Model[BaseDataModule[Data], ModelResult],
         evaluator: Evaluator[ModelResult, EvaluationResult],
+        output_path: Path,
         **kwargs: Any
     ) -> None:
         self.datamodule = datamodule
         self.model = model
         self.evaluator = evaluator
+        self.output_path = output_path
 
     def run(self, run_name: Optional[str] = None) -> EvaluationResult:
+        self._save_artifacts()
         model_result = self.model.execute(data=self.datamodule, run_name=run_name)
-        return self.evaluator.evaluate(model_result)
+        result = self.evaluator.evaluate(model_result)
+        if self.logging_kwargs["use_wandb"]:
+            wandb.log_artifact(
+                str(self.output_path),
+                name="test",
+                type="output",
+            )
+            wandb.finish()
+        return result
 
     @property
     @abstractmethod
     def logging_kwargs(self) -> Dict[str, Any]:
         pass
+
+    def _save_artifacts(self) -> None:
+        srsly.write_json(self.output_path.joinpath("packages.json"), get_installed_packages())

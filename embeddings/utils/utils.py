@@ -2,11 +2,13 @@ import copy
 import importlib
 import os.path
 import pprint
+from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
+import pkg_resources
 import requests
 import yaml
 from numpy import typing as nptyping
@@ -44,7 +46,9 @@ def import_from_string(dotted_path: str) -> Any:
         raise ImportError(msg)
 
 
-def build_output_path(root: T_path, embedding_name: T_path, dataset_name: T_path) -> Path:
+def build_output_path(
+    root: T_path, embedding_name: T_path, dataset_name: T_path, timestamp_subdir: bool = True
+) -> Path:
     """Builds output path using pattern {root}/{embedding_name}/{dataset_name}.
     Every "/" in the embedding/dataset name is replaced with  "__".
     E.g. "clarin-pl/nkjp-pos" -> "clarin-pl__nkjp-pos".
@@ -66,7 +70,10 @@ def build_output_path(root: T_path, embedding_name: T_path, dataset_name: T_path
 
     embedding_name = _get_new_dir_name(embedding_name)
     dataset_name = _get_new_dir_name(dataset_name)
-    return Path(root, embedding_name, dataset_name)
+    path = Path(root, embedding_name, dataset_name)
+    if timestamp_subdir:
+        path = path.joinpath(f"{datetime.utcnow().strftime('%Y%m%d%H%M%S')}UTC")
+    return path
 
 
 def format_eval_result(result: Dict[str, Any]) -> str:
@@ -108,3 +115,8 @@ def download_file(url: str, chunk_size: int = 1024) -> Tuple[Any, str]:
     pbar.close()
     tmp_file.seek(0)
     return tmp_file, filename
+
+
+def get_installed_packages() -> List[str]:
+    installed_packages_list = sorted([f"{p.key}=={p.version}" for p in pkg_resources.working_set])
+    return installed_packages_list
