@@ -37,7 +37,7 @@ def run(
     dataset_path.mkdir(parents=True, exist_ok=True)
 
     preprocessing_pipeline = FlairSequenceLabelingPreprocessingPipeline(
-        dataset_name=dataset_name,
+        dataset_name_or_path=dataset_name,
         input_column_name=input_column_name,
         target_column_name=target_column_name,
         persist_path=str(dataset_path),

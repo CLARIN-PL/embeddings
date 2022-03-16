@@ -119,7 +119,7 @@ class OptimizedFlairClassificationPipeline(
             self.preprocessing_pipeline = None
         else:
             self.preprocessing_pipeline = FlairTextClassificationPreprocessingPipeline(
-                dataset_name=str(self.dataset_name_or_path),
+                dataset_name_or_path=str(self.dataset_name_or_path),
                 input_column_name=self.input_column_name,
                 target_column_name=self.target_column_name,
                 persist_path=str(self.dataset_path),
@@ -210,7 +210,7 @@ class OptimizedFlairPairClassificationPipeline(
             self.preprocessing_pipeline = None
         else:
             self.preprocessing_pipeline = FlairTextPairClassificationPreprocessingPipeline(
-                dataset_name=str(self.dataset_name_or_path),
+                dataset_name_or_path=str(self.dataset_name_or_path),
                 input_column_names=self.input_columns_names_pair,
                 target_column_name=self.target_column_name,
                 persist_path=str(self.dataset_path),
@@ -316,7 +316,7 @@ class OptimizedFlairSequenceLabelingPipeline(
             self.preprocessing_pipeline = None
         else:
             self.preprocessing_pipeline = FlairSequenceLabelingPreprocessingPipeline(
-                dataset_name=str(self.dataset_name_or_path),
+                dataset_name_or_path=str(self.dataset_name_or_path),
                 input_column_name=self.input_column_name,
                 target_column_name=self.target_column_name,
                 persist_path=str(self.dataset_path),
