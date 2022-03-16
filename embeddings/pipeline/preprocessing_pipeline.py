@@ -4,7 +4,12 @@ from typing import Any, Dict, Generic, Optional, Tuple, Union
 import datasets
 from flair.data import Corpus
 
-from embeddings.data.data_loader import DataLoader, HuggingFaceDataLoader
+from embeddings.data.data_loader import (
+    DataLoader,
+    HuggingFaceDataLoader,
+    HuggingFaceLocalDataLoader,
+    get_hf_dataloader,
+)
 from embeddings.data.dataset import Data, Dataset, HuggingFaceDataset
 from embeddings.defaults import DATASET_PATH
 from embeddings.pipeline.pipeline import Pipeline
@@ -52,7 +57,7 @@ class FlairTextClassificationPreprocessingPipeline(
 ):
     def __init__(
         self,
-        dataset_name: str,
+        dataset_name_or_path: str,
         persist_path: str,
         input_column_name: str,
         target_column_name: str,
@@ -63,9 +68,11 @@ class FlairTextClassificationPreprocessingPipeline(
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = HuggingFaceDataset(
-            dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
+            dataset_name_or_path, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
-        data_loader = HuggingFaceDataLoader()
+        data_loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = get_hf_dataloader(
+            dataset
+        )
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
         ]
@@ -90,7 +97,7 @@ class FlairTextPairClassificationPreprocessingPipeline(
 ):
     def __init__(
         self,
-        dataset_name: str,
+        dataset_name_or_path: str,
         persist_path: str,
         input_column_names: Tuple[str, str],
         target_column_name: str,
@@ -101,9 +108,11 @@ class FlairTextPairClassificationPreprocessingPipeline(
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = HuggingFaceDataset(
-            dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
+            dataset_name_or_path, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
-        data_loader = HuggingFaceDataLoader()
+        data_loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = get_hf_dataloader(
+            dataset
+        )
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
         ]
@@ -127,7 +136,7 @@ class FlairSequenceLabelingPreprocessingPipeline(
 ):
     def __init__(
         self,
-        dataset_name: str,
+        dataset_name_or_path: str,
         persist_path: str,
         input_column_name: str,
         target_column_name: str,
@@ -138,9 +147,11 @@ class FlairSequenceLabelingPreprocessingPipeline(
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = HuggingFaceDataset(
-            dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
+            dataset_name_or_path, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
-        data_loader = HuggingFaceDataLoader()
+        data_loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = get_hf_dataloader(
+            dataset
+        )
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
         ]
