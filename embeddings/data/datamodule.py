@@ -1,5 +1,4 @@
 import abc
-from os.path import exists, isdir
 from typing import Any, Callable, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import datasets
@@ -11,7 +10,11 @@ from transformers import AutoTokenizer, BatchEncoding
 
 from embeddings.data import dataset as embeddings_dataset
 from embeddings.data.data_collator import CustomDataCollatorForTokenClassification
-from embeddings.data.data_loader import HuggingFaceDataLoader, HuggingFaceLocalDataLoader
+from embeddings.data.data_loader import (
+    HuggingFaceDataLoader,
+    HuggingFaceLocalDataLoader,
+    get_hf_dataloader,
+)
 from embeddings.data.dataset import LightingDataLoaders, LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.utils.loggers import get_logger
@@ -105,22 +108,17 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.process_data()
 
     def load_dataset(self, preparation_step: bool = False) -> DatasetDict:
-        loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = HuggingFaceDataLoader()
-        if exists(self.dataset_name_or_path):
-            if not isdir(self.dataset_name_or_path):
-                raise NotImplementedError(
-                    "Reading from file is currently not supported. "
-                    "Pass dataset directory or HuggingFace repository name"
-                )
+        self.load_dataset_kwargs = self.load_dataset_kwargs if self.load_dataset_kwargs else {}
+        dataset = embeddings_dataset.HuggingFaceDataset(
+            str(self.dataset_name_or_path), **self.load_dataset_kwargs
+        )
+        loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = get_hf_dataloader(
+            dataset
+        )
 
-            if preparation_step:
-                return datasets.DatasetDict()
-            dataset = embeddings_dataset.HuggingFaceDataset(str(self.dataset_name_or_path))
-            loader = HuggingFaceLocalDataLoader()
-        else:
-            dataset = embeddings_dataset.HuggingFaceDataset(
-                str(self.dataset_name_or_path), **self.load_dataset_kwargs
-            )
+        if isinstance(loader, HuggingFaceLocalDataLoader) and preparation_step:
+            return datasets.DatasetDict()
+
         return loader.load(dataset)
 
     def downsample_dataset(self) -> None:

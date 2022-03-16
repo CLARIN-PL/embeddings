@@ -1,8 +1,9 @@
 import abc
 import pickle
 from abc import ABC
+from os.path import exists, isdir
 from pathlib import Path
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Union
 
 import datasets
 from flair.data import Corpus
@@ -71,3 +72,16 @@ class ConllFlairCorpusDataLoader(DataLoader[T_path, Corpus]):
             test=flair_datasets["test"],
             sample_missing_splits=False,
         )
+
+
+def get_hf_dataloader(
+    dataset: HuggingFaceDataset,
+) -> Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader]:
+    if exists(dataset.dataset):
+        if not isdir(dataset.dataset):
+            raise NotImplementedError(
+                "Reading from file is currently not supported. "
+                "Pass dataset directory or HuggingFace repository name"
+            )
+        return HuggingFaceLocalDataLoader()
+    return HuggingFaceDataLoader()
