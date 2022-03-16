@@ -40,6 +40,7 @@ transformers = ">=4.12.5"
 typer = ">=0.3.2"
 types-PyYAML = ">=5.4.10"
 typing-extensions = ">=4.0.1"
+intel-openmp = {version="^2022.0.3", platform="win32"}
 
 [tool.poetry.dev-dependencies]
 black = "21.12b0"
@@ -59,7 +60,7 @@ isort_fix = "isort . "
 pyflakes = "pyflakes embeddings"
 mypy = "mypy -p embeddings"
 coverage_test = "coverage run -m pytest"
-coverage_report = "coverage report -m"
+coverage_report = "coverage report -mi"
 test = ["coverage_test", "coverage_report"]
 check = ["black", "isort", "mypy", "pyflakes"]
 fix = ["black_fix", "isort_fix"]
