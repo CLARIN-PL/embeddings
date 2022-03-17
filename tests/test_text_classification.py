@@ -42,7 +42,7 @@ def text_classification_pipeline(
     )
     data_loader = HuggingFaceDataLoader()
     transformation = ClassificationCorpusTransformation("text", "target").then(
-        DownsampleFlairCorpusTransformation(percentage=0.01, stratify=False)
+        DownsampleFlairCorpusTransformation(*(0.01, 0.01, 0.01), stratify=False)
     )
     embedding = AutoFlairDocumentEmbedding.from_hub("allegro/herbert-base-cased")
     task = TextClassification(result_path.name, task_train_kwargs={"max_epochs": 1})
@@ -90,7 +90,7 @@ def text_classification_pipeline_local_embedding(
     )
     data_loader = HuggingFaceDataLoader()
     transformation = ClassificationCorpusTransformation("text", "target").then(
-        DownsampleFlairCorpusTransformation(percentage=0.01, stratify=False)
+        DownsampleFlairCorpusTransformation(*(0.01, 0.01, 0.01), stratify=False)
     )
     embedding = AutoFlairDocumentEmbedding.from_file(local_embedding_filepath, model_type_reference)
     task = TextClassification(result_path.name, task_train_kwargs={"max_epochs": 1})

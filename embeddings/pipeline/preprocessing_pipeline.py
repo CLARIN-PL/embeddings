@@ -23,6 +23,9 @@ from embeddings.transformation.flair_transformation.classification_corpus_transf
 from embeddings.transformation.flair_transformation.column_corpus_transformation import (
     ColumnCorpusTransformation,
 )
+from embeddings.transformation.flair_transformation.downsample_corpus_transformation import (
+    DownsampleFlairCorpusTransformation,
+)
 from embeddings.transformation.flair_transformation.drop_subset_corpus_transformation import (
     DropSubsetFlairCorpusTransformation,
 )
@@ -79,6 +82,8 @@ class FlairPreprocessingPipeline(
     target_column_name: str
     datasets_path: Path = DATASET_PATH
     sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None
+    downsample_splits: Optional[Tuple[Optional[float], Optional[float], Optional[float]]] = None
+    downsample_splits_stratification: bool = True
     ignore_test_subset: bool = False
     seed: int = 441
     load_dataset_kwargs: Optional[Dict[str, Any]] = None
@@ -145,6 +150,15 @@ class FlairPreprocessingPipeline(
 
         if self.ignore_test_subset:
             transformation = transformation.then(DropSubsetFlairCorpusTransformation(subset="test"))
+
+        if self.downsample_splits:
+            transformation = transformation.then(
+                DownsampleFlairCorpusTransformation(
+                    *self.downsample_splits,
+                    stratify=self.downsample_splits_stratification,
+                    seed=self.seed
+                )
+            )
 
         transformation = transformation.persisting(self.persister)
 

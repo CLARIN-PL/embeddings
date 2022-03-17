@@ -40,7 +40,7 @@ def text_pair_classification_pipeline(
     data_loader = HuggingFaceDataLoader()
     transformation = (
         PairClassificationCorpusTransformation(("sentence_1", "sentence_2"), "label")
-        .then(DownsampleFlairCorpusTransformation(percentage=0.1, stratify=True))
+        .then(DownsampleFlairCorpusTransformation(*(0.1, 0.1, 0.1), stratify=True))
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, seed=441, stratify=True))
     )
     embedding = AutoFlairDocumentEmbedding.from_hub("allegro/herbert-base-cased")
@@ -84,7 +84,7 @@ def text_pair_classification_pipeline_local_embedding(
     data_loader = HuggingFaceDataLoader()
     transformation = (
         PairClassificationCorpusTransformation(("sentence_1", "sentence_2"), "label")
-        .then(DownsampleFlairCorpusTransformation(percentage=0.1, stratify=True))
+        .then(DownsampleFlairCorpusTransformation(*(0.1, 0.1, 0.1), stratify=True))
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, seed=441, stratify=True))
     )
     embedding = AutoFlairDocumentEmbedding.from_file(local_embedding_filepath, model_type_reference)

@@ -63,7 +63,7 @@ def sequence_labeling_preprocessing_pipeline(
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, test_fraction=0.1, seed=441))
-        .then(DownsampleFlairCorpusTransformation(percentage=0.005))
+        .then(DownsampleFlairCorpusTransformation(*(0.005, 0.005, 0.005)))
         .persisting(FlairConllPersister(result_path.name))
     )
     pipeline = PreprocessingPipeline(

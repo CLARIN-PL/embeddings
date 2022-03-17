@@ -55,7 +55,7 @@ def pos_tagging_pipeline(
     dataset = LoadableDataset("clarin-pl/nkjp-pos")
     data_loader = HuggingFaceDataLoader()
     transformation = ColumnCorpusTransformation("tokens", "pos_tags").then(
-        DownsampleFlairCorpusTransformation(percentage=0.001)
+        DownsampleFlairCorpusTransformation(*(0.001, 0.001, 0.001))
     )
     task = SequenceLabeling(result_path.name, hidden_size=256, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(allegro_embedding, task)
@@ -82,7 +82,7 @@ def ner_tagging_pipeline(
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, seed=441))
-        .then(DownsampleFlairCorpusTransformation(percentage=0.005))
+        .then(DownsampleFlairCorpusTransformation(*(0.005, 0.005, 0.005)))
     )
     task = SequenceLabeling(
         result_path.name,
@@ -109,7 +109,7 @@ def pos_tagging_pipeline_local_embedding(
     dataset = LoadableDataset("clarin-pl/nkjp-pos")
     data_loader = HuggingFaceDataLoader()
     transformation = ColumnCorpusTransformation("tokens", "pos_tags").then(
-        DownsampleFlairCorpusTransformation(percentage=0.001)
+        DownsampleFlairCorpusTransformation(*(0.001, 0.001, 0.001))
     )
     task = SequenceLabeling(result_path.name, hidden_size=256, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(ipipan_embedding_local_file, task)
@@ -136,7 +136,7 @@ def ner_tagging_pipeline_local_embedding(
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, seed=441))
-        .then(DownsampleFlairCorpusTransformation(percentage=0.005))
+        .then(DownsampleFlairCorpusTransformation(*(0.005, 0.005, 0.005)))
     )
     task = SequenceLabeling(
         result_path.name,

@@ -55,7 +55,7 @@ def sequence_labeling_preprocessing_pipeline(
     data_loader = HuggingFaceDataLoader()
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
-        .then(DownsampleFlairCorpusTransformation(percentage=0.005, seed=14))
+        .then(DownsampleFlairCorpusTransformation(*(0.005, 0.005, 0.005), seed=14))
         .persisting(FlairConllPersister(result_path.name))
     )
     pipeline = PreprocessingPipeline(
