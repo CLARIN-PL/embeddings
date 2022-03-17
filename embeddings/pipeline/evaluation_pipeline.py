@@ -9,7 +9,7 @@ from embeddings.data.data_loader import (
     DataLoader,
     PickleFlairCorpusDataLoader,
 )
-from embeddings.data.dataset import Data, Dataset, LocalDataset
+from embeddings.data.dataset import Data, Dataset, LoadableDataset
 from embeddings.data.io import T_path
 from embeddings.embedding.auto_flair import DocumentEmbedding
 from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
@@ -53,12 +53,12 @@ class ModelEvaluationPipeline(
 
 
 class FlairTextClassificationEvaluationPipeline(
-    ModelEvaluationPipeline[T_path, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
+    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
     def __init__(
         self,
-        dataset_path: T_path,
-        embedding_name: T_path,
+        dataset_path: str,
+        embedding_name: str,
         output_path: T_path,
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         model_type_reference: str = "",
@@ -69,7 +69,7 @@ class FlairTextClassificationEvaluationPipeline(
         load_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
         load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
-        dataset = LocalDataset(dataset=dataset_path)
+        dataset = LoadableDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
 
         embedding_loader = FlairDocumentPoolEmbeddingLoader(embedding_name, model_type_reference)
@@ -88,11 +88,11 @@ class FlairTextClassificationEvaluationPipeline(
 
 
 class FlairTextPairClassificationEvaluationPipeline(
-    ModelEvaluationPipeline[T_path, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
+    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
     def __init__(
         self,
-        dataset_path: T_path,
+        dataset_path: str,
         embedding_name: T_path,
         output_path: T_path,
         document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
@@ -104,7 +104,7 @@ class FlairTextPairClassificationEvaluationPipeline(
         load_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
         load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
-        dataset = LocalDataset(dataset=dataset_path)
+        dataset = LoadableDataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
 
         embedding_loader = FlairDocumentPoolEmbeddingLoader(embedding_name, model_type_reference)
@@ -123,13 +123,13 @@ class FlairTextPairClassificationEvaluationPipeline(
 
 
 class FlairSequenceLabelingEvaluationPipeline(
-    ModelEvaluationPipeline[T_path, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
+    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
     DEFAULT_EVAL_MODE = SequenceLabelingEvaluator.EvaluationMode.CONLL
 
     def __init__(
         self,
-        dataset_path: T_path,
+        dataset_path: str,
         embedding_name: T_path,
         output_path: T_path,
         hidden_size: int,
@@ -142,7 +142,7 @@ class FlairSequenceLabelingEvaluationPipeline(
         task_train_kwargs: Optional[Dict[str, Any]] = None,
         word_embedding_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = LocalDataset(dataset=dataset_path)
+        dataset = LoadableDataset(dataset=dataset_path)
         data_loader = ConllFlairCorpusDataLoader()
 
         embedding_loader = FlairWordEmbeddingLoader(embedding_name, model_type_reference)

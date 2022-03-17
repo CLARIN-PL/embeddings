@@ -11,7 +11,7 @@ from flair.data import Corpus
 from numpy import typing as nptyping
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
-from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.dataset import LoadableDataset
 from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
 from embeddings.embedding.flair_embedding import FlairEmbedding
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
@@ -52,7 +52,7 @@ def pos_tagging_pipeline(
     ],
     "TemporaryDirectory[str]",
 ]:
-    dataset = HuggingFaceDataset("clarin-pl/nkjp-pos")
+    dataset = LoadableDataset("clarin-pl/nkjp-pos")
     data_loader = HuggingFaceDataLoader()
     transformation = ColumnCorpusTransformation("tokens", "pos_tags").then(
         DownsampleFlairCorpusTransformation(percentage=0.001)
@@ -77,7 +77,7 @@ def ner_tagging_pipeline(
     ],
     "TemporaryDirectory[str]",
 ]:
-    dataset = HuggingFaceDataset("clarin-pl/kpwr-ner")
+    dataset = LoadableDataset("clarin-pl/kpwr-ner")
     data_loader = HuggingFaceDataLoader()
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
@@ -106,7 +106,7 @@ def pos_tagging_pipeline_local_embedding(
     ],
     "TemporaryDirectory[str]",
 ]:
-    dataset = HuggingFaceDataset("clarin-pl/nkjp-pos")
+    dataset = LoadableDataset("clarin-pl/nkjp-pos")
     data_loader = HuggingFaceDataLoader()
     transformation = ColumnCorpusTransformation("tokens", "pos_tags").then(
         DownsampleFlairCorpusTransformation(percentage=0.001)
@@ -131,7 +131,7 @@ def ner_tagging_pipeline_local_embedding(
     ],
     "TemporaryDirectory[str]",
 ]:
-    dataset = HuggingFaceDataset("clarin-pl/kpwr-ner")
+    dataset = LoadableDataset("clarin-pl/kpwr-ner")
     data_loader = HuggingFaceDataLoader()
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")

@@ -133,7 +133,7 @@ class OptimizedFlairClassificationPipeline(
         self._init_preprocessing_pipeline()
         super().__init__(
             preprocessing_pipeline=self.preprocessing_pipeline,
-            evaluation_pipeline=FlairTextClassificationEvaluationPipeline,  # type: ignore
+            evaluation_pipeline=FlairTextClassificationEvaluationPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
@@ -211,7 +211,7 @@ class OptimizedFlairPairClassificationPipeline(
         else:
             self.preprocessing_pipeline = FlairTextPairClassificationPreprocessingPipeline(
                 dataset_name_or_path=str(self.dataset_name_or_path),
-                input_column_names=self.input_columns_names_pair,
+                input_column_name=self.input_columns_names_pair,
                 target_column_name=self.target_column_name,
                 persist_path=str(self.dataset_path),
                 sample_missing_splits=(self.sample_dev_split_fraction, None),
@@ -224,7 +224,7 @@ class OptimizedFlairPairClassificationPipeline(
         self._init_preprocessing_pipeline()
         super().__init__(
             preprocessing_pipeline=self.preprocessing_pipeline,
-            evaluation_pipeline=FlairTextPairClassificationEvaluationPipeline,  # type: ignore
+            evaluation_pipeline=FlairTextPairClassificationEvaluationPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
@@ -333,7 +333,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         )
         super().__init__(
             preprocessing_pipeline=self.preprocessing_pipeline,
-            evaluation_pipeline=FlairSequenceLabelingEvaluationPipeline,  # type: ignore
+            evaluation_pipeline=FlairSequenceLabelingEvaluationPipeline,
             pruner=self.pruner_cls(n_warmup_steps=self.n_warmup_steps),
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,

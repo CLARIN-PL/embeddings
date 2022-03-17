@@ -5,7 +5,7 @@ import datasets
 import pytest
 
 from embeddings.data.data_loader import HuggingFaceDataLoader, HuggingFaceLocalDataLoader
-from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.dataset import LoadableDataset
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.transformation.hf_transformation.drop_subset_transformation import (
     DropSubsetHuggingFaceCorpusTransformation,
@@ -36,7 +36,7 @@ def hf_preprocessing_pipeline_kwargs(hf_dataset_cfg, result_path):
 
 @pytest.fixture(scope="module")
 def hf_dataset(hf_dataset_cfg):
-    return HuggingFaceDataLoader().load(HuggingFaceDataset(**hf_dataset_cfg))
+    return HuggingFaceDataLoader().load(LoadableDataset(**hf_dataset_cfg))
 
 
 def test_hf_dataset(hf_dataset):
@@ -72,7 +72,7 @@ def test_huggingface_text_classification_preprocessing_pipeline(hf_preprocessing
     pipeline.run()
 
     dataset = HuggingFaceLocalDataLoader().load(
-        HuggingFaceDataset(hf_preprocessing_pipeline_kwargs["persist_path"])
+        LoadableDataset(hf_preprocessing_pipeline_kwargs["persist_path"])
     )
     assert isinstance(dataset, datasets.DatasetDict)
     assert frozenset(dataset.keys()) == frozenset(("train", "validation"))

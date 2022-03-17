@@ -6,7 +6,7 @@ from flair.data import Corpus
 from numpy import typing as nptyping
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
-from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.dataset import LoadableDataset
 from embeddings.data.io import T_path
 from embeddings.embedding.auto_flair import DocumentEmbedding
 from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
@@ -48,7 +48,7 @@ class FlairPairClassificationPipeline(
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         output_path = Path(output_path)
-        dataset = HuggingFaceDataset(
+        dataset = LoadableDataset(
             dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
         data_loader = HuggingFaceDataLoader()

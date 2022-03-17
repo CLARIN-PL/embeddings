@@ -10,7 +10,7 @@ from flair.data import Corpus
 from numpy import typing as nptyping
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
-from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.dataset import LoadableDataset
 from embeddings.embedding.auto_flair import AutoFlairDocumentEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
@@ -33,7 +33,7 @@ def text_classification_pipeline(
     ],
     "TemporaryDirectory[str]",
 ]:
-    dataset = HuggingFaceDataset(
+    dataset = LoadableDataset(
         "clarin-pl/polemo2-official",
         train_domains=["reviews"],
         dev_domains=["reviews"],
@@ -81,7 +81,7 @@ def text_classification_pipeline_local_embedding(
     ],
     "TemporaryDirectory[str]",
 ]:
-    dataset = HuggingFaceDataset(
+    dataset = LoadableDataset(
         "clarin-pl/polemo2-official",
         train_domains=["reviews"],
         dev_domains=["reviews"],

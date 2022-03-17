@@ -2,12 +2,8 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 import datasets
 
-from embeddings.data.data_loader import (
-    HuggingFaceDataLoader,
-    HuggingFaceLocalDataLoader,
-    get_hf_dataloader,
-)
-from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.data_loader import HF_DATALOADERS, get_hf_dataloader
+from embeddings.data.dataset import LoadableDataset
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
 from embeddings.transformation.hf_transformation.drop_subset_transformation import (
     DropSubsetHuggingFaceCorpusTransformation,
@@ -31,12 +27,10 @@ class HuggingFacePreprocessingPipeline(
         seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = HuggingFaceDataset(
+        dataset = LoadableDataset(
             dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
-        data_loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = get_hf_dataloader(
-            dataset
-        )
+        data_loader: HF_DATALOADERS = get_hf_dataloader(dataset)
 
         transformation: Union[
             DummyTransformation[datasets.DatasetDict],
