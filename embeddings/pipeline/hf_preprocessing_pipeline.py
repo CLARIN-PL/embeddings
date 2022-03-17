@@ -5,6 +5,9 @@ import datasets
 from embeddings.data.data_loader import HF_DATALOADERS, get_hf_dataloader
 from embeddings.data.dataset import LoadableDataset
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
+from embeddings.transformation.hf_transformation.downsample_transformation import (
+    DownsampleHuggingFaceTransformation,
+)
 from embeddings.transformation.hf_transformation.drop_subset_transformation import (
     DropSubsetHuggingFaceCorpusTransformation,
 )
@@ -23,6 +26,9 @@ class HuggingFacePreprocessingPipeline(
         dataset_name: str,
         persist_path: str,
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
+        downsample_splits: Optional[
+            Tuple[Optional[float], Optional[float], Optional[float]]
+        ] = None,
         ignore_test_subset: bool = False,
         seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
@@ -45,6 +51,11 @@ class HuggingFacePreprocessingPipeline(
         if sample_missing_splits:
             transformation = transformation.then(
                 SampleSplitsHuggingFaceTransformation(*sample_missing_splits, seed=seed)
+            )
+
+        if downsample_splits:
+            transformation = transformation.then(
+                DownsampleHuggingFaceTransformation(*downsample_splits, seed=seed)
             )
 
         transformation = transformation.persisting(
