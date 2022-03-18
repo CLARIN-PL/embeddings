@@ -24,6 +24,11 @@ from embeddings.pipeline.evaluation_pipeline import (
     FlairTextClassificationEvaluationPipeline,
     FlairTextPairClassificationEvaluationPipeline,
 )
+from embeddings.pipeline.flair_preprocessing_pipeline import (
+    FlairSequenceLabelingPreprocessingPipeline,
+    FlairTextClassificationPreprocessingPipeline,
+    FlairTextPairClassificationPreprocessingPipeline,
+)
 from embeddings.pipeline.hps_pipeline import (
     AbstractHuggingFaceOptimizedPipeline,
     OptunaPipeline,
@@ -37,11 +42,6 @@ from embeddings.pipeline.pipelines_metadata import (
     FlairPairClassificationPipelineMetadata,
     FlairSequenceLabelingEvaluationPipelineMetadata,
     FlairSequenceLabelingPipelineMetadata,
-)
-from embeddings.pipeline.preprocessing_pipeline import (
-    FlairSequenceLabelingPreprocessingPipeline,
-    FlairTextClassificationPreprocessingPipeline,
-    FlairTextPairClassificationPreprocessingPipeline,
 )
 
 

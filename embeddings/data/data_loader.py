@@ -23,22 +23,18 @@ class DataLoader(ABC, Generic[Input, Output]):
 
 class HuggingFaceDataLoader(DataLoader[str, datasets.DatasetDict]):
     def load(self, dataset: Dataset[str]) -> datasets.DatasetDict:
-        if isinstance(dataset, LoadableDataset):
-            result = datasets.load_dataset(dataset.dataset, **dataset.load_dataset_kwargs)
-            assert isinstance(result, datasets.DatasetDict)
-            return result
-        else:
-            raise ValueError("This DataLoader should be used with HuggingFaceDataset only.")
+        assert isinstance(dataset, LoadableDataset)
+        result = datasets.load_dataset(dataset.dataset, **dataset.load_dataset_kwargs)
+        assert isinstance(result, datasets.DatasetDict)
+        return result
 
 
 class HuggingFaceLocalDataLoader(DataLoader[str, datasets.DatasetDict]):
     def load(self, dataset: Dataset[str]) -> datasets.DatasetDict:
-        if isinstance(dataset, LoadableDataset):
-            result = datasets.load_from_disk(str(dataset.dataset))
-            assert isinstance(result, datasets.DatasetDict)
-            return result
-        else:
-            raise ValueError("This DataLoader should be used with HuggingFaceDataset only.")
+        assert isinstance(dataset, LoadableDataset)
+        result = datasets.load_from_disk(dataset.dataset)
+        assert isinstance(result, datasets.DatasetDict)
+        return result
 
 
 class PickleFlairCorpusDataLoader(DataLoader[str, Corpus]):

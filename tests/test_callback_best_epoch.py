@@ -39,7 +39,7 @@ def dataset_kwargs() -> Tuple[Dict[str, Any], "TemporaryDirectory[str]"]:
         "dataset_name_or_path": path.name,
         "input_column_name": ["text"],
         "target_column_name": "target",
-    }, path
+    }, path  # TemporaryDirectory object is passed additionally to omit cleanup of the temporal path
 
 
 @pytest.fixture(scope="module")

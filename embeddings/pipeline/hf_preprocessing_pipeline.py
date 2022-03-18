@@ -1,9 +1,10 @@
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Union
 
 import datasets
 
 from embeddings.data.data_loader import HF_DATALOADERS, get_hf_dataloader
 from embeddings.data.dataset import LoadableDataset
+from embeddings.pipeline import DOWNSAMPLE_SPLITS_TYPE, SAMPLE_MISSING_SPLITS_TYPE
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
 from embeddings.transformation.hf_transformation.downsample_transformation import (
     DownsampleHuggingFaceTransformation,
@@ -25,10 +26,8 @@ class HuggingFacePreprocessingPipeline(
         self,
         dataset_name: str,
         persist_path: str,
-        sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
-        downsample_splits: Optional[
-            Tuple[Optional[float], Optional[float], Optional[float]]
-        ] = None,
+        sample_missing_splits: Optional[SAMPLE_MISSING_SPLITS_TYPE] = None,
+        downsample_splits: Optional[DOWNSAMPLE_SPLITS_TYPE] = None,
         ignore_test_subset: bool = False,
         seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
