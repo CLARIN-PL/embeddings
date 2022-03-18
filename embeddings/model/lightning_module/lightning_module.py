@@ -22,15 +22,15 @@ Model = TypeVar("Model")
 class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
     def __init__(
         self,
+        optimizer: str,
+        learning_rate: float,
+        adam_epsilon: float,
+        warmup_steps: int,
+        weight_decay: float,
+        train_batch_size: int,
+        eval_batch_size: int,
+        use_scheduler: bool,
         metrics: Optional[MetricCollection] = None,
-        optimizer: str = "AdamW",
-        learning_rate: float = 1e-4,
-        adam_epsilon: float = 1e-8,
-        warmup_steps: int = 100,
-        weight_decay: float = 0.0,
-        train_batch_size: int = 32,
-        eval_batch_size: int = 32,
-        use_scheduler: bool = False,
         **kwargs: Any,
     ):
         super().__init__()

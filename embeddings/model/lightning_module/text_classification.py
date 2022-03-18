@@ -18,7 +18,7 @@ class TextClassificationModule(HuggingFaceLightningModule):
     def __init__(
         self,
         model_name_or_path: T_path,
-        finetune_last_n_layers: int = -1,
+        finetune_last_n_layers: int,
         metrics: Optional[MetricCollection] = None,
         config_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
