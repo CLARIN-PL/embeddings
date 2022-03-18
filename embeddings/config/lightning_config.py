@@ -142,5 +142,19 @@ class LightningAdvancedConfig(AdvancedConfig, LightningConfigDefaultKwargs):
     def from_dict(cls, config: Dict[str, Any]) -> "LightningAdvancedConfig":
         return cls(**config)
 
+    @staticmethod
+    def from_basic() -> "LightningAdvancedConfig":
+        config = LightningBasicConfig()
+        return LightningAdvancedConfig(
+            train_batch_size=config.train_batch_size,
+            eval_batch_size=config.eval_batch_size,
+            finetune_last_n_layers=config.finetune_last_n_layers,
+            datamodule_kwargs=config.datamodule_kwargs,
+            task_model_kwargs=config.task_model_kwargs,
+            task_train_kwargs=config.task_train_kwargs,
+            model_config_kwargs=config.model_config_kwargs,
+            early_stopping_kwargs=config.early_stopping_kwargs,
+        )
+
 
 LightningConfig = Union[LightningBasicConfig, LightningAdvancedConfig]

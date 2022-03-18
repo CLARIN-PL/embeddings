@@ -143,11 +143,27 @@ class FlairAdvancedConfig(AdvancedConfig, ABC):
 class FlairSequenceLabelingAdvancedConfig(FlairAdvancedConfig):
     hidden_size: int = 256
 
+    @staticmethod
+    def from_basic() -> "FlairSequenceLabelingAdvancedConfig":
+        config = FlairSequenceLabelingBasicConfig()
+        return FlairSequenceLabelingAdvancedConfig(
+            task_model_kwargs=config.task_model_kwargs, task_train_kwargs=config.task_train_kwargs
+        )
+
 
 @dataclass
 class FlairTextClassificationAdvancedConfig(FlairAdvancedConfig):
     document_embedding_cls: str = "FlairDocumentPoolEmbedding"
     load_model_kwargs: Dict[str, Any] = field(default_factory=dict)
+
+    @staticmethod
+    def from_basic() -> "FlairTextClassificationAdvancedConfig":
+        config = FlairTextClassificationBasicConfig()
+        return FlairTextClassificationAdvancedConfig(
+            task_model_kwargs=config.task_model_kwargs,
+            task_train_kwargs=config.task_train_kwargs,
+            load_model_kwargs=config.load_model_kwargs,
+        )
 
 
 FlairTextClassificationConfig = Union[

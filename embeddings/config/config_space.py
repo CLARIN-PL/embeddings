@@ -15,10 +15,10 @@ from embeddings.embedding.static.embedding import StaticEmbedding
 Parameter = Union[SearchableParameter, ConstantParameter]
 ParsedParameters = TypeVar("ParsedParameters")
 SampledParameters = Dict[str, Union[ParameterValues, Dict[str, ParameterValues]]]
-OptimizedConfig = TypeVar("OptimizedConfig", bound="ConfigSpace")
+ConfigSpace = TypeVar("ConfigSpace", bound="BaseConfigSpace")
 
 
-class ConfigSpace(Config, ABC):
+class BaseConfigSpace(Config, ABC):
     def _parse_parameter(
         self, param_name: str, trial: optuna.trial.Trial
     ) -> Tuple[str, ParameterValues]:

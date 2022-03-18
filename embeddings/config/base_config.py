@@ -42,3 +42,7 @@ class AdvancedConfig(Config, abc.ABC):
     @abc.abstractmethod
     def __post_init__(self) -> None:
         pass
+
+    @staticmethod
+    def from_basic() -> "AdvancedConfig":
+        pass
