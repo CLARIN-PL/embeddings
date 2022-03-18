@@ -167,7 +167,7 @@ class OptimizedFlairClassificationPipeline(
         return metadata
 
     def _get_evaluation_metadata(
-        self, parameters: SampledParameters
+        self, parameters: SampledParameters, **kwargs: Any
     ) -> FlairClassificationEvaluationPipelineMetadata:
         (
             embedding_name,
@@ -262,7 +262,7 @@ class OptimizedFlairPairClassificationPipeline(
         return metadata
 
     def _get_evaluation_metadata(
-        self, parameters: SampledParameters
+        self, parameters: SampledParameters, **kwargs: Any
     ) -> FlairClassificationEvaluationPipelineMetadata:
         (
             embedding_name,
@@ -386,7 +386,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         return metadata
 
     def _get_evaluation_metadata(
-        self, parameters: SampledParameters
+        self, parameters: SampledParameters, **kwargs: Any
     ) -> FlairSequenceLabelingEvaluationPipelineMetadata:
         (
             embedding_name,

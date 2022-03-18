@@ -9,7 +9,7 @@ from embeddings.data.datamodule import BaseDataModule, Data
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.model.model import Model
 from embeddings.pipeline.pipeline import Pipeline
-from embeddings.utils.utils import get_installed_packages
+from embeddings.utils.utils import get_installed_packages, standardize_name
 
 EvaluationResult = TypeVar("EvaluationResult")
 ModelResult = TypeVar("ModelResult")
@@ -48,13 +48,15 @@ class LightningPipeline(
         self.output_path = output_path
 
     def run(self, run_name: Optional[str] = None) -> EvaluationResult:
+        if run_name:
+            run_name = standardize_name(run_name)
         self._save_artifacts()
         model_result = self.model.execute(data=self.datamodule, run_name=run_name)
         result = self.evaluator.evaluate(model_result)
         if self.logging_kwargs["use_wandb"]:
             wandb.log_artifact(
                 str(self.output_path),
-                name="test",
+                name=run_name,
                 type="output",
             )
             wandb.finish()

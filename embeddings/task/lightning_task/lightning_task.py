@@ -6,7 +6,7 @@ import pytorch_lightning as pl
 import torch
 from numpy import typing as nptyping
 from pytorch_lightning import loggers as pl_loggers
-from pytorch_lightning.callbacks import Callback
+from pytorch_lightning.callbacks import Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.loggers import LightningLoggerBase
 from torch.utils.data import DataLoader
@@ -68,7 +68,9 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
 
-        callbacks: List[Callback] = []
+        callbacks: List[Callback] = [
+            ModelCheckpoint(dirpath=self.output_path.joinpath("checkpoints"))
+        ]
         if "validation" in data.load_dataset().keys():
             callbacks.append(BestEpochCallback())
             callbacks.append(EarlyStopping(**self.early_stopping_kwargs))

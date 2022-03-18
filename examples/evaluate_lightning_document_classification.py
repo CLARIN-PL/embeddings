@@ -7,18 +7,10 @@ from embeddings.defaults import RESULTS_PATH
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.utils.utils import build_output_path, format_eval_result
 
-LightningClassificationPipeline.DEFAULT_DATAMODULE_KWARGS.update(
-    {
-        "downsample_train": 0.01,
-        "downsample_val": 0.04,
-        "downsample_test": 0.04,
-    }
-)
-
 
 def run(
     embedding_name_or_path: str = typer.Option(
-        "hf-internal-testing/tiny-albert", help="Hugging Face embedding model name or path."
+        "allegro/herbert-base-cased", help="Hugging Face embedding model name or path."
     ),
     dataset_name: str = typer.Option(
         "clarin-pl/polemo2-official", help="Hugging Face dataset name or path."
@@ -40,8 +32,6 @@ def run(
     typer.echo(pprint.pformat(locals()))
 
     output_path = build_output_path(root, embedding_name_or_path, dataset_name)
-    output_path.mkdir(parents=True, exist_ok=True)
-
     pipeline = LightningClassificationPipeline(
         embedding_name_or_path=embedding_name_or_path,
         dataset_name_or_path=dataset_name,

@@ -15,10 +15,14 @@ from numpy import typing as nptyping
 from tqdm.auto import tqdm
 
 from embeddings.data.io import T_path
+from embeddings.utils.loggers import get_logger
 
 Numeric = Union[float, int]
 PrimitiveTypes = Union[None, bool, int, float, str]
 NDArrayInt = nptyping.NDArray[np.int_]
+
+
+_LOGGER = get_logger(__name__)
 
 
 def import_from_string(dotted_path: str) -> Any:
@@ -47,7 +51,11 @@ def import_from_string(dotted_path: str) -> Any:
 
 
 def build_output_path(
-    root: T_path, embedding_name: T_path, dataset_name: T_path, timestamp_subdir: bool = True
+    root: T_path,
+    embedding_name: T_path,
+    dataset_name: T_path,
+    timestamp_subdir: bool = True,
+    mkdirs: bool = True,
 ) -> Path:
     """Builds output path using pattern {root}/{embedding_name}/{dataset_name}.
     Every "/" in the embedding/dataset name is replaced with  "__".
@@ -62,7 +70,7 @@ def build_output_path(
             return Path(embedding_or_dataset).name
         else:
             assert isinstance(embedding_or_dataset, str)
-            return embedding_or_dataset.replace("/", "__")
+            return standardize_name(embedding_or_dataset)
 
     for x in [embedding_name, dataset_name]:
         if isinstance(x, Path) and (x.is_file() or not x.exists()):
@@ -72,8 +80,19 @@ def build_output_path(
     dataset_name = _get_new_dir_name(dataset_name)
     path = Path(root, embedding_name, dataset_name)
     if timestamp_subdir:
-        path = path.joinpath(f"{datetime.utcnow().strftime('%Y%m%d%H%M%S')}UTC")
+        path = path.joinpath(f"{datetime.now().strftime('%Y%m%d%H%M%S')}")
+    if mkdirs:
+        path.mkdir(exist_ok=True, parents=True)
     return path
+
+
+def standardize_name(text: str) -> str:
+    if "/" in text:
+        result = text.replace("/", "__")
+        _LOGGER.warning(f"String '{text}' contains '/'. Replacing it with '__'. Result: {result}.")
+    else:
+        result = text
+    return result
 
 
 def format_eval_result(result: Dict[str, Any]) -> str:

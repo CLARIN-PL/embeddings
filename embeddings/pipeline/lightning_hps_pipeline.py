@@ -35,6 +35,7 @@ from embeddings.pipeline.pipelines_metadata import (
     LightningSequenceLabelingPipelineMetadata,
 )
 from embeddings.utils.loggers import get_logger
+from embeddings.utils.utils import standardize_name
 
 _logger = get_logger(__name__)
 
@@ -77,11 +78,15 @@ class OptimizedLightingPipeline(
     ABC,
     Generic[ConfigSpace, LightningMetadata],
 ):
-    def _get_evaluation_metadata(self, parameters: SampledParameters) -> LightningMetadata:
+    def _get_evaluation_metadata(
+        self, parameters: SampledParameters, trial_name: str = "", **kwargs: Any
+    ) -> LightningMetadata:
         metadata = self._get_metadata(parameters)
         metadata["predict_subset"] = LightingDataModuleSubset.VALIDATION
         metadata["dataset_name_or_path"] = str(self.dataset_path)
-        metadata["output_path"] = self.tmp_model_output_dir.name
+        output_path = Path(self.tmp_model_output_dir.name).joinpath(trial_name)
+        output_path.mkdir()
+        metadata["output_path"] = output_path
         return metadata
 
     def _init_dataset_path(self) -> None:
@@ -92,7 +97,7 @@ class OptimizedLightingPipeline(
                 raise FileNotFoundError("Dataset path not found")
         else:
             path = Path(self.tmp_dataset_dir.name).joinpath(
-                str(self.dataset_name_or_path).replace("/", "__")
+                standardize_name(str(self.dataset_name_or_path))
             )
             path.mkdir()
             self.dataset_path = path

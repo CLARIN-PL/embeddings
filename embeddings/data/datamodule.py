@@ -82,7 +82,9 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
         self.seed = seed
         dataset_info = self.load_dataset()["train"].info
-        super().__init__(dataset_info=dataset_info, dataset_version=dataset_info.version.version_str)
+        super().__init__(
+            dataset_info=dataset_info, dataset_version=dataset_info.version.version_str
+        )
 
     @abc.abstractmethod
     def prepare_labels(self) -> None:

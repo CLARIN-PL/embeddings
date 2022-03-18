@@ -18,7 +18,7 @@ from embeddings.pipeline.pipelines_metadata import EvaluationMetadata, Metadata
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
 from embeddings.pipeline.standard_pipeline import LoaderResult, ModelResult, TransformationResult
 from embeddings.utils.hps_persister import HPSResultsPersister
-from embeddings.utils.utils import PrimitiveTypes
+from embeddings.utils.utils import PrimitiveTypes, standardize_name
 
 EvaluationResult = TypeVar("EvaluationResult", bound=Dict[str, Dict[str, PrimitiveTypes]])
 
@@ -97,7 +97,9 @@ class OptunaPipeline(
         pass
 
     @abc.abstractmethod
-    def _get_evaluation_metadata(self, parameters: SampledParameters) -> EvaluationMetadata:
+    def _get_evaluation_metadata(
+        self, parameters: SampledParameters, **kwargs: Any
+    ) -> EvaluationMetadata:
         pass
 
     def get_best_paramaters(self, study: Study) -> Metadata:
@@ -123,13 +125,13 @@ class OptunaPipeline(
         return study.trials_dataframe(), metadata
 
     def objective(self, trial: optuna.trial.Trial) -> float:
-        run_name = f"study_{trial.study.study_name}_trial_{trial.number}".replace("/", "__")
+        trial_name = standardize_name(f"study_{trial.study.study_name}_trial_{trial.number}")
 
         parameters = self.config_space.sample_parameters(trial=trial)
         parsed_params = self.config_space.parse_parameters(parameters)
-        kwargs = self._get_evaluation_metadata(parsed_params)
+        kwargs = self._get_evaluation_metadata(parsed_params, trial_name=trial_name)
         pipeline = self._init_evaluation_pipeline(**kwargs)
-        results = pipeline.run(run_name=run_name)
+        results = pipeline.run(run_name=trial_name)
         metric = results[self.metric_name][self.metric_key]
         assert isinstance(metric, float)
         return metric

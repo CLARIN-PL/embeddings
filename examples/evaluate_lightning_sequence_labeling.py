@@ -40,8 +40,6 @@ def run(
     typer.echo(pprint.pformat(locals()))
 
     output_path = build_output_path(root, embedding_name_or_path, dataset_name)
-    output_path.mkdir(parents=True, exist_ok=True)
-
     pipeline = LightningSequenceLabelingPipeline(
         embedding_name_or_path=embedding_name_or_path,
         dataset_name_or_path=dataset_name,
