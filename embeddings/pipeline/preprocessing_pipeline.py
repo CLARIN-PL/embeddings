@@ -131,7 +131,7 @@ class FlairPreprocessingPipeline(
                 )
 
             elif self.corpus_transformation_cls == PairClassificationCorpusTransformation:
-                assert isinstance(self.input_column_name, tuple)
+                assert isinstance(self.input_column_name, (tuple, list))
                 transformation = PairClassificationCorpusTransformation(
                     input_columns_names_pair=self.input_column_name,
                     target_column_name=self.target_column_name,
