@@ -6,7 +6,7 @@ import pytest
 import yaml
 from _pytest.tmpdir import TempdirFactory
 
-from embeddings.config.config_space import ConfigSpace
+from embeddings.config.config_space import BaseConfigSpace
 from embeddings.config.flair_config_space import (
     FlairModelTrainerConfigSpace,
     FlairSequenceLabelingConfigSpace,
@@ -250,7 +250,7 @@ def lightning_classification_wrong_param_yaml_config_file_path(
     return output_path
 
 
-def assert_config_with_yaml(config_space: ConfigSpace, config: Dict[str, Any]) -> None:
+def assert_config_with_yaml(config_space: BaseConfigSpace, config: Dict[str, Any]) -> None:
     cs_params = config.pop("parameters")
     for param_name, param_values in cs_params.items():
         param_values.pop("param_type")

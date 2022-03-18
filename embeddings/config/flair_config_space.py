@@ -7,7 +7,7 @@ from typing import Any, ClassVar, Dict, List, Mapping, Set, Tuple, Union
 import optuna
 from typing_extensions import Final
 
-from embeddings.config.config_space import ConfigSpace, Parameter, SampledParameters
+from embeddings.config.config_space import BaseConfigSpace, Parameter, SampledParameters
 from embeddings.config.flair_config import FlairSequenceLabelingBasicConfig
 from embeddings.config.parameters import ConstantParameter, ParameterValues, SearchableParameter
 from embeddings.data.io import T_path
@@ -58,7 +58,7 @@ class FlairTextClassificationConfigSpaceMapping:
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
-class AbstractFlairModelTrainerConfigSpace(ConfigSpace, ABC):
+class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
     embedding_name: InitVar[Union[str, List[str]]]
     param_embedding_name: Parameter = field(init=False)
     param_selection_mode: Parameter = field(
@@ -101,7 +101,7 @@ class AbstractFlairModelTrainerConfigSpace(ConfigSpace, ABC):
             "param_selection_mode",
             "save_final_model",
         }
-        task_train_kwargs = ConfigSpace._pop_parameters(
+        task_train_kwargs = BaseConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=task_train_keys
         )
         return parameters, task_train_kwargs
@@ -122,7 +122,7 @@ class FlairModelTrainerConfigSpace(AbstractFlairModelTrainerConfigSpace):
             parameters,
             task_train_kwargs,
         ) = FlairModelTrainerConfigSpace._parse_model_trainer_parameters(parameters)
-        ConfigSpace._check_unmapped_parameters(parameters=parameters)
+        BaseConfigSpace._check_unmapped_parameters(parameters=parameters)
         return {"embedding_name": embedding_name, "task_train_kwargs": task_train_kwargs}
 
     @classmethod

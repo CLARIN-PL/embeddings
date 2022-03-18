@@ -3,7 +3,7 @@ from copy import deepcopy
 from dataclasses import InitVar, dataclass, field
 from typing import Any, Dict, Final, List, Union
 
-from embeddings.config.config_space import ConfigSpace, Parameter, SampledParameters
+from embeddings.config.config_space import BaseConfigSpace, Parameter, SampledParameters
 from embeddings.config.lightning_config import LightningConfigKeys
 from embeddings.config.parameters import ConstantParameter, ParameterValues, SearchableParameter
 from embeddings.data.io import T_path
@@ -14,7 +14,7 @@ DEFAULT_ACCELERATOR = "auto"
 
 
 @dataclass
-class LightingConfigSpace(ConfigSpace, LightningConfigKeys, ABC):
+class LightingConfigSpace(BaseConfigSpace, LightningConfigKeys, ABC):
     embedding_name_or_path: InitVar[Union[T_path, List[T_path]]]
     devices: InitVar[Union[int, str, None, List[int]]] = field(default=DEFAULT_DEVICES)
     accelerator: InitVar[Union[str, None]] = field(default=DEFAULT_ACCELERATOR)
@@ -162,7 +162,7 @@ class LightingSequenceLabelingConfigSpace(LightingConfigSpace):
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
         sampled_parameters = super().parse_parameters(parameters=parameters)
         extra_datamodule_keys: Final = {"label_all_tokens"}
-        extra_datamodule_kwargs = ConfigSpace._pop_parameters(
+        extra_datamodule_kwargs = BaseConfigSpace._pop_parameters(
             parameters=parameters, parameters_keys=extra_datamodule_keys
         )
         assert isinstance(sampled_parameters["datamodule_kwargs"], dict)

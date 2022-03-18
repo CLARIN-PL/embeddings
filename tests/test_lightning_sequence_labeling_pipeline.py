@@ -62,6 +62,14 @@ def config() -> LightningAdvancedConfig:
             "downsample_test": 0.05,
         },
         dataloader_kwargs={"num_workers": 0},
+        task_model_kwargs={
+            "learning_rate": 1e-4,
+            "use_scheduler": False,
+            "optimizer": "AdamW",
+            "adam_epsilon": 1e-8,
+            "warmup_steps": 100,
+            "weight_decay": 0.0,
+        },
     )
 
 

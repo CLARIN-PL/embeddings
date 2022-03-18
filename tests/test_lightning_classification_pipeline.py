@@ -61,7 +61,14 @@ def config() -> LightningAdvancedConfig:
             "accelerator": "cpu",
             "deterministic": True,
         },
-        task_model_kwargs={"learning_rate": 5e-4, "use_scheduler": False},
+        task_model_kwargs={
+            "learning_rate": 5e-4,
+            "use_scheduler": False,
+            "optimizer": "AdamW",
+            "adam_epsilon": 1e-8,
+            "warmup_steps": 100,
+            "weight_decay": 0.0,
+        },
         datamodule_kwargs={
             "downsample_train": 0.01,
             "downsample_val": 0.01,

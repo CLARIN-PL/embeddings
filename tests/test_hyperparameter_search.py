@@ -9,7 +9,7 @@ from embeddings.config.flair_config import (
     FlairSequenceLabelingAdvancedConfig,
     FlairTextClassificationAdvancedConfig,
 )
-from embeddings.config.lightning_config import LightningAdvancedConfig
+from embeddings.config.lightning_config import LightningAdvancedConfig, LightningBasicConfig
 from embeddings.config.parameters import SearchableParameter
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.pipeline.flair_classification import FlairClassificationPipeline
@@ -86,9 +86,7 @@ def lightning_classification_kwargs(output_path: "TemporaryDirectory[str]") -> D
     return {
         "output_path": output_path.name,
         "embedding_name_or_path": "clarin-pl/roberta-polish-kgr10",
-        "config": LightningAdvancedConfig(
-            train_batch_size=1, eval_batch_size=1, finetune_last_n_layers=0
-        ),
+        "config": LightningBasicConfig(mini_batch_size=1, finetune_last_n_layers=0),
         "tokenizer_name_or_path": None,
         "predict_subset": LightingDataModuleSubset.TEST,
     }
