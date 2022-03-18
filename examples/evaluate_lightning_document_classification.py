@@ -15,8 +15,8 @@ def run(
     dataset_name: str = typer.Option(
         "clarin-pl/polemo2-official", help="Hugging Face dataset name or path."
     ),
-    input_columns_name: str = typer.Option(
-        "text", help="Pair of column names that contain texts to classify."
+    input_column_name: str = typer.Option(
+        "text", help="Column name that contains text to classify."
     ),
     target_column_name: str = typer.Option(
         "target", help="Column name that contains label for classification."
@@ -35,10 +35,8 @@ def run(
     pipeline = LightningClassificationPipeline(
         embedding_name_or_path=embedding_name_or_path,
         dataset_name_or_path=dataset_name,
-        input_column_name=input_columns_name,
+        input_column_name=input_column_name,
         target_column_name=target_column_name,
-        # finetune_last_n_layers=4,
-        task_train_kwargs={"max_epochs": 50},
         output_path=output_path,
         logging_kwargs={
             "use_tensorboard": tensorboard,
