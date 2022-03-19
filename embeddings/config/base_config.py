@@ -1,6 +1,6 @@
 import abc
 from dataclasses import dataclass
-from typing import Any, Dict, Set
+from typing import Any, Dict, Set, Tuple
 
 from embeddings.data.io import T_path
 from embeddings.utils.loggers import get_logger
@@ -29,6 +29,9 @@ class BasicConfig(Config, abc.ABC):
 
     def _parse_fields(self, keys: Set[str]) -> Dict[str, Any]:
         return {field_name: getattr(self, field_name) for field_name in keys}
+
+    def _map_parse_fields(self, key_tuples: Set[Tuple[str, str]]):
+        return {field_name: getattr(self, attr_name) for attr_name, field_name in key_tuples}
 
     @classmethod
     def get_config_keys(cls) -> Set[str]:

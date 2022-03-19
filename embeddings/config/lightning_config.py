@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from types import MappingProxyType
-from typing import Any, ClassVar, Dict, List, Mapping, Optional, Set, Union
+from typing import Any, ClassVar, Dict, List, Mapping, Optional, Set, Tuple, Union
 
 from pytorch_lightning.accelerators import Accelerator
 
@@ -32,7 +32,11 @@ class LightningConfigKeys:
     }
     TASK_TRAIN_KEYS: ClassVar[Set[str]] = {"max_epochs", "devices", "accelerator"}
     MODEL_CONFIG_KEYS: ClassVar[Set[str]] = {"classifier_dropout"}
-    EARLY_STOPPING_KEYS: ClassVar[Set[str]] = {"monitor", "mode", "patience"}
+    EARLY_STOPPING_KEYS: ClassVar[Set[Tuple[str, str]]] = {
+        ("early_stopping_monitor", "monitor"),
+        ("early_stopping_mode", "mode"),
+        ("early_stopping_patience", "patience"),
+    }
 
 
 @dataclass
@@ -70,9 +74,9 @@ class LightningBasicConfig(BasicConfig, LightningConfigKeys):
     devices: Optional[Union[List[int], str, int]] = "auto"
     max_epochs: Optional[int] = None
     accelerator: Optional[Union[str, Accelerator]] = "auto"
-    monitor: str = "val/Loss"
-    mode: str = "min"
-    patience: int = 3
+    early_stopping_monitor: str = "val/Loss"
+    early_stopping_mode: str = "min"
+    early_stopping_patience: int = 3
 
     train_batch_size: int = field(init=False)
     eval_batch_size: int = field(init=False)
@@ -91,7 +95,7 @@ class LightningBasicConfig(BasicConfig, LightningConfigKeys):
         self.task_model_kwargs = self._parse_fields(self.TASK_MODEL_KEYS)
         self.task_train_kwargs = self._parse_fields(self.TASK_TRAIN_KEYS)
         self.model_config_kwargs = self._parse_fields(self.MODEL_CONFIG_KEYS)
-        self.early_stopping_kwargs = self._parse_fields(self.EARLY_STOPPING_KEYS)
+        self.early_stopping_kwargs = self._map_parse_fields(self.EARLY_STOPPING_KEYS)
         self.task_model_kwargs.update(
             {"train_batch_size": self.train_batch_size, "eval_batch_size": self.eval_batch_size}
         )
