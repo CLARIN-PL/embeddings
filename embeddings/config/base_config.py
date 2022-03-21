@@ -30,7 +30,7 @@ class BasicConfig(Config, abc.ABC):
     def _parse_fields(self, keys: Set[str]) -> Dict[str, Any]:
         return {field_name: getattr(self, field_name) for field_name in keys}
 
-    def _map_parse_fields(self, key_tuples: Set[Tuple[str, str]]):
+    def _map_parse_fields(self, key_tuples: Set[Tuple[str, str]]) -> Dict[str, Any]:
         return {field_name: getattr(self, attr_name) for attr_name, field_name in key_tuples}
 
     @classmethod

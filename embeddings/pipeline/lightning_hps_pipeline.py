@@ -7,7 +7,7 @@ from typing import Any, Dict, Generic, Optional, Tuple
 import datasets
 from numpy import typing as nptyping
 
-from embeddings.config.config_space import OptimizedConfig, SampledParameters
+from embeddings.config.config_space import ConfigSpace, SampledParameters
 from embeddings.config.lighting_config_space import (
     LightingSequenceLabelingConfigSpace,
     LightingTextClassificationConfigSpace,
@@ -43,7 +43,7 @@ _logger = get_logger(__name__)
 
 @dataclass
 class _OptimizedLightingPipelineBase(
-    _HuggingFaceOptimizedPipelineBase[OptimizedConfig], ABC, Generic[OptimizedConfig]
+    _HuggingFaceOptimizedPipelineBase[ConfigSpace], ABC, Generic[ConfigSpace]
 ):
     input_column_name: str
     target_column_name: str
@@ -65,7 +65,7 @@ class _OptimizedLightingPipelineBase(
 @dataclass  # type: ignore
 class OptimizedLightingPipeline(
     OptunaPipeline[
-        OptimizedConfig,
+        ConfigSpace,
         LightningMetadata,
         LightningMetadata,
         str,
@@ -74,10 +74,10 @@ class OptimizedLightingPipeline(
         Dict[str, nptyping.NDArray[Any]],
         Dict[str, Any],
     ],
-    AbstractHuggingFaceOptimizedPipeline[OptimizedConfig],
-    _OptimizedLightingPipelineBase[OptimizedConfig],
+    AbstractHuggingFaceOptimizedPipeline[ConfigSpace],
+    _OptimizedLightingPipelineBase[ConfigSpace],
     ABC,
-    Generic[OptimizedConfig, LightningMetadata],
+    Generic[ConfigSpace, LightningMetadata],
 ):
     def _get_evaluation_metadata(
         self, parameters: SampledParameters, trial_name: str = "", **kwargs: Any

@@ -8,7 +8,7 @@ import datasets
 from flair.data import Corpus
 from numpy import typing as nptyping
 
-from embeddings.config.config_space import OptimizedConfig, SampledParameters
+from embeddings.config.config_space import ConfigSpace, SampledParameters
 from embeddings.config.flair_config import (
     FlairSequenceLabelingAdvancedConfig,
     FlairTextClassificationAdvancedConfig,
@@ -52,7 +52,7 @@ from embeddings.pipeline.pipelines_metadata import (
 
 @dataclass
 class _OptimizedFlairPipelineBase(
-    _HuggingFaceOptimizedPipelineBase[OptimizedConfig], ABC, Generic[OptimizedConfig]
+    _HuggingFaceOptimizedPipelineBase[ConfigSpace], ABC, Generic[ConfigSpace]
 ):
     input_column_name: str
     target_column_name: str
@@ -60,7 +60,7 @@ class _OptimizedFlairPipelineBase(
 
 @dataclass
 class _OptimizedFlairPairClassificationPipelineBase(
-    _HuggingFaceOptimizedPipelineBase[OptimizedConfig], ABC, Generic[OptimizedConfig]
+    _HuggingFaceOptimizedPipelineBase[ConfigSpace], ABC, Generic[ConfigSpace]
 ):
     input_columns_names_pair: Tuple[str, str]
     target_column_name: str

@@ -10,7 +10,7 @@ import optuna
 import pandas as pd
 from optuna import Study
 
-from embeddings.config.config_space import OptimizedConfig, SampledParameters
+from embeddings.config.config_space import ConfigSpace, SampledParameters
 from embeddings.data.dataset import Data
 from embeddings.data.io import T_path
 from embeddings.pipeline.evaluation_pipeline import ModelEvaluationPipeline
@@ -56,7 +56,7 @@ class PersistingPipeline(OptimizedPipeline[Metadata]):
 class OptunaPipeline(
     OptimizedPipeline[Metadata],
     Generic[
-        OptimizedConfig,
+        ConfigSpace,
         Metadata,
         EvaluationMetadata,
         Data,
@@ -68,7 +68,7 @@ class OptunaPipeline(
 ):
     def __init__(
         self,
-        config_space: OptimizedConfig,
+        config_space: ConfigSpace,
         preprocessing_pipeline: Optional[
             PreprocessingPipeline[Data, LoaderResult, TransformationResult]
         ],
@@ -158,9 +158,9 @@ class OptunaPipeline(
 
 
 @dataclass
-class _HuggingFaceOptimizedPipelineBase(ABC, Generic[OptimizedConfig]):
+class _HuggingFaceOptimizedPipelineBase(ABC, Generic[ConfigSpace]):
     dataset_name_or_path: T_path
-    config_space: OptimizedConfig
+    config_space: ConfigSpace
 
 
 @dataclass
@@ -183,9 +183,9 @@ class _HuggingFaceOptimizedPipelineDefaultsBase(ABC):
 @dataclass  # type: ignore
 class AbstractHuggingFaceOptimizedPipeline(
     _HuggingFaceOptimizedPipelineDefaultsBase,
-    _HuggingFaceOptimizedPipelineBase[OptimizedConfig],
+    _HuggingFaceOptimizedPipelineBase[ConfigSpace],
     ABC,
-    Generic[OptimizedConfig],
+    Generic[ConfigSpace],
 ):
     @abc.abstractmethod
     def __post_init__(self) -> None:
