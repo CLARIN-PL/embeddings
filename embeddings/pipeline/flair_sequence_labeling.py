@@ -47,9 +47,7 @@ class FlairSequenceLabelingPipeline(
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         output_path = Path(output_path)
-        dataset = Dataset(
-            dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
-        )
+        dataset = Dataset(dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {})
         data_loader = HuggingFaceDataLoader()
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]

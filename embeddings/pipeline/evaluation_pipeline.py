@@ -9,7 +9,7 @@ from embeddings.data.data_loader import (
     DataLoader,
     PickleFlairCorpusDataLoader,
 )
-from embeddings.data.dataset import Data, BaseDataset, Dataset
+from embeddings.data.dataset import BaseDataset, Data, Dataset
 from embeddings.data.io import T_path
 from embeddings.embedding.auto_flair import DocumentEmbedding
 from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding

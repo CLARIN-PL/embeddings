@@ -48,9 +48,7 @@ class SklearnClassificationPipeline(
         embedding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = Dataset(
-            dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
-        )
+        dataset = Dataset(dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {})
         data_loader = HuggingFaceDataLoader()
         transformation = ToPandasHuggingFaceCorpusTransformation().then(
             RenameInputColumnsTransformation(input_column_name, target_column_name)

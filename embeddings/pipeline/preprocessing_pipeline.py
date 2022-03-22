@@ -1,7 +1,7 @@
 from typing import Generic
 
 from embeddings.data.data_loader import DataLoader
-from embeddings.data.dataset import Data, BaseDataset
+from embeddings.data.dataset import BaseDataset, Data
 from embeddings.pipeline.pipeline import Pipeline
 from embeddings.pipeline.standard_pipeline import LoaderResult, TransformationResult
 from embeddings.transformation.transformation import Transformation

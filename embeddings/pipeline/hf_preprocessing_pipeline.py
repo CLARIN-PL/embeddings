@@ -32,9 +32,7 @@ class HuggingFacePreprocessingPipeline(
         seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = Dataset(
-            dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
-        )
+        dataset = Dataset(dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {})
         data_loader: HF_DATALOADERS = get_hf_dataloader(dataset)
 
         transformation: Union[
