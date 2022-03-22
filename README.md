@@ -148,8 +148,26 @@ As most datasets in HuggingFace repository should be compatible with our pipelin
 Model and training parameters can be controlled via `task_model_kwargs` and 
 `task_train_kwargs` parameters that can be populated using the advanced config. 
 Tutorial on how to use configs can be found in `/tutorials` directory of the repository.
+Two types of config are defined in our library: BasicConfig and AdvancedConfig. 
+In summary, the BasicConfig takes arguments and automatically assign them into proper keyword group, 
+while the AdvancedConfig takes as the input keyword groups that should be already correctly mapped.
 
-## Example with `polemo2` dataset.
+The list of available config can be found below:
+#### **Flair**:                 
+   - FlairBasicConfig
+   - FlairSequenceLabelingBasicConfig
+   - FlairTextClassificationBasicConfig
+   - FlairSequenceLabelingAdvancedConfig
+   - FlairTextClassificationAdvancedConfig
+   
+#### **Lightning**:
+   - LightningBasicConfig
+   - LightningAdvancedConfig
+
+
+## Example with `polemo2` dataset
+
+### Flair pipeline
 
 ```python
 from embeddings.pipeline.flair_classification import FlairClassificationPipeline
@@ -177,6 +195,65 @@ pipeline = FlairClassificationPipeline(
 )
 
 print(pipeline.run())
+```
+
+### Lightning pipeline
+
+```python
+from embeddings.config.lightning_config import LightningBasicConfig
+from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
+
+config = LightningBasicConfig(
+    learning_rate=0.01, max_epochs=1, max_seq_length=128, finetune_last_n_layers=0, accelerator="cpu"
+)
+
+pipeline = LightningClassificationPipeline(
+    embedding_name_or_path="allegro/herbert-base-cased",
+    dataset_name_or_path="clarin-pl/polemo2-official",
+    input_column_name=["text"],
+    target_column_name="target",
+    load_dataset_kwargs={
+            "train_domains": ["hotels", "medicine"],
+            "dev_domains": ["hotels", "medicine"],
+            "test_domains": ["hotels", "medicine"],
+            "text_cfg": "text",
+        },
+    output_path=".",
+    config=config
+)
+```
+
+You can also define an Advanced config with populated keyword arguments.
+In general, the keywords are passed to the object when constructing specific pipelines.
+We can identify and trace the keyword arguments to find the possible arguments that can be set in the config kwargs.
+
+
+```python
+from embeddings.config.lightning_config import LightningAdvancedConfig
+
+config = LightningAdvancedConfig(
+    finetune_last_n_layers=0,
+    task_train_kwargs={
+        "max_epochs": 1,
+        "devices": "auto",
+        "accelerator": "cpu",
+        "deterministic": True,
+    },
+    task_model_kwargs={
+        "learning_rate": 5e-4,
+        "use_scheduler": False,
+        "optimizer": "AdamW",
+        "adam_epsilon": 1e-8,
+        "warmup_steps": 100,
+        "weight_decay": 0.0,
+    },
+    datamodule_kwargs={
+        "downsample_train": 0.01,
+        "downsample_val": 0.01,
+        "downsample_test": 0.05,
+    },
+    dataloader_kwargs={"num_workers": 0},
+)
 ```
 
 # Static embeddings
