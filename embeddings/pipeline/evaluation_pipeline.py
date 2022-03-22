@@ -9,7 +9,7 @@ from embeddings.data.data_loader import (
     DataLoader,
     PickleFlairCorpusDataLoader,
 )
-from embeddings.data.dataset import Data, Dataset, LoadableDataset
+from embeddings.data.dataset import Data, BaseDataset, Dataset
 from embeddings.data.io import T_path
 from embeddings.embedding.auto_flair import DocumentEmbedding
 from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
@@ -36,7 +36,7 @@ class ModelEvaluationPipeline(
 ):
     def __init__(
         self,
-        dataset: Dataset[Data],
+        dataset: BaseDataset[Data],
         data_loader: DataLoader[Data, LoaderResult],
         model: Model[LoaderResult, ModelResult],
         evaluator: Evaluator[ModelResult, EvaluationResult],
@@ -69,7 +69,7 @@ class FlairTextClassificationEvaluationPipeline(
         load_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
         load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
-        dataset = LoadableDataset(dataset=dataset_path)
+        dataset = Dataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
 
         embedding_loader = FlairDocumentPoolEmbeddingLoader(embedding_name, model_type_reference)
@@ -104,7 +104,7 @@ class FlairTextPairClassificationEvaluationPipeline(
         load_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
         load_model_kwargs = {} if load_model_kwargs is None else load_model_kwargs
-        dataset = LoadableDataset(dataset=dataset_path)
+        dataset = Dataset(dataset=dataset_path)
         data_loader = PickleFlairCorpusDataLoader()
 
         embedding_loader = FlairDocumentPoolEmbeddingLoader(embedding_name, model_type_reference)
@@ -142,7 +142,7 @@ class FlairSequenceLabelingEvaluationPipeline(
         task_train_kwargs: Optional[Dict[str, Any]] = None,
         word_embedding_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = LoadableDataset(dataset=dataset_path)
+        dataset = Dataset(dataset=dataset_path)
         data_loader = ConllFlairCorpusDataLoader()
 
         embedding_loader = FlairWordEmbeddingLoader(embedding_name, model_type_reference)

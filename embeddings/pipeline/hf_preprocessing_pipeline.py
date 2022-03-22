@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional, Union
 import datasets
 
 from embeddings.data.data_loader import HF_DATALOADERS, get_hf_dataloader
-from embeddings.data.dataset import LoadableDataset
+from embeddings.data.dataset import Dataset
 from embeddings.pipeline import DOWNSAMPLE_SPLITS_TYPE, SAMPLE_MISSING_SPLITS_TYPE
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
 from embeddings.transformation.hf_transformation.downsample_transformation import (
@@ -32,7 +32,7 @@ class HuggingFacePreprocessingPipeline(
         seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = LoadableDataset(
+        dataset = Dataset(
             dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
         data_loader: HF_DATALOADERS = get_hf_dataloader(dataset)

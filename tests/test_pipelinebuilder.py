@@ -3,7 +3,7 @@ import tempfile
 from typing import Dict
 
 from embeddings.data.data_loader import DataLoader, Input, Output
-from embeddings.data.dataset import Dataset
+from embeddings.data.dataset import BaseDataset
 from embeddings.embedding.embedding import Embedding
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.model.base_model import BaseModel
@@ -13,12 +13,12 @@ from embeddings.transformation.transformation import Transformation
 from embeddings.utils.json_dict_persister import JsonPersister
 
 
-class DummyDataset(Dataset[str]):
+class DummyBaseDataset(BaseDataset[str]):
     pass
 
 
 class DummyLoader(DataLoader[str, str]):
-    def load(self, dataset: Dataset[Input]) -> Output:
+    def load(self, dataset: BaseDataset[Input]) -> Output:
         pass
 
 
@@ -44,7 +44,7 @@ class DummyEvaluator(Evaluator[int, Dict[str, int]]):
 
 def test_pipeline_builder() -> None:
     temp_file: str = os.path.join(tempfile.gettempdir(), "pipelinebuilder.embeddings.json")
-    dataset = DummyDataset()
+    dataset = DummyBaseDataset()
     data_loader = DummyLoader()
     data_transformation = DummyTransformation()
     task = DummyTask()

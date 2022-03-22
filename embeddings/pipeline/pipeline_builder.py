@@ -2,7 +2,7 @@ from abc import ABC
 from typing import Generic, Optional, TypeVar
 
 from embeddings.data.data_loader import DataLoader
-from embeddings.data.dataset import Dataset
+from embeddings.data.dataset import BaseDataset
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.model.model import Model
 from embeddings.pipeline.pipeline import Pipeline
@@ -27,7 +27,7 @@ class PipelineBuilder(
 ):
     def __init__(
         self,
-        dataset: Optional[Dataset[Data]] = None,
+        dataset: Optional[BaseDataset[Data]] = None,
         data_loader: Optional[DataLoader[Data, LoaderResult]] = None,
         transformation: Optional[Transformation[LoaderResult, TransformationResult]] = None,
         model: Optional[Model[TransformationResult, ModelResult]] = None,
@@ -41,7 +41,7 @@ class PipelineBuilder(
 
     @staticmethod
     def with_dataset(
-        dataset: Dataset[CreationData],
+        dataset: BaseDataset[CreationData],
     ) -> "PipelineBuilder[CreationData, LoaderResult, TransformationResult, ModelResult, EvaluationResult]":
         return PipelineBuilder(dataset)
 

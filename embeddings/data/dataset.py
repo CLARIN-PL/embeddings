@@ -16,12 +16,12 @@ LightingDataLoaders = Union[
 ]
 
 
-class Dataset(ABC, Generic[Data]):
+class BaseDataset(ABC, Generic[Data]):
     def __repr__(self) -> str:
         return type(self).__name__
 
 
-class LoadableDataset(Dataset[str]):
+class Dataset(BaseDataset[str]):
     def __init__(self, dataset: str, **load_dataset_kwargs: Any):
         super().__init__()
         self.dataset = dataset

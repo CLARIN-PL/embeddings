@@ -1,7 +1,7 @@
 from typing import Generic
 
 from embeddings.data.data_loader import DataLoader
-from embeddings.data.dataset import Data, Dataset
+from embeddings.data.dataset import Data, BaseDataset
 from embeddings.pipeline.pipeline import Pipeline
 from embeddings.pipeline.standard_pipeline import LoaderResult, TransformationResult
 from embeddings.transformation.transformation import Transformation
@@ -12,7 +12,7 @@ class PreprocessingPipeline(
 ):
     def __init__(
         self,
-        dataset: Dataset[Data],
+        dataset: BaseDataset[Data],
         data_loader: DataLoader[Data, LoaderResult],
         transformation: Transformation[LoaderResult, TransformationResult],
     ) -> None:

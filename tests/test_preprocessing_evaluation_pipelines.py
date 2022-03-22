@@ -10,7 +10,7 @@ from flair.data import Corpus
 from numpy import typing as nptyping
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
-from embeddings.data.dataset import LoadableDataset
+from embeddings.data.dataset import Dataset
 from embeddings.pipeline.evaluation_pipeline import (
     FlairSequenceLabelingEvaluationPipeline,
     ModelEvaluationPipeline,
@@ -58,7 +58,7 @@ def sequence_labeling_preprocessing_pipeline(
     result_path: "TemporaryDirectory[str]",
     ner_dataset_name: str,
 ) -> Tuple[PreprocessingPipeline[str, datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"]:
-    dataset = LoadableDataset(ner_dataset_name)
+    dataset = Dataset(ner_dataset_name)
     data_loader = HuggingFaceDataLoader()
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")

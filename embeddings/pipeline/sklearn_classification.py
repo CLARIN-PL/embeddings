@@ -9,7 +9,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from typing_extensions import Literal
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
-from embeddings.data.dataset import LoadableDataset
+from embeddings.data.dataset import Dataset
 from embeddings.data.io import T_path
 from embeddings.embedding.sklearn_embedding import SklearnEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
@@ -48,7 +48,7 @@ class SklearnClassificationPipeline(
         embedding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = LoadableDataset(
+        dataset = Dataset(
             dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
         )
         data_loader = HuggingFaceDataLoader()

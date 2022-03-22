@@ -8,7 +8,7 @@ import pytest
 from flair.data import Corpus
 
 from embeddings.data.data_loader import ConllFlairCorpusDataLoader, HuggingFaceDataLoader
-from embeddings.data.dataset import LoadableDataset
+from embeddings.data.dataset import Dataset
 from embeddings.transformation.flair_transformation.column_corpus_transformation import (
     ColumnCorpusTransformation,
 )
@@ -44,7 +44,7 @@ def split_sample_percentage() -> float:
 
 @pytest.fixture
 def ner_data(ner_dataset_name: str) -> datasets.DatasetDict:
-    dataset = LoadableDataset(ner_dataset_name)
+    dataset = Dataset(ner_dataset_name)
     data_loader = HuggingFaceDataLoader()
     data = data_loader.load(dataset)
     return data
@@ -138,7 +138,7 @@ def test_downsampling(
     assert transformed_data.dev is None
 
     data_loader = ConllFlairCorpusDataLoader()
-    dataset = LoadableDataset(dataset=path.name)
+    dataset = Dataset(dataset=path.name)
     loaded_data = data_loader.load(dataset)
 
     assert len(loaded_data.train) == expected_train_size
@@ -175,7 +175,7 @@ def test_split_sampling(
     assert len(transformed_data.test) == expected_test_size
 
     data_loader = ConllFlairCorpusDataLoader()
-    dataset = LoadableDataset(dataset=path.name)
+    dataset = Dataset(dataset=path.name)
     loaded_data = data_loader.load(dataset)
 
     assert len(loaded_data.train) == expected_train_size
@@ -226,7 +226,7 @@ def test_combined_sampling(
     assert len(transformed_data.test) == len(other_transformed_data.test)
 
     data_loader = ConllFlairCorpusDataLoader()
-    dataset = LoadableDataset(dataset=path.name)
+    dataset = Dataset(dataset=path.name)
     loaded_data = data_loader.load(dataset)
 
     assert len(loaded_data.train) == expected_train_size

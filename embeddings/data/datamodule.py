@@ -108,7 +108,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
     def load_dataset(self, preparation_step: bool = False) -> DatasetDict:
         self.load_dataset_kwargs = self.load_dataset_kwargs if self.load_dataset_kwargs else {}
-        dataset = embeddings_dataset.LoadableDataset(
+        dataset = embeddings_dataset.Dataset(
             str(self.dataset_name_or_path), **self.load_dataset_kwargs
         )
         loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = get_hf_dataloader(

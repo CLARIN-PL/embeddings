@@ -9,7 +9,7 @@ import datasets
 from flair.data import Corpus
 from flair.datasets import ColumnDataset
 
-from embeddings.data.dataset import Dataset, LoadableDataset
+from embeddings.data.dataset import BaseDataset, Dataset
 
 Input = TypeVar("Input")
 Output = TypeVar("Output")
@@ -17,29 +17,29 @@ Output = TypeVar("Output")
 
 class DataLoader(ABC, Generic[Input, Output]):
     @abc.abstractmethod
-    def load(self, dataset: Dataset[Input]) -> Output:
+    def load(self, dataset: BaseDataset[Input]) -> Output:
         pass
 
 
 class HuggingFaceDataLoader(DataLoader[str, datasets.DatasetDict]):
-    def load(self, dataset: Dataset[str]) -> datasets.DatasetDict:
-        assert isinstance(dataset, LoadableDataset)
+    def load(self, dataset: BaseDataset[str]) -> datasets.DatasetDict:
+        assert isinstance(dataset, Dataset)
         result = datasets.load_dataset(dataset.dataset, **dataset.load_dataset_kwargs)
         assert isinstance(result, datasets.DatasetDict)
         return result
 
 
 class HuggingFaceLocalDataLoader(DataLoader[str, datasets.DatasetDict]):
-    def load(self, dataset: Dataset[str]) -> datasets.DatasetDict:
-        assert isinstance(dataset, LoadableDataset)
+    def load(self, dataset: BaseDataset[str]) -> datasets.DatasetDict:
+        assert isinstance(dataset, Dataset)
         result = datasets.load_from_disk(dataset.dataset)
         assert isinstance(result, datasets.DatasetDict)
         return result
 
 
 class PickleFlairCorpusDataLoader(DataLoader[str, Corpus]):
-    def load(self, dataset: Dataset[str]) -> Corpus:
-        assert isinstance(dataset, LoadableDataset)
+    def load(self, dataset: BaseDataset[str]) -> Corpus:
+        assert isinstance(dataset, Dataset)
         with open(dataset.dataset, "rb") as file:
             corpus = pickle.load(file)
         assert isinstance(corpus, Corpus)
@@ -50,8 +50,8 @@ class ConllFlairCorpusDataLoader(DataLoader[str, Corpus]):
     DEFAULT_COLUMN_FORMAT = {0: "text", 1: "tag"}
     DEFAULT_FLAIR_SUBSET_NAMES = ["train", "dev", "test"]
 
-    def load(self, dataset: Dataset[str]) -> Corpus:
-        assert isinstance(dataset, LoadableDataset)
+    def load(self, dataset: BaseDataset[str]) -> Corpus:
+        assert isinstance(dataset, Dataset)
         assert exists(dataset.dataset)
         flair_datasets = {}
         dataset_dir = Path(dataset.dataset)
@@ -76,7 +76,7 @@ FLAIR_DATALOADERS = Union[
 ]
 
 
-def get_hf_dataloader(dataset: LoadableDataset) -> HF_DATALOADERS:
+def get_hf_dataloader(dataset: Dataset) -> HF_DATALOADERS:
     if exists(dataset.dataset):
         if not isdir(dataset.dataset):
             raise NotImplementedError(
@@ -87,7 +87,7 @@ def get_hf_dataloader(dataset: LoadableDataset) -> HF_DATALOADERS:
     return HuggingFaceDataLoader()
 
 
-def get_flair_dataloader(dataset: LoadableDataset) -> FLAIR_DATALOADERS:
+def get_flair_dataloader(dataset: Dataset) -> FLAIR_DATALOADERS:
     if exists(dataset.dataset):
         if isdir(dataset.dataset):
             return ConllFlairCorpusDataLoader()

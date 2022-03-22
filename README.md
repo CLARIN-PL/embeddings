@@ -68,7 +68,7 @@ For static embedding based pipelines we use [Flair](https://github.com/flairNLP/
 from pathlib import Path
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
-from embeddings.data.dataset import LoadableDataset
+from embeddings.data.dataset import Dataset
 from embeddings.embedding.auto_flair import AutoFlairDocumentEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
@@ -78,7 +78,7 @@ from embeddings.transformation.flair_transformation.classification_corpus_transf
     ClassificationCorpusTransformation,
 )
 
-dataset = LoadableDataset("clarin-pl/polemo2-official")
+dataset = Dataset("clarin-pl/polemo2-official")
 data_loader = HuggingFaceDataLoader()
 transformation = ClassificationCorpusTransformation("text", "target")
 embedding = AutoFlairDocumentEmbedding.from_hub("clarin-pl/word2vec-kgr10")

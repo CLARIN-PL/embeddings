@@ -12,7 +12,7 @@ from embeddings.data.data_loader import (
     PickleFlairCorpusDataLoader,
     get_flair_dataloader,
 )
-from embeddings.data.dataset import LoadableDataset
+from embeddings.data.dataset import Dataset
 from embeddings.defaults import DATASET_PATH
 from embeddings.pipeline import (
     DOWNSAMPLE_SPLITS_TYPE,

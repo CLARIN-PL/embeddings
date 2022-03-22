@@ -10,7 +10,7 @@ from flair.data import Corpus
 from numpy import typing as nptyping
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
-from embeddings.data.dataset import LoadableDataset
+from embeddings.data.dataset import Dataset
 from embeddings.embedding.auto_flair import AutoFlairDocumentEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
@@ -36,7 +36,7 @@ def text_pair_classification_pipeline(
     ],
     "TemporaryDirectory[str]",
 ]:
-    dataset = LoadableDataset("clarin-pl/cst-wikinews")
+    dataset = Dataset("clarin-pl/cst-wikinews")
     data_loader = HuggingFaceDataLoader()
     transformation = (
         PairClassificationCorpusTransformation(("sentence_1", "sentence_2"), "label")
@@ -80,7 +80,7 @@ def text_pair_classification_pipeline_local_embedding(
     ],
     "TemporaryDirectory[str]",
 ]:
-    dataset = LoadableDataset("clarin-pl/cst-wikinews")
+    dataset = Dataset("clarin-pl/cst-wikinews")
     data_loader = HuggingFaceDataLoader()
     transformation = (
         PairClassificationCorpusTransformation(("sentence_1", "sentence_2"), "label")

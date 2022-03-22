@@ -1,7 +1,7 @@
 from typing import Generic, TypeVar
 
 from embeddings.data.data_loader import DataLoader
-from embeddings.data.dataset import Dataset
+from embeddings.data.dataset import BaseDataset
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.model.model import Model
 from embeddings.pipeline.pipeline import Pipeline
@@ -20,7 +20,7 @@ class StandardPipeline(
 ):
     def __init__(
         self,
-        dataset: Dataset[Data],
+        dataset: BaseDataset[Data],
         data_loader: DataLoader[Data, LoaderResult],
         transformation: Transformation[LoaderResult, TransformationResult],
         model: Model[TransformationResult, ModelResult],
