@@ -71,35 +71,35 @@ class FlairPreprocessingPipeline(
         super(FlairPreprocessingPipeline, self).__init__(dataset, data_loader, transformation)
 
     @abc.abstractmethod
-    def _get_base_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
+    def _get_base_dataset_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
         pass
 
     @abc.abstractmethod
     def _get_persister(self) -> FLAIR_PERSISTERS_TYPE:
         pass
 
-    def _get_dataset(self) -> LoadableDataset:
-        return LoadableDataset(
+    def _get_dataset(self) -> Dataset:
+        return Dataset(
             self.dataset_name_or_path,
             **self.load_dataset_kwargs if self.load_dataset_kwargs else {}
         )
 
-    def _get_dataloader(self, dataset: LoadableDataset) -> FLAIR_DATALOADERS:
+    def _get_dataloader(self, dataset: Dataset) -> FLAIR_DATALOADERS:
         return get_flair_dataloader(dataset)
 
-    def _get_transformation(
+    def _get_dataset_transformation(
         self, data_loader: FLAIR_DATALOADERS
     ) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
         if isinstance(data_loader, (ConllFlairCorpusDataLoader, PickleFlairCorpusDataLoader)):
             return DummyTransformation()
 
-        return self._get_base_transformation()
+        return self._get_base_dataset_transformation()
 
     def _get_transformations(
         self, data_loader: FLAIR_DATALOADERS
     ) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
 
-        transformation = self._get_transformation(data_loader)
+        transformation = self._get_dataset_transformation(data_loader)
 
         if self.sample_missing_splits:
             transformation = transformation.then(
@@ -126,7 +126,7 @@ class FlairTextClassificationPreprocessingPipeline(FlairPreprocessingPipeline):
     def _get_persister(self) -> FLAIR_PERSISTERS_TYPE:
         return FlairPicklePersister(self.persist_path)
 
-    def _get_base_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
+    def _get_base_dataset_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
         assert isinstance(self.input_column_name, str)
         return ClassificationCorpusTransformation(
             input_column_name=self.input_column_name,
@@ -138,7 +138,7 @@ class FlairTextClassificationPreprocessingPipeline(FlairPreprocessingPipeline):
 class FlairTextPairClassificationPreprocessingPipeline(
     FlairTextClassificationPreprocessingPipeline
 ):
-    def _get_base_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
+    def _get_base_dataset_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
         assert isinstance(self.input_column_name, (tuple, list))
         return PairClassificationCorpusTransformation(
             input_columns_names_pair=self.input_column_name,
@@ -151,7 +151,7 @@ class FlairSequenceLabelingPreprocessingPipeline(FlairPreprocessingPipeline):
     def _get_persister(self) -> FLAIR_PERSISTERS_TYPE:
         return FlairConllPersister(self.persist_path)
 
-    def _get_base_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
+    def _get_base_dataset_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
         assert isinstance(self.input_column_name, str)
         return ColumnCorpusTransformation(
             input_column_name=self.input_column_name,
