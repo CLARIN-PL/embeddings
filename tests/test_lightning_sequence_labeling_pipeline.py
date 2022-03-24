@@ -41,27 +41,17 @@ def dataset_kwargs(tmp_path_module) -> Dict[str, Any]:
 
 
 @pytest.fixture(scope="module")
-def pipeline_kwargs() -> Dict[str, Any]:
-    return {"embedding_name_or_path": "allegro/herbert-base-cased"}
-
-
-@pytest.fixture(scope="module")
 def config() -> LightningAdvancedConfig:
     return LightningAdvancedConfig(
         finetune_last_n_layers=0,
+        train_batch_size=32,
+        eval_batch_size=32,
         task_train_kwargs={
             "max_epochs": 1,
             "devices": "auto",
             "accelerator": "cpu",
             "deterministic": True,
         },
-        datamodule_kwargs={
-            "max_seq_length": 64,
-            "downsample_train": 0.01,
-            "downsample_val": 0.01,
-            "downsample_test": 0.05,
-        },
-        dataloader_kwargs={"num_workers": 0},
         task_model_kwargs={
             "learning_rate": 1e-4,
             "use_scheduler": False,
@@ -70,12 +60,19 @@ def config() -> LightningAdvancedConfig:
             "warmup_steps": 100,
             "weight_decay": 0.0,
         },
+        datamodule_kwargs={
+            "max_seq_length": 64,
+        },
+        early_stopping_kwargs={
+            "monitor": "val/Loss",
+            "mode": "min",
+            "patience": 3,
+        },
     )
 
 
 @pytest.fixture
 def lightning_sequence_labeling_pipeline(
-    pipeline_kwargs: Dict[str, Any],
     dataset_kwargs: Dict[str, Any],
     config: LightningAdvancedConfig,
     tmp_path: Path,
@@ -83,8 +80,8 @@ def lightning_sequence_labeling_pipeline(
     return (
         LightningSequenceLabelingPipeline(
             output_path=tmp_path,
+            embedding_name_or_path="allegro/herbert-base-cased",
             config=config,
-            **pipeline_kwargs,
             **dataset_kwargs,
         ),
         tmp_path,

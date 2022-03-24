@@ -9,7 +9,6 @@ import yaml
 from _pytest.tmpdir import TempdirFactory
 
 from embeddings.config.lighting_config_space import LightingTextClassificationConfigSpace
-from embeddings.config.lightning_config import LightningConfigDefaultKwargs
 from embeddings.config.parameters import ConstantParameter
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
@@ -171,7 +170,6 @@ def test_keys_allowed_in_metadata_but_not_in_config_space(
         "early_stopping_kwargs",
         "input_column_name",
         "dataset_name_or_path",
-        "dataloader_kwargs",
     }
 
 
@@ -246,7 +244,9 @@ def test_hparams_best_params_files_compatibility(
     assert hparams["model_name_or_path"] == best_params["embedding_name_or_path"]
     hparams = {k: v for k, v in hparams.items() if k in best_params.keys() and k != "config"}
     for k in hparams.keys():
-        if isinstance(metadata[k], Enum):  # type: ignore
+        if k == "dataset_name_or_path":
+            continue
+        elif isinstance(metadata[k], Enum):  # type: ignore
             enum_hparam = getattr(type(metadata[k]), hparams[k])  # type: ignore
             assert enum_hparam == best_params[k] == metadata[k]  # type: ignore
         else:

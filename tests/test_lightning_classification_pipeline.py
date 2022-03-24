@@ -55,6 +55,8 @@ def dataset_kwargs(tmp_path_module) -> Dict[str, Any]:
 def config() -> LightningAdvancedConfig:
     return LightningAdvancedConfig(
         finetune_last_n_layers=0,
+        train_batch_size=32,
+        eval_batch_size=32,
         task_train_kwargs={
             "max_epochs": 1,
             "devices": "auto",
@@ -70,17 +72,18 @@ def config() -> LightningAdvancedConfig:
             "weight_decay": 0.0,
         },
         datamodule_kwargs={
-            "downsample_train": 0.01,
-            "downsample_val": 0.01,
-            "downsample_test": 0.05,
+            "max_seq_length": 64,
         },
-        dataloader_kwargs={"num_workers": 0},
+        early_stopping_kwargs={
+            "monitor": "val/Loss",
+            "mode": "min",
+            "patience": 3,
+        },
     )
 
 
 @pytest.fixture(scope="module")
 def lightning_classification_pipeline(
-    pipeline_kwargs: Dict[str, Any],
     dataset_kwargs: Dict[str, Any],
     config: LightningAdvancedConfig,
     result_path: "TemporaryDirectory[str]",
@@ -90,9 +93,9 @@ def lightning_classification_pipeline(
 ]:
     return (
         LightningClassificationPipeline(
+            embedding_name_or_path="allegro/herbert-base-cased",
             output_path=result_path.name,
             config=config,
-            **pipeline_kwargs,
             **dataset_kwargs[0],
         ),
         result_path,
@@ -109,16 +112,16 @@ def test_lightning_classification_pipeline(
     pipeline, path = lightning_classification_pipeline
     result = pipeline.run()
     np.testing.assert_almost_equal(
-        result["accuracy"]["accuracy"], 0.4864864, decimal=pytest.decimal
+        result["accuracy"]["accuracy"], 0.3783783, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        result["f1__average_macro"]["f1"], 0.2684458, decimal=pytest.decimal
+        result["f1__average_macro"]["f1"], 0.1399999, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        result["precision__average_macro"]["precision"], 0.3602941, decimal=pytest.decimal
+        result["precision__average_macro"]["precision"], 0.1, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        result["recall__average_macro"]["recall"], 0.325, decimal=pytest.decimal
+        result["recall__average_macro"]["recall"], 0.2333333, decimal=pytest.decimal
     )
 
     assert "data" in result
