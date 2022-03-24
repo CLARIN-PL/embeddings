@@ -8,8 +8,8 @@ import pytest
 import pytorch_lightning as pl
 from _pytest.tmpdir import TempdirFactory
 
-from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.config.lightning_config import LightningAdvancedConfig
+from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 
@@ -93,7 +93,7 @@ def lightning_classification_pipeline(
             output_path=result_path.name,
             config=config,
             **pipeline_kwargs,
-            **dataset_kwargs,
+            **dataset_kwargs[0],
         ),
         result_path,
     )

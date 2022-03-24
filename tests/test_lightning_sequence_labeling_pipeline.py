@@ -7,8 +7,8 @@ import pytest
 import pytorch_lightning as pl
 from _pytest.tmpdir import TempdirFactory
 
-from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.config.lightning_config import LightningAdvancedConfig
+from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
 

@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 import pytorch_lightning as pl
 
-from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.config.lightning_config import LightningAdvancedConfig
+from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 

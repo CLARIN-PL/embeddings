@@ -8,11 +8,10 @@ import pytest
 import yaml
 from _pytest.tmpdir import TempdirFactory
 
-
 from embeddings.config.lighting_config_space import LightingSequenceLabelingConfigSpace
 from embeddings.config.lightning_config import LightningConfigDefaultKwargs
-from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.config.parameters import ConstantParameter
+from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingSequenceLabelingPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
 from embeddings.pipeline.pipelines_metadata import LightningSequenceLabelingPipelineMetadata
@@ -25,9 +24,6 @@ def dataset_name() -> str:
     return "clarin-pl/kpwr-ner"
 
 
-@pytest.fixture(scope="module")
-def sequence_labelling_config_space() -> LightingSequenceLabelingConfigSpace:
-    config_space = LightingSequenceLabelingConfigSpace(
 def hps_dataset_path(dataset_name: str) -> "TemporaryDirectory[str]":
     path = TemporaryDirectory()
     pipeline = HuggingFacePreprocessingPipeline(
