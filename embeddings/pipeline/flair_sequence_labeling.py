@@ -61,7 +61,7 @@ class FlairSequenceLabelingPipeline(
             )
 
         embedding_loader = FlairWordEmbeddingLoader(embedding_name, model_type_reference)
-        embedding = embedding_loader.get_embedding()
+        embedding = embedding_loader.get_embedding(**config.load_model_kwargs)
 
         task = SequenceLabeling(
             output_path,

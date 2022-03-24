@@ -43,13 +43,14 @@ class FlairTextClassificationConfigMapping:
 
 
 @dataclass
-class FlairBasicConfig(BasicConfig):
+class FlairBasicConfig(BasicConfig, ABC):
     learning_rate: float = 1e-3
     mini_batch_size: int = 32
     max_epochs: int = 20
 
     task_model_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
     task_train_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
+    load_model_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
 
     def __post_init__(self) -> None:
         self.task_train_kwargs = self._parse_fields(self.get_task_train_keys())
@@ -109,8 +110,6 @@ class FlairTextClassificationBasicConfig(FlairBasicConfig, FlairTextClassificati
     word_dropout: float = 0.05
     reproject_words: bool = True
 
-    load_model_kwargs: Dict[str, Any] = field(init=True, compare=False, default_factory=dict)
-
     def __post_init__(self) -> None:
         load_model_keys = self.get_map_load_model_keys(self.document_embedding_cls)
         self.load_model_kwargs = self._parse_fields(load_model_keys)
@@ -125,6 +124,7 @@ class FlairTextClassificationBasicConfig(FlairBasicConfig, FlairTextClassificati
 class FlairAdvancedConfig(AdvancedConfig, ABC):
     task_model_kwargs: Dict[str, Any] = field(default_factory=dict)
     task_train_kwargs: Dict[str, Any] = field(default_factory=dict)
+    load_model_kwargs: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         pass
@@ -154,7 +154,6 @@ class FlairSequenceLabelingAdvancedConfig(FlairAdvancedConfig):
 @dataclass
 class FlairTextClassificationAdvancedConfig(FlairAdvancedConfig):
     document_embedding_cls: str = "FlairDocumentPoolEmbedding"
-    load_model_kwargs: Dict[str, Any] = field(default_factory=dict)
 
     @staticmethod
     def from_basic() -> "FlairTextClassificationAdvancedConfig":
