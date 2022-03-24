@@ -83,6 +83,8 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         )
         try:
             self.trainer.fit(self.model, data)
+            if "test" in data.load_dataset().keys():
+                self.trainer.test(self.model, data.test_dataloader())
         except Exception as e:
             del self.trainer
             torch.cuda.empty_cache()  # type: ignore

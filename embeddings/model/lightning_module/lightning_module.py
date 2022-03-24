@@ -66,7 +66,9 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.trainer is not None
-        predictions = self.trainer.predict(dataloaders=dataloader, return_predictions=True)
+        predictions = self.trainer.predict(
+            dataloaders=dataloader, return_predictions=True, ckpt_path="best"
+        )
         predictions = torch.cat(predictions).numpy()
         assert isinstance(predictions, np.ndarray)
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
