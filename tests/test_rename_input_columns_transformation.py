@@ -1,7 +1,7 @@
 import pytest
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
-from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.dataset import Dataset
 from embeddings.transformation.hf_transformation.to_pandas_transformation import (
     ToPandasHuggingFaceCorpusTransformation,
 )
@@ -12,7 +12,7 @@ from embeddings.transformation.pandas_transformation.rename_input_columns_transf
 
 @pytest.fixture(scope="module")
 def hf_dataset(dataset_name: str = "clarin-pl/polemo2-official"):
-    return HuggingFaceDataset(dataset_name)
+    return Dataset(dataset_name)
 
 
 @pytest.fixture(scope="module")
@@ -30,7 +30,7 @@ def rename_columns_transformation(
 
 
 def test_rename_input_columns_transformation(
-    hf_dataset: HuggingFaceDataset,
+    hf_dataset: Dataset,
     data_loader: HuggingFaceDataLoader,
     rename_columns_transformation: ToPandasHuggingFaceCorpusTransformation,
 ):

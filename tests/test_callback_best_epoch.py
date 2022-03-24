@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 import pytorch_lightning as pl
 
+from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 
@@ -16,18 +17,29 @@ def pipeline_kwargs() -> Dict[str, Any]:
 
 
 @pytest.fixture(scope="module")
-def dataset_kwargs() -> Dict[str, Any]:
-    return {
-        "dataset_name_or_path": "clarin-pl/polemo2-official",
-        "input_column_name": ["text"],
-        "target_column_name": "target",
-        "load_dataset_kwargs": {
+def dataset_kwargs() -> Tuple[Dict[str, Any], "TemporaryDirectory[str]"]:
+    path = TemporaryDirectory()
+    pipeline = HuggingFacePreprocessingPipeline(
+        dataset_name="clarin-pl/polemo2-official",
+        load_dataset_kwargs={
             "train_domains": ["hotels", "medicine"],
             "dev_domains": ["hotels", "medicine"],
             "test_domains": ["hotels", "medicine"],
             "text_cfg": "text",
         },
-    }
+        persist_path=path.name,
+        sample_missing_splits=None,
+        ignore_test_subset=False,
+        downsample_splits=(0.01, 0.01, 0.05),
+        seed=441,
+    )
+    pipeline.run()
+
+    return {
+        "dataset_name_or_path": path.name,
+        "input_column_name": ["text"],
+        "target_column_name": "target",
+    }, path  # TemporaryDirectory object is passed additionally to omit cleanup of the temporal path
 
 
 @pytest.fixture(scope="module")
@@ -47,12 +59,7 @@ def task_model_kwargs() -> Dict[str, Any]:
 
 @pytest.fixture(scope="module")
 def datamodule_kwargs() -> Dict[str, Any]:
-    return {
-        "downsample_train": 0.01,
-        "downsample_val": 0.01,
-        "downsample_test": 0.05,
-        "num_workers": 0,
-    }
+    return {"num_workers": 0}
 
 
 @pytest.fixture(scope="module")
@@ -71,7 +78,7 @@ def lightning_classification_pipeline(
         LightningClassificationPipeline(
             output_path=result_path.name,
             **pipeline_kwargs,
-            **dataset_kwargs,
+            **dataset_kwargs[0],
             datamodule_kwargs=datamodule_kwargs,
             task_train_kwargs=task_train_kwargs,
             task_model_kwargs=task_model_kwargs,

@@ -1,14 +1,14 @@
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Union
 
 import datasets
 
-from embeddings.data.data_loader import (
-    HuggingFaceDataLoader,
-    HuggingFaceLocalDataLoader,
-    get_hf_dataloader,
-)
-from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.data_loader import HF_DATALOADERS, get_hf_dataloader
+from embeddings.data.dataset import Dataset
+from embeddings.pipeline import DOWNSAMPLE_SPLITS_TYPE, SAMPLE_MISSING_SPLITS_TYPE
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
+from embeddings.transformation.hf_transformation.downsample_transformation import (
+    DownsampleHuggingFaceTransformation,
+)
 from embeddings.transformation.hf_transformation.drop_subset_transformation import (
     DropSubsetHuggingFaceCorpusTransformation,
 )
@@ -26,17 +26,14 @@ class HuggingFacePreprocessingPipeline(
         self,
         dataset_name: str,
         persist_path: str,
-        sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
+        sample_missing_splits: Optional[SAMPLE_MISSING_SPLITS_TYPE] = None,
+        downsample_splits: Optional[DOWNSAMPLE_SPLITS_TYPE] = None,
         ignore_test_subset: bool = False,
         seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = HuggingFaceDataset(
-            dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
-        )
-        data_loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = get_hf_dataloader(
-            dataset
-        )
+        dataset = Dataset(dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {})
+        data_loader: HF_DATALOADERS = get_hf_dataloader(dataset)
 
         transformation: Union[
             DummyTransformation[datasets.DatasetDict],
@@ -51,6 +48,11 @@ class HuggingFacePreprocessingPipeline(
         if sample_missing_splits:
             transformation = transformation.then(
                 SampleSplitsHuggingFaceTransformation(*sample_missing_splits, seed=seed)
+            )
+
+        if downsample_splits:
+            transformation = transformation.then(
+                DownsampleHuggingFaceTransformation(*downsample_splits, seed=seed)
             )
 
         transformation = transformation.persisting(

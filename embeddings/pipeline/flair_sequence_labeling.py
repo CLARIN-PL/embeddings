@@ -6,7 +6,7 @@ from flair.data import Corpus
 from numpy import typing as nptyping
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
-from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.dataset import Dataset
 from embeddings.data.io import T_path
 from embeddings.embedding.flair_loader import FlairWordEmbeddingLoader
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
@@ -47,9 +47,7 @@ class FlairSequenceLabelingPipeline(
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         output_path = Path(output_path)
-        dataset = HuggingFaceDataset(
-            dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {}
-        )
+        dataset = Dataset(dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {})
         data_loader = HuggingFaceDataLoader()
         transformation: Union[
             Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]

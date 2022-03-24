@@ -5,7 +5,9 @@ import typer
 
 from embeddings.defaults import DATASET_PATH, RESULTS_PATH
 from embeddings.pipeline.evaluation_pipeline import FlairSequenceLabelingEvaluationPipeline
-from embeddings.pipeline.preprocessing_pipeline import FlairSequenceLabelingPreprocessingPipeline
+from embeddings.pipeline.flair_preprocessing_pipeline import (
+    FlairSequenceLabelingPreprocessingPipeline,
+)
 from embeddings.utils.utils import build_output_path
 
 app = typer.Typer()
