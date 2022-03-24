@@ -1,8 +1,9 @@
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import datasets
 from numpy import typing as nptyping
+from pytorch_lightning.accelerators import Accelerator
 
 from embeddings.config.lightning_config import LightningBasicConfig, LightningConfig
 from embeddings.data.datamodule import SequenceLabelingDataModule
@@ -24,8 +25,6 @@ from embeddings.utils.utils import initialize_kwargs
 class LightningSequenceLabelingPipeline(
     LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
-    DEFAULT_DATAMODULE_KWARGS: Dict[str, Any] = {"max_seq_length": None, "label_all_tokens": False}
-
     def __init__(
         self,
         embedding_name_or_path: T_path,
@@ -39,9 +38,12 @@ class LightningSequenceLabelingPipeline(
         config: LightningConfig = LightningBasicConfig(),
         logging_config: LightningLoggingConfig = LightningLoggingConfig(),
         tokenizer_name_or_path: Optional[T_path] = None,
+        devices: Optional[Union[List[int], str, int]] = "auto",
+        accelerator: Optional[Union[str, Accelerator]] = "auto",
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
+        config.task_train_kwargs.update({"devices": devices, "accelerator": accelerator})
         tokenizer_name_or_path = tokenizer_name_or_path or embedding_name_or_path
         output_path = Path(output_path)
 

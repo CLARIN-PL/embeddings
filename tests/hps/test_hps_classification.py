@@ -153,6 +153,8 @@ def test_keys_allowed_in_metadata_but_not_in_config_space(
     metadata_keys = {**metadata, **metadata["config"].__dict__}.keys()
     config_space_keys = classification_config_space.__dict__.keys()
     assert metadata_keys - config_space_keys == {
+        "accelerator",
+        "devices",
         "eval_batch_size",
         "tokenizer_kwargs",
         "target_column_name",
@@ -235,8 +237,12 @@ def test_hparams_best_params_files_compatibility(
         == metadata["config"].__dict__.keys()
     )
     # compare config values
+    # append devices and accelerator to best params since this is done in lightning pipeline
     assert (
-        _flatten(best_params["config"].__dict__)
+        {
+            **_flatten(best_params["config"].__dict__),
+            **{"devices": best_params["devices"], "accelerator": best_params["accelerator"]},
+        }
         == _flatten(hparams["config"].__dict__)
         == _flatten(metadata["config"].__dict__)
     )

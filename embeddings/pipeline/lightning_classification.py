@@ -1,8 +1,9 @@
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence, Union
+from typing import Any, Dict, List, Optional, Sequence, Union
 
 import datasets
 from numpy import typing as nptyping
+from pytorch_lightning.accelerators import Accelerator
 
 from embeddings.config.lightning_config import LightningBasicConfig, LightningConfig
 from embeddings.data.datamodule import TextClassificationDataModule
@@ -29,11 +30,14 @@ class LightningClassificationPipeline(
         output_path: T_path,
         evaluation_filename: str = "evaluation.json",
         config: LightningConfig = LightningBasicConfig(),
+        devices: Optional[Union[List[int], str, int]] = "auto",
+        accelerator: Optional[Union[str, Accelerator]] = "auto",
         logging_config: LightningLoggingConfig = LightningLoggingConfig(),
         tokenizer_name_or_path: Optional[T_path] = None,
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
+        config.task_train_kwargs.update({"devices": devices, "accelerator": accelerator})
         tokenizer_name_or_path = tokenizer_name_or_path or embedding_name_or_path
         output_path = Path(output_path)
         self.evaluation_filename = evaluation_filename

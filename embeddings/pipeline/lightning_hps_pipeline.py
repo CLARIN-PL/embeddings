@@ -2,9 +2,10 @@ from abc import ABC
 from dataclasses import dataclass, field
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Generic, Optional, Tuple
+from typing import Any, Dict, Generic, List, Optional, Tuple, Union
 
 import datasets
+from pytorch_lightning.accelerators import Accelerator
 from numpy import typing as nptyping
 
 from embeddings.config.config_space import ConfigSpace, SampledParameters
@@ -129,6 +130,8 @@ class OptimizedLightingPipeline(
         int,
         int,
         int,
+        Optional[Union[List[int], str, int]],
+        Optional[Union[str, Accelerator]],
         Dict[str, ParameterValues],
         Dict[str, ParameterValues],
         Dict[str, ParameterValues],
@@ -142,6 +145,10 @@ class OptimizedLightingPipeline(
         assert isinstance(eval_batch_size, int)
         finetune_last_n_layers = parameters["finetune_last_n_layers"]
         assert isinstance(finetune_last_n_layers, int)
+        devices = parameters["devices"]
+        assert isinstance(devices, (list, str, int)) or devices is None
+        accelerator = parameters["accelerator"]
+        assert isinstance(accelerator, (str, Accelerator)) or accelerator is None
         datamodule_kwargs = parameters["datamodule_kwargs"]
         assert isinstance(datamodule_kwargs, dict)
         task_model_kwargs = parameters["task_model_kwargs"]
@@ -156,6 +163,8 @@ class OptimizedLightingPipeline(
             train_batch_size,
             eval_batch_size,
             finetune_last_n_layers,
+            devices,
+            accelerator,
             datamodule_kwargs,
             task_model_kwargs,
             task_train_kwargs,
@@ -203,6 +212,8 @@ class OptimizedLightingClassificationPipeline(
             train_batch_size,
             eval_batch_size,
             finetune_last_n_layers,
+            devices,
+            accelerator,
             datamodule_kwargs,
             task_model_kwargs,
             task_train_kwargs,
@@ -216,6 +227,8 @@ class OptimizedLightingClassificationPipeline(
             "dataset_name_or_path": self.dataset_name_or_path,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
+            "devices": devices,
+            "accelerator": accelerator,
             "tokenizer_name_or_path": tokenizer_name_or_path,
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "predict_subset": LightingDataModuleSubset.TEST,
@@ -270,6 +283,8 @@ class OptimizedLightingSequenceLabelingPipeline(
             train_batch_size,
             eval_batch_size,
             finetune_last_n_layers,
+            devices,
+            accelerator,
             datamodule_kwargs,
             task_model_kwargs,
             task_train_kwargs,
@@ -285,6 +300,8 @@ class OptimizedLightingSequenceLabelingPipeline(
             "target_column_name": self.target_column_name,
             "evaluation_mode": self.evaluation_mode,
             "tagging_scheme": self.tagging_scheme,
+            "devices": devices,
+            "accelerator": accelerator,
             "tokenizer_name_or_path": tokenizer_name_or_path,
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "predict_subset": LightingDataModuleSubset.TEST,

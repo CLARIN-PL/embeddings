@@ -1,5 +1,6 @@
-from typing import Any, Dict, Optional, Sequence, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, TypeVar, Union
 
+from pytorch_lightning.accelerators import Accelerator
 from typing_extensions import Literal, TypedDict
 
 from embeddings.config.flair_config import (
@@ -65,6 +66,8 @@ class LightningPipelineMetadata(EmbeddingPipelineBaseMetadata):
     input_column_name: Union[str, Sequence[str]]
     target_column_name: str
     config: LightningConfig
+    devices: Optional[Union[List[int], str, int]]
+    accelerator: Optional[Union[str, Accelerator]]
     tokenizer_name_or_path: Optional[T_path]
     load_dataset_kwargs: Optional[Dict[str, Any]]
     predict_subset: Literal[LightingDataModuleSubset.VALIDATION, LightingDataModuleSubset.TEST]

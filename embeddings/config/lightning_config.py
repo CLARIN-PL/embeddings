@@ -1,7 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, ClassVar, Dict, List, Mapping, Optional, Set, Tuple, Union
-
-from pytorch_lightning.accelerators import Accelerator
+from typing import Any, ClassVar, Dict, Mapping, Optional, Set, Tuple, Union
 
 from embeddings.config.base_config import AdvancedConfig, BasicConfig
 from embeddings.data.io import T_path
@@ -19,6 +17,8 @@ class LightningConfigKeys:
         "batch_size",
         "finetune_last_n_layers",
         "embedding_name_or_path",
+        "devices",
+        "accelerator",
     }
     DATAMODULE_KEYS: ClassVar[Set[str]] = {"max_seq_length"}
     TASK_MODEL_KEYS: ClassVar[Set[str]] = {
@@ -29,7 +29,7 @@ class LightningConfigKeys:
         "adam_epsilon",
         "weight_decay",
     }
-    TASK_TRAIN_KEYS: ClassVar[Set[str]] = {"max_epochs", "devices", "accelerator"}
+    TASK_TRAIN_KEYS: ClassVar[Set[str]] = {"max_epochs"}
     MODEL_CONFIG_KEYS: ClassVar[Set[str]] = {"classifier_dropout"}
     EARLY_STOPPING_KEYS: ClassVar[Set[Tuple[str, str]]] = {
         ("early_stopping_monitor", "monitor"),
@@ -50,9 +50,7 @@ class LightningBasicConfig(BasicConfig, LightningConfigKeys):
     classifier_dropout: Optional[float] = None
     max_seq_length: Optional[int] = None
     mini_batch_size: int = 32
-    devices: Optional[Union[List[int], str, int]] = "auto"
     max_epochs: Optional[int] = None
-    accelerator: Optional[Union[str, Accelerator]] = "auto"
     early_stopping_monitor: str = "val/Loss"
     early_stopping_mode: str = "min"
     early_stopping_patience: int = 3
