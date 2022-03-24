@@ -15,6 +15,7 @@ class TextClassificationTask(LightningTask):
         self,
         model_name_or_path: T_path,
         output_path: T_path,
+        num_classes: int,
         model_config_kwargs: Dict[str, Any],
         task_model_kwargs: Dict[str, Any],
         task_train_kwargs: Dict[str, Any],
@@ -24,6 +25,7 @@ class TextClassificationTask(LightningTask):
     ) -> None:
         super().__init__(output_path, task_train_kwargs, early_stopping_kwargs, logging_config)
         self.model_name_or_path = model_name_or_path
+        self.num_classes = num_classes
         self.model_config_kwargs = model_config_kwargs
         self.task_model_kwargs = task_model_kwargs
         self.finetune_last_n_layers = finetune_last_n_layers
@@ -31,10 +33,14 @@ class TextClassificationTask(LightningTask):
     def build_task_model(self) -> None:
         self.model = TextClassificationModule(
             model_name_or_path=self.model_name_or_path,
+            num_classes=self.num_classes,
             finetune_last_n_layers=self.finetune_last_n_layers,
             config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
         )
+
+    def restore_task_model(self, checkpoint_path: str) -> None:
+        self.model = TextClassificationModule.load_from_checkpoint(checkpoint_path)
 
     def predict(self, dataloader: DataLoader[Any]) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.model is not None

@@ -15,6 +15,7 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
         self,
         model_name_or_path: T_path,
         downstream_model_type: Type["AutoModel"],
+        num_classes: int,
         finetune_last_n_layers: int,
         metrics: Optional[MetricCollection] = None,
         config_kwargs: Optional[Dict[str, Any]] = None,
@@ -24,11 +25,11 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
         self.save_hyperparameters({"downstream_model_type": downstream_model_type.__name__})
         self.downstream_model_type = downstream_model_type
         self.config_kwargs = config_kwargs if config_kwargs else {}
+        self.configure_model()
+        self.configure_metrics()
 
     def setup(self, stage: Optional[str] = None) -> None:
         if stage in ("fit", None):
-            self.configure_model()
-            self.configure_metrics()
             if self.hparams.use_scheduler:
                 assert self.trainer is not None
                 train_loader = self.trainer.datamodule.train_dataloader()
@@ -40,10 +41,9 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
                 )
 
     def configure_model(self) -> None:
-        assert self.trainer is not None
         self.config = AutoConfig.from_pretrained(
             self.hparams.model_name_or_path,
-            num_labels=self.trainer.datamodule.num_classes,
+            num_labels=self.hparams.num_classes,
             **self.config_kwargs,
         )
         self.model: AutoModel = self.downstream_model_type.from_pretrained(
@@ -72,24 +72,22 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
                 param.requires_grad = False
 
     def get_default_metrics(self) -> MetricCollection:
-        assert self.trainer is not None
-        num_classes = self.trainer.datamodule.num_classes
-        if num_classes > 2:
+        if self.hparams.num_classes > 2:
             metrics = MetricCollection(
                 [
-                    Accuracy(num_classes=num_classes),
-                    Precision(num_classes=num_classes, average="macro"),
-                    Recall(num_classes=num_classes, average="macro"),
-                    F1(num_classes=num_classes, average="macro"),
+                    Accuracy(num_classes=self.hparams.num_classes),
+                    Precision(num_classes=self.hparams.num_classes, average="macro"),
+                    Recall(num_classes=self.hparams.num_classes, average="macro"),
+                    F1(num_classes=self.hparams.num_classes, average="macro"),
                 ]
             )
         else:
             metrics = MetricCollection(
                 [
-                    Accuracy(num_classes=num_classes),
-                    Precision(num_classes=num_classes),
-                    Recall(num_classes=num_classes),
-                    F1(num_classes=num_classes),
+                    Accuracy(num_classes=self.hparams.num_classes),
+                    Precision(num_classes=self.hparams.num_classes),
+                    Recall(num_classes=self.hparams.num_classes),
+                    F1(num_classes=self.hparams.num_classes),
                 ]
             )
         return metrics

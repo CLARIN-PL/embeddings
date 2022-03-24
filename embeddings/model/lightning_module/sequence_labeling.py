@@ -18,6 +18,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
     def __init__(
         self,
         model_name_or_path: T_path,
+        num_classes: int,
         finetune_last_n_layers: int,
         metrics: Optional[MetricCollection] = None,
         ignore_index: int = -100,
@@ -27,6 +28,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         super().__init__(
             model_name_or_path=model_name_or_path,
             downstream_model_type=self.downstream_model_type,
+            num_classes=num_classes,
             finetune_last_n_layers=finetune_last_n_layers,
             metrics=metrics,
             config_kwargs=config_kwargs,

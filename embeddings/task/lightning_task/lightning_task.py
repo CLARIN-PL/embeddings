@@ -114,3 +114,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
     @abc.abstractmethod
     def build_task_model(self) -> None:
         pass
+
+    @abc.abstractmethod
+    def restore_task_model(self, checkpoint_path: str) -> None:
+        pass
