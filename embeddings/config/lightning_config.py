@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from types import MappingProxyType
 from typing import Any, ClassVar, Dict, List, Mapping, Optional, Set, Tuple, Union
 
 from pytorch_lightning.accelerators import Accelerator
@@ -37,26 +36,6 @@ class LightningConfigKeys:
         ("early_stopping_mode", "mode"),
         ("early_stopping_patience", "patience"),
     }
-
-
-@dataclass
-class LightningConfigDefaultKwargs:
-    DEFAULT_DATAMODULE_KWARGS: ClassVar[T_kwarg] = MappingProxyType({"max_seq_length": None})
-    DEFAULT_TASK_MODEL_KWARGS: ClassVar[T_kwarg] = MappingProxyType({"use_scheduler": True})
-    DEFAULT_TASK_TRAIN_KWARGS: ClassVar[T_kwarg] = MappingProxyType(
-        {
-            "devices": "auto",
-            "accelerator": "auto",
-        }
-    )
-    DEFAULT_MODEL_CONFIG_KWARGS: ClassVar[T_kwarg] = MappingProxyType({"classifier_dropout": None})
-    DEFAULT_EARLY_STOPPING_KWARGS: ClassVar[T_kwarg] = MappingProxyType(
-        {
-            "monitor": "val/Loss",
-            "mode": "min",
-            "patience": 3,
-        }
-    )
 
 
 @dataclass
@@ -111,10 +90,10 @@ class LightningBasicConfig(BasicConfig, LightningConfigKeys):
 
 
 @dataclass
-class LightningAdvancedConfig(AdvancedConfig, LightningConfigDefaultKwargs):
-    train_batch_size: int = 32
-    eval_batch_size: int = 32
-    finetune_last_n_layers: int = -1
+class LightningAdvancedConfig(AdvancedConfig):
+    train_batch_size: int
+    eval_batch_size: int
+    finetune_last_n_layers: int
     datamodule_kwargs: Dict[str, Any] = field(default_factory=dict)
     task_model_kwargs: Dict[str, Any] = field(default_factory=dict)
     task_train_kwargs: Dict[str, Any] = field(default_factory=dict)
@@ -122,17 +101,8 @@ class LightningAdvancedConfig(AdvancedConfig, LightningConfigDefaultKwargs):
     early_stopping_kwargs: Dict[str, Any] = field(default_factory=dict)
     tokenizer_kwargs: Dict[str, Any] = field(default_factory=dict)
     batch_encoding_kwargs: Dict[str, Any] = field(default_factory=dict)
-    dataloader_kwargs: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        self.datamodule_kwargs = {**self.DEFAULT_DATAMODULE_KWARGS, **self.datamodule_kwargs}
-        self.task_model_kwargs = {**self.DEFAULT_TASK_MODEL_KWARGS, **self.task_model_kwargs}
-        self.task_train_kwargs = {**self.DEFAULT_TASK_TRAIN_KWARGS, **self.task_train_kwargs}
-        self.model_config_kwargs = {**self.DEFAULT_MODEL_CONFIG_KWARGS, **self.model_config_kwargs}
-        self.early_stopping_kwargs = {
-            **self.DEFAULT_EARLY_STOPPING_KWARGS,
-            **self.early_stopping_kwargs,
-        }
         self.task_model_kwargs.update(
             {"train_batch_size": self.train_batch_size, "eval_batch_size": self.eval_batch_size}
         )
