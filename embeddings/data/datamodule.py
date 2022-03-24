@@ -103,13 +103,12 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
     def setup(self, stage: Optional[str] = None) -> None:
         self.dataset = self.load_dataset()
-        self.downsample_dataset()
         self.prepare_labels()
         self.process_data()
 
     def load_dataset(self, preparation_step: bool = False) -> DatasetDict:
         self.load_dataset_kwargs = self.load_dataset_kwargs if self.load_dataset_kwargs else {}
-        dataset = embeddings_dataset.HuggingFaceDataset(
+        dataset = embeddings_dataset.Dataset(
             str(self.dataset_name_or_path), **self.load_dataset_kwargs
         )
         loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = get_hf_dataloader(
@@ -120,24 +119,6 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
             return datasets.DatasetDict()
 
         return loader.load(dataset)
-
-    def downsample_dataset(self) -> None:
-        assert isinstance(self.dataset, DatasetDict)
-        downsamples = (
-            ("train", self.downsample_train),
-            ("validation", self.downsample_val),
-            ("test", self.downsample_test),
-        )
-        for column_name, downsample_factor in downsamples:
-            if (
-                downsample_factor is not None
-                and column_name in self.dataset
-                and 0 < downsample_factor < 1
-            ):
-                downsampled_data = self.dataset[column_name].train_test_split(
-                    downsample_factor, seed=self.seed
-                )
-                self.dataset[column_name] = downsampled_data["test"]
 
     def process_data(self) -> None:
         columns = [c for c in self.dataset["train"].column_names if c not in self.LOADER_COLUMNS]

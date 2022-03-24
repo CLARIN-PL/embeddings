@@ -9,7 +9,7 @@ import torch
 from flair.data import Corpus
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
-from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.dataset import Dataset
 from embeddings.pipeline.evaluation_pipeline import (
     FlairSequenceLabelingEvaluationPipeline,
     ModelEvaluationPipeline,
@@ -51,11 +51,11 @@ def sequence_labeling_preprocessing_pipeline(
     embedding_name: str,
     ner_dataset_name: str,
 ) -> PreprocessingPipeline[str, datasets.DatasetDict, Corpus]:
-    dataset = HuggingFaceDataset(ner_dataset_name)
+    dataset = Dataset(ner_dataset_name)
     data_loader = HuggingFaceDataLoader()
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
-        .then(DownsampleFlairCorpusTransformation(percentage=0.005, seed=14))
+        .then(DownsampleFlairCorpusTransformation(*(0.005, 0.005, 0.005), seed=14))
         .persisting(FlairConllPersister(result_path.name))
     )
     pipeline = PreprocessingPipeline(

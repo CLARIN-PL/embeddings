@@ -10,7 +10,7 @@ from flair.data import Corpus
 from numpy import typing as nptyping
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
-from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.dataset import Dataset
 from embeddings.embedding.auto_flair import AutoFlairDocumentEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
@@ -36,11 +36,11 @@ def text_pair_classification_pipeline(
     ],
     "TemporaryDirectory[str]",
 ]:
-    dataset = HuggingFaceDataset("clarin-pl/cst-wikinews")
+    dataset = Dataset("clarin-pl/cst-wikinews")
     data_loader = HuggingFaceDataLoader()
     transformation = (
         PairClassificationCorpusTransformation(("sentence_1", "sentence_2"), "label")
-        .then(DownsampleFlairCorpusTransformation(percentage=0.1, stratify=True))
+        .then(DownsampleFlairCorpusTransformation(*(0.1, 0.1, 0.1), stratify=True))
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, seed=441, stratify=True))
     )
     embedding = AutoFlairDocumentEmbedding.from_hub("allegro/herbert-base-cased")
@@ -80,11 +80,11 @@ def text_pair_classification_pipeline_local_embedding(
     ],
     "TemporaryDirectory[str]",
 ]:
-    dataset = HuggingFaceDataset("clarin-pl/cst-wikinews")
+    dataset = Dataset("clarin-pl/cst-wikinews")
     data_loader = HuggingFaceDataLoader()
     transformation = (
         PairClassificationCorpusTransformation(("sentence_1", "sentence_2"), "label")
-        .then(DownsampleFlairCorpusTransformation(percentage=0.1, stratify=True))
+        .then(DownsampleFlairCorpusTransformation(*(0.1, 0.1, 0.1), stratify=True))
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, seed=441, stratify=True))
     )
     embedding = AutoFlairDocumentEmbedding.from_file(local_embedding_filepath, model_type_reference)

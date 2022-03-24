@@ -1,7 +1,7 @@
 import pytest
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
-from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.dataset import Dataset
 from embeddings.transformation.hf_transformation.to_pandas_transformation import (
     ToPandasHuggingFaceCorpusTransformation,
 )
@@ -9,7 +9,7 @@ from embeddings.transformation.hf_transformation.to_pandas_transformation import
 
 @pytest.fixture(scope="module")
 def hf_dataset(dataset_name: str = "clarin-pl/polemo2-official"):
-    return HuggingFaceDataset(dataset_name)
+    return Dataset(dataset_name)
 
 
 @pytest.fixture(scope="module")
@@ -23,7 +23,7 @@ def to_pandas_transformation():
 
 
 def test_to_pandas_transformation(
-    hf_dataset: HuggingFaceDataset,
+    hf_dataset: Dataset,
     data_loader: HuggingFaceDataLoader,
     to_pandas_transformation: ToPandasHuggingFaceCorpusTransformation,
 ):

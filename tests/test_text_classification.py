@@ -10,7 +10,7 @@ from flair.data import Corpus
 from numpy import typing as nptyping
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
-from embeddings.data.dataset import HuggingFaceDataset
+from embeddings.data.dataset import Dataset
 from embeddings.embedding.auto_flair import AutoFlairDocumentEmbedding
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
@@ -33,7 +33,7 @@ def text_classification_pipeline(
     ],
     "TemporaryDirectory[str]",
 ]:
-    dataset = HuggingFaceDataset(
+    dataset = Dataset(
         "clarin-pl/polemo2-official",
         train_domains=["reviews"],
         dev_domains=["reviews"],
@@ -42,7 +42,7 @@ def text_classification_pipeline(
     )
     data_loader = HuggingFaceDataLoader()
     transformation = ClassificationCorpusTransformation("text", "target").then(
-        DownsampleFlairCorpusTransformation(percentage=0.01, stratify=False)
+        DownsampleFlairCorpusTransformation(*(0.01, 0.01, 0.01), stratify=False)
     )
     embedding = AutoFlairDocumentEmbedding.from_hub("allegro/herbert-base-cased")
     task = TextClassification(result_path.name, task_train_kwargs={"max_epochs": 1})
@@ -81,7 +81,7 @@ def text_classification_pipeline_local_embedding(
     ],
     "TemporaryDirectory[str]",
 ]:
-    dataset = HuggingFaceDataset(
+    dataset = Dataset(
         "clarin-pl/polemo2-official",
         train_domains=["reviews"],
         dev_domains=["reviews"],
@@ -90,7 +90,7 @@ def text_classification_pipeline_local_embedding(
     )
     data_loader = HuggingFaceDataLoader()
     transformation = ClassificationCorpusTransformation("text", "target").then(
-        DownsampleFlairCorpusTransformation(percentage=0.01, stratify=False)
+        DownsampleFlairCorpusTransformation(*(0.01, 0.01, 0.01), stratify=False)
     )
     embedding = AutoFlairDocumentEmbedding.from_file(local_embedding_filepath, model_type_reference)
     task = TextClassification(result_path.name, task_train_kwargs={"max_epochs": 1})

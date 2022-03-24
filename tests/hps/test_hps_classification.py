@@ -1,8 +1,7 @@
-from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Tuple
-from unittest.mock import patch
+from tempfile import TemporaryDirectory
+from typing import Any, Dict, List, Tuple, Union
 
 import pandas as pd
 import pytest
@@ -12,21 +11,26 @@ from embeddings.hyperparameter_search.lighting_configspace import (
     LightingTextClassificationConfigSpace,
 )
 from embeddings.hyperparameter_search.parameters import ConstantParameter
+from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingClassificationPipeline
 from embeddings.pipeline.pipelines_metadata import LightningClassificationPipelineMetadata
 from tests.hps.utils import _flatten
 
-TESTING_DATAMODULE_KWARGS: Dict[str, Any] = deepcopy(
-    LightningClassificationPipeline.DEFAULT_DATAMODULE_KWARGS
-)
-TESTING_DATAMODULE_KWARGS.update(
-    {
-        "downsample_train": 0.01,
-        "downsample_val": 0.01,
-        "downsample_test": 0.05,
+
+@pytest.fixture(scope="module")
+def dataset_name() -> str:
+    return "clarin-pl/polemo2-official"
+
+
+@pytest.fixture(scope="module")
+def load_dataset_kwargs() -> Dict[str, Union[List[str], str]]:
+    return {
+        "train_domains": ["hotels", "medicine"],
+        "dev_domains": ["hotels", "medicine"],
+        "test_domains": ["hotels", "medicine"],
+        "text_cfg": "text",
     }
-)
 
 
 @pytest.fixture(scope="module")
@@ -40,19 +44,56 @@ def classification_config_space() -> LightingTextClassificationConfigSpace:
 
 
 @pytest.fixture(scope="module")
-@patch.object(
-    LightningClassificationPipeline, "DEFAULT_DATAMODULE_KWARGS", TESTING_DATAMODULE_KWARGS
-)
+def hps_dataset_path(
+    dataset_name: str, load_dataset_kwargs: Dict[str, Union[List[str], str]]
+) -> "TemporaryDirectory[str]":
+    path = TemporaryDirectory()
+    pipeline = HuggingFacePreprocessingPipeline(
+        dataset_name=dataset_name,
+        load_dataset_kwargs=load_dataset_kwargs,
+        persist_path=path.name,
+        sample_missing_splits=(0.1, None),
+        ignore_test_subset=True,
+        downsample_splits=(0.01, 0.01, 0.05),
+        seed=441,
+    )
+    pipeline.run()
+
+    return path
+
+
+@pytest.fixture(scope="module")
+def dataset_path(
+    dataset_name: str, load_dataset_kwargs: Dict[str, Union[List[str], str]]
+) -> "TemporaryDirectory[str]":
+    path = TemporaryDirectory()
+    pipeline = HuggingFacePreprocessingPipeline(
+        dataset_name=dataset_name,
+        load_dataset_kwargs=load_dataset_kwargs,
+        persist_path=path.name,
+        sample_missing_splits=None,
+        ignore_test_subset=False,
+        downsample_splits=(0.01, 0.01, 0.05),
+        seed=441,
+    )
+    pipeline.run()
+
+    return path
+
+
+@pytest.fixture(scope="module")
 def classification_hps_run_result(
-    tmp_path_module: Path, classification_config_space: LightingTextClassificationConfigSpace
+    hps_dataset_path: "TemporaryDirectory[str]",
+    tmp_path_module: Path,
+    classification_config_space: LightingTextClassificationConfigSpace,
 ) -> Tuple[pd.DataFrame, LightningClassificationPipelineMetadata]:
-    assert LightningClassificationPipeline.DEFAULT_DATAMODULE_KWARGS == TESTING_DATAMODULE_KWARGS
     pipeline = OptimizedLightingClassificationPipeline(
         config_space=classification_config_space,
-        dataset_name_or_path="clarin-pl/polemo2-official",
+        dataset_name_or_path=hps_dataset_path.name,
         input_column_name="text",
         target_column_name="target",
         n_trials=1,
+        ignore_preprocessing_pipeline=True,
     ).persisting(
         best_params_path=tmp_path_module.joinpath("best_params.yaml"),
         log_path=tmp_path_module.joinpath("hps_log.pickle"),
@@ -125,15 +166,13 @@ def test_keys_allowed_in_config_space_but_not_in_metadata(
 
 
 @pytest.fixture(scope="module")
-@patch.object(
-    LightningClassificationPipeline, "DEFAULT_DATAMODULE_KWARGS", TESTING_DATAMODULE_KWARGS
-)
 def retrain_model_result(
+    dataset_path: "TemporaryDirectory[str]",
     retrain_tmp_path: Path,
     classification_hps_run_result: Tuple[pd.DataFrame, LightningClassificationPipelineMetadata],
 ) -> Dict[str, Any]:
-    assert LightningClassificationPipeline.DEFAULT_DATAMODULE_KWARGS == TESTING_DATAMODULE_KWARGS
     df, metadata = classification_hps_run_result
+    metadata["dataset_name_or_path"] = dataset_path.name
     metadata["output_path"] = retrain_tmp_path
     pipeline = LightningClassificationPipeline(**metadata)
     results = pipeline.run()
@@ -191,6 +230,9 @@ def test_hparams_best_params_files_compatibility(
         "classifier_dropout",
     }
     for k in common_keys:
+        if k == "dataset_name_or_path":
+            continue
+
         if k in metadata:
             if isinstance(metadata[k], Enum):  # type: ignore
                 enum_hparam = getattr(type(metadata[k]), hparams[k])  # type: ignore
