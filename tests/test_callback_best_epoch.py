@@ -13,11 +13,6 @@ from embeddings.pipeline.lightning_pipeline import LightningPipeline
 
 
 @pytest.fixture(scope="module")
-def pipeline_kwargs() -> Dict[str, Any]:
-    return {"embedding_name_or_path": "allegro/herbert-base-cased"}
-
-
-@pytest.fixture(scope="module")
 def dataset_kwargs() -> Tuple[Dict[str, Any], "TemporaryDirectory[str]"]:
     path = TemporaryDirectory()
     pipeline = HuggingFacePreprocessingPipeline(
@@ -47,6 +42,8 @@ def dataset_kwargs() -> Tuple[Dict[str, Any], "TemporaryDirectory[str]"]:
 def config() -> LightningAdvancedConfig:
     return LightningAdvancedConfig(
         finetune_last_n_layers=0,
+        train_batch_size=32,
+        eval_batch_size=32,
         task_train_kwargs={
             "max_epochs": 3,
             "devices": "auto",
@@ -61,18 +58,12 @@ def config() -> LightningAdvancedConfig:
             "warmup_steps": 100,
             "weight_decay": 0.0,
         },
-        datamodule_kwargs={
-            "downsample_train": 0.01,
-            "downsample_val": 0.01,
-            "downsample_test": 0.05,
-        },
-        dataloader_kwargs={"num_workers": 0},
+        datamodule_kwargs={"max_seq_length": None}
     )
 
 
 @pytest.fixture(scope="module")
 def lightning_classification_pipeline(
-    pipeline_kwargs: Dict[str, Any],
     dataset_kwargs: Dict[str, Any],
     config: LightningAdvancedConfig,
     result_path: "TemporaryDirectory[str]",
@@ -82,10 +73,10 @@ def lightning_classification_pipeline(
 ]:
     return (
         LightningClassificationPipeline(
+            embedding_name_or_path="allegro/herbert-base-cased",
             output_path=result_path.name,
             config=config,
-            **pipeline_kwargs,
-            **dataset_kwargs,
+            **dataset_kwargs[0],
         ),
         result_path,
     )
