@@ -6,6 +6,7 @@ import pytorch_lightning as pl
 import torch
 from numpy import typing as nptyping
 from pytorch_lightning.utilities.types import STEP_OUTPUT
+from torch.nn.functional import softmax
 from torch.optim import AdamW, Optimizer
 from torch.utils.data import DataLoader
 from torchmetrics import MetricCollection
@@ -70,12 +71,12 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             dataloaders=dataloader, return_predictions=True, ckpt_path="best"
         )
         logits, predictions = zip(*logits_predictions)
-        logits = torch.cat(logits).numpy()
+        probabilities = softmax(torch.cat(logits)).numpy()
         predictions = torch.cat(predictions).numpy()
-        assert isinstance(predictions, np.ndarray)
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
-        assert isinstance(ground_truth, np.ndarray)
-        return {"y_logits": logits, "y_pred": predictions, "y_true": ground_truth}
+        result = {"y_pred": predictions, "y_true": ground_truth, "y_probabilities": probabilities}
+        assert all(isinstance(x, np.ndarray) for x in result.values())
+        return result
 
     def configure_metrics(self) -> None:
         if self.metrics is None:
