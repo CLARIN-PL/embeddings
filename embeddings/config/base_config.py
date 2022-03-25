@@ -1,6 +1,6 @@
 import abc
 from dataclasses import dataclass
-from typing import Any, Dict, Set, Tuple
+from typing import Any, Dict, Iterable, Set, Tuple
 
 from embeddings.data.io import T_path
 from embeddings.utils.loggers import get_logger
@@ -23,14 +23,10 @@ class Config(abc.ABC):
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
 class BasicConfig(Config, abc.ABC):
-    @abc.abstractmethod
-    def __post_init__(self) -> None:
-        pass
-
-    def _parse_fields(self, keys: Set[str]) -> Dict[str, Any]:
+    def _parse_fields(self, keys: Iterable[str]) -> Dict[str, Any]:
         return {field_name: getattr(self, field_name) for field_name in keys}
 
-    def _map_parse_fields(self, key_tuples: Set[Tuple[str, str]]) -> Dict[str, Any]:
+    def _map_parse_fields(self, key_tuples: Iterable[Tuple[str, str]]) -> Dict[str, Any]:
         return {field_name: getattr(self, attr_name) for attr_name, field_name in key_tuples}
 
     @classmethod
@@ -42,10 +38,7 @@ class BasicConfig(Config, abc.ABC):
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
 class AdvancedConfig(Config, abc.ABC):
-    @abc.abstractmethod
-    def __post_init__(self) -> None:
-        pass
-
     @staticmethod
+    @abc.abstractmethod
     def from_basic() -> "AdvancedConfig":
         pass

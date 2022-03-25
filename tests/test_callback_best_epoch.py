@@ -42,8 +42,6 @@ def dataset_kwargs() -> Tuple[Dict[str, Any], "TemporaryDirectory[str]"]:
 def config() -> LightningAdvancedConfig:
     return LightningAdvancedConfig(
         finetune_last_n_layers=0,
-        train_batch_size=32,
-        eval_batch_size=32,
         task_train_kwargs={
             "max_epochs": 3,
             "devices": "auto",
@@ -52,13 +50,15 @@ def config() -> LightningAdvancedConfig:
         },
         task_model_kwargs={
             "learning_rate": 2e-4,
+            "train_batch_size": 32,
+            "eval_batch_size": 32,
             "use_scheduler": False,
             "optimizer": "AdamW",
             "adam_epsilon": 1e-8,
             "warmup_steps": 100,
             "weight_decay": 0.0,
         },
-        datamodule_kwargs={"max_seq_length": None}
+        datamodule_kwargs={"max_seq_length": None},
     )
 
 

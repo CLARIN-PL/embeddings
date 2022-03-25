@@ -48,19 +48,16 @@ class FlairBasicConfig(BasicConfig, ABC):
     mini_batch_size: int = 32
     max_epochs: int = 20
 
-    task_model_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-    task_train_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-    load_model_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-
-    def __post_init__(self) -> None:
-        self.task_train_kwargs = self._parse_fields(self.get_task_train_keys())
+    @property
+    def task_train_kwargs(self) -> Dict[str, Any]:
+        return self._parse_fields(self.get_task_train_keys())
 
     @staticmethod
     def get_task_train_keys() -> Set[str]:
-        task_train_kwargs = {
+        task_train_keys = {
             key for key in FlairBasicConfig.__annotations__.keys() if not key.endswith("_kwargs")
         }
-        return task_train_kwargs
+        return task_train_keys
 
     @classmethod
     def from_yaml(cls, path: T_path) -> "FlairBasicConfig":
@@ -84,13 +81,17 @@ class FlairSequenceLabelingBasicConfig(FlairBasicConfig):
     locked_dropout: float = 0.5
     reproject_embeddings: bool = True
 
-    def __post_init__(self) -> None:
-        self.task_model_kwargs = self._parse_fields(self.get_task_model_keys())
-        super().__post_init__()
+    @property
+    def task_model_kwargs(self) -> Dict[str, Any]:
+        return self._parse_fields(self.get_task_model_keys())
+
+    @property
+    def load_model_kwargs(self) -> Dict[str, Any]:
+        return {}
 
     @classmethod
     def get_task_model_keys(cls) -> Set[str]:
-        task_model_keys = set(FlairSequenceLabelingBasicConfig.__annotations__.keys())
+        task_model_keys = set(cls.__annotations__.keys())
         task_model_keys.remove("hidden_size")
         return task_model_keys
 
@@ -110,10 +111,14 @@ class FlairTextClassificationBasicConfig(FlairBasicConfig, FlairTextClassificati
     word_dropout: float = 0.05
     reproject_words: bool = True
 
-    def __post_init__(self) -> None:
+    @property
+    def load_model_kwargs(self) -> Dict[str, Any]:
         load_model_keys = self.get_map_load_model_keys(self.document_embedding_cls)
-        self.load_model_kwargs = self._parse_fields(load_model_keys)
-        super().__post_init__()
+        return self._parse_fields(load_model_keys)
+
+    @property
+    def task_model_kwargs(self) -> Dict[str, Any]:
+        return {}
 
     @classmethod
     def get_map_load_model_keys(cls, document_embedding_cls: str) -> Set[str]:
@@ -125,9 +130,6 @@ class FlairAdvancedConfig(AdvancedConfig, ABC):
     task_model_kwargs: Dict[str, Any] = field(default_factory=dict)
     task_train_kwargs: Dict[str, Any] = field(default_factory=dict)
     load_model_kwargs: Dict[str, Any] = field(default_factory=dict)
-
-    def __post_init__(self) -> None:
-        pass
 
     @classmethod
     def from_yaml(cls, path: T_path) -> "FlairAdvancedConfig":
@@ -143,10 +145,10 @@ class FlairAdvancedConfig(AdvancedConfig, ABC):
 class FlairSequenceLabelingAdvancedConfig(FlairAdvancedConfig):
     hidden_size: int = 256
 
-    @staticmethod
-    def from_basic() -> "FlairSequenceLabelingAdvancedConfig":
+    @classmethod
+    def from_basic(cls) -> "FlairSequenceLabelingAdvancedConfig":
         config = FlairSequenceLabelingBasicConfig()
-        return FlairSequenceLabelingAdvancedConfig(
+        return cls(
             task_model_kwargs=config.task_model_kwargs, task_train_kwargs=config.task_train_kwargs
         )
 
@@ -155,10 +157,10 @@ class FlairSequenceLabelingAdvancedConfig(FlairAdvancedConfig):
 class FlairTextClassificationAdvancedConfig(FlairAdvancedConfig):
     document_embedding_cls: str = "FlairDocumentPoolEmbedding"
 
-    @staticmethod
-    def from_basic() -> "FlairTextClassificationAdvancedConfig":
+    @classmethod
+    def from_basic(cls) -> "FlairTextClassificationAdvancedConfig":
         config = FlairTextClassificationBasicConfig()
-        return FlairTextClassificationAdvancedConfig(
+        return cls(
             task_model_kwargs=config.task_model_kwargs,
             task_train_kwargs=config.task_train_kwargs,
             load_model_kwargs=config.load_model_kwargs,

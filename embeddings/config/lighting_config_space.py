@@ -110,8 +110,8 @@ class LightingConfigSpace(BaseConfigSpace, LightningConfigKeys, ABC):
             parameters=parameters, parameters_keys=cls.MODEL_CONFIG_KEYS
         )
 
-        batch_size = pipeline_kwargs.pop("batch_size")
-        pipeline_kwargs["train_batch_size"] = pipeline_kwargs["eval_batch_size"] = batch_size
+        batch_size = task_model_kwargs.pop("batch_size")
+        task_model_kwargs["train_batch_size"] = task_model_kwargs["eval_batch_size"] = batch_size
 
         return {
             "datamodule_kwargs": datamodule_kwargs,

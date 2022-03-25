@@ -128,8 +128,6 @@ class OptimizedLightingPipeline(
     ) -> Tuple[
         str,
         int,
-        int,
-        int,
         Optional[Union[List[int], str, int]],
         Optional[Union[str, Accelerator]],
         Dict[str, ParameterValues],
@@ -139,10 +137,6 @@ class OptimizedLightingPipeline(
     ]:
         embedding_name_or_path = parameters["embedding_name_or_path"]
         assert isinstance(embedding_name_or_path, str)
-        train_batch_size = parameters["train_batch_size"]
-        assert isinstance(train_batch_size, int)
-        eval_batch_size = parameters["eval_batch_size"]
-        assert isinstance(eval_batch_size, int)
         finetune_last_n_layers = parameters["finetune_last_n_layers"]
         assert isinstance(finetune_last_n_layers, int)
         devices = parameters["devices"]
@@ -160,8 +154,6 @@ class OptimizedLightingPipeline(
 
         return (
             embedding_name_or_path,
-            train_batch_size,
-            eval_batch_size,
             finetune_last_n_layers,
             devices,
             accelerator,
@@ -209,8 +201,6 @@ class OptimizedLightingClassificationPipeline(
     ) -> LightningClassificationPipelineMetadata:
         (
             embedding_name_or_path,
-            train_batch_size,
-            eval_batch_size,
             finetune_last_n_layers,
             devices,
             accelerator,
@@ -233,8 +223,6 @@ class OptimizedLightingClassificationPipeline(
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "predict_subset": LightingDataModuleSubset.TEST,
             "config": LightningAdvancedConfig(
-                train_batch_size=train_batch_size,
-                eval_batch_size=eval_batch_size,
                 finetune_last_n_layers=finetune_last_n_layers,
                 datamodule_kwargs=datamodule_kwargs,
                 task_model_kwargs=task_model_kwargs,
@@ -280,8 +268,6 @@ class OptimizedLightingSequenceLabelingPipeline(
     ) -> LightningSequenceLabelingPipelineMetadata:
         (
             embedding_name_or_path,
-            train_batch_size,
-            eval_batch_size,
             finetune_last_n_layers,
             devices,
             accelerator,
@@ -306,8 +292,6 @@ class OptimizedLightingSequenceLabelingPipeline(
             "load_dataset_kwargs": self.load_dataset_kwargs,
             "predict_subset": LightingDataModuleSubset.TEST,
             "config": LightningAdvancedConfig(
-                train_batch_size=train_batch_size,
-                eval_batch_size=eval_batch_size,
                 finetune_last_n_layers=finetune_last_n_layers,
                 datamodule_kwargs=datamodule_kwargs,
                 task_model_kwargs=task_model_kwargs,

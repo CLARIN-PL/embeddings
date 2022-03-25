@@ -155,7 +155,6 @@ def test_keys_allowed_in_metadata_but_not_in_config_space(
     assert metadata_keys - config_space_keys == {
         "accelerator",
         "devices",
-        "eval_batch_size",
         "tokenizer_kwargs",
         "target_column_name",
         "model_config_kwargs",
@@ -167,7 +166,6 @@ def test_keys_allowed_in_metadata_but_not_in_config_space(
         "task_model_kwargs",
         "tokenizer_name_or_path",
         "config",
-        "train_batch_size",
         "datamodule_kwargs",
         "early_stopping_kwargs",
         "input_column_name",

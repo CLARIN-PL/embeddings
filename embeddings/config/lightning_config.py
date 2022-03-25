@@ -14,7 +14,6 @@ _logger = get_logger(__name__)
 @dataclass
 class LightningConfigKeys:
     PIPELINE_KEYS: ClassVar[Set[str]] = {
-        "batch_size",
         "finetune_last_n_layers",
         "embedding_name_or_path",
         "devices",
@@ -28,6 +27,7 @@ class LightningConfigKeys:
         "warmup_steps",
         "adam_epsilon",
         "weight_decay",
+        "batch_size",
     }
     TASK_TRAIN_KEYS: ClassVar[Set[str]] = {"max_epochs"}
     MODEL_CONFIG_KEYS: ClassVar[Set[str]] = {"classifier_dropout"}
@@ -55,27 +55,40 @@ class LightningBasicConfig(BasicConfig, LightningConfigKeys):
     early_stopping_mode: str = "min"
     early_stopping_patience: int = 3
 
-    train_batch_size: int = field(init=False)
-    eval_batch_size: int = field(init=False)
-    datamodule_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-    task_model_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-    task_train_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-    model_config_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-    early_stopping_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
     tokenizer_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
     batch_encoding_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-    dataloader_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
 
-    def __post_init__(self) -> None:
-        self.train_batch_size = self.eval_batch_size = self.mini_batch_size
-        self.datamodule_kwargs = self._parse_fields(self.DATAMODULE_KEYS)
-        self.task_model_kwargs = self._parse_fields(self.TASK_MODEL_KEYS)
-        self.task_train_kwargs = self._parse_fields(self.TASK_TRAIN_KEYS)
-        self.model_config_kwargs = self._parse_fields(self.MODEL_CONFIG_KEYS)
-        self.early_stopping_kwargs = self._map_parse_fields(self.EARLY_STOPPING_KEYS)
-        self.task_model_kwargs.update(
+    @property
+    def train_batch_size(self) -> int:
+        return self.mini_batch_size
+
+    @property
+    def eval_batch_size(self) -> int:
+        return self.mini_batch_size
+
+    @property
+    def datamodule_kwargs(self) -> Dict[str, Any]:
+        return self._parse_fields(self.DATAMODULE_KEYS)
+
+    @property
+    def task_model_kwargs(self) -> Dict[str, Any]:
+        task_model_kwargs = self._parse_fields(self.TASK_MODEL_KEYS)
+        task_model_kwargs.update(
             {"train_batch_size": self.train_batch_size, "eval_batch_size": self.eval_batch_size}
         )
+        return task_model_kwargs
+
+    @property
+    def task_train_kwargs(self) -> Dict[str, Any]:
+        return self._parse_fields(self.TASK_TRAIN_KEYS)
+
+    @property
+    def model_config_kwargs(self) -> Dict[str, Any]:
+        return self._parse_fields(self.MODEL_CONFIG_KEYS)
+
+    @property
+    def early_stopping_kwargs(self) -> Dict[str, Any]:
+        return self._map_parse_fields(self.EARLY_STOPPING_KEYS)
 
     @classmethod
     def from_yaml(cls, path: T_path) -> "LightningBasicConfig":
@@ -89,8 +102,6 @@ class LightningBasicConfig(BasicConfig, LightningConfigKeys):
 
 @dataclass
 class LightningAdvancedConfig(AdvancedConfig):
-    train_batch_size: int
-    eval_batch_size: int
     finetune_last_n_layers: int
     datamodule_kwargs: Dict[str, Any] = field(default_factory=dict)
     task_model_kwargs: Dict[str, Any] = field(default_factory=dict)
@@ -99,11 +110,6 @@ class LightningAdvancedConfig(AdvancedConfig):
     early_stopping_kwargs: Dict[str, Any] = field(default_factory=dict)
     tokenizer_kwargs: Dict[str, Any] = field(default_factory=dict)
     batch_encoding_kwargs: Dict[str, Any] = field(default_factory=dict)
-
-    def __post_init__(self) -> None:
-        self.task_model_kwargs.update(
-            {"train_batch_size": self.train_batch_size, "eval_batch_size": self.eval_batch_size}
-        )
 
     @classmethod
     def from_yaml(cls, path: T_path) -> "LightningAdvancedConfig":
@@ -118,8 +124,6 @@ class LightningAdvancedConfig(AdvancedConfig):
     def from_basic() -> "LightningAdvancedConfig":
         config = LightningBasicConfig()
         return LightningAdvancedConfig(
-            train_batch_size=config.train_batch_size,
-            eval_batch_size=config.eval_batch_size,
             finetune_last_n_layers=config.finetune_last_n_layers,
             datamodule_kwargs=config.datamodule_kwargs,
             task_model_kwargs=config.task_model_kwargs,
