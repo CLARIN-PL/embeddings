@@ -39,6 +39,5 @@ class BasicConfig(Config, abc.ABC):
 @dataclass  # type: ignore
 class AdvancedConfig(Config, abc.ABC):
     @staticmethod
-    @abc.abstractmethod
     def from_basic() -> "AdvancedConfig":
         pass

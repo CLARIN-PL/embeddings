@@ -228,28 +228,52 @@ def test_hparams_best_params_files_compatibility(
     with open(tmp_path_module / "best_params.yaml") as f:
         best_params = yaml.load(f, Loader=yaml.Loader)
 
-    # compare config keys
+    common_keys = _flatten(hparams).keys() & _flatten(best_params).keys()
+    assert common_keys == {
+        "devices",
+        "accelerator",
+        "embedding_name_or_path",
+        "predict_subset",
+        "input_column_name",
+        "config",
+        "tokenizer_name_or_path",
+        "target_column_name",
+        "dataset_name_or_path",
+        "load_dataset_kwargs",
+    }
+
     assert (
         best_params["config"].__dict__.keys()
         == hparams["config"].__dict__.keys()
         == metadata["config"].__dict__.keys()
     )
-    # compare config values
-    # append devices and accelerator to best params since this is done in lightning pipeline
-    assert (
-        {
-            **_flatten(best_params["config"].__dict__),
-            **{"devices": best_params["devices"], "accelerator": best_params["accelerator"]},
-        }
-        == _flatten(hparams["config"].__dict__)
-        == _flatten(metadata["config"].__dict__)
-    )
 
+    assert_compare_config_values(best_params, hparams, metadata)
+    assert_compare_params_values(best_params, hparams, metadata)
+
+
+def assert_compare_config_values(
+    best_params: Dict[str, Any], hparams: Dict[str, Any], metadata: Dict[str, Any]
+) -> None:
+    best_params_config = _flatten(best_params["config"].__dict__)
+    best_params_config.update(
+        {"devices": best_params["devices"], "accelerator": best_params["accelerator"]}
+    )  # append devices and accelerator to best params since this is done in lightning pipeline
+    hparams_config = _flatten(hparams["config"].__dict__)
+    metadata_config = _flatten(metadata["config"].__dict__)
+    assert best_params_config == hparams_config == metadata_config
+
+
+def assert_compare_params_values(
+    best_params: Dict[str, Any], hparams: Dict[str, Any], metadata: Dict[str, Any]
+) -> None:
     assert hparams["model_name_or_path"] == best_params["embedding_name_or_path"]
     hparams = {k: v for k, v in hparams.items() if k in best_params.keys() and k != "config"}
     for k in hparams.keys():
         if k == "dataset_name_or_path":
             continue
+        elif not k.endswith("_kwargs"):
+            assert hparams[k] is not None
         elif isinstance(metadata[k], Enum):  # type: ignore
             enum_hparam = getattr(type(metadata[k]), hparams[k])  # type: ignore
             assert enum_hparam == best_params[k] == metadata[k]  # type: ignore
