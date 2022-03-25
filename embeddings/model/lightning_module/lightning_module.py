@@ -57,23 +57,25 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
     def test_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         pass
 
-    def predict_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
+    def predict_step(self, *args: Any, **kwargs: Any) -> Optional[Tuple[STEP_OUTPUT, STEP_OUTPUT]]:
         batch, batch_idx = args
         loss, logits, preds = self.shared_step(**batch)
-        return preds
+        return logits, preds
 
     def predict(
         self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.trainer is not None
-        predictions = self.trainer.predict(
+        logits_predictions = self.trainer.predict(
             dataloaders=dataloader, return_predictions=True, ckpt_path="best"
         )
+        logits, predictions = zip(*logits_predictions)
+        logits = torch.cat(logits).numpy()
         predictions = torch.cat(predictions).numpy()
         assert isinstance(predictions, np.ndarray)
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
         assert isinstance(ground_truth, np.ndarray)
-        return {"y_pred": predictions, "y_true": ground_truth}
+        return {"y_logits": logits, "y_pred": predictions, "y_true": ground_truth}
 
     def configure_metrics(self) -> None:
         if self.metrics is None:
