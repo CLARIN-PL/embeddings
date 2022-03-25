@@ -55,9 +55,6 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         train_batch_size: int,
         eval_batch_size: int,
         processing_batch_size: Optional[int] = None,
-        downsample_train: Optional[float] = None,
-        downsample_val: Optional[float] = None,
-        downsample_test: Optional[float] = None,
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         dataloader_kwargs: Optional[Dict[str, Any]] = None,
@@ -70,9 +67,6 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.train_batch_size = train_batch_size
         self.eval_batch_size = eval_batch_size
         self.processing_batch_size = processing_batch_size
-        self.downsample_train = downsample_train
-        self.downsample_val = downsample_val
-        self.downsample_test = downsample_test
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.tokenizer_name_or_path,
             **tokenizer_kwargs if tokenizer_kwargs else {},
@@ -109,7 +103,6 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.process_data()
 
     def load_dataset(self, preparation_step: bool = False) -> DatasetDict:
-        self.load_dataset_kwargs = self.load_dataset_kwargs if self.load_dataset_kwargs else {}
         dataset = embeddings_dataset.Dataset(
             str(self.dataset_name_or_path), **self.load_dataset_kwargs
         )
@@ -202,6 +195,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
         batch_encoding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
+        dataloader_kwargs: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ):
         if isinstance(text_fields, str):
@@ -221,6 +215,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
             eval_batch_size=eval_batch_size,
             tokenizer_kwargs=tokenizer_kwargs,
             load_dataset_kwargs=load_dataset_kwargs,
+            dataloader_kwargs=dataloader_kwargs,
             **kwargs,
         )
 
@@ -280,6 +275,7 @@ class SequenceLabelingDataModule(HuggingFaceDataModule):
         tokenizer_kwargs: Optional[Dict[str, Any]] = None,
         batch_encoding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
+        dataloader_kwargs: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ):
         self.text_field = text_field
@@ -296,6 +292,7 @@ class SequenceLabelingDataModule(HuggingFaceDataModule):
             eval_batch_size=eval_batch_size,
             tokenizer_kwargs=tokenizer_kwargs,
             load_dataset_kwargs=load_dataset_kwargs,
+            dataloader_kwargs=dataloader_kwargs,
             **kwargs,
         )
 

@@ -57,6 +57,7 @@ class LightningSequenceLabelingPipeline(
             tokenizer_kwargs=config.tokenizer_kwargs,
             batch_encoding_kwargs=config.batch_encoding_kwargs,
             load_dataset_kwargs=load_dataset_kwargs,
+            dataloader_kwargs=config.dataloader_kwargs,
             **config.datamodule_kwargs
         )
         task = SequenceLabelingTask(

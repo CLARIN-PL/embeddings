@@ -57,6 +57,7 @@ class LightningBasicConfig(BasicConfig, LightningConfigKeys):
 
     tokenizer_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
     batch_encoding_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
+    dataloader_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
 
     @property
     def train_batch_size(self) -> int:
@@ -110,6 +111,7 @@ class LightningAdvancedConfig(AdvancedConfig):
     early_stopping_kwargs: Dict[str, Any] = field(default_factory=dict)
     tokenizer_kwargs: Dict[str, Any] = field(default_factory=dict)
     batch_encoding_kwargs: Dict[str, Any] = field(default_factory=dict)
+    dataloader_kwargs: Dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def from_yaml(cls, path: T_path) -> "LightningAdvancedConfig":
