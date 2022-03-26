@@ -116,9 +116,18 @@ def test_lightning_sequence_labeling_pipeline(
     assert "data" in result
     assert "y_pred" in result["data"]
     assert "y_true" in result["data"]
+    assert "y_probabilities" in result["data"]
+    assert "names" in result["data"]
     assert isinstance(result["data"]["y_pred"], np.ndarray)
     assert isinstance(result["data"]["y_true"], np.ndarray)
+    assert isinstance(result["data"]["y_probabilities"], np.ndarray)
+    assert isinstance(result["data"]["names"], np.ndarray)
     assert isinstance(result["data"]["y_pred"][0], list)
     assert isinstance(result["data"]["y_true"][0], list)
+    assert isinstance(result["data"]["y_probabilities"][0], list)
+    assert isinstance(result["data"]["names"][0], np.ndarray)
     assert isinstance(result["data"]["y_pred"][0][0], str)
     assert isinstance(result["data"]["y_true"][0][0], str)
+    assert isinstance(result["data"]["y_probabilities"][0][0], np.ndarray)
+    assert isinstance(result["data"]["names"][0][0], str)
+    assert isinstance(result["data"]["y_probabilities"][0][0][0], np.float32)

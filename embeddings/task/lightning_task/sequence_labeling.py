@@ -42,11 +42,28 @@ class SequenceLabelingTask(LightningTask):
     def predict(self, dataloader: DataLoader[Any]) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.model is not None
         results = self.model.predict(dataloader=dataloader)
-        predictions, ground_truth = (list(results["y_pred"]), list(results["y_true"]))
-        for i, (pred, gt) in enumerate(zip(predictions, ground_truth)):
+        predictions, ground_truth, probabilities = (
+            list(results["y_pred"]),
+            list(results["y_true"]),
+            list(results["y_probabilities"]),
+        )
+
+        for i, (pred, gt, probs) in enumerate(zip(predictions, ground_truth, probabilities)):
             predictions[i] = self._map_filter_data(pred, gt)
             ground_truth[i] = self._map_filter_data(gt, gt)
-        return {"y_pred": np.array(predictions), "y_true": np.array(ground_truth)}
+            probabilities[i] = [x for x in probs[gt != self.model.ignore_index]]
+
+        assert self.trainer is not None
+        assert hasattr(self.trainer, "datamodule")
+        names = (
+            getattr(self.trainer, "datamodule").dataset["train"].features["labels"].feature.names,
+        )
+        return {
+            "y_pred": np.array(predictions),
+            "y_true": np.array(ground_truth),
+            "y_probabilities": np.array(probabilities),
+            "names": np.array(names),
+        }
 
     def _map_filter_data(
         self, data: nptyping.NDArray[Any], ground_truth_data: nptyping.NDArray[Any]
