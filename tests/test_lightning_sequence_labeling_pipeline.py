@@ -79,7 +79,7 @@ def lightning_sequence_labeling_pipeline(
             datamodule_kwargs=datamodule_kwargs,
             task_train_kwargs=task_train_kwargs,
             **pipeline_kwargs,
-            **dataset_kwargs[0],
+            **dataset_kwargs,
         ),
         tmp_path,
     )
