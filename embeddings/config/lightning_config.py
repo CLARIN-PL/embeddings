@@ -49,7 +49,7 @@ class LightningBasicConfig(BasicConfig, LightningConfigKeys):
     finetune_last_n_layers: int = -1
     classifier_dropout: Optional[float] = None
     max_seq_length: Optional[int] = None
-    mini_batch_size: int = 32
+    batch_size: int = 32
     max_epochs: Optional[int] = None
     early_stopping_monitor: str = "val/Loss"
     early_stopping_mode: str = "min"
@@ -61,11 +61,11 @@ class LightningBasicConfig(BasicConfig, LightningConfigKeys):
 
     @property
     def train_batch_size(self) -> int:
-        return self.mini_batch_size
+        return self.batch_size
 
     @property
     def eval_batch_size(self) -> int:
-        return self.mini_batch_size
+        return self.batch_size
 
     @property
     def datamodule_kwargs(self) -> Dict[str, Any]:

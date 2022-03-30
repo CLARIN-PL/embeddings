@@ -167,6 +167,7 @@ def test_keys_allowed_in_metadata_but_not_in_config_space(
         "tokenizer_name_or_path",
         "config",
         "datamodule_kwargs",
+        "dataloader_kwargs",
         "early_stopping_kwargs",
         "input_column_name",
         "dataset_name_or_path",

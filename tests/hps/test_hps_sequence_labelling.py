@@ -178,6 +178,7 @@ def test_keys_allowed_in_metadata_but_not_in_config_space(
         "tokenizer_name_or_path",
         "batch_encoding_kwargs",
         "datamodule_kwargs",
+        "dataloader_kwargs",
         "tagging_scheme",
         "task_model_kwargs",
         "evaluation_mode",

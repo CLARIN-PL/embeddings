@@ -57,8 +57,6 @@ def config() -> LightningAdvancedConfig:
         finetune_last_n_layers=0,
         task_train_kwargs={
             "max_epochs": 1,
-            "devices": "auto",
-            "accelerator": "cpu",
             "deterministic": True,
         },
         task_model_kwargs={
@@ -96,6 +94,8 @@ def lightning_classification_pipeline(
             embedding_name_or_path="allegro/herbert-base-cased",
             output_path=result_path.name,
             config=config,
+            devices="auto",
+            accelerator="cpu",
             **dataset_kwargs[0],
         ),
         result_path,
