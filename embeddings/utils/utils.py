@@ -80,7 +80,7 @@ def build_output_path(
     dataset_name = _get_new_dir_name(dataset_name)
     path = Path(root, embedding_name, dataset_name)
     if timestamp_subdir:
-        path = path.joinpath(f"{datetime.now().strftime('%Y%m%d%H%M%S')}")
+        path = path.joinpath(f"{datetime.now().strftime('%Y%m%d_%H%M%S')}")
     if mkdirs:
         path.mkdir(exist_ok=True, parents=True)
     return path

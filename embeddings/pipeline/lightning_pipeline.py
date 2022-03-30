@@ -53,13 +53,7 @@ class LightningPipeline(
         self._save_artifacts()
         model_result = self.model.execute(data=self.datamodule, run_name=run_name)
         result = self.evaluator.evaluate(model_result)
-        if self.logging_kwargs["use_wandb"]:
-            wandb.log_artifact(
-                str(self.output_path),
-                name=run_name,
-                type="output",
-            )
-            wandb.finish()
+        self._finish_logging()
         return result
 
     @property
@@ -69,3 +63,12 @@ class LightningPipeline(
 
     def _save_artifacts(self) -> None:
         srsly.write_json(self.output_path.joinpath("packages.json"), get_installed_packages())
+
+    def _finish_logging(self, run_name: Optional[str] = None) -> None:
+        if self.logging_kwargs["use_wandb"]:
+            wandb.log_artifact(
+                str(self.output_path),
+                name=run_name,
+                type="output",
+            )
+            wandb.finish()

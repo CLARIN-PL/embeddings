@@ -108,14 +108,16 @@ class OptunaPipeline(
         parsed_params = self.config_space.parse_parameters(dict(best_params, **constant_params))
         return self._get_metadata(parsed_params)
 
-    def run(self, run_name: Optional[str] = None, **kwargs: Any) -> Tuple[pd.DataFrame, Metadata]:
+    def run(
+        self, run_name: Optional[str] = None, catch: Tuple[Type[Exception], ...] = (), **kwargs: Any
+    ) -> Tuple[pd.DataFrame, Metadata]:
         self._pre_run_hook()
         if self.preprocessing_pipeline is not None:
             self.preprocessing_pipeline.run()
         study: Study = optuna.create_study(
             direction="maximize", sampler=self.sampler, pruner=self.pruner, study_name=run_name
         )
-        study.optimize(self.objective, n_trials=self.n_trials, show_progress_bar=True)
+        study.optimize(self.objective, n_trials=self.n_trials, show_progress_bar=True, catch=catch)
 
         if isinstance(self.dataset_path, TemporaryDirectory):
             self.dataset_path.cleanup()

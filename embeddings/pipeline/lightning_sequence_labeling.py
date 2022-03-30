@@ -73,7 +73,6 @@ class LightningSequenceLabelingPipeline(
         )
 
         output_path = Path(output_path)
-        self.evaluation_filename = evaluation_filename
 
         datamodule = SequenceLabelingDataModule(
             tokenizer_name_or_path=tokenizer_name_or_path,

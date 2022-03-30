@@ -120,6 +120,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         use_csv: bool = True,
         wandb_project: Optional[str] = None,
         wandb_entity: Optional[str] = None,
+        wandb_logger_kwargs: Optional[Dict[str, Any]] = None,
     ) -> List[LightningLoggerBase]:
         """Based on configuration, provides pytorch-lightning loggers' callbacks."""
         loggers: List[LightningLoggerBase] = []
@@ -132,9 +133,10 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
                 )
             )
 
-        if not use_wandb and (wandb_project or wandb_entity):
+        if not use_wandb and (wandb_project or wandb_entity or wandb_logger_kwargs):
             raise ValueError(
-                "`wandb_project` or `wandb_entity` was configured but use_wand is set to false."
+                "`wandb_project` or `wandb_entity` or 'wandb_logger_kwargs' was configured but "
+                "use_wand is set to false."
             )
 
         if use_wandb:
@@ -147,6 +149,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
                     project=wandb_project,
                     entity=wandb_entity,
                     reinit=True,
+                    **wandb_logger_kwargs or {}
                 )
             )
 
