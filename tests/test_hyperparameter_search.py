@@ -86,7 +86,7 @@ def lightning_classification_kwargs(output_path: "TemporaryDirectory[str]") -> D
     return {
         "output_path": output_path.name,
         "embedding_name_or_path": "clarin-pl/roberta-polish-kgr10",
-        "config": LightningBasicConfig(mini_batch_size=1, finetune_last_n_layers=0),
+        "config": LightningBasicConfig(batch_size=1, finetune_last_n_layers=0),
         "tokenizer_name_or_path": None,
         "predict_subset": LightingDataModuleSubset.TEST,
     }
