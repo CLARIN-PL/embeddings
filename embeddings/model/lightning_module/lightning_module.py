@@ -71,7 +71,7 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             dataloaders=dataloader, return_predictions=True, ckpt_path="best"
         )
         logits, predictions = zip(*logits_predictions)
-        probabilities = softmax(torch.cat(logits)).numpy()
+        probabilities = softmax(torch.cat(logits), dim=1).numpy()
         predictions = torch.cat(predictions).numpy()
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
         result = {"y_pred": predictions, "y_true": ground_truth, "y_probabilities": probabilities}

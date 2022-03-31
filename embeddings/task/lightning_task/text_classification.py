@@ -1,5 +1,6 @@
 from typing import Any, Dict
 
+import numpy as np
 from numpy import typing as nptyping
 from torch.utils.data import DataLoader
 
@@ -36,4 +37,10 @@ class TextClassificationTask(LightningTask):
 
     def predict(self, dataloader: DataLoader[Any]) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.model is not None
-        return self.model.predict(dataloader=dataloader)
+        results = self.model.predict(dataloader=dataloader)
+        assert self.trainer is not None
+        assert hasattr(self.trainer, "datamodule")
+        results["names"] = np.array(
+            getattr(self.trainer, "datamodule").target_names,
+        )
+        return results
