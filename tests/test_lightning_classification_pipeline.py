@@ -25,7 +25,7 @@ def pipeline_kwargs() -> Dict[str, Any]:
 
 
 @pytest.fixture(scope="module")
-def dataset_kwargs(tmp_path_module) -> Tuple[Dict[str, Any], str]:
+def dataset_kwargs(tmp_path_module) -> Dict[str, Any]:
     path = str(tmp_path_module)
     pipeline = HuggingFacePreprocessingPipeline(
         dataset_name="clarin-pl/polemo2-official",
@@ -121,9 +121,12 @@ def test_lightning_classification_pipeline(
     assert "y_pred" in result["data"]
     assert "y_true" in result["data"]
     assert "y_probabilities" in result["data"]
+    assert "names" in result["data"]
     assert isinstance(result["data"]["y_pred"], np.ndarray)
     assert isinstance(result["data"]["y_true"], np.ndarray)
     assert isinstance(result["data"]["y_probabilities"], np.ndarray)
+    assert isinstance(result["data"]["names"], np.ndarray)
     assert result["data"]["y_pred"].dtype == np.int64
     assert result["data"]["y_true"].dtype == np.int64
     assert result["data"]["y_probabilities"].dtype == np.float32
+    assert isinstance(result["data"]["names"][0], str)
