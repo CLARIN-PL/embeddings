@@ -55,9 +55,7 @@ class SequenceLabelingTask(LightningTask):
 
         assert self.trainer is not None
         assert hasattr(self.trainer, "datamodule")
-        names = (
-            getattr(self.trainer, "datamodule").target_names,
-        )
+        names = getattr(self.trainer, "datamodule").target_names
         return {
             "y_pred": np.array(predictions, dtype=object),
             "y_true": np.array(ground_truth, dtype=object),
