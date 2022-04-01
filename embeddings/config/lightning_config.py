@@ -55,9 +55,9 @@ class LightningBasicConfig(BasicConfig, LightningConfigKeys):
     early_stopping_mode: str = "min"
     early_stopping_patience: int = 3
 
-    tokenizer_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-    batch_encoding_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
-    dataloader_kwargs: Dict[str, Any] = field(init=False, compare=False, default_factory=dict)
+    tokenizer_kwargs: Dict[str, Any] = field(init=False, default_factory=dict)
+    batch_encoding_kwargs: Dict[str, Any] = field(init=False, default_factory=dict)
+    dataloader_kwargs: Dict[str, Any] = field(init=False, default_factory=dict)
 
     @property
     def train_batch_size(self) -> int:
