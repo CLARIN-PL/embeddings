@@ -128,17 +128,16 @@ class OptunaPipeline(
 
     def objective(self, trial: optuna.trial.Trial) -> float:
         trial_name = standardize_name(f"study_{trial.study.study_name}_trial_{trial.number}")
-
         parameters = self.config_space.sample_parameters(trial=trial)
         parsed_params = self.config_space.parse_parameters(parameters)
         kwargs = self._get_evaluation_metadata(parsed_params, trial_name=trial_name)
-        pipeline = self._init_evaluation_pipeline(**kwargs)
+        pipeline = self._get_evaluation_pipeline(**kwargs)
         results = pipeline.run(run_name=trial_name)
         metric = results[self.metric_name][self.metric_key]
         assert isinstance(metric, float)
         return metric
 
-    def _init_evaluation_pipeline(
+    def _get_evaluation_pipeline(
         self, **kwargs: Any
     ) -> Union[
         ModelEvaluationPipeline[Data, LoaderResult, ModelResult, EvaluationResult],

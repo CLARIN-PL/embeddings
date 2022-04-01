@@ -22,7 +22,7 @@ PrimitiveTypes = Union[None, bool, int, float, str]
 NDArrayInt = nptyping.NDArray[np.int_]
 
 
-_LOGGER = get_logger(__name__)
+_logger = get_logger(__name__)
 
 
 def import_from_string(dotted_path: str) -> Any:
@@ -89,7 +89,7 @@ def build_output_path(
 def standardize_name(text: str) -> str:
     if "/" in text:
         result = text.replace("/", "__")
-        _LOGGER.warning(f"String '{text}' contains '/'. Replacing it with '__'. Result: {result}.")
+        _logger.warning(f"String '{text}' contains '/'. Replacing it with '__'. Result: {result}.")
     else:
         result = text
     return result

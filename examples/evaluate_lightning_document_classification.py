@@ -26,8 +26,8 @@ def run(
     wandb: bool = typer.Option(False, help="Flag for using wandb."),
     tensorboard: bool = typer.Option(False, help="Flag for using tensorboard."),
     csv: bool = typer.Option(False, help="Flag for using csv."),
-    wandb_project: Optional[str] = typer.Option(None, help="Name of wandb project."),
-    wandb_entity: Optional[str] = typer.Option(None, help="Name of entity project"),
+    tracking_project_name: Optional[str] = typer.Option(None, help="Name of wandb project."),
+    wandb_entity: Optional[str] = typer.Option(None, help="Name of wandb entity."),
 ) -> None:
     typer.echo(pprint.pformat(locals()))
 
@@ -42,7 +42,7 @@ def run(
             "use_tensorboard": tensorboard,
             "use_wandb": wandb,
             "use_csv": csv,
-            "wandb_project": wandb_project,
+            "tracking_project_name": tracking_project_name,
             "wandb_entity": wandb_entity,
         },
     )

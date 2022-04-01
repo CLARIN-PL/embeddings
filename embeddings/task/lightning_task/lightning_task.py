@@ -118,7 +118,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         use_wandb: bool = True,
         use_tensorboard: bool = True,
         use_csv: bool = True,
-        wandb_project: Optional[str] = None,
+        tracking_project_name: Optional[str] = None,
         wandb_entity: Optional[str] = None,
         wandb_logger_kwargs: Optional[Dict[str, Any]] = None,
     ) -> List[LightningLoggerBase]:
@@ -133,7 +133,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
                 )
             )
 
-        if not use_wandb and (wandb_project or wandb_entity or wandb_logger_kwargs):
+        if not use_wandb and (tracking_project_name or wandb_entity or wandb_logger_kwargs):
             raise ValueError(
                 "`wandb_project` or `wandb_entity` or 'wandb_logger_kwargs' was configured but "
                 "use_wand is set to false."
@@ -146,7 +146,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
                 pl_loggers.WandbLogger(
                     name=run_name,
                     save_dir=str(save_dir),
-                    project=wandb_project,
+                    project=tracking_project_name,
                     entity=wandb_entity,
                     reinit=True,
                     **wandb_logger_kwargs or {}

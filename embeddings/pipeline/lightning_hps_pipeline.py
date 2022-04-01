@@ -85,7 +85,7 @@ class OptimizedLightingPipeline(
         metadata["predict_subset"] = LightingDataModuleSubset.VALIDATION
         metadata["dataset_name_or_path"] = str(self.dataset_path)
         output_path = Path(self.tmp_model_output_dir.name).joinpath(trial_name)
-        output_path.mkdir()
+        output_path.mkdir(parents=True, exist_ok=True)
         metadata["output_path"] = output_path
         return metadata
 
@@ -99,7 +99,7 @@ class OptimizedLightingPipeline(
             path = Path(self.tmp_dataset_dir.name).joinpath(
                 standardize_name(str(self.dataset_name_or_path))
             )
-            path.mkdir()
+            path.mkdir(parents=True, exist_ok=True)
             self.dataset_path = path
 
     def _init_preprocessing_pipeline(self) -> None:
@@ -115,7 +115,7 @@ class OptimizedLightingPipeline(
                 load_dataset_kwargs=self.load_dataset_kwargs,
             )
 
-    def _init_evaluation_pipeline(
+    def _get_evaluation_pipeline(
         self, **kwargs: Any
     ) -> LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]:
         assert issubclass(self.evaluation_pipeline, LightningPipeline)
