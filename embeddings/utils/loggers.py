@@ -1,7 +1,9 @@
 import logging
 import os
 from dataclasses import dataclass, field
-from typing import Any, Dict, Literal, Optional, Union
+from typing import Any, Dict, Optional, Union
+
+from typing_extensions import Literal
 
 DEFAULT_LOG_LEVEL = os.getenv("LOG_LEVEL", logging.INFO)
 
