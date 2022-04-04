@@ -34,7 +34,7 @@ from embeddings.pipeline.pipelines_metadata import (
     LightningMetadata,
     LightningSequenceLabelingPipelineMetadata,
 )
-from embeddings.utils.loggers import get_logger
+from embeddings.utils.loggers import LightningLoggingConfig, get_logger
 from embeddings.utils.utils import standardize_name
 
 _logger = get_logger(__name__)
@@ -56,7 +56,7 @@ class _OptimizedLightingPipelineBase(
     tokenizer_name_or_path: Optional[T_path] = None
     tokenizer_kwargs: Optional[Dict[str, Any]] = None
     batch_encoding_kwargs: Optional[Dict[str, Any]] = None
-    logging_kwargs: Optional[Dict[str, Any]] = None
+    logging_config: LightningLoggingConfig = field(default_factory=LightningLoggingConfig)
 
 
 # Mypy currently properly don't handle dataclasses with abstract methods
@@ -119,7 +119,7 @@ class OptimizedLightingPipeline(
         self, **kwargs: Any
     ) -> LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]:
         assert issubclass(self.evaluation_pipeline, LightningPipeline)
-        return self.evaluation_pipeline(logging_kwargs=self.logging_kwargs, **kwargs)
+        return self.evaluation_pipeline(logging_config=self.logging_config, **kwargs)
 
     @staticmethod
     def _pop_sampled_parameters(

@@ -17,7 +17,7 @@ from embeddings.data.io import T_path
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.task.task import Task
 from embeddings.utils.lightning_callbacks.best_epoch_callback import BestEpochCallback
-from embeddings.utils.loggers import get_logger
+from embeddings.utils.loggers import LightningLoggingConfig, get_logger
 
 _logger = get_logger(__name__)
 
@@ -30,13 +30,13 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         output_path: T_path,
         task_train_kwargs: Dict[str, Any],
         early_stopping_kwargs: Dict[str, Any],
-        logging_kwargs: Dict[str, Any],
+        logging_config: LightningLoggingConfig,
     ):
         super().__init__()
         self.output_path: Path = Path(output_path)
         self.task_train_kwargs = task_train_kwargs
         self.early_stopping_kwargs = early_stopping_kwargs
-        self.logging_kwargs = logging_kwargs
+        self.logging_config = logging_config
         self.model: Optional[HuggingFaceLightningModule] = None
         self.trainer: Optional[pl.Trainer] = None
 
@@ -78,7 +78,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         self.trainer = pl.Trainer(
             default_root_dir=str(self.output_path),
             callbacks=callbacks,
-            logger=self.get_lightning_loggers(run_name, **self.logging_kwargs),
+            logger=self.get_lightning_loggers(run_name),
             **self.task_train_kwargs
         )
         try:
@@ -115,17 +115,11 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
     def get_lightning_loggers(
         self,
         run_name: Optional[str] = None,
-        use_wandb: bool = True,
-        use_tensorboard: bool = True,
-        use_csv: bool = True,
-        tracking_project_name: Optional[str] = None,
-        wandb_entity: Optional[str] = None,
-        wandb_logger_kwargs: Optional[Dict[str, Any]] = None,
     ) -> List[LightningLoggerBase]:
         """Based on configuration, provides pytorch-lightning loggers' callbacks."""
         loggers: List[LightningLoggerBase] = []
 
-        if use_tensorboard:
+        if "tensorboard" in self.logging_config.loggers_names:
             loggers.append(
                 pl_loggers.TensorBoardLogger(
                     name=run_name,
@@ -133,27 +127,21 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
                 )
             )
 
-        if not use_wandb and (tracking_project_name or wandb_entity or wandb_logger_kwargs):
-            raise ValueError(
-                "`wandb_project` or `wandb_entity` or 'wandb_logger_kwargs' was configured but "
-                "use_wand is set to false."
-            )
-
-        if use_wandb:
+        if "wandb" in self.logging_config.loggers_names:
             save_dir = self.output_path.joinpath("wandb")
             save_dir.mkdir(exist_ok=True)
             loggers.append(
                 pl_loggers.WandbLogger(
                     name=run_name,
                     save_dir=str(save_dir),
-                    project=tracking_project_name,
-                    entity=wandb_entity,
+                    project=self.logging_config.tracking_project_name,
+                    entity=self.logging_config.wandb_entity,
                     reinit=True,
-                    **wandb_logger_kwargs or {}
+                    **self.logging_config.wandb_logger_kwargs
                 )
             )
 
-        if use_csv:
+        if "csv" in self.logging_config.loggers_names:
             loggers.append(
                 pl_loggers.CSVLogger(name=run_name, save_dir=str(self.output_path.joinpath("csv")))
             )

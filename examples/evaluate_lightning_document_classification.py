@@ -5,6 +5,7 @@ import typer
 
 from embeddings.defaults import RESULTS_PATH
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
+from embeddings.utils.loggers import LightningLoggingConfig
 from embeddings.utils.utils import build_output_path, format_eval_result
 
 
@@ -38,13 +39,13 @@ def run(
         input_column_name=input_column_name,
         target_column_name=target_column_name,
         output_path=output_path,
-        logging_kwargs={
-            "use_tensorboard": tensorboard,
-            "use_wandb": wandb,
-            "use_csv": csv,
-            "tracking_project_name": tracking_project_name,
-            "wandb_entity": wandb_entity,
-        },
+        logging_config=LightningLoggingConfig.from_flags(
+            wandb=wandb,
+            tensorboard=tensorboard,
+            csv=csv,
+            tracking_project_name=tracking_project_name,
+            wandb_entity=wandb_entity,
+        ),
     )
 
     result = pipeline.run(run_name=run_name)

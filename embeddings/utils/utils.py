@@ -137,5 +137,4 @@ def download_file(url: str, chunk_size: int = 1024) -> Tuple[Any, str]:
 
 
 def get_installed_packages() -> List[str]:
-    installed_packages_list = sorted([f"{p.key}=={p.version}" for p in pkg_resources.working_set])
-    return installed_packages_list
+    return sorted([f"{p.key}=={p.version}" for p in pkg_resources.working_set])

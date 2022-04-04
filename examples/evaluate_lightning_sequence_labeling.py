@@ -6,6 +6,7 @@ import typer
 from embeddings.defaults import RESULTS_PATH
 from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
+from embeddings.utils.loggers import LightningLoggingConfig
 from embeddings.utils.utils import build_output_path, format_eval_result
 
 
@@ -48,13 +49,13 @@ def run(
         output_path=root,
         evaluation_mode=evaluation_mode,
         tagging_scheme=tagging_scheme,
-        logging_kwargs={
-            "use_tensorboard": tensorboard,
-            "use_wandb": wandb,
-            "use_csv": csv,
-            "tracking_project_name": tracking_project_name,
-            "wandb_entity": wandb_entity,
-        },
+        logging_config=LightningLoggingConfig.from_flags(
+            wandb=wandb,
+            tensorboard=tensorboard,
+            csv=csv,
+            tracking_project_name=tracking_project_name,
+            wandb_entity=wandb_entity,
+        ),
     )
 
     result = pipeline.run()

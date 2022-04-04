@@ -16,6 +16,7 @@ from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task.sequence_labeling import SequenceLabelingTask
 from embeddings.utils.json_dict_persister import JsonPersister
+from embeddings.utils.loggers import LightningLoggingConfig
 from embeddings.utils.utils import initialize_kwargs
 
 
@@ -46,7 +47,7 @@ class LightningSequenceLabelingPipeline(
         task_train_kwargs: Optional[Dict[str, Any]] = None,
         model_config_kwargs: Optional[Dict[str, Any]] = None,
         early_stopping_kwargs: Optional[Dict[str, Any]] = None,
-        logging_kwargs: Optional[Dict[str, Any]] = None,
+        logging_config: LightningLoggingConfig = LightningLoggingConfig(),
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
     ):
         self.datamodule_kwargs = initialize_kwargs(
@@ -67,7 +68,6 @@ class LightningSequenceLabelingPipeline(
         self.early_stopping_kwargs = initialize_kwargs(
             self.DEFAULT_EARLY_STOPPING_KWARGS, early_stopping_kwargs
         )
-        self._logging_kwargs = initialize_kwargs(self.DEFAULT_LOGGING_KWARGS, logging_kwargs)
         tokenizer_name_or_path = (
             tokenizer_name_or_path if tokenizer_name_or_path else embedding_name_or_path
         )
@@ -93,15 +93,11 @@ class LightningSequenceLabelingPipeline(
             model_config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
             task_train_kwargs=self.task_train_kwargs,
-            logging_kwargs=self.logging_kwargs,
+            logging_config=logging_config,
             early_stopping_kwargs=self.early_stopping_kwargs,
         )
         model = LightningModel(task=task, predict_subset=predict_subset)
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         ).persisting(JsonPersister(path=output_path.joinpath(evaluation_filename)))
-        super().__init__(datamodule, model, evaluator, output_path)
-
-    @property
-    def logging_kwargs(self) -> Dict[str, Any]:
-        return self._logging_kwargs
+        super().__init__(datamodule, model, evaluator, output_path, logging_config)
