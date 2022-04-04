@@ -16,6 +16,7 @@ from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessi
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingSequenceLabelingPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
 from embeddings.pipeline.pipelines_metadata import LightningSequenceLabelingPipelineMetadata
+from embeddings.utils.loggers import LightningLoggingConfig
 from tests.hps.utils import _flatten
 
 
@@ -94,6 +95,7 @@ def sequence_labelling_hps_run_result(
         target_column_name="ner",
         n_trials=1,
         ignore_preprocessing_pipeline=True,
+        logging_config=LightningLoggingConfig.from_flags(csv=True),
     ).persisting(
         best_params_path=tmp_path_module.joinpath("best_params.yaml"),
         log_path=tmp_path_module.joinpath("hps_log.pickle"),
@@ -187,7 +189,9 @@ def retrain_model_result(
     df, metadata = sequence_labelling_hps_run_result
     metadata["dataset_name_or_path"] = dataset_path.name
     metadata["output_path"] = retrain_tmp_path
-    pipeline = LightningSequenceLabelingPipeline(**metadata)
+    pipeline = LightningSequenceLabelingPipeline(
+        logging_config=LightningLoggingConfig.from_flags(csv=True), **metadata
+    )
     results = pipeline.run()
     return results
 
