@@ -100,7 +100,14 @@ def flair_classification_pipeline_metadata(
     return {
         **flair_pipeline_kwargs,
         **flair_text_classification_dataset_kwargs,
-        **{"config": FlairTextClassificationAdvancedConfig()},
+        **{
+            "config": FlairTextClassificationAdvancedConfig(
+                document_embedding_cls="FlairDocumentPoolEmbedding",
+                load_model_kwargs={},
+                task_model_kwargs={},
+                task_train_kwargs={},
+            )
+        },
     }
 
 
@@ -112,7 +119,14 @@ def flair_pair_classification_pipeline_metadata(
     return {
         **flair_pipeline_kwargs,
         **flair_text_pair_classification_dataset_kwargs,
-        **{"config": FlairTextClassificationAdvancedConfig()},
+        **{
+            "config": FlairTextClassificationAdvancedConfig(
+                document_embedding_cls="FlairDocumentPoolEmbedding",
+                load_model_kwargs={},
+                task_model_kwargs={},
+                task_train_kwargs={},
+            )
+        },
     }
 
 
@@ -126,7 +140,11 @@ def flair_sequence_labeling_pipeline_metadata(
         **flair_pipeline_kwargs,
         **flair_sequence_labeling_pipeline_kwargs,
         **flair_sequence_labeling_dataset_kwargs,
-        **{"config": FlairSequenceLabelingAdvancedConfig()},
+        **{
+            "config": FlairSequenceLabelingAdvancedConfig(
+                hidden_size=16, load_model_kwargs={}, task_model_kwargs={}, task_train_kwargs={}
+            )
+        },
     }
 
 

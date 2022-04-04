@@ -59,6 +59,11 @@ def config() -> LightningAdvancedConfig:
             "weight_decay": 0.0,
         },
         datamodule_kwargs={"max_seq_length": None},
+        model_config_kwargs={},
+        tokenizer_kwargs={},
+        batch_encoding_kwargs={},
+        dataloader_kwargs={},
+        early_stopping_kwargs={},
     )
 
 

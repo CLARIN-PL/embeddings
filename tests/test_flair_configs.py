@@ -1,5 +1,4 @@
 from dataclasses import fields
-from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple
 
@@ -36,9 +35,8 @@ from embeddings.utils.flair_corpus_persister import FlairConllPersister
 
 
 @pytest.fixture(scope="module")
-def result_path(tmpdir_factory: TempdirFactory) -> Path:
-    path = tmpdir_factory.mktemp(__name__)
-    return Path(path)
+def result_path(tmpdir_factory: TempdirFactory) -> "TemporaryDirectory[str]":
+    return TemporaryDirectory()
 
 
 @pytest.fixture(scope="module")

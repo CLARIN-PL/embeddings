@@ -77,6 +77,10 @@ def config() -> LightningAdvancedConfig:
             "mode": "min",
             "patience": 3,
         },
+        tokenizer_kwargs={},
+        batch_encoding_kwargs={},
+        dataloader_kwargs={},
+        model_config_kwargs={},
     )
 
 
