@@ -1,8 +1,10 @@
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple
 
 import pytest
 import pytorch_lightning as pl
+from _pytest.tmpdir import TempdirFactory
 
 from embeddings.config.lightning_config import (
     LightningAdvancedConfig,
@@ -14,8 +16,14 @@ from embeddings.pipeline.lightning_classification import LightningClassification
 
 
 @pytest.fixture(scope="module")
-def dataset_kwargs() -> Tuple[Dict[str, Any], "TemporaryDirectory[str]"]:
-    path = TemporaryDirectory()
+def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
+    path = tmpdir_factory.mktemp(__name__)
+    return Path(path)
+
+
+@pytest.fixture(scope="module")
+def dataset_kwargs(tmp_path_module: Path) -> Tuple[Dict[str, Any], "TemporaryDirectory[str]"]:
+    path = tmp_path_module
     pipeline = HuggingFacePreprocessingPipeline(
         dataset_name="clarin-pl/polemo2-official",
         load_dataset_kwargs={
@@ -70,6 +78,10 @@ def lightning_advanced_config() -> LightningAdvancedConfig:
             "mode": "min",
             "patience": 3,
         },
+        model_config_kwargs={},
+        batch_encoding_kwargs={},
+        dataloader_kwargs={},
+        tokenizer_kwargs={},
     )
 
 
@@ -95,6 +107,10 @@ def lightning_config_missing_parameters() -> LightningAdvancedConfig:
             "mode": "min",
             "patience": 3,
         },
+        model_config_kwargs={},
+        batch_encoding_kwargs={},
+        dataloader_kwargs={},
+        tokenizer_kwargs={},
     )
 
 
@@ -104,7 +120,7 @@ def test_lightning_config_missing_params(
     result_path: "TemporaryDirectory[str]",
 ) -> None:
     pipeline = LightningClassificationPipeline(
-        embedding_name_or_path="allegro/herbert-base-cased",
+        embedding_name_or_path="hf-internal-testing/tiny-albert",
         output_path=result_path.name,
         config=lightning_config_missing_parameters,
         devices="auto",
@@ -129,7 +145,7 @@ def test_lightning_classification_basic_config(
 ) -> None:
     pl.seed_everything(441, workers=True)
     pipeline = LightningClassificationPipeline(
-        embedding_name_or_path="allegro/herbert-base-cased",
+        embedding_name_or_path="hf-internal-testing/tiny-albert",
         output_path=result_path.name,
         config=lightning_basic_config,
         devices="auto",
@@ -146,7 +162,7 @@ def test_lightning_classification_advanced_config(
 ) -> None:
     pl.seed_everything(441, workers=True)
     pipeline = LightningClassificationPipeline(
-        embedding_name_or_path="allegro/herbert-base-cased",
+        embedding_name_or_path="hf-internal-testing/tiny-albert",
         output_path=result_path.name,
         config=lightning_advanced_config,
         devices="auto",

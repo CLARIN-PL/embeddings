@@ -1,12 +1,10 @@
 from abc import ABC
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from itertools import chain
 from types import MappingProxyType
 from typing import Any, ClassVar, Dict, Mapping, Set, Tuple, Union
 
 from embeddings.config.base_config import AdvancedConfig, BasicConfig
-from embeddings.data.io import T_path
-from embeddings.utils.utils import read_yaml
 
 
 @dataclass
@@ -58,15 +56,6 @@ class FlairBasicConfig(BasicConfig, ABC):
             key for key in FlairBasicConfig.__annotations__.keys() if not key.endswith("_kwargs")
         }
         return task_train_keys
-
-    @classmethod
-    def from_yaml(cls, path: T_path) -> "FlairBasicConfig":
-        config = read_yaml(path)
-        return cls(**config)
-
-    @classmethod
-    def from_dict(cls, config: Dict[str, Any]) -> "FlairBasicConfig":
-        return cls(**config)
 
 
 @dataclass
@@ -127,40 +116,35 @@ class FlairTextClassificationBasicConfig(FlairBasicConfig, FlairTextClassificati
 
 @dataclass
 class FlairAdvancedConfig(AdvancedConfig, ABC):
-    task_model_kwargs: Dict[str, Any] = field(default_factory=dict)
-    task_train_kwargs: Dict[str, Any] = field(default_factory=dict)
-    load_model_kwargs: Dict[str, Any] = field(default_factory=dict)
-
-    @classmethod
-    def from_yaml(cls, path: T_path) -> "FlairAdvancedConfig":
-        config = read_yaml(path)
-        return cls(**config)
-
-    @classmethod
-    def from_dict(cls, config: Dict[str, Any]) -> "FlairAdvancedConfig":
-        return cls(**config)
+    task_model_kwargs: Dict[str, Any]
+    task_train_kwargs: Dict[str, Any]
+    load_model_kwargs: Dict[str, Any]
 
 
 @dataclass
 class FlairSequenceLabelingAdvancedConfig(FlairAdvancedConfig):
-    hidden_size: int = 256
+    hidden_size: int
 
     @classmethod
     def from_basic(cls) -> "FlairSequenceLabelingAdvancedConfig":
         config = FlairSequenceLabelingBasicConfig()
         return cls(
-            task_model_kwargs=config.task_model_kwargs, task_train_kwargs=config.task_train_kwargs
+            hidden_size=config.hidden_size,
+            task_model_kwargs=config.task_model_kwargs,
+            task_train_kwargs=config.task_train_kwargs,
+            load_model_kwargs=config.load_model_kwargs,
         )
 
 
 @dataclass
 class FlairTextClassificationAdvancedConfig(FlairAdvancedConfig):
-    document_embedding_cls: str = "FlairDocumentPoolEmbedding"
+    document_embedding_cls: str
 
     @classmethod
     def from_basic(cls) -> "FlairTextClassificationAdvancedConfig":
         config = FlairTextClassificationBasicConfig()
         return cls(
+            document_embedding_cls=config.document_embedding_cls,
             task_model_kwargs=config.task_model_kwargs,
             task_train_kwargs=config.task_train_kwargs,
             load_model_kwargs=config.load_model_kwargs,

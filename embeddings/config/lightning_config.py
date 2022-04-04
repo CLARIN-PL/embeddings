@@ -1,14 +1,7 @@
 from dataclasses import dataclass, field
-from typing import Any, ClassVar, Dict, Mapping, Optional, Set, Tuple, Union
+from typing import Any, ClassVar, Dict, Optional, Set, Tuple, Union
 
 from embeddings.config.base_config import AdvancedConfig, BasicConfig
-from embeddings.data.io import T_path
-from embeddings.utils.loggers import get_logger
-from embeddings.utils.utils import read_yaml
-
-T_kwarg = Mapping[str, Any]
-
-_logger = get_logger(__name__)
 
 
 @dataclass
@@ -91,36 +84,18 @@ class LightningBasicConfig(BasicConfig, LightningConfigKeys):
     def early_stopping_kwargs(self) -> Dict[str, Any]:
         return self._map_parse_fields(self.EARLY_STOPPING_KEYS)
 
-    @classmethod
-    def from_yaml(cls, path: T_path) -> "LightningBasicConfig":
-        config = read_yaml(path)
-        return cls(**config)
-
-    @classmethod
-    def from_dict(cls, config: Dict[str, Any]) -> "LightningBasicConfig":
-        return cls(**config)
-
 
 @dataclass
 class LightningAdvancedConfig(AdvancedConfig):
     finetune_last_n_layers: int
-    datamodule_kwargs: Dict[str, Any] = field(default_factory=dict)
-    task_model_kwargs: Dict[str, Any] = field(default_factory=dict)
-    task_train_kwargs: Dict[str, Any] = field(default_factory=dict)
-    model_config_kwargs: Dict[str, Any] = field(default_factory=dict)
-    early_stopping_kwargs: Dict[str, Any] = field(default_factory=dict)
-    tokenizer_kwargs: Dict[str, Any] = field(default_factory=dict)
-    batch_encoding_kwargs: Dict[str, Any] = field(default_factory=dict)
-    dataloader_kwargs: Dict[str, Any] = field(default_factory=dict)
-
-    @classmethod
-    def from_yaml(cls, path: T_path) -> "LightningAdvancedConfig":
-        config = read_yaml(path)
-        return cls(**config)
-
-    @classmethod
-    def from_dict(cls, config: Dict[str, Any]) -> "LightningAdvancedConfig":
-        return cls(**config)
+    task_model_kwargs: Dict[str, Any]
+    datamodule_kwargs: Dict[str, Any]
+    task_train_kwargs: Dict[str, Any]
+    model_config_kwargs: Dict[str, Any]
+    early_stopping_kwargs: Dict[str, Any]
+    tokenizer_kwargs: Dict[str, Any]
+    batch_encoding_kwargs: Dict[str, Any]
+    dataloader_kwargs: Dict[str, Any]
 
     @staticmethod
     def from_basic() -> "LightningAdvancedConfig":
@@ -132,6 +107,9 @@ class LightningAdvancedConfig(AdvancedConfig):
             task_train_kwargs=config.task_train_kwargs,
             model_config_kwargs=config.model_config_kwargs,
             early_stopping_kwargs=config.early_stopping_kwargs,
+            batch_encoding_kwargs=config.batch_encoding_kwargs,
+            dataloader_kwargs=config.dataloader_kwargs,
+            tokenizer_kwargs=config.tokenizer_kwargs,
         )
 
 

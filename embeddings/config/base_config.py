@@ -4,24 +4,24 @@ from typing import Any, Dict, Iterable, Set, Tuple
 
 from embeddings.data.io import T_path
 from embeddings.utils.loggers import get_logger
+from embeddings.utils.utils import read_yaml
 
 _logger = get_logger(__name__)
 
 
+@dataclass
 class Config(abc.ABC):
     @classmethod
-    @abc.abstractmethod
     def from_yaml(cls, path: T_path) -> "Config":
-        pass
+        config = read_yaml(path)
+        return cls(**config)
 
     @classmethod
-    @abc.abstractmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "Config":
-        pass
+    def from_dict(cls, config: Dict[str, Any]) -> "Config":
+        return cls(**config)
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
+@dataclass
 class BasicConfig(Config, abc.ABC):
     def _parse_fields(self, keys: Iterable[str]) -> Dict[str, Any]:
         return {field_name: getattr(self, field_name) for field_name in keys}
@@ -35,8 +35,7 @@ class BasicConfig(Config, abc.ABC):
         return config_keys
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
+@dataclass
 class AdvancedConfig(Config, abc.ABC):
     @staticmethod
     def from_basic() -> "AdvancedConfig":

@@ -167,6 +167,7 @@ class OptimizedFlairClassificationPipeline(
                 document_embedding_cls=document_embedding_cls,
                 task_train_kwargs=task_train_kwargs,
                 load_model_kwargs=load_model_kwargs,
+                task_model_kwargs={},
             ),
         }
 
@@ -191,6 +192,7 @@ class OptimizedFlairClassificationPipeline(
                 document_embedding_cls=document_embedding_cls,
                 task_train_kwargs=task_train_kwargs,
                 load_model_kwargs=load_model_kwargs,
+                task_model_kwargs={},
             ),
         }
         return metadata
@@ -265,6 +267,7 @@ class OptimizedFlairPairClassificationPipeline(
                 document_embedding_cls=document_embedding_cls,
                 task_train_kwargs=task_train_kwargs,
                 load_model_kwargs=load_model_kwargs,
+                task_model_kwargs={},
             ),
         }
         return metadata
@@ -288,6 +291,7 @@ class OptimizedFlairPairClassificationPipeline(
                 document_embedding_cls=document_embedding_cls,
                 task_train_kwargs=task_train_kwargs,
                 load_model_kwargs=load_model_kwargs,
+                task_model_kwargs={},
             ),
         }
         return metadata
@@ -392,6 +396,7 @@ class OptimizedFlairSequenceLabelingPipeline(
                 hidden_size=hidden_size,
                 task_train_kwargs=task_train_kwargs,
                 task_model_kwargs=task_model_kwargs,
+                load_model_kwargs={},
             ),
         }
         return metadata
@@ -418,6 +423,7 @@ class OptimizedFlairSequenceLabelingPipeline(
                 hidden_size=hidden_size,
                 task_train_kwargs=task_train_kwargs,
                 task_model_kwargs=task_model_kwargs,
+                load_model_kwargs={},
             ),
         }
         return metadata

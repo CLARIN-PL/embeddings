@@ -1,4 +1,5 @@
 from dataclasses import fields
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple
 
@@ -6,6 +7,7 @@ import datasets
 import flair
 import pytest
 import torch
+from _pytest.tmpdir import TempdirFactory
 from flair.data import Corpus
 from numpy import typing as nptyping
 
@@ -34,8 +36,9 @@ from embeddings.utils.flair_corpus_persister import FlairConllPersister
 
 
 @pytest.fixture(scope="module")
-def result_path() -> "TemporaryDirectory[str]":
-    return TemporaryDirectory()
+def result_path(tmpdir_factory: TempdirFactory) -> Path:
+    path = tmpdir_factory.mktemp(__name__)
+    return Path(path)
 
 
 @pytest.fixture(scope="module")
@@ -58,6 +61,7 @@ def flair_advanced_config() -> FlairSequenceLabelingConfig:
             "locked_dropout": 0.5,
             "reproject_embeddings": True,
         },
+        load_model_kwargs={},
     )
 
 
@@ -89,7 +93,7 @@ def sequence_labeling_evaluation_pipeline(
 ]:
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,
-        embedding_name="allegro/herbert-base-cased",
+        embedding_name="hf-internal-testing/tiny-albert",
         output_path=result_path.name,
         config=flair_basic_config,
         persist_path=None,
@@ -112,7 +116,7 @@ def test_sequence_labeling_basic_config(
 
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,
-        embedding_name="allegro/herbert-base-cased",
+        embedding_name="hf-internal-testing/tiny-albert",
         output_path=result_path.name,
         config=flair_basic_config,
         persist_path=None,
@@ -135,7 +139,7 @@ def test_sequence_labeling_advanced_config(
 
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,
-        embedding_name="allegro/herbert-base-cased",
+        embedding_name="hf-internal-testing/tiny-albert",
         output_path=result_path.name,
         config=flair_advanced_config,
         persist_path=None,
