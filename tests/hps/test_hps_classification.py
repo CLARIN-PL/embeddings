@@ -16,6 +16,7 @@ from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessi
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingClassificationPipeline
 from embeddings.pipeline.pipelines_metadata import LightningClassificationPipelineMetadata
+from embeddings.utils.loggers import LightningLoggingConfig
 from tests.hps.utils import _flatten
 
 
@@ -108,6 +109,7 @@ def classification_hps_run_result(
         target_column_name="target",
         n_trials=1,
         ignore_preprocessing_pipeline=True,
+        logging_config=LightningLoggingConfig.from_flags(csv=True),
     ).persisting(
         best_params_path=tmp_path_module.joinpath("best_params.yaml"),
         log_path=tmp_path_module.joinpath("hps_log.pickle"),
@@ -188,7 +190,9 @@ def retrain_model_result(
     df, metadata = classification_hps_run_result
     metadata["dataset_name_or_path"] = dataset_path.name
     metadata["output_path"] = retrain_tmp_path
-    pipeline = LightningClassificationPipeline(**metadata)
+    pipeline = LightningClassificationPipeline(
+        logging_config=LightningLoggingConfig.from_flags(csv=True), **metadata
+    )
     results = pipeline.run()
     return results
 
@@ -197,6 +201,10 @@ def test_evaluation_json_exists(
     retrain_tmp_path: Path, retrain_model_result: Dict[str, Any]
 ) -> None:
     assert retrain_tmp_path.joinpath("evaluation.json").exists()
+
+
+def test_packages_json_exists(retrain_tmp_path: Path, retrain_model_result: Dict[str, Any]) -> None:
+    assert retrain_tmp_path.joinpath("packages.json").exists()
 
 
 def test_hparams_best_params_files_compatibility(
