@@ -2,13 +2,12 @@ from pathlib import Path
 from typing import Any, Dict, Generic, Optional, TypeVar
 
 import srsly
-import wandb
 
 from embeddings.data.datamodule import BaseDataModule, Data
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.model.model import Model
 from embeddings.pipeline.pipeline import Pipeline
-from embeddings.utils.loggers import LightningLoggingConfig
+from embeddings.utils.loggers import LightningLoggingConfig, WandbWrapper
 from embeddings.utils.utils import get_installed_packages, standardize_name
 
 EvaluationResult = TypeVar("EvaluationResult")
@@ -56,10 +55,7 @@ class LightningPipeline(
         srsly.write_json(self.output_path.joinpath("packages.json"), get_installed_packages())
 
     def _finish_logging(self, run_name: Optional[str] = None) -> None:
-        if "wandb" in self.logging_config.loggers_names:
-            wandb.log_artifact(
-                str(self.output_path),
-                name=run_name,
-                type="output",
-            )
-            wandb.finish()
+        if self.logging_config.use_wandb():
+            logger = WandbWrapper()
+            logger.log_output(self.output_path, run_name)
+            logger.finish_logging()

@@ -119,7 +119,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         """Based on configuration, provides pytorch-lightning loggers' callbacks."""
         loggers: List[LightningLoggerBase] = []
 
-        if "tensorboard" in self.logging_config.loggers_names:
+        if self.logging_config.use_tensorboard():
             loggers.append(
                 pl_loggers.TensorBoardLogger(
                     name=run_name,
@@ -127,7 +127,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
                 )
             )
 
-        if "wandb" in self.logging_config.loggers_names:
+        if self.logging_config.use_wandb():
             save_dir = self.output_path.joinpath("wandb")
             save_dir.mkdir(exist_ok=True)
             loggers.append(
@@ -141,7 +141,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
                 )
             )
 
-        if "csv" in self.logging_config.loggers_names:
+        if self.logging_config.use_csv():
             loggers.append(
                 pl_loggers.CSVLogger(name=run_name, save_dir=str(self.output_path.joinpath("csv")))
             )

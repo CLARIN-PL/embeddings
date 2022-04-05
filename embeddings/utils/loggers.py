@@ -1,9 +1,13 @@
+import abc
 import logging
 import os
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
 
+import wandb
 from typing_extensions import Literal
+
+from embeddings.data.io import T_path
 
 DEFAULT_LOG_LEVEL = os.getenv("LOG_LEVEL", logging.INFO)
 
@@ -62,3 +66,34 @@ class LightningLoggingConfig:
             wandb_entity=wandb_entity,
             wandb_logger_kwargs=wandb_logger_kwargs or {},
         )
+
+    def use_wandb(self) -> bool:
+        return "wandb" in self.loggers_names
+
+    def use_csv(self) -> bool:
+        return "csv" in self.loggers_names
+
+    def use_tensorboard(self) -> bool:
+        return "tensorboard" in self.loggers_names
+
+
+class ExperimentLogger(abc.ABC):
+    @abc.abstractmethod
+    def log_output(self, output_path: T_path, run_name: Optional[str] = None) -> None:
+        pass
+
+    @abc.abstractmethod
+    def finish_logging(self) -> None:
+        pass
+
+
+class WandbWrapper(ExperimentLogger):
+    def log_output(self, output_path: T_path, run_name: Optional[str] = None) -> None:
+        wandb.log_artifact(
+            str(output_path),
+            name=run_name,
+            type="output",
+        )
+
+    def finish_logging(self) -> None:
+        wandb.finish()
