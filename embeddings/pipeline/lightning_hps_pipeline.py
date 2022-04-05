@@ -85,7 +85,6 @@ class OptimizedLightingPipeline(
         metadata["predict_subset"] = LightingDataModuleSubset.VALIDATION
         metadata["dataset_name_or_path"] = str(self.dataset_path)
         output_path = Path(self.tmp_model_output_dir.name).joinpath(trial_name)
-        output_path.mkdir(parents=True, exist_ok=True)
         metadata["output_path"] = output_path
         return metadata
 
