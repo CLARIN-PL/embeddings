@@ -49,7 +49,7 @@ class LightningPipeline(
         self._save_artifacts()
         model_result = self.model.execute(data=self.datamodule, run_name=run_name)
         result = self.evaluator.evaluate(model_result)
-        self._finish_logging()
+        self._finish_logging(run_name)
         return result
 
     def _save_artifacts(self) -> None:
