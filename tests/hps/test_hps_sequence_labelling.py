@@ -100,7 +100,7 @@ def sequence_labelling_hps_run_result(
         best_params_path=tmp_path_module.joinpath("best_params.yaml"),
         log_path=tmp_path_module.joinpath("hps_log.pickle"),
     )
-    df, metadata = pipeline.run()
+    df, metadata = pipeline.run(catch=())
     return df, metadata
 
 

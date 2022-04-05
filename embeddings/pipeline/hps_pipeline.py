@@ -109,7 +109,10 @@ class OptunaPipeline(
         return self._get_metadata(parsed_params)
 
     def run(
-        self, run_name: Optional[str] = None, catch: Tuple[Type[Exception], ...] = (), **kwargs: Any
+        self,
+        run_name: Optional[str] = None,
+        catch: Tuple[Type[Exception], ...] = (Exception,),
+        **kwargs: Any,
     ) -> Tuple[pd.DataFrame, Metadata]:
         self._pre_run_hook()
         if self.preprocessing_pipeline is not None:
