@@ -1,7 +1,7 @@
 import logging
 import os
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from typing_extensions import Literal
 
@@ -24,7 +24,7 @@ def get_logger(name: str, log_level: Union[str, int] = DEFAULT_LOG_LEVEL) -> log
 
 @dataclass
 class LightningLoggingConfig:
-    loggers_names: list[Literal["wandb", "csv", "tensorboard"]] = field(default_factory=list)
+    loggers_names: List[Literal["wandb", "csv", "tensorboard"]] = field(default_factory=list)
     tracking_project_name: Optional[str] = None
     wandb_entity: Optional[str] = None
     wandb_logger_kwargs: Dict[str, Any] = field(default_factory=dict)
