@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import numpy as np
 from numpy import typing as nptyping
@@ -29,6 +29,7 @@ class TextClassificationTask(LightningTask):
         self.model_config_kwargs = model_config_kwargs
         self.task_model_kwargs = task_model_kwargs
         self.finetune_last_n_layers = finetune_last_n_layers
+        self.task_train_kwargs = task_train_kwargs
 
     def build_task_model(self) -> None:
         self.model = TextClassificationModule(
@@ -39,9 +40,6 @@ class TextClassificationTask(LightningTask):
             task_model_kwargs=self.task_model_kwargs,
         )
 
-    def restore_task_model(self, checkpoint_path: str) -> None:
-        self.model = TextClassificationModule.load_from_checkpoint(checkpoint_path)
-
     def predict(self, dataloader: DataLoader[Any]) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.model is not None
         results = self.model.predict(dataloader=dataloader)
@@ -49,3 +47,19 @@ class TextClassificationTask(LightningTask):
         assert hasattr(self.trainer, "datamodule")
         results["names"] = np.array(getattr(self.trainer, "datamodule").target_names)
         return results
+
+    @classmethod
+    def from_checkpoint(
+        cls,
+        checkpoint_path: T_path,
+        output_path: T_path,
+        task_train_kwargs: Optional[Dict[str, Any]],
+        early_stopping_kwargs: Optional[Dict[str, Any]],
+    ) -> "LightningTask":
+        return cls.restore_task_model(
+            checkpoint_path=checkpoint_path,
+            output_path=output_path,
+            task_train_kwargs=task_train_kwargs,
+            early_stopping_kwargs=early_stopping_kwargs,
+            lightning_module=TextClassificationModule,
+        )

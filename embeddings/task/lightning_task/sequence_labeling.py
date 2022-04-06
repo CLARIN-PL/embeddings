@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from numpy import typing as nptyping
@@ -21,8 +21,6 @@ class SequenceLabelingTask(LightningTask):
         task_train_kwargs: Dict[str, Any],
         early_stopping_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
-        train_batch_size: int = 32,
-        eval_batch_size: int = 32,
         finetune_last_n_layers: int = -1,
     ) -> None:
         super().__init__(output_path, task_train_kwargs, early_stopping_kwargs, logging_config)
@@ -30,8 +28,6 @@ class SequenceLabelingTask(LightningTask):
         self.num_classes = num_classes
         self.model_config_kwargs = model_config_kwargs
         self.task_model_kwargs = task_model_kwargs
-        self.train_batch_size = train_batch_size
-        self.eval_batch_size = eval_batch_size
         self.finetune_last_n_layers = finetune_last_n_layers
 
     def build_task_model(self) -> None:
@@ -42,9 +38,6 @@ class SequenceLabelingTask(LightningTask):
             config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
         )
-
-    def restore_task_model(self, checkpoint_path: str) -> None:
-        self.model = SequenceLabelingModule.load_from_checkpoint(checkpoint_path)
 
     def predict(self, dataloader: DataLoader[Any]) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.model is not None
@@ -80,3 +73,19 @@ class SequenceLabelingTask(LightningTask):
             getattr(self.trainer, "datamodule").id2str(x.item())
             for x in data[ground_truth_data != self.model.ignore_index]
         ]
+
+    @classmethod
+    def from_checkpoint(
+        cls,
+        checkpoint_path: T_path,
+        output_path: T_path,
+        task_train_kwargs: Optional[Dict[str, Any]],
+        early_stopping_kwargs: Optional[Dict[str, Any]],
+    ) -> "LightningTask":
+        return cls.restore_task_model(
+            checkpoint_path=checkpoint_path,
+            output_path=output_path,
+            task_train_kwargs=task_train_kwargs,
+            early_stopping_kwargs=early_stopping_kwargs,
+            lightning_module=SequenceLabelingModule,
+        )

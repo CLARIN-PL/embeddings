@@ -70,7 +70,7 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
     ) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.trainer is not None
         logits_predictions = self.trainer.predict(
-            dataloaders=dataloader, return_predictions=True, ckpt_path="best"
+            model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="best"
         )
         logits, predictions = zip(*logits_predictions)
         probabilities = softmax(torch.cat(logits), dim=1).numpy()
