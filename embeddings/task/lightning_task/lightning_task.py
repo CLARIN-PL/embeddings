@@ -5,10 +5,8 @@ from typing import Any, Dict, List, Optional
 import pytorch_lightning as pl
 import torch
 from numpy import typing as nptyping
-from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.callbacks import Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-from pytorch_lightning.loggers import LightningLoggerBase
 from torch.utils.data import DataLoader
 
 from embeddings.data.datamodule import HuggingFaceDataModule
@@ -78,13 +76,11 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         self.trainer = pl.Trainer(
             default_root_dir=str(self.output_path),
             callbacks=callbacks,
-            logger=self.get_lightning_loggers(run_name),
+            logger=self.logging_config.get_lightning_loggers(self.output_path, run_name),
             **self.task_train_kwargs
         )
         try:
             self.trainer.fit(self.model, data)
-            if "test" in data.load_dataset().keys():
-                self.trainer.test(self.model, data.test_dataloader())
         except Exception as e:
             del self.trainer
             torch.cuda.empty_cache()  # type: ignore
@@ -103,6 +99,9 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
         self.fit(data, run_name=run_name)
+        if "test" in data.dataset:
+            assert isinstance(self.trainer, pl.Trainer)
+            self.trainer.test(self.model, data.test_dataloader())
         dataloader = data.get_subset(subset=predict_subset)
         assert isinstance(dataloader, DataLoader)
         result = self.predict(dataloader=dataloader)
@@ -111,39 +110,3 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
     @abc.abstractmethod
     def build_task_model(self) -> None:
         pass
-
-    def get_lightning_loggers(
-        self,
-        run_name: Optional[str] = None,
-    ) -> List[LightningLoggerBase]:
-        """Based on configuration, provides pytorch-lightning loggers' callbacks."""
-        loggers: List[LightningLoggerBase] = []
-
-        if self.logging_config.use_tensorboard():
-            loggers.append(
-                pl_loggers.TensorBoardLogger(
-                    name=run_name,
-                    save_dir=str(self.output_path.joinpath("tensorboard")),
-                )
-            )
-
-        if self.logging_config.use_wandb():
-            save_dir = self.output_path.joinpath("wandb")
-            save_dir.mkdir(exist_ok=True)
-            loggers.append(
-                pl_loggers.WandbLogger(
-                    name=run_name,
-                    save_dir=str(save_dir),
-                    project=self.logging_config.tracking_project_name,
-                    entity=self.logging_config.wandb_entity,
-                    reinit=True,
-                    **self.logging_config.wandb_logger_kwargs
-                )
-            )
-
-        if self.logging_config.use_csv():
-            loggers.append(
-                pl_loggers.CSVLogger(name=run_name, save_dir=str(self.output_path.joinpath("csv")))
-            )
-
-        return loggers

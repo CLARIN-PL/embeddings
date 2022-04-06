@@ -2,9 +2,12 @@ import abc
 import logging
 import os
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import wandb
+from pytorch_lightning import loggers as pl_loggers
+from pytorch_lightning.loggers import LightningLoggerBase
 from typing_extensions import Literal
 
 from embeddings.data.io import T_path
@@ -75,6 +78,44 @@ class LightningLoggingConfig:
 
     def use_tensorboard(self) -> bool:
         return "tensorboard" in self.loggers_names
+
+    def get_lightning_loggers(
+        self,
+        output_path: T_path,
+        run_name: Optional[str] = None,
+    ) -> List[LightningLoggerBase]:
+        """Based on configuration, provides pytorch-lightning loggers' callbacks."""
+        output_path = Path(output_path)
+        loggers: List[LightningLoggerBase] = []
+
+        if self.use_tensorboard():
+            loggers.append(
+                pl_loggers.TensorBoardLogger(
+                    name=run_name,
+                    save_dir=str(output_path.joinpath("tensorboard")),
+                )
+            )
+
+        if self.use_wandb():
+            save_dir = output_path.joinpath("wandb")
+            save_dir.mkdir(exist_ok=True)
+            loggers.append(
+                pl_loggers.WandbLogger(
+                    name=run_name,
+                    save_dir=str(save_dir),
+                    project=self.tracking_project_name,
+                    entity=self.wandb_entity,
+                    reinit=True,
+                    **self.wandb_logger_kwargs
+                )
+            )
+
+        if self.use_csv():
+            loggers.append(
+                pl_loggers.CSVLogger(name=run_name, save_dir=str(output_path.joinpath("csv")))
+            )
+
+        return loggers
 
 
 class ExperimentLogger(abc.ABC):
