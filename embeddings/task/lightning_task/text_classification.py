@@ -1,11 +1,13 @@
 from typing import Any, Dict
 
+import numpy as np
 from numpy import typing as nptyping
 from torch.utils.data import DataLoader
 
 from embeddings.data.io import T_path
 from embeddings.model.lightning_module.text_classification import TextClassificationModule
 from embeddings.task.lightning_task.lightning_task import LightningTask
+from embeddings.utils.loggers import LightningLoggingConfig
 
 
 class TextClassificationTask(LightningTask):
@@ -17,9 +19,10 @@ class TextClassificationTask(LightningTask):
         task_model_kwargs: Dict[str, Any],
         task_train_kwargs: Dict[str, Any],
         early_stopping_kwargs: Dict[str, Any],
+        logging_config: LightningLoggingConfig,
         finetune_last_n_layers: int = -1,
     ) -> None:
-        super().__init__(output_path, task_train_kwargs, early_stopping_kwargs)
+        super().__init__(output_path, task_train_kwargs, early_stopping_kwargs, logging_config)
         self.model_name_or_path = model_name_or_path
         self.model_config_kwargs = model_config_kwargs
         self.task_model_kwargs = task_model_kwargs
@@ -35,4 +38,8 @@ class TextClassificationTask(LightningTask):
 
     def predict(self, dataloader: DataLoader[Any]) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.model is not None
-        return self.model.predict(dataloader=dataloader)
+        results = self.model.predict(dataloader=dataloader)
+        assert self.trainer is not None
+        assert hasattr(self.trainer, "datamodule")
+        results["names"] = np.array(getattr(self.trainer, "datamodule").target_names)
+        return results

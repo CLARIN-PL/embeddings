@@ -46,7 +46,7 @@ class ModelEvaluationPipeline(
         self.model = model
         self.evaluator = evaluator
 
-    def run(self) -> EvaluationResult:
+    def run(self, **kwargs: Any) -> EvaluationResult:
         loaded_data = self.data_loader.load(self.dataset)
         model_result = self.model.execute(loaded_data)
         return self.evaluator.evaluate(model_result)

@@ -2,21 +2,27 @@ import copy
 import importlib
 import os.path
 import pprint
+from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
+import pkg_resources
 import requests
 import yaml
 from numpy import typing as nptyping
 from tqdm.auto import tqdm
 
 from embeddings.data.io import T_path
+from embeddings.utils.loggers import get_logger
 
 Numeric = Union[float, int]
 PrimitiveTypes = Union[None, bool, int, float, str]
 NDArrayInt = nptyping.NDArray[np.int_]
+
+
+_logger = get_logger(__name__)
 
 
 def import_from_string(dotted_path: str) -> Any:
@@ -44,7 +50,13 @@ def import_from_string(dotted_path: str) -> Any:
         raise ImportError(msg)
 
 
-def build_output_path(root: T_path, embedding_name: T_path, dataset_name: T_path) -> Path:
+def build_output_path(
+    root: T_path,
+    embedding_name: T_path,
+    dataset_name: T_path,
+    timestamp_subdir: bool = True,
+    mkdirs: bool = True,
+) -> Path:
     """Builds output path using pattern {root}/{embedding_name}/{dataset_name}.
     Every "/" in the embedding/dataset name is replaced with  "__".
     E.g. "clarin-pl/nkjp-pos" -> "clarin-pl__nkjp-pos".
@@ -58,7 +70,7 @@ def build_output_path(root: T_path, embedding_name: T_path, dataset_name: T_path
             return Path(embedding_or_dataset).name
         else:
             assert isinstance(embedding_or_dataset, str)
-            return embedding_or_dataset.replace("/", "__")
+            return standardize_name(embedding_or_dataset)
 
     for x in [embedding_name, dataset_name]:
         if isinstance(x, Path) and (x.is_file() or not x.exists()):
@@ -66,7 +78,23 @@ def build_output_path(root: T_path, embedding_name: T_path, dataset_name: T_path
 
     embedding_name = _get_new_dir_name(embedding_name)
     dataset_name = _get_new_dir_name(dataset_name)
-    return Path(root, embedding_name, dataset_name)
+    path = Path(root, embedding_name, dataset_name)
+    if timestamp_subdir:
+        path = path.joinpath(f"{datetime.now().strftime('%Y%m%d_%H%M%S')}")
+    if mkdirs:
+        path.mkdir(exist_ok=True, parents=True)
+    return path
+
+
+def standardize_name(text: str) -> str:
+    if "/" in text:
+        cleaned_text = text.replace("/", "__")
+        _logger.warning(
+            f"String '{text}' contains '/'. Replacing it with '__'. Cleaned_text: {cleaned_text}."
+        )
+        return cleaned_text
+    else:
+        return text
 
 
 def format_eval_result(result: Dict[str, Any]) -> str:
@@ -108,3 +136,7 @@ def download_file(url: str, chunk_size: int = 1024) -> Tuple[Any, str]:
     pbar.close()
     tmp_file.seek(0)
     return tmp_file, filename
+
+
+def get_installed_packages() -> List[str]:
+    return sorted([f"{p.key}=={p.version}" for p in pkg_resources.working_set])

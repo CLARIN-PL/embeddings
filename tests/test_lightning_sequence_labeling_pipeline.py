@@ -1,10 +1,11 @@
-from tempfile import TemporaryDirectory
+from pathlib import Path
 from typing import Any, Dict, Tuple
 
 import datasets
 import numpy as np
 import pytest
 import pytorch_lightning as pl
+from _pytest.tmpdir import TempdirFactory
 
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
@@ -12,12 +13,18 @@ from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLab
 
 
 @pytest.fixture(scope="module")
-def dataset_kwargs() -> Tuple[Dict[str, Any], "TemporaryDirectory[str]"]:
-    path = TemporaryDirectory()
+def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
+    path = tmpdir_factory.mktemp(__name__)
+    return Path(path)
+
+
+@pytest.fixture(scope="module")
+def dataset_kwargs(tmp_path_module) -> Dict[str, Any]:
+    path = str(tmp_path_module)
     pipeline = HuggingFacePreprocessingPipeline(
         dataset_name="clarin-pl/kpwr-ner",
         load_dataset_kwargs=None,
-        persist_path=path.name,
+        persist_path=path,
         sample_missing_splits=None,
         ignore_test_subset=False,
         downsample_splits=(0.01, 0.01, 0.05),
@@ -26,10 +33,10 @@ def dataset_kwargs() -> Tuple[Dict[str, Any], "TemporaryDirectory[str]"]:
     pipeline.run()
 
     return {
-        "dataset_name_or_path": path.name,
+        "dataset_name_or_path": path,
         "input_column_name": "tokens",
         "target_column_name": "ner",
-    }, path  # TemporaryDirectory object is passed additionally to omit cleanup of the temporal path
+    }
 
 
 @pytest.fixture(scope="module")
@@ -60,37 +67,33 @@ def datamodule_kwargs() -> Dict[str, Any]:
 @pytest.fixture
 def lightning_sequence_labeling_pipeline(
     pipeline_kwargs: Dict[str, Any],
-    dataset_kwargs: Tuple[Dict[str, Any], "TemporaryDirectory[str]"],
+    dataset_kwargs: Dict[str, Any],
     datamodule_kwargs: Dict[str, Any],
     task_train_kwargs: Dict[str, Any],
-    result_path: "TemporaryDirectory[str]",
-) -> Tuple[
-    LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]],
-    "TemporaryDirectory[str]",
-]:
+    tmp_path: Path,
+) -> Tuple[LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]], Path]:
     datamodule_kwargs["max_seq_length"] = 64
     return (
         LightningSequenceLabelingPipeline(
-            output_path=result_path.name,
+            output_path=tmp_path,
             datamodule_kwargs=datamodule_kwargs,
             task_train_kwargs=task_train_kwargs,
             **pipeline_kwargs,
-            **dataset_kwargs[0],
+            **dataset_kwargs,
         ),
-        result_path,
+        tmp_path,
     )
 
 
 def test_lightning_sequence_labeling_pipeline(
     lightning_sequence_labeling_pipeline: Tuple[
         LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]],
-        "TemporaryDirectory[str]",
+        Path,
     ],
 ) -> None:
     pl.seed_everything(441)
     pipeline, path = lightning_sequence_labeling_pipeline
     result = pipeline.run()
-    path.cleanup()
     np.testing.assert_almost_equal(
         result["seqeval__mode_None__scheme_None"]["overall_accuracy"],
         0.0015690,
@@ -113,9 +116,18 @@ def test_lightning_sequence_labeling_pipeline(
     assert "data" in result
     assert "y_pred" in result["data"]
     assert "y_true" in result["data"]
+    assert "y_probabilities" in result["data"]
+    assert "names" in result["data"]
     assert isinstance(result["data"]["y_pred"], np.ndarray)
     assert isinstance(result["data"]["y_true"], np.ndarray)
+    assert isinstance(result["data"]["y_probabilities"], np.ndarray)
+    assert isinstance(result["data"]["names"], np.ndarray)
     assert isinstance(result["data"]["y_pred"][0], list)
     assert isinstance(result["data"]["y_true"][0], list)
+    assert isinstance(result["data"]["y_probabilities"][0], list)
+    assert isinstance(result["data"]["names"], np.ndarray)
     assert isinstance(result["data"]["y_pred"][0][0], str)
     assert isinstance(result["data"]["y_true"][0][0], str)
+    assert isinstance(result["data"]["y_probabilities"][0][0], np.ndarray)
+    assert isinstance(result["data"]["names"][0], str)
+    assert isinstance(result["data"]["y_probabilities"][0][0][0], np.float32)

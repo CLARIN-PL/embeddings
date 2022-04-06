@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 from embeddings.data.io import T_path
 from embeddings.model.lightning_module.sequence_labeling import SequenceLabelingModule
 from embeddings.task.lightning_task.lightning_task import LightningTask
+from embeddings.utils.loggers import LightningLoggingConfig
 
 
 class SequenceLabelingTask(LightningTask):
@@ -18,11 +19,12 @@ class SequenceLabelingTask(LightningTask):
         task_model_kwargs: Dict[str, Any],
         task_train_kwargs: Dict[str, Any],
         early_stopping_kwargs: Dict[str, Any],
+        logging_config: LightningLoggingConfig,
         train_batch_size: int = 32,
         eval_batch_size: int = 32,
         finetune_last_n_layers: int = -1,
     ) -> None:
-        super().__init__(output_path, task_train_kwargs, early_stopping_kwargs)
+        super().__init__(output_path, task_train_kwargs, early_stopping_kwargs, logging_config)
         self.model_name_or_path = model_name_or_path
         self.model_config_kwargs = model_config_kwargs
         self.task_model_kwargs = task_model_kwargs
@@ -41,11 +43,26 @@ class SequenceLabelingTask(LightningTask):
     def predict(self, dataloader: DataLoader[Any]) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.model is not None
         results = self.model.predict(dataloader=dataloader)
-        predictions, ground_truth = (list(results["y_pred"]), list(results["y_true"]))
-        for i, (pred, gt) in enumerate(zip(predictions, ground_truth)):
+        predictions, ground_truth, probabilities = (
+            list(results["y_pred"]),
+            list(results["y_true"]),
+            list(results["y_probabilities"]),
+        )
+
+        for i, (pred, gt, probs) in enumerate(zip(predictions, ground_truth, probabilities)):
             predictions[i] = self._map_filter_data(pred, gt)
             ground_truth[i] = self._map_filter_data(gt, gt)
-        return {"y_pred": np.array(predictions), "y_true": np.array(ground_truth)}
+            probabilities[i] = [x for x in probs[gt != self.model.ignore_index]]
+
+        assert self.trainer is not None
+        assert hasattr(self.trainer, "datamodule")
+        names = getattr(self.trainer, "datamodule").target_names
+        return {
+            "y_pred": np.array(predictions, dtype=object),
+            "y_true": np.array(ground_truth, dtype=object),
+            "y_probabilities": np.array(probabilities, dtype=object),
+            "names": np.array(names),
+        }
 
     def _map_filter_data(
         self, data: nptyping.NDArray[Any], ground_truth_data: nptyping.NDArray[Any]

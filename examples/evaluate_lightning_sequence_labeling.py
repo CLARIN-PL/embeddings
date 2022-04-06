@@ -1,5 +1,4 @@
 import pprint
-from pathlib import Path
 from typing import Optional
 
 import typer
@@ -7,6 +6,7 @@ import typer
 from embeddings.defaults import RESULTS_PATH
 from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
+from embeddings.utils.loggers import LightningLoggingConfig
 from embeddings.utils.utils import build_output_path, format_eval_result
 
 
@@ -31,12 +31,16 @@ def run(
         None, help="Tagging scheme. Supported schemes: [IOB1, IOB2, IOE1, IOE2, IOBES, BILOU]"
     ),
     root: str = typer.Option(RESULTS_PATH.joinpath("lightning_sequence_classification")),
+    run_name: Optional[str] = typer.Option(None, help="Name of run used for logging."),
+    wandb: bool = typer.Option(False, help="Flag for using wandb."),
+    tensorboard: bool = typer.Option(False, help="Flag for using tensorboard."),
+    csv: bool = typer.Option(False, help="Flag for using csv."),
+    tracking_project_name: Optional[str] = typer.Option(None, help="Name of wandb project."),
+    wandb_entity: Optional[str] = typer.Option(None, help="Name of wandb entity."),
 ) -> None:
     typer.echo(pprint.pformat(locals()))
 
     output_path = build_output_path(root, embedding_name_or_path, dataset_name)
-    output_path.mkdir(parents=True, exist_ok=True)
-
     pipeline = LightningSequenceLabelingPipeline(
         embedding_name_or_path=embedding_name_or_path,
         dataset_name_or_path=dataset_name,
@@ -45,6 +49,13 @@ def run(
         output_path=root,
         evaluation_mode=evaluation_mode,
         tagging_scheme=tagging_scheme,
+        logging_config=LightningLoggingConfig.from_flags(
+            wandb=wandb,
+            tensorboard=tensorboard,
+            csv=csv,
+            tracking_project_name=tracking_project_name,
+            wandb_entity=wandb_entity,
+        ),
     )
 
     result = pipeline.run()

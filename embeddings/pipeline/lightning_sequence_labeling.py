@@ -16,17 +16,14 @@ from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task.sequence_labeling import SequenceLabelingTask
 from embeddings.utils.json_dict_persister import JsonPersister
+from embeddings.utils.loggers import LightningLoggingConfig
 from embeddings.utils.utils import initialize_kwargs
 
 
 class LightningSequenceLabelingPipeline(
     LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
 ):
-    DEFAULT_TASK_TRAIN_KWARGS = {"devices": "auto", "accelerator": "auto"}
-    DEFAULT_TASK_MODEL_KWARGS = {"use_scheduler": True}
-    DEFAULT_DATAMODULE_KWARGS = {"max_seq_length": None, "label_all_tokens": False}
-    DEFAULT_MODEL_CONFIG_KWARGS = {"classifier_dropout": None}
-    DEFAULT_EARLY_STOPPING_KWARGS = {"monitor": "val/Loss", "mode": "min", "patience": 3}
+    DEFAULT_DATAMODULE_KWARGS: Dict[str, Any] = {"max_seq_length": None, "label_all_tokens": False}
 
     def __init__(
         self,
@@ -50,6 +47,7 @@ class LightningSequenceLabelingPipeline(
         task_train_kwargs: Optional[Dict[str, Any]] = None,
         model_config_kwargs: Optional[Dict[str, Any]] = None,
         early_stopping_kwargs: Optional[Dict[str, Any]] = None,
+        logging_config: LightningLoggingConfig = LightningLoggingConfig(),
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
     ):
         self.datamodule_kwargs = initialize_kwargs(
@@ -64,17 +62,18 @@ class LightningSequenceLabelingPipeline(
         self.task_model_kwargs = task_model_kwargs = initialize_kwargs(
             self.DEFAULT_TASK_MODEL_KWARGS, task_model_kwargs
         )
-        self.early_stopping_kwargs = initialize_kwargs(
-            self.DEFAULT_EARLY_STOPPING_KWARGS, early_stopping_kwargs
-        )
         self.task_model_kwargs.update(
             {"train_batch_size": train_batch_size, "eval_batch_size": eval_batch_size}
+        )
+        self.early_stopping_kwargs = initialize_kwargs(
+            self.DEFAULT_EARLY_STOPPING_KWARGS, early_stopping_kwargs
         )
         tokenizer_name_or_path = (
             tokenizer_name_or_path if tokenizer_name_or_path else embedding_name_or_path
         )
 
         output_path = Path(output_path)
+
         datamodule = SequenceLabelingDataModule(
             tokenizer_name_or_path=tokenizer_name_or_path,
             dataset_name_or_path=dataset_name_or_path,
@@ -94,10 +93,11 @@ class LightningSequenceLabelingPipeline(
             model_config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
             task_train_kwargs=self.task_train_kwargs,
+            logging_config=logging_config,
             early_stopping_kwargs=self.early_stopping_kwargs,
         )
         model = LightningModel(task=task, predict_subset=predict_subset)
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         ).persisting(JsonPersister(path=output_path.joinpath(evaluation_filename)))
-        super().__init__(datamodule, model, evaluator)
+        super().__init__(datamodule, model, evaluator, output_path, logging_config)
