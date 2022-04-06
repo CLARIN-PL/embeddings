@@ -100,7 +100,7 @@ def lightning_classification_pipeline(
             config=config,
             devices="auto",
             accelerator="cpu",
-            **dataset_kwargs[0],
+            **dataset_kwargs,
         ),
         result_path,
     )
