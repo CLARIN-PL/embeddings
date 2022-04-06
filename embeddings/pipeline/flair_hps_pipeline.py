@@ -2,10 +2,11 @@ from abc import ABC
 from dataclasses import dataclass, field
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Dict, Generic, Optional, Tuple
+from typing import Any, Dict, Generic, Optional, Tuple
 
 import datasets
 from flair.data import Corpus
+from numpy import typing as nptyping
 
 from embeddings.data.io import T_path
 from embeddings.evaluator.sequence_labeling_evaluator import (
@@ -109,6 +110,8 @@ class OptimizedFlairClassificationPipeline(
         str,
         datasets.DatasetDict,
         Corpus,
+        Dict[str, nptyping.NDArray[Any]],
+        Dict[str, Any],
     ],
     AbstractOptimizedFlairClassificationPipeline,
     _OptimizedFlairPipelineBase[FlairTextClassificationConfigSpace],
@@ -164,7 +167,7 @@ class OptimizedFlairClassificationPipeline(
         return metadata
 
     def _get_evaluation_metadata(
-        self, parameters: SampledParameters
+        self, parameters: SampledParameters, **kwargs: Any
     ) -> FlairClassificationEvaluationPipelineMetadata:
         (
             embedding_name,
@@ -200,6 +203,8 @@ class OptimizedFlairPairClassificationPipeline(
         str,
         datasets.DatasetDict,
         Corpus,
+        Dict[str, nptyping.NDArray[Any]],
+        Dict[str, Any],
     ],
     AbstractOptimizedFlairClassificationPipeline,
     _OptimizedFlairPairClassificationPipelineBase[FlairTextClassificationConfigSpace],
@@ -257,7 +262,7 @@ class OptimizedFlairPairClassificationPipeline(
         return metadata
 
     def _get_evaluation_metadata(
-        self, parameters: SampledParameters
+        self, parameters: SampledParameters, **kwargs: Any
     ) -> FlairClassificationEvaluationPipelineMetadata:
         (
             embedding_name,
@@ -293,6 +298,8 @@ class OptimizedFlairSequenceLabelingPipeline(
         str,
         datasets.DatasetDict,
         Corpus,
+        Dict[str, nptyping.NDArray[Any]],
+        Dict[str, Any],
     ],
     AbstractHuggingFaceOptimizedPipeline[FlairSequenceLabelingConfigSpace],
     _OptimizedFlairPipelineDefaultsBase,
@@ -379,7 +386,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         return metadata
 
     def _get_evaluation_metadata(
-        self, parameters: SampledParameters
+        self, parameters: SampledParameters, **kwargs: Any
     ) -> FlairSequenceLabelingEvaluationPipelineMetadata:
         (
             embedding_name,

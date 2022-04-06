@@ -21,7 +21,7 @@ class FlairModel(Model[Corpus, Dict[str, nptyping.NDArray[Any]]]):
         self.task = task
         self.predict_subset = predict_subset
 
-    def execute(self, data: Corpus) -> Dict[str, nptyping.NDArray[Any]]:
+    def execute(self, data: Corpus, **kwargs: Any) -> Dict[str, nptyping.NDArray[Any]]:
         self.task.build_task_model(
             embedding=self.embedding, y_dictionary=self.task.make_y_dictionary(data)
         )

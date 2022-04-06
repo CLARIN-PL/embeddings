@@ -28,8 +28,6 @@ def run(
     typer.echo(pprint.pformat(locals()))
 
     output_path = build_output_path(root, embedding_name_or_path, dataset_name)
-    output_path.mkdir(parents=True, exist_ok=True)
-
     pipeline = FlairPairClassificationPipeline(
         embedding_name=embedding_name_or_path,
         dataset_name=dataset_name,

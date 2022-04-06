@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Tuple, Union
 import pandas as pd
 import pytest
 import yaml
+from _pytest.tmpdir import TempdirFactory
 
 from embeddings.hyperparameter_search.lighting_configspace import (
     LightingTextClassificationConfigSpace,
@@ -15,6 +16,7 @@ from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessi
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingClassificationPipeline
 from embeddings.pipeline.pipelines_metadata import LightningClassificationPipelineMetadata
+from embeddings.utils.loggers import LightningLoggingConfig
 from tests.hps.utils import _flatten
 
 
@@ -31,6 +33,19 @@ def load_dataset_kwargs() -> Dict[str, Union[List[str], str]]:
         "test_domains": ["hotels", "medicine"],
         "text_cfg": "text",
     }
+
+
+@pytest.fixture(scope="module")
+def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
+    path = tmpdir_factory.mktemp(__name__)
+    return Path(path)
+
+
+@pytest.fixture(scope="module")
+def retrain_tmp_path(tmp_path_module: Path) -> Path:
+    path = tmp_path_module.joinpath("retrain")
+    path.mkdir()
+    return path
 
 
 @pytest.fixture(scope="module")
@@ -94,11 +109,12 @@ def classification_hps_run_result(
         target_column_name="target",
         n_trials=1,
         ignore_preprocessing_pipeline=True,
+        logging_config=LightningLoggingConfig.from_flags(csv=True),
     ).persisting(
         best_params_path=tmp_path_module.joinpath("best_params.yaml"),
         log_path=tmp_path_module.joinpath("hps_log.pickle"),
     )
-    df, metadata = pipeline.run()
+    df, metadata = pipeline.run(catch=())
     return df, metadata
 
 
@@ -174,7 +190,9 @@ def retrain_model_result(
     df, metadata = classification_hps_run_result
     metadata["dataset_name_or_path"] = dataset_path.name
     metadata["output_path"] = retrain_tmp_path
-    pipeline = LightningClassificationPipeline(**metadata)
+    pipeline = LightningClassificationPipeline(
+        logging_config=LightningLoggingConfig.from_flags(csv=True), **metadata
+    )
     results = pipeline.run()
     return results
 
@@ -185,6 +203,10 @@ def test_evaluation_json_exists(
     assert retrain_tmp_path.joinpath("evaluation.json").exists()
 
 
+def test_packages_json_exists(retrain_tmp_path: Path, retrain_model_result: Dict[str, Any]) -> None:
+    assert retrain_tmp_path.joinpath("packages.json").exists()
+
+
 def test_hparams_best_params_files_compatibility(
     tmp_path_module: Path,
     retrain_tmp_path: Path,
@@ -193,7 +215,7 @@ def test_hparams_best_params_files_compatibility(
 ) -> None:
     df, metadata = classification_hps_run_result
 
-    with open(retrain_tmp_path / "lightning_logs" / "version_0" / "hparams.yaml") as f:
+    with open(retrain_tmp_path / "csv" / "version_0" / "hparams.yaml") as f:
         hparams = yaml.load(f, Loader=yaml.Loader)
 
     with open(tmp_path_module / "best_params.yaml") as f:

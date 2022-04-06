@@ -6,6 +6,7 @@ import pytorch_lightning as pl
 import torch
 from numpy import typing as nptyping
 from pytorch_lightning.utilities.types import STEP_OUTPUT
+from torch.nn.functional import softmax
 from torch.optim import AdamW, Optimizer
 from torch.utils.data import DataLoader
 from torchmetrics import MetricCollection
@@ -57,21 +58,25 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
     def test_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         pass
 
-    def predict_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
+    def predict_step(self, *args: Any, **kwargs: Any) -> Optional[Tuple[STEP_OUTPUT, STEP_OUTPUT]]:
         batch, batch_idx = args
         loss, logits, preds = self.shared_step(**batch)
-        return preds
+        return logits, preds
 
     def predict(
         self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.trainer is not None
-        predictions = self.trainer.predict(dataloaders=dataloader, return_predictions=True)
+        logits_predictions = self.trainer.predict(
+            dataloaders=dataloader, return_predictions=True, ckpt_path="best"
+        )
+        logits, predictions = zip(*logits_predictions)
+        probabilities = softmax(torch.cat(logits), dim=1).numpy()
         predictions = torch.cat(predictions).numpy()
-        assert isinstance(predictions, np.ndarray)
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
-        assert isinstance(ground_truth, np.ndarray)
-        return {"y_pred": predictions, "y_true": ground_truth}
+        result = {"y_pred": predictions, "y_true": ground_truth, "y_probabilities": probabilities}
+        assert all(isinstance(x, np.ndarray) for x in result.values())
+        return result
 
     def configure_metrics(self) -> None:
         if self.metrics is None:

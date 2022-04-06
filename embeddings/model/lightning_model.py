@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from numpy import typing as nptyping
 
@@ -18,6 +18,8 @@ class LightningModel(Model[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any
         self.task = task
         self.predict_subset = predict_subset
 
-    def execute(self, data: HuggingFaceDataModule) -> Dict[str, nptyping.NDArray[Any]]:
+    def execute(
+        self, data: HuggingFaceDataModule, run_name: Optional[str] = None, **kwargs: Any
+    ) -> Dict[str, nptyping.NDArray[Any]]:
         self.task.build_task_model()
-        return self.task.fit_predict(data, self.predict_subset)
+        return self.task.fit_predict(data, self.predict_subset, run_name=run_name)

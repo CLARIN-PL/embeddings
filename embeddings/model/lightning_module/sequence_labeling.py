@@ -67,7 +67,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         loss, logits, preds = self.shared_step(**batch)
         if -1 not in labels:
             self.test_metrics(
-                preds[labels != self.IGNORE_INDEX], labels[labels != self.IGNORE_INDEX]
+                preds[labels != self.ignore_index], labels[labels != self.ignore_index]
             )
             self.log("test/Loss", loss, on_epoch=True)
         else:
