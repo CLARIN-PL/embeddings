@@ -1,5 +1,5 @@
 from dataclasses import fields
-from tempfile import TemporaryDirectory
+from pathlib import Path
 from typing import Any, Dict, Tuple
 
 import datasets
@@ -35,8 +35,9 @@ from embeddings.utils.flair_corpus_persister import FlairConllPersister
 
 
 @pytest.fixture(scope="module")
-def result_path(tmpdir_factory: TempdirFactory) -> "TemporaryDirectory[str]":
-    return TemporaryDirectory()
+def result_path(tmpdir_factory: TempdirFactory) -> Path:
+    path = tmpdir_factory.mktemp(__name__)
+    return Path(path)
 
 
 @pytest.fixture(scope="module")
@@ -65,15 +66,15 @@ def flair_advanced_config() -> FlairSequenceLabelingConfig:
 
 @pytest.fixture(scope="module")
 def sequence_labeling_preprocessing_pipeline(
-    result_path: "TemporaryDirectory[str]",
-) -> Tuple[PreprocessingPipeline[str, datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"]:
+    result_path: Path,
+) -> Tuple[PreprocessingPipeline[str, datasets.DatasetDict, Corpus], Path]:
     dataset = Dataset("clarin-pl/kpwr-ner")
     data_loader = HuggingFaceDataLoader()
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
         .then(SampleSplitsFlairCorpusTransformation(dev_fraction=0.1, test_fraction=0.1, seed=441))
         .then(DownsampleFlairCorpusTransformation(*(0.005, 0.005, 0.005)))
-        .persisting(FlairConllPersister(result_path.name))
+        .persisting(FlairConllPersister(str(result_path)))
     )
     pipeline = PreprocessingPipeline(
         dataset=dataset, data_loader=data_loader, transformation=transformation
@@ -83,16 +84,16 @@ def sequence_labeling_preprocessing_pipeline(
 
 @pytest.fixture(scope="module")
 def sequence_labeling_evaluation_pipeline(
-    result_path: "TemporaryDirectory[str]",
+    result_path: Path,
     flair_basic_config: FlairSequenceLabelingConfig,
 ) -> Tuple[
     ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]],
-    "TemporaryDirectory[str]",
+    Path,
 ]:
     pipeline = FlairSequenceLabelingEvaluationPipeline(
-        dataset_path=result_path.name,
+        dataset_path=str(result_path),
         embedding_name="hf-internal-testing/tiny-albert",
-        output_path=result_path.name,
+        output_path=result_path,
         config=flair_basic_config,
         persist_path=None,
     )
@@ -100,9 +101,9 @@ def sequence_labeling_evaluation_pipeline(
 
 
 def test_sequence_labeling_basic_config(
-    result_path: "TemporaryDirectory[str]",
+    result_path: Path,
     sequence_labeling_preprocessing_pipeline: Tuple[
-        PreprocessingPipeline[str, datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"
+        PreprocessingPipeline[str, datasets.DatasetDict, Corpus], Path
     ],
     flair_basic_config: FlairSequenceLabelingConfig,
 ) -> None:
@@ -113,9 +114,9 @@ def test_sequence_labeling_basic_config(
     preprocessing_pipeline.run()
 
     pipeline = FlairSequenceLabelingEvaluationPipeline(
-        dataset_path=result_path.name,
+        dataset_path=str(result_path),
         embedding_name="hf-internal-testing/tiny-albert",
-        output_path=result_path.name,
+        output_path=result_path,
         config=flair_basic_config,
         persist_path=None,
     )
@@ -123,9 +124,9 @@ def test_sequence_labeling_basic_config(
 
 
 def test_sequence_labeling_advanced_config(
-    result_path: "TemporaryDirectory[str]",
+    result_path: Path,
     sequence_labeling_preprocessing_pipeline: Tuple[
-        PreprocessingPipeline[str, datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"
+        PreprocessingPipeline[str, datasets.DatasetDict, Corpus], Path
     ],
     flair_advanced_config: FlairSequenceLabelingConfig,
 ) -> None:
@@ -136,9 +137,9 @@ def test_sequence_labeling_advanced_config(
     preprocessing_pipeline.run()
 
     pipeline = FlairSequenceLabelingEvaluationPipeline(
-        dataset_path=result_path.name,
+        dataset_path=str(result_path),
         embedding_name="hf-internal-testing/tiny-albert",
-        output_path=result_path.name,
+        output_path=result_path,
         config=flair_advanced_config,
         persist_path=None,
     )
