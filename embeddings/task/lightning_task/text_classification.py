@@ -41,7 +41,5 @@ class TextClassificationTask(LightningTask):
         results = self.model.predict(dataloader=dataloader)
         assert self.trainer is not None
         assert hasattr(self.trainer, "datamodule")
-        results["names"] = np.array(
-            getattr(self.trainer, "datamodule").target_names,
-        )
+        results["names"] = np.array(getattr(self.trainer, "datamodule").target_names)
         return results

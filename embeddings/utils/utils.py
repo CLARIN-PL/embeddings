@@ -88,11 +88,13 @@ def build_output_path(
 
 def standardize_name(text: str) -> str:
     if "/" in text:
-        result = text.replace("/", "__")
-        _logger.warning(f"String '{text}' contains '/'. Replacing it with '__'. Result: {result}.")
+        cleaned_text = text.replace("/", "__")
+        _logger.warning(
+            f"String '{text}' contains '/'. Replacing it with '__'. Cleaned_text: {cleaned_text}."
+        )
+        return cleaned_text
     else:
-        result = text
-    return result
+        return text
 
 
 def format_eval_result(result: Dict[str, Any]) -> str:
