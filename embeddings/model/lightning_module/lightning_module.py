@@ -8,7 +8,6 @@ import torch
 from numpy import typing as nptyping
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.nn.functional import softmax
-from torch.optim import AdamW, Optimizer
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from torchmetrics import MetricCollection

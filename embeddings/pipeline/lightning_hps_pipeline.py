@@ -5,8 +5,8 @@ from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, List, Optional, Tuple, Union
 
 import datasets
-from pytorch_lightning.accelerators import Accelerator
 from numpy import typing as nptyping
+from pytorch_lightning.accelerators import Accelerator
 
 from embeddings.config.config_space import ConfigSpace, SampledParameters
 from embeddings.config.lighting_config_space import (
