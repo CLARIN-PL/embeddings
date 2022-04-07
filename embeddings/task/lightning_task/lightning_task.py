@@ -93,7 +93,9 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
             raise e
 
     @abc.abstractmethod
-    def predict(self, dataloader: DataLoader[Any]) -> Dict[str, nptyping.NDArray[Any]]:
+    def predict(
+        self, dataloader: DataLoader[Any], return_names: bool = True
+    ) -> Dict[str, nptyping.NDArray[Any]]:
         pass
 
     def fit_predict(
@@ -125,9 +127,14 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         lightning_module: Type[LightningModule[AutoModel]],
         task_train_kwargs: Optional[Dict[str, Any]],
         early_stopping_kwargs: Optional[Dict[str, Any]],
+        logging_config: Optional[LightningLoggingConfig],
     ) -> "LightningTask":
         model = lightning_module.load_from_checkpoint(str(checkpoint_path))
-        trainer = pl.Trainer(default_root_dir=str(output_path), **task_train_kwargs or {})
+        trainer = pl.Trainer(
+            default_root_dir=str(output_path),
+            callbacks=[ModelCheckpoint(dirpath=Path(output_path).joinpath("checkpoints"))],
+            **task_train_kwargs or {}
+        )
         init_kwargs = {
             "model_name_or_path": model.hparams.model_name_or_path,
             "output_path": output_path,
@@ -137,6 +144,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
             "task_model_kwargs": model.hparams.task_model_kwargs,
             "task_train_kwargs": task_train_kwargs or {},
             "early_stopping_kwargs": early_stopping_kwargs or {},
+            "logging_config": logging_config or LightningLoggingConfig(),
         }
         task = cls(**init_kwargs)
         task.model = model
@@ -150,7 +158,8 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         cls,
         checkpoint_path: T_path,
         output_path: T_path,
-        task_train_kwargs: Optional[Dict[str, Any]],
-        early_stopping_kwargs: Optional[Dict[str, Any]],
+        task_train_kwargs: Optional[Dict[str, Any]] = None,
+        early_stopping_kwargs: Optional[Dict[str, Any]] = None,
+        logging_config: Optional[LightningLoggingConfig] = None,
     ) -> "LightningTask":
         pass

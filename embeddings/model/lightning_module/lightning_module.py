@@ -6,6 +6,7 @@ import numpy as np
 import pytorch_lightning as pl
 import torch
 from numpy import typing as nptyping
+from pytorch_lightning.utilities.exceptions import MisconfigurationException
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.nn.functional import softmax
 from torch.optim import Optimizer
@@ -68,17 +69,26 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
     def predict(
         self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Dict[str, nptyping.NDArray[Any]]:
-        assert self.trainer is not None
-        logits_predictions = self.trainer.predict(
-            model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="best"
-        )
-        logits, predictions = zip(*logits_predictions)
+        logits, predictions = zip(*self._predict_with_trainer(dataloader))
         probabilities = softmax(torch.cat(logits), dim=1).numpy()
         predictions = torch.cat(predictions).numpy()
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
         result = {"y_pred": predictions, "y_true": ground_truth, "y_probabilities": probabilities}
         assert all(isinstance(x, np.ndarray) for x in result.values())
         return result
+
+    def _predict_with_trainer(self, dataloader: DataLoader[HuggingFaceDataset]) -> torch.Tensor:
+        assert self.trainer is not None
+        try:
+            return self.trainer.predict(
+                model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="best"
+            )
+        except MisconfigurationException:  # model loaded but not fitted
+            return self.trainer.predict(
+                model=self,
+                dataloaders=dataloader,
+                return_predictions=True,
+            )
 
     def configure_metrics(self) -> None:
         if self.metrics is None:

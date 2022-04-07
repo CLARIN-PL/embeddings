@@ -39,7 +39,9 @@ class SequenceLabelingTask(LightningTask):
             task_model_kwargs=self.task_model_kwargs,
         )
 
-    def predict(self, dataloader: DataLoader[Any]) -> Dict[str, nptyping.NDArray[Any]]:
+    def predict(
+        self, dataloader: DataLoader[Any], return_names: bool = True
+    ) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.model is not None
         results = self.model.predict(dataloader=dataloader)
         predictions, ground_truth, probabilities = (
@@ -53,15 +55,16 @@ class SequenceLabelingTask(LightningTask):
             ground_truth[i] = self._map_filter_data(gt, gt)
             probabilities[i] = [x for x in probs[gt != self.model.ignore_index]]
 
-        assert self.trainer is not None
-        assert hasattr(self.trainer, "datamodule")
-        names = getattr(self.trainer, "datamodule").target_names
-        return {
+        results = {
             "y_pred": np.array(predictions, dtype=object),
             "y_true": np.array(ground_truth, dtype=object),
             "y_probabilities": np.array(probabilities, dtype=object),
-            "names": np.array(names),
         }
+        if return_names:
+            assert self.trainer is not None
+            assert hasattr(self.trainer, "datamodule")
+            results["names"] = np.array(getattr(self.trainer, "datamodule").target_names)
+        return results
 
     def _map_filter_data(
         self, data: nptyping.NDArray[Any], ground_truth_data: nptyping.NDArray[Any]
@@ -79,8 +82,9 @@ class SequenceLabelingTask(LightningTask):
         cls,
         checkpoint_path: T_path,
         output_path: T_path,
-        task_train_kwargs: Optional[Dict[str, Any]],
-        early_stopping_kwargs: Optional[Dict[str, Any]],
+        task_train_kwargs: Optional[Dict[str, Any]] = None,
+        early_stopping_kwargs: Optional[Dict[str, Any]] = None,
+        logging_config: Optional[LightningLoggingConfig] = None,
     ) -> "LightningTask":
         return cls.restore_task_model(
             checkpoint_path=checkpoint_path,
@@ -88,4 +92,5 @@ class SequenceLabelingTask(LightningTask):
             task_train_kwargs=task_train_kwargs,
             early_stopping_kwargs=early_stopping_kwargs,
             lightning_module=SequenceLabelingModule,
+            logging_config=logging_config,
         )
