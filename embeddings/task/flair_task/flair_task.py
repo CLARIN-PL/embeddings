@@ -1,9 +1,10 @@
 import abc
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Type
 
 import flair
 from flair.data import Corpus, Dictionary, Sentence
+from flair.models import SequenceTagger
 from flair.trainers import ModelTrainer
 from numpy import typing as nptyping
 from typing_extensions import Literal
@@ -105,4 +106,32 @@ class FlairTask(Task[Corpus, Dict[str, nptyping.NDArray[Any]]]):
     @staticmethod
     @abc.abstractmethod
     def remove_labels_from_data(data: List[Sentence], y_type: str) -> None:
+        pass
+
+    @classmethod
+    def restore_task_model(
+        cls,
+        checkpoint_path: T_path,
+        output_path: T_path,
+        flair_model: Type[flair.nn.Model],
+        task_train_kwargs: Optional[Dict[str, Any]],
+    ) -> "FlairTask":
+        model = flair_model.load(checkpoint_path)
+        task_model_kwargs = (
+            {"hidden_size": model.hidden_size} if isinstance(model, SequenceTagger) else {}
+        )
+        task = cls(
+            output_path=output_path, task_train_kwargs=task_train_kwargs or {}, **task_model_kwargs
+        )
+        task.model = model
+        return task
+
+    @classmethod
+    @abc.abstractmethod
+    def from_checkpoint(
+        cls,
+        checkpoint_path: T_path,
+        output_path: T_path,
+        task_train_kwargs: Optional[Dict[str, Any]] = None,
+    ) -> "FlairTask":
         pass

@@ -57,3 +57,17 @@ class TextClassification(FlairTask):
     def remove_labels_from_data(data: List[Sentence], y_type: str) -> None:
         for sentence in data:
             sentence.remove_labels(y_type)
+
+    @classmethod
+    def from_checkpoint(
+        cls,
+        checkpoint_path: T_path,
+        output_path: T_path,
+        task_train_kwargs: Optional[Dict[str, Any]] = None,
+    ) -> "FlairTask":
+        return cls.restore_task_model(
+            checkpoint_path=checkpoint_path,
+            output_path=output_path,
+            flair_model=TextClassifier,
+            task_train_kwargs=task_train_kwargs,
+        )
