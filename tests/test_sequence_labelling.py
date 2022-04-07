@@ -57,7 +57,7 @@ def pos_tagging_pipeline(
     transformation = ColumnCorpusTransformation("tokens", "pos_tags").then(
         DownsampleFlairCorpusTransformation(*(0.001, 0.001, 0.001))
     )
-    task = SequenceLabeling(result_path.name, hidden_size=64, task_train_kwargs={"max_epochs": 1})
+    task = SequenceLabeling(result_path.name, hidden_size=16, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(allegro_embedding, task)
     evaluator = SequenceLabelingEvaluator(
         evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.UNIT
@@ -86,8 +86,8 @@ def ner_tagging_pipeline(
     )
     task = SequenceLabeling(
         result_path.name,
-        hidden_size=64,
-        task_train_kwargs={"max_epochs": 1, "mini_batch_size": 64},
+        hidden_size=16,
+        task_train_kwargs={"max_epochs": 1, "mini_batch_size": 16},
     )
     model = FlairModel(allegro_embedding, task)
     evaluator = SequenceLabelingEvaluator()
@@ -111,7 +111,7 @@ def pos_tagging_pipeline_local_embedding(
     transformation = ColumnCorpusTransformation("tokens", "pos_tags").then(
         DownsampleFlairCorpusTransformation(*(0.001, 0.001, 0.001))
     )
-    task = SequenceLabeling(result_path.name, hidden_size=64, task_train_kwargs={"max_epochs": 1})
+    task = SequenceLabeling(result_path.name, hidden_size=16, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(ipipan_embedding_local_file, task)
     evaluator = SequenceLabelingEvaluator(
         evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.UNIT
@@ -140,8 +140,8 @@ def ner_tagging_pipeline_local_embedding(
     )
     task = SequenceLabeling(
         result_path.name,
-        hidden_size=64,
-        task_train_kwargs={"max_epochs": 1, "mini_batch_size": 64},
+        hidden_size=16,
+        task_train_kwargs={"max_epochs": 1, "mini_batch_size": 16},
     )
     model = FlairModel(ipipan_embedding_local_file, task)
     evaluator = SequenceLabelingEvaluator()
@@ -164,7 +164,7 @@ def test_pos_tagging_pipeline(
     result = pipeline.run()
     path.cleanup()
 
-    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.2900763)
+    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.1450381)
 
 
 def test_ner_tagging_pipeline(
@@ -181,9 +181,7 @@ def test_ner_tagging_pipeline(
     result = pipeline.run()
     path.cleanup()
 
-    np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_f1"], 0.0171673
-    )
+    np.testing.assert_almost_equal(result["seqeval__mode_None__scheme_None"]["overall_f1"], 0.0)
 
 
 def test_pos_tagging_pipeline_local_embedding(
@@ -200,7 +198,7 @@ def test_pos_tagging_pipeline_local_embedding(
     result = pipeline.run()
     path.cleanup()
 
-    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.0766283)
+    np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.1832061)
 
 
 def test_ner_tagging_pipeline_local_embedding(
@@ -218,5 +216,5 @@ def test_ner_tagging_pipeline_local_embedding(
     path.cleanup()
 
     np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_f1"], 0.0054054
+        result["seqeval__mode_None__scheme_None"]["overall_f1"], 0.0107816
     )
