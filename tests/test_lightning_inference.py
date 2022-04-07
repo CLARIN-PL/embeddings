@@ -23,7 +23,7 @@ def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
 @pytest.fixture(scope="module")
 def pipeline_kwargs() -> Dict[str, Any]:
     return {
-        "embedding_name_or_path": "hf-internal-testing/tiny-albert",
+        "embedding_name_or_path": "allegro/herbert-base-cased",
         "finetune_last_n_layers": 0,
     }
 
