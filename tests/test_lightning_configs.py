@@ -1,6 +1,6 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
 import pytest
 import pytorch_lightning as pl
@@ -22,7 +22,7 @@ def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
 
 
 @pytest.fixture(scope="module")
-def dataset_kwargs(tmp_path_module: Path) -> Tuple[Dict[str, Any], "TemporaryDirectory[str]"]:
+def dataset_kwargs(tmp_path_module: Path) -> Dict[str, Any]:
     path = tmp_path_module
     pipeline = HuggingFacePreprocessingPipeline(
         dataset_name="clarin-pl/polemo2-official",
@@ -44,7 +44,7 @@ def dataset_kwargs(tmp_path_module: Path) -> Tuple[Dict[str, Any], "TemporaryDir
         "dataset_name_or_path": path.name,
         "input_column_name": ["text"],
         "target_column_name": "target",
-    }, path  # TemporaryDirectory object is passed additionally to omit cleanup of the temporal path
+    }
 
 
 @pytest.fixture(scope="module")
@@ -125,7 +125,7 @@ def test_lightning_config_missing_params(
         config=lightning_config_missing_parameters,
         devices="auto",
         accelerator="cpu",
-        **dataset_kwargs[0],
+        **dataset_kwargs,
     )
     with pytest.raises(TypeError):
         pipeline.run()
@@ -150,7 +150,7 @@ def test_lightning_classification_basic_config(
         config=lightning_basic_config,
         devices="auto",
         accelerator="cpu",
-        **dataset_kwargs[0],
+        **dataset_kwargs,
     )
     pipeline.run()
 
@@ -167,6 +167,6 @@ def test_lightning_classification_advanced_config(
         config=lightning_advanced_config,
         devices="auto",
         accelerator="cpu",
-        **dataset_kwargs[0],
+        **dataset_kwargs,
     )
     pipeline.run()
