@@ -126,7 +126,6 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         output_path: T_path,
         lightning_module: Type[LightningModule[AutoModel]],
         task_train_kwargs: Optional[Dict[str, Any]],
-        early_stopping_kwargs: Optional[Dict[str, Any]],
         logging_config: Optional[LightningLoggingConfig],
     ) -> "LightningTask":
         model = lightning_module.load_from_checkpoint(str(checkpoint_path))
@@ -139,7 +138,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
             "model_config_kwargs": model.hparams.config_kwargs,
             "task_model_kwargs": model.hparams.task_model_kwargs,
             "task_train_kwargs": task_train_kwargs or {},
-            "early_stopping_kwargs": early_stopping_kwargs or {},
+            "early_stopping_kwargs": {},
             "logging_config": logging_config or LightningLoggingConfig(),
         }
         task = cls(**init_kwargs)
@@ -155,7 +154,6 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         checkpoint_path: T_path,
         output_path: T_path,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
-        early_stopping_kwargs: Optional[Dict[str, Any]] = None,
         logging_config: Optional[LightningLoggingConfig] = None,
     ) -> "LightningTask":
         pass

@@ -83,14 +83,12 @@ class SequenceLabelingTask(LightningTask):
         checkpoint_path: T_path,
         output_path: T_path,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
-        early_stopping_kwargs: Optional[Dict[str, Any]] = None,
         logging_config: Optional[LightningLoggingConfig] = None,
     ) -> "LightningTask":
         return cls.restore_task_model(
             checkpoint_path=checkpoint_path,
             output_path=output_path,
             task_train_kwargs=task_train_kwargs,
-            early_stopping_kwargs=early_stopping_kwargs,
             lightning_module=SequenceLabelingModule,
             logging_config=logging_config,
         )
