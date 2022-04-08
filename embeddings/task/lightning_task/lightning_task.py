@@ -130,11 +130,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         logging_config: Optional[LightningLoggingConfig],
     ) -> "LightningTask":
         model = lightning_module.load_from_checkpoint(str(checkpoint_path))
-        trainer = pl.Trainer(
-            default_root_dir=str(output_path),
-            callbacks=[ModelCheckpoint(dirpath=Path(output_path).joinpath("checkpoints"))],
-            **task_train_kwargs or {}
-        )
+        trainer = pl.Trainer(default_root_dir=str(output_path), **task_train_kwargs or {})
         init_kwargs = {
             "model_name_or_path": model.hparams.model_name_or_path,
             "output_path": output_path,
