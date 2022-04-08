@@ -55,10 +55,8 @@ def run(
         dataset_path=str(dataset_path),
         embedding_name=embedding_name_or_path,
         output_path=str(output_path),
-        hidden_size=hidden_size,
         persist_path=str(persist_out_path),
         predict_subset="test",
-        task_train_kwargs={"max_epochs": 1},
     )
 
     result = evaluation_pipeline.run()

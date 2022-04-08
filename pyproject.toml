@@ -128,7 +128,8 @@ module = [
     "spacy.*",
     "torch.testing",
     "torch",
-    "datasets"
+    "datasets",
+    "pytorch_lightning.accelerators"
 ]
 implicit_reexport = true
 

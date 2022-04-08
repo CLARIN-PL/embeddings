@@ -8,6 +8,7 @@ import pytest
 import pytorch_lightning as pl
 from _pytest.tmpdir import TempdirFactory
 
+from embeddings.config.lightning_config import LightningAdvancedConfig
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
@@ -21,7 +22,7 @@ def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
 
 @pytest.fixture(scope="module")
 def pipeline_kwargs() -> Dict[str, Any]:
-    return {"embedding_name_or_path": "allegro/herbert-base-cased", "finetune_last_n_layers": 0}
+    return {"embedding_name_or_path": "allegro/herbert-base-cased"}
 
 
 @pytest.fixture(scope="module")
@@ -51,32 +52,42 @@ def dataset_kwargs(tmp_path_module) -> Dict[str, Any]:
 
 
 @pytest.fixture(scope="module")
-def task_train_kwargs() -> Dict[str, Any]:
-    return {
-        "max_epochs": 1,
-        "devices": "auto",
-        "accelerator": "cpu",
-        "deterministic": True,
-    }
-
-
-@pytest.fixture(scope="module")
-def task_model_kwargs() -> Dict[str, Any]:
-    return {"learning_rate": 5e-4, "use_scheduler": False}
-
-
-@pytest.fixture(scope="module")
-def datamodule_kwargs() -> Dict[str, Any]:
-    return {"num_workers": 0}
+def config() -> LightningAdvancedConfig:
+    return LightningAdvancedConfig(
+        finetune_last_n_layers=0,
+        task_train_kwargs={
+            "max_epochs": 1,
+            "deterministic": True,
+        },
+        task_model_kwargs={
+            "learning_rate": 5e-4,
+            "train_batch_size": 32,
+            "eval_batch_size": 32,
+            "use_scheduler": False,
+            "optimizer": "AdamW",
+            "adam_epsilon": 1e-8,
+            "warmup_steps": 100,
+            "weight_decay": 0.0,
+        },
+        datamodule_kwargs={
+            "max_seq_length": 64,
+        },
+        early_stopping_kwargs={
+            "monitor": "val/Loss",
+            "mode": "min",
+            "patience": 3,
+        },
+        tokenizer_kwargs={},
+        batch_encoding_kwargs={},
+        dataloader_kwargs={},
+        model_config_kwargs={},
+    )
 
 
 @pytest.fixture(scope="module")
 def lightning_classification_pipeline(
-    pipeline_kwargs: Dict[str, Any],
     dataset_kwargs: Dict[str, Any],
-    datamodule_kwargs: Dict[str, Any],
-    task_train_kwargs: Dict[str, Any],
-    task_model_kwargs: Dict[str, Any],
+    config: LightningAdvancedConfig,
     result_path: "TemporaryDirectory[str]",
 ) -> Tuple[
     LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]],
@@ -84,12 +95,12 @@ def lightning_classification_pipeline(
 ]:
     return (
         LightningClassificationPipeline(
+            embedding_name_or_path="allegro/herbert-base-cased",
             output_path=result_path.name,
-            **pipeline_kwargs,
+            config=config,
+            devices="auto",
+            accelerator="cpu",
             **dataset_kwargs,
-            datamodule_kwargs=datamodule_kwargs,
-            task_train_kwargs=task_train_kwargs,
-            task_model_kwargs=task_model_kwargs,
         ),
         result_path,
     )
@@ -105,16 +116,16 @@ def test_lightning_classification_pipeline(
     pipeline, path = lightning_classification_pipeline
     result = pipeline.run()
     np.testing.assert_almost_equal(
-        result["accuracy"]["accuracy"], 0.4864864, decimal=pytest.decimal
+        result["accuracy"]["accuracy"], 0.3783783, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        result["f1__average_macro"]["f1"], 0.2684458, decimal=pytest.decimal
+        result["f1__average_macro"]["f1"], 0.1399999, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        result["precision__average_macro"]["precision"], 0.3602941, decimal=pytest.decimal
+        result["precision__average_macro"]["precision"], 0.1, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        result["recall__average_macro"]["recall"], 0.325, decimal=pytest.decimal
+        result["recall__average_macro"]["recall"], 0.2333333, decimal=pytest.decimal
     )
 
     assert "data" in result

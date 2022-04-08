@@ -1,4 +1,5 @@
 import abc
+from inspect import signature
 from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar
 
 import numpy as np
@@ -7,7 +8,7 @@ import torch
 from numpy import typing as nptyping
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.nn.functional import softmax
-from torch.optim import AdamW, Optimizer
+from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from torchmetrics import MetricCollection
 from transformers import get_linear_schedule_with_warmup
@@ -20,14 +21,15 @@ Model = TypeVar("Model")
 class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
     def __init__(
         self,
+        optimizer: str,
+        learning_rate: float,
+        adam_epsilon: float,
+        warmup_steps: int,
+        weight_decay: float,
+        train_batch_size: int,
+        eval_batch_size: int,
+        use_scheduler: bool,
         metrics: Optional[MetricCollection] = None,
-        learning_rate: float = 1e-4,
-        adam_epsilon: float = 1e-8,
-        warmup_steps: int = 100,
-        weight_decay: float = 0.0,
-        train_batch_size: int = 32,
-        eval_batch_size: int = 32,
-        use_scheduler: bool = False,
         **kwargs: Any,
     ):
         super().__init__()
@@ -119,7 +121,11 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
                 "weight_decay": 0.0,
             },
         ]
-        optimizer = AdamW(
+
+        optimizer_cls = getattr(torch.optim, self.hparams.optimizer)
+        assert "lr" in signature(optimizer_cls).parameters
+        assert "eps" in signature(optimizer_cls).parameters
+        optimizer = optimizer_cls(
             optimizer_grouped_parameters,
             lr=self.hparams.learning_rate,
             eps=self.hparams.adam_epsilon,

@@ -1,19 +1,20 @@
-from typing import Any, Dict, Optional, Tuple, TypeVar
+from typing import Any, Dict, List, Optional, Sequence, Tuple, TypeVar, Union
 
+from pytorch_lightning.accelerators import Accelerator
 from typing_extensions import Literal, TypedDict
 
+from embeddings.config.flair_config import (
+    FlairSequenceLabelingConfig,
+    FlairTextClassificationConfig,
+)
+from embeddings.config.lightning_config import LightningConfig
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 
 
-class PathMetadata(TypedDict, total=False):
+class EmbeddingPipelineBaseMetadata(TypedDict, total=False):
     output_path: T_path
-
-
-class EmbeddingPipelineBaseMetadata(PathMetadata):
-    task_model_kwargs: Optional[Dict[str, Any]]
-    task_train_kwargs: Optional[Dict[str, Any]]
 
 
 class FlairEmbeddingPipelineMetadata(EmbeddingPipelineBaseMetadata):
@@ -25,23 +26,21 @@ class FlairEmbeddingPipelineMetadata(EmbeddingPipelineBaseMetadata):
 class FlairClassificationPipelineMetadata(FlairEmbeddingPipelineMetadata):
     input_column_name: str
     target_column_name: str
-    document_embedding_cls: str
-    load_model_kwargs: Optional[Dict[str, Any]]
+    config: FlairTextClassificationConfig
 
 
 class FlairPairClassificationPipelineMetadata(FlairEmbeddingPipelineMetadata):
     input_columns_names_pair: Tuple[str, str]
     target_column_name: str
-    document_embedding_cls: str
-    load_model_kwargs: Optional[Dict[str, Any]]
+    config: FlairTextClassificationConfig
 
 
 class FlairSequenceLabelingPipelineMetadata(FlairEmbeddingPipelineMetadata):
     input_column_name: str
     target_column_name: str
-    hidden_size: int
     evaluation_mode: str
     tagging_scheme: Optional[str]
+    config: FlairSequenceLabelingConfig
 
 
 class FlairEvaluationPipelineMetadata(EmbeddingPipelineBaseMetadata):
@@ -52,30 +51,25 @@ class FlairEvaluationPipelineMetadata(EmbeddingPipelineBaseMetadata):
 
 
 class FlairSequenceLabelingEvaluationPipelineMetadata(FlairEvaluationPipelineMetadata):
-    hidden_size: int
     evaluation_mode: str
     tagging_scheme: Optional[str]
+    config: FlairSequenceLabelingConfig
 
 
 class FlairClassificationEvaluationPipelineMetadata(FlairEvaluationPipelineMetadata):
-    document_embedding_cls: str
-    load_model_kwargs: Optional[Dict[str, Any]]
+    config: FlairTextClassificationConfig
 
 
 class LightningPipelineMetadata(EmbeddingPipelineBaseMetadata):
     embedding_name_or_path: T_path
     dataset_name_or_path: T_path
-    input_column_name: str
+    input_column_name: Union[str, Sequence[str]]
     target_column_name: str
-    train_batch_size: int
-    eval_batch_size: int
-    finetune_last_n_layers: int
+    config: LightningConfig
+    devices: Optional[Union[List[int], str, int]]
+    accelerator: Optional[Union[str, Accelerator]]
     tokenizer_name_or_path: Optional[T_path]
     load_dataset_kwargs: Optional[Dict[str, Any]]
-    datamodule_kwargs: Optional[Dict[str, Any]]
-    tokenizer_kwargs: Optional[Dict[str, Any]]
-    batch_encoding_kwargs: Optional[Dict[str, Any]]
-    model_config_kwargs: Optional[Dict[str, Any]]
     predict_subset: Literal[LightingDataModuleSubset.VALIDATION, LightingDataModuleSubset.TEST]
 
 

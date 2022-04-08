@@ -1,6 +1,6 @@
 import abc
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence
 
 import pytorch_lightning as pl
 import torch
@@ -58,6 +58,16 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
                 return callback.best_score.item()
         return None
 
+    def _get_callbacks(self, dataset_subsets: Sequence[str]) -> List[Callback]:
+        callbacks: List[Callback] = [
+            ModelCheckpoint(dirpath=self.output_path.joinpath("checkpoints"))
+        ]
+        if "validation" in dataset_subsets:
+            callbacks.append(BestEpochCallback())
+            if self.early_stopping_kwargs:
+                callbacks.append(EarlyStopping(**self.early_stopping_kwargs))
+        return callbacks
+
     def fit(
         self,
         data: HuggingFaceDataModule,
@@ -66,13 +76,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
 
-        callbacks: List[Callback] = [
-            ModelCheckpoint(dirpath=self.output_path.joinpath("checkpoints"))
-        ]
-        if "validation" in data.load_dataset().keys():
-            callbacks.append(BestEpochCallback())
-            callbacks.append(EarlyStopping(**self.early_stopping_kwargs))
-
+        callbacks = self._get_callbacks(dataset_subsets=list(data.load_dataset().keys()))
         self.trainer = pl.Trainer(
             default_root_dir=str(self.output_path),
             callbacks=callbacks,

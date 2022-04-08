@@ -1,15 +1,17 @@
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple, Type, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 import datasets
 from flair.data import Corpus
 from numpy import typing as nptyping
 
+from embeddings.config.flair_config import (
+    FlairTextClassificationBasicConfig,
+    FlairTextClassificationConfig,
+)
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import Dataset
 from embeddings.data.io import T_path
-from embeddings.embedding.auto_flair import DocumentEmbedding
-from embeddings.embedding.flair_embedding import FlairDocumentPoolEmbedding
 from embeddings.embedding.flair_loader import FlairDocumentPoolEmbeddingLoader
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
@@ -37,14 +39,11 @@ class FlairPairClassificationPipeline(
         input_columns_names_pair: Tuple[str, str],
         target_column_name: str,
         output_path: T_path,
-        evaluation_filename: str = "evaluation.json",
-        document_embedding_cls: Union[str, Type[DocumentEmbedding]] = FlairDocumentPoolEmbedding,
         model_type_reference: str = "",
+        evaluation_filename: str = "evaluation.json",
+        config: FlairTextClassificationConfig = FlairTextClassificationBasicConfig(),
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
-        task_model_kwargs: Optional[Dict[str, Any]] = None,
-        task_train_kwargs: Optional[Dict[str, Any]] = None,
-        load_model_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         output_path = Path(output_path)
@@ -63,13 +62,13 @@ class FlairPairClassificationPipeline(
 
         embedding_loader = FlairDocumentPoolEmbeddingLoader(embedding_name, model_type_reference)
         embedding = embedding_loader.get_embedding(
-            document_embedding_cls, **load_model_kwargs or {}
+            config.document_embedding_cls, **config.load_model_kwargs
         )
 
         task = TextPairClassification(
             output_path,
-            task_model_kwargs=task_model_kwargs,
-            task_train_kwargs=task_train_kwargs,
+            task_model_kwargs=config.task_model_kwargs,
+            task_train_kwargs=config.task_train_kwargs,
         )
         model = FlairModel(embedding, task)
         evaluator = TextClassificationEvaluator().persisting(
