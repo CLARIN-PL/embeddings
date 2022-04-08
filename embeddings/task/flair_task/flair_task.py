@@ -25,6 +25,7 @@ class FlairTask(Task[Corpus, Dict[str, nptyping.NDArray[Any]]]):
         self,
         output_path: T_path = RESULTS_PATH,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
+        **kwargs: Any
     ):
         super().__init__()
         self.model: Optional[flair.nn.Model] = None
@@ -117,11 +118,11 @@ class FlairTask(Task[Corpus, Dict[str, nptyping.NDArray[Any]]]):
         task_train_kwargs: Optional[Dict[str, Any]],
     ) -> "FlairTask":
         model = flair_model.load(checkpoint_path)
-        task_model_kwargs = (
+        task_kwargs = (
             {"hidden_size": model.hidden_size} if isinstance(model, SequenceTagger) else {}
         )
         task = cls(
-            output_path=output_path, task_train_kwargs=task_train_kwargs or {}, **task_model_kwargs
+            output_path=output_path, task_train_kwargs=task_train_kwargs or {}, **task_kwargs
         )
         task.model = model
         return task
