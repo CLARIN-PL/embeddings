@@ -7,6 +7,7 @@ import pytest
 import pytorch_lightning as pl
 from _pytest.tmpdir import TempdirFactory
 
+from embeddings.config.lightning_config import LightningAdvancedConfig
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
@@ -40,45 +41,51 @@ def dataset_kwargs(tmp_path_module) -> Dict[str, Any]:
 
 
 @pytest.fixture(scope="module")
-def pipeline_kwargs() -> Dict[str, Any]:
-    return {"embedding_name_or_path": "allegro/herbert-base-cased", "finetune_last_n_layers": 0}
-
-
-@pytest.fixture(scope="module")
-def task_train_kwargs() -> Dict[str, Any]:
-    return {
-        "max_epochs": 1,
-        "devices": "auto",
-        "accelerator": "cpu",
-        "deterministic": True,
-    }
-
-
-@pytest.fixture(scope="module")
-def task_model_kwargs() -> Dict[str, Any]:
-    return {"learning_rate": 5e-4, "use_scheduler": False}
-
-
-@pytest.fixture(scope="module")
-def datamodule_kwargs() -> Dict[str, Any]:
-    return {"num_workers": 0}
+def config() -> LightningAdvancedConfig:
+    return LightningAdvancedConfig(
+        finetune_last_n_layers=0,
+        task_train_kwargs={
+            "max_epochs": 1,
+            "devices": "auto",
+            "accelerator": "cpu",
+            "deterministic": True,
+        },
+        task_model_kwargs={
+            "learning_rate": 1e-4,
+            "train_batch_size": 32,
+            "eval_batch_size": 32,
+            "use_scheduler": False,
+            "optimizer": "AdamW",
+            "adam_epsilon": 1e-8,
+            "warmup_steps": 100,
+            "weight_decay": 0.0,
+        },
+        datamodule_kwargs={
+            "max_seq_length": 64,
+        },
+        early_stopping_kwargs={
+            "monitor": "val/Loss",
+            "mode": "min",
+            "patience": 3,
+        },
+        tokenizer_kwargs={},
+        batch_encoding_kwargs={},
+        dataloader_kwargs={},
+        model_config_kwargs={},
+    )
 
 
 @pytest.fixture
 def lightning_sequence_labeling_pipeline(
-    pipeline_kwargs: Dict[str, Any],
     dataset_kwargs: Dict[str, Any],
-    datamodule_kwargs: Dict[str, Any],
-    task_train_kwargs: Dict[str, Any],
+    config: LightningAdvancedConfig,
     tmp_path: Path,
 ) -> Tuple[LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]], Path]:
-    datamodule_kwargs["max_seq_length"] = 64
     return (
         LightningSequenceLabelingPipeline(
             output_path=tmp_path,
-            datamodule_kwargs=datamodule_kwargs,
-            task_train_kwargs=task_train_kwargs,
-            **pipeline_kwargs,
+            embedding_name_or_path="allegro/herbert-base-cased",
+            config=config,
             **dataset_kwargs,
         ),
         tmp_path,

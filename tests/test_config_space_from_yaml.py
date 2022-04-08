@@ -6,14 +6,12 @@ import pytest
 import yaml
 from _pytest.tmpdir import TempdirFactory
 
-from embeddings.hyperparameter_search.configspace import BaseConfigSpace
-from embeddings.hyperparameter_search.flair_configspace import (
+from embeddings.config.config_space import BaseConfigSpace
+from embeddings.config.flair_config_space import (
     FlairModelTrainerConfigSpace,
     FlairSequenceLabelingConfigSpace,
 )
-from embeddings.hyperparameter_search.lighting_configspace import (
-    LightingTextClassificationConfigSpace,
-)
+from embeddings.config.lighting_config_space import LightingTextClassificationConfigSpace
 
 
 @pytest.fixture(scope="module")

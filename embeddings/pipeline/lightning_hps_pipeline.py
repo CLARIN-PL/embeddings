@@ -2,11 +2,19 @@ from abc import ABC
 from dataclasses import dataclass, field
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Generic, Optional, Tuple
+from typing import Any, Dict, Generic, List, Optional, Tuple, Union
 
 import datasets
 from numpy import typing as nptyping
+from pytorch_lightning.accelerators import Accelerator
 
+from embeddings.config.config_space import ConfigSpace, SampledParameters
+from embeddings.config.lighting_config_space import (
+    LightingSequenceLabelingConfigSpace,
+    LightingTextClassificationConfigSpace,
+)
+from embeddings.config.lightning_config import LightningAdvancedConfig
+from embeddings.config.parameters import ParameterValues
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.evaluator.sequence_labeling_evaluator import (
@@ -14,12 +22,6 @@ from embeddings.evaluator.sequence_labeling_evaluator import (
     SequenceLabelingEvaluator,
     TaggingScheme,
 )
-from embeddings.hyperparameter_search.configspace import ConfigSpace, SampledParameters
-from embeddings.hyperparameter_search.lighting_configspace import (
-    LightingSequenceLabelingConfigSpace,
-    LightingTextClassificationConfigSpace,
-)
-from embeddings.hyperparameter_search.parameters import ParameterValues
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.hps_pipeline import (
     AbstractHuggingFaceOptimizedPipeline,
@@ -54,8 +56,8 @@ class _OptimizedLightingPipelineBase(
         init=False, default_factory=TemporaryDirectory
     )
     tokenizer_name_or_path: Optional[T_path] = None
-    tokenizer_kwargs: Optional[Dict[str, Any]] = None
-    batch_encoding_kwargs: Optional[Dict[str, Any]] = None
+    tokenizer_kwargs: Dict[str, Any] = field(default_factory=dict)
+    batch_encoding_kwargs: Dict[str, Any] = field(default_factory=dict)
     logging_config: LightningLoggingConfig = field(default_factory=LightningLoggingConfig)
 
 
@@ -126,8 +128,8 @@ class OptimizedLightingPipeline(
     ) -> Tuple[
         str,
         int,
-        int,
-        int,
+        Optional[Union[List[int], str, int]],
+        Optional[Union[str, Accelerator]],
         Dict[str, ParameterValues],
         Dict[str, ParameterValues],
         Dict[str, ParameterValues],
@@ -135,12 +137,12 @@ class OptimizedLightingPipeline(
     ]:
         embedding_name_or_path = parameters["embedding_name_or_path"]
         assert isinstance(embedding_name_or_path, str)
-        train_batch_size = parameters["train_batch_size"]
-        assert isinstance(train_batch_size, int)
-        eval_batch_size = parameters["eval_batch_size"]
-        assert isinstance(eval_batch_size, int)
         finetune_last_n_layers = parameters["finetune_last_n_layers"]
         assert isinstance(finetune_last_n_layers, int)
+        devices = parameters["devices"]
+        assert isinstance(devices, (list, str, int)) or devices is None
+        accelerator = parameters["accelerator"]
+        assert isinstance(accelerator, (str, Accelerator)) or accelerator is None
         datamodule_kwargs = parameters["datamodule_kwargs"]
         assert isinstance(datamodule_kwargs, dict)
         task_model_kwargs = parameters["task_model_kwargs"]
@@ -152,9 +154,9 @@ class OptimizedLightingPipeline(
 
         return (
             embedding_name_or_path,
-            train_batch_size,
-            eval_batch_size,
             finetune_last_n_layers,
+            devices,
+            accelerator,
             datamodule_kwargs,
             task_model_kwargs,
             task_train_kwargs,
@@ -199,9 +201,9 @@ class OptimizedLightingClassificationPipeline(
     ) -> LightningClassificationPipelineMetadata:
         (
             embedding_name_or_path,
-            train_batch_size,
-            eval_batch_size,
             finetune_last_n_layers,
+            devices,
+            accelerator,
             datamodule_kwargs,
             task_model_kwargs,
             task_train_kwargs,
@@ -215,18 +217,22 @@ class OptimizedLightingClassificationPipeline(
             "dataset_name_or_path": self.dataset_name_or_path,
             "input_column_name": self.input_column_name,
             "target_column_name": self.target_column_name,
-            "train_batch_size": train_batch_size,
-            "eval_batch_size": eval_batch_size,
-            "finetune_last_n_layers": finetune_last_n_layers,
+            "devices": devices,
+            "accelerator": accelerator,
             "tokenizer_name_or_path": tokenizer_name_or_path,
-            "datamodule_kwargs": datamodule_kwargs,
-            "tokenizer_kwargs": self.tokenizer_kwargs,
-            "batch_encoding_kwargs": self.batch_encoding_kwargs,
             "load_dataset_kwargs": self.load_dataset_kwargs,
-            "task_model_kwargs": task_model_kwargs,
-            "task_train_kwargs": task_train_kwargs,
-            "model_config_kwargs": model_config_kwargs,
             "predict_subset": LightingDataModuleSubset.TEST,
+            "config": LightningAdvancedConfig(
+                finetune_last_n_layers=finetune_last_n_layers,
+                datamodule_kwargs=datamodule_kwargs,
+                task_model_kwargs=task_model_kwargs,
+                task_train_kwargs=task_train_kwargs,
+                model_config_kwargs=model_config_kwargs,
+                tokenizer_kwargs=self.tokenizer_kwargs,
+                batch_encoding_kwargs=self.batch_encoding_kwargs,
+                early_stopping_kwargs={},
+                dataloader_kwargs={},
+            ),
         }
         return metadata
 
@@ -264,9 +270,9 @@ class OptimizedLightingSequenceLabelingPipeline(
     ) -> LightningSequenceLabelingPipelineMetadata:
         (
             embedding_name_or_path,
-            train_batch_size,
-            eval_batch_size,
             finetune_last_n_layers,
+            devices,
+            accelerator,
             datamodule_kwargs,
             task_model_kwargs,
             task_train_kwargs,
@@ -282,17 +288,21 @@ class OptimizedLightingSequenceLabelingPipeline(
             "target_column_name": self.target_column_name,
             "evaluation_mode": self.evaluation_mode,
             "tagging_scheme": self.tagging_scheme,
-            "train_batch_size": train_batch_size,
-            "eval_batch_size": eval_batch_size,
-            "finetune_last_n_layers": finetune_last_n_layers,
+            "devices": devices,
+            "accelerator": accelerator,
             "tokenizer_name_or_path": tokenizer_name_or_path,
-            "datamodule_kwargs": datamodule_kwargs,
-            "tokenizer_kwargs": self.tokenizer_kwargs,
-            "batch_encoding_kwargs": self.batch_encoding_kwargs,
             "load_dataset_kwargs": self.load_dataset_kwargs,
-            "task_model_kwargs": task_model_kwargs,
-            "task_train_kwargs": task_train_kwargs,
-            "model_config_kwargs": model_config_kwargs,
             "predict_subset": LightingDataModuleSubset.TEST,
+            "config": LightningAdvancedConfig(
+                finetune_last_n_layers=finetune_last_n_layers,
+                datamodule_kwargs=datamodule_kwargs,
+                task_model_kwargs=task_model_kwargs,
+                task_train_kwargs=task_train_kwargs,
+                model_config_kwargs=model_config_kwargs,
+                tokenizer_kwargs=self.tokenizer_kwargs,
+                batch_encoding_kwargs=self.batch_encoding_kwargs,
+                early_stopping_kwargs={},
+                dataloader_kwargs={},
+            ),
         }
         return metadata

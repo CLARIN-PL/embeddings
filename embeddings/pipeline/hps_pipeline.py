@@ -10,9 +10,9 @@ import optuna
 import pandas as pd
 from optuna import Study
 
+from embeddings.config.config_space import ConfigSpace, SampledParameters
 from embeddings.data.dataset import Data
 from embeddings.data.io import T_path
-from embeddings.hyperparameter_search.configspace import ConfigSpace, SampledParameters
 from embeddings.pipeline.evaluation_pipeline import ModelEvaluationPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.pipeline.pipelines_metadata import EvaluationMetadata, Metadata

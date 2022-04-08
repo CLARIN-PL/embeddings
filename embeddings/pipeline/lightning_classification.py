@@ -1,9 +1,11 @@
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence, Union
+from typing import Any, Dict, List, Optional, Sequence, Union
 
 import datasets
 from numpy import typing as nptyping
+from pytorch_lightning.accelerators import Accelerator
 
+from embeddings.config.lightning_config import LightningBasicConfig, LightningConfig
 from embeddings.data.datamodule import TextClassificationDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
@@ -13,7 +15,6 @@ from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task.text_classification import TextClassificationTask
 from embeddings.utils.json_dict_persister import JsonPersister
 from embeddings.utils.loggers import LightningLoggingConfig
-from embeddings.utils.utils import initialize_kwargs
 
 
 class LightningClassificationPipeline(
@@ -27,44 +28,16 @@ class LightningClassificationPipeline(
         target_column_name: str,
         output_path: T_path,
         evaluation_filename: str = "evaluation.json",
-        train_batch_size: int = 32,
-        eval_batch_size: int = 32,
-        finetune_last_n_layers: int = -1,
-        tokenizer_name_or_path: Optional[T_path] = None,
-        tokenizer_kwargs: Optional[Dict[str, Any]] = None,
-        datamodule_kwargs: Optional[Dict[str, Any]] = None,
-        batch_encoding_kwargs: Optional[Dict[str, Any]] = None,
-        load_dataset_kwargs: Optional[Dict[str, Any]] = None,
-        task_model_kwargs: Optional[Dict[str, Any]] = None,
-        task_train_kwargs: Optional[Dict[str, Any]] = None,
-        model_config_kwargs: Optional[Dict[str, Any]] = None,
-        early_stopping_kwargs: Optional[Dict[str, Any]] = None,
+        config: LightningConfig = LightningBasicConfig(),
+        devices: Optional[Union[List[int], str, int]] = "auto",
+        accelerator: Optional[Union[str, Accelerator]] = "auto",
         logging_config: LightningLoggingConfig = LightningLoggingConfig(),
+        tokenizer_name_or_path: Optional[T_path] = None,
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
+        load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        self.datamodule_kwargs = initialize_kwargs(
-            self.DEFAULT_DATAMODULE_KWARGS, datamodule_kwargs
-        )
-        self.task_train_kwargs = initialize_kwargs(
-            self.DEFAULT_TASK_TRAIN_KWARGS, task_train_kwargs
-        )
-        self.model_config_kwargs = initialize_kwargs(
-            self.DEFAULT_MODEL_CONFIG_KWARGS, model_config_kwargs
-        )
-        self.task_model_kwargs = task_model_kwargs = initialize_kwargs(
-            self.DEFAULT_TASK_MODEL_KWARGS, task_model_kwargs
-        )
-        self.task_model_kwargs.update(
-            {"train_batch_size": train_batch_size, "eval_batch_size": eval_batch_size}
-        )
-        self.early_stopping_kwargs = initialize_kwargs(
-            self.DEFAULT_EARLY_STOPPING_KWARGS, early_stopping_kwargs
-        )
-        self._logging_config = logging_config
-        tokenizer_name_or_path = (
-            tokenizer_name_or_path if tokenizer_name_or_path else embedding_name_or_path
-        )
-
+        config.task_train_kwargs.update({"devices": devices, "accelerator": accelerator})
+        tokenizer_name_or_path = tokenizer_name_or_path or embedding_name_or_path
         output_path = Path(output_path)
         self.evaluation_filename = evaluation_filename
 
@@ -73,21 +46,22 @@ class LightningClassificationPipeline(
             dataset_name_or_path=dataset_name_or_path,
             text_fields=input_column_name,
             target_field=target_column_name,
-            train_batch_size=train_batch_size,
-            eval_batch_size=eval_batch_size,
-            tokenizer_kwargs=tokenizer_kwargs,
-            batch_encoding_kwargs=batch_encoding_kwargs,
+            train_batch_size=config.task_model_kwargs["train_batch_size"],
+            eval_batch_size=config.task_model_kwargs["eval_batch_size"],
+            tokenizer_kwargs=config.tokenizer_kwargs,
+            batch_encoding_kwargs=config.batch_encoding_kwargs,
             load_dataset_kwargs=load_dataset_kwargs,
-            **self.datamodule_kwargs,
+            dataloader_kwargs=config.dataloader_kwargs,
+            **config.datamodule_kwargs
         )
         task = TextClassificationTask(
             model_name_or_path=embedding_name_or_path,
             output_path=output_path,
-            finetune_last_n_layers=finetune_last_n_layers,
-            model_config_kwargs=self.model_config_kwargs,
-            task_model_kwargs=self.task_model_kwargs,
-            task_train_kwargs=self.task_train_kwargs,
-            early_stopping_kwargs=self.early_stopping_kwargs,
+            finetune_last_n_layers=config.finetune_last_n_layers,
+            model_config_kwargs=config.model_config_kwargs,
+            task_model_kwargs=config.task_model_kwargs,
+            task_train_kwargs=config.task_train_kwargs,
+            early_stopping_kwargs=config.early_stopping_kwargs,
             logging_config=logging_config,
         )
         model = LightningModel(task=task, predict_subset=predict_subset)

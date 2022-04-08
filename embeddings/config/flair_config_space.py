@@ -1,23 +1,59 @@
 from abc import ABC
 from copy import deepcopy
 from dataclasses import InitVar, dataclass, field
-from typing import Any, Dict, List, Set, Tuple, Union
+from types import MappingProxyType
+from typing import Any, ClassVar, Dict, List, Mapping, Set, Tuple, Union
 
 import optuna
 from typing_extensions import Final
 
+from embeddings.config.config_space import BaseConfigSpace, Parameter, SampledParameters
+from embeddings.config.flair_config import FlairSequenceLabelingBasicConfig
+from embeddings.config.parameters import ConstantParameter, ParameterValues, SearchableParameter
 from embeddings.data.io import T_path
-from embeddings.hyperparameter_search.configspace import (
-    BaseConfigSpace,
-    Parameter,
-    SampledParameters,
-)
-from embeddings.hyperparameter_search.parameters import (
-    ConstantParameter,
-    ParameterValues,
-    SearchableParameter,
-)
 from embeddings.utils.utils import read_yaml
+
+
+@dataclass
+class FlairTextClassificationConfigSpaceMapping:
+    LOAD_MODEL_KEYS_MAPPING: ClassVar[Mapping[str, Set[str]]] = MappingProxyType(
+        {
+            "FlairDocumentCNNEmbeddings": {
+                "hidden_size",
+                "rnn_type",
+                "rnn_layers",
+                "bidirectional",
+                "dropout",
+                "word_dropout",
+                "reproject_words",
+            },
+            "FlairDocumentRNNEmbeddings": {
+                "cnn_pool_kernels",
+                "dropout",
+                "word_dropout",
+                "reproject_words",
+            },
+            "FlairTransformerDocumentEmbedding": {"dynamic_pooling", "dynamic_fine_tune"},
+            "FlairDocumentPoolEmbedding": {"static_pooling", "static_fine_tune_mode"},
+        }
+    )
+    LOAD_MODEL_KEYS: ClassVar[Set[str]] = {
+        "cnn_pool_kernels",
+        "fine_tune_mode",
+        "reproject_words",
+        "pooling",
+        "rnn_type",
+        "dropout",
+        "bidirectional",
+        "fine_tune",
+        "word_dropout",
+        "rnn_layers",
+        "hidden_size",
+    }
+
+    @classmethod
+    def map_load_model_keys(cls, document_embedding_cls: str) -> Set[str]:
+        return cls.LOAD_MODEL_KEYS_MAPPING[document_embedding_cls]
 
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
@@ -150,16 +186,7 @@ class FlairSequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
         assert isinstance(embedding_name, str)
         hidden_size = parameters.pop("hidden_size")
         assert isinstance(hidden_size, int)
-        task_model_keys: Final = {
-            "use_rnn",
-            "dropout",
-            "word_dropout",
-            "locked_dropout",
-            "reproject_embeddings",
-            "use_crf",
-            "rnn_layers",
-            "rnn_type",
-        }
+        task_model_keys = FlairSequenceLabelingBasicConfig.get_task_model_keys()
         task_model_kwargs = cls._pop_parameters(
             parameters=parameters, parameters_keys=task_model_keys
         )
@@ -188,7 +215,9 @@ class FlairSequenceLabelingConfigSpace(AbstractFlairModelTrainerConfigSpace):
 
 
 @dataclass
-class FlairTextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
+class FlairTextClassificationConfigSpace(
+    AbstractFlairModelTrainerConfigSpace, FlairTextClassificationConfigSpaceMapping
+):
     dynamic_document_embedding: Parameter = SearchableParameter(
         name="document_embedding",
         type="categorical",
@@ -259,14 +288,6 @@ class FlairTextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
     def _map_task_specific_parameters(
         self, trial: optuna.trial.Trial
     ) -> Tuple[Dict[str, ParameterValues], Set[str]]:
-        shared_params = ("dropout", "word_dropout", "reproject_words")
-        param_names_mapping: Final = {
-            "FlairDocumentCNNEmbeddings": ("cnn_pool_kernels",) + shared_params,
-            "FlairDocumentRNNEmbeddings": ("hidden_size", "rnn_type", "rnn_layers", "bidirectional")
-            + shared_params,
-            "FlairTransformerDocumentEmbedding": ("dynamic_pooling", "dynamic_fine_tune"),
-            "FlairDocumentPoolEmbedding": ("static_pooling", "static_fine_tune_mode"),
-        }
         parameters = {}
 
         embedding_name, embedding_name_val = self._parse_parameter(
@@ -284,8 +305,7 @@ class FlairTextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
             raise TypeError("Variable document_embedding_val must be a str!")
 
         parameters[document_embedding_name] = document_embedding_val
-        parameter_names = param_names_mapping[document_embedding_val]
-
+        parameter_names = self.map_load_model_keys(document_embedding_val)
         parameters.update(self._map_parameters(parameters_names=list(parameter_names), trial=trial))
 
         mapped_parameters: Final[Set[str]] = {
@@ -302,21 +322,8 @@ class FlairTextClassificationConfigSpace(AbstractFlairModelTrainerConfigSpace):
         document_embedding = parameters.pop("document_embedding")
         assert isinstance(document_embedding, str)
 
-        load_model_keys: Final = {
-            "pooling",
-            "fine_tune_mode",
-            "fine_tune",
-            "kernels",
-            "hidden_size",
-            "rnn_type",
-            "rnn_layers",
-            "bidirectional",
-            "dropout",
-            "word_dropout",
-            "reproject_words",
-        }
         load_model_kwargs = cls._pop_parameters(
-            parameters=parameters, parameters_keys=load_model_keys
+            parameters=parameters, parameters_keys=cls.LOAD_MODEL_KEYS
         )
 
         (
