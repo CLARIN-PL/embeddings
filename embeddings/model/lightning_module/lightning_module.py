@@ -90,7 +90,7 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
                 return_predictions=True,
             )
 
-    def configure_metrics(self) -> None:
+    def _init_metrics(self) -> None:
         if self.metrics is None:
             self.metrics = self.get_default_metrics()
         self.train_metrics = self.metrics.clone(prefix="train/")
@@ -142,13 +142,13 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         )
 
         if self.hparams.use_scheduler:
-            lr_schedulers = self.configure_schedulers(optimizer=optimizer)
+            lr_schedulers = self._get_schedulers(optimizer=optimizer)
         else:
             lr_schedulers = []
 
         return [optimizer], lr_schedulers
 
-    def configure_schedulers(self, optimizer: Optimizer) -> List[Dict[str, Any]]:
+    def _get_schedulers(self, optimizer: Optimizer) -> List[Dict[str, Any]]:
         scheduler = get_linear_schedule_with_warmup(
             optimizer,
             num_warmup_steps=self.hparams.warmup_steps,

@@ -25,8 +25,8 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
         self.save_hyperparameters({"downstream_model_type": downstream_model_type.__name__})
         self.downstream_model_type = downstream_model_type
         self.config_kwargs = config_kwargs if config_kwargs else {}
-        self.configure_model()
-        self.configure_metrics()
+        self._init_model()
+        self._init_metrics()
 
     def setup(self, stage: Optional[str] = None) -> None:
         if stage in ("fit", None):
@@ -40,7 +40,7 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
                     (len(train_loader.dataset) / ab_size) * float(self.trainer.max_epochs)
                 )
 
-    def configure_model(self) -> None:
+    def _init_model(self) -> None:
         self.config = AutoConfig.from_pretrained(
             self.hparams.model_name_or_path,
             num_labels=self.hparams.num_classes,
