@@ -85,7 +85,9 @@ def sequence_labeling_pipeline(
         hidden_size=256,
         task_train_kwargs={"max_epochs": 1, "mini_batch_size": 64},
     )
-    embedding_loader = FlairWordEmbeddingLoader("allegro/herbert-base-cased", "model_type_reference")
+    embedding_loader = FlairWordEmbeddingLoader(
+        "allegro/herbert-base-cased", "model_type_reference"
+    )
     embedding = embedding_loader.get_embedding()
     model = FlairModel(embedding, task)
     evaluator = SequenceLabelingEvaluator()
