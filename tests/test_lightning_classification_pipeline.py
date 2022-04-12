@@ -6,12 +6,14 @@ import datasets
 import numpy as np
 import pytest
 import pytorch_lightning as pl
+import torch
 from _pytest.tmpdir import TempdirFactory
 
 from embeddings.config.lightning_config import LightningAdvancedConfig
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
+from embeddings.task.lightning_task.text_classification import TextClassificationTask
 
 
 @pytest.fixture(scope="module")
@@ -30,7 +32,7 @@ def dataset_kwargs(tmp_path_module: Path) -> Dict[str, Any]:
             "test_domains": ["hotels", "medicine"],
             "text_cfg": "text",
         },
-        persist_path=tmp_path_module.name,
+        persist_path=str(tmp_path_module),
         sample_missing_splits=None,
         ignore_test_subset=False,
         downsample_splits=(0.01, 0.01, 0.05),
@@ -39,7 +41,7 @@ def dataset_kwargs(tmp_path_module: Path) -> Dict[str, Any]:
     pipeline.run()
 
     return {
-        "dataset_name_or_path": tmp_path_module.name,
+        "dataset_name_or_path": tmp_path_module,
         "input_column_name": ["text"],
         "target_column_name": "target",
     }
@@ -86,7 +88,7 @@ def lightning_classification_pipeline(
 ) -> LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]]:
     return LightningClassificationPipeline(
         embedding_name_or_path="allegro/herbert-base-cased",
-        output_path=tmp_path_module.name,
+        output_path=tmp_path_module,
         config=config,
         devices="auto",
         accelerator="cpu",
@@ -97,11 +99,19 @@ def lightning_classification_pipeline(
 def test_lightning_classification_pipeline(
     lightning_classification_pipeline: LightningPipeline[
         datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]
-    ]
+    ],
+    tmp_path_module: Path,
 ) -> None:
     pl.seed_everything(441, workers=True)
     pipeline = lightning_classification_pipeline
     result = pipeline.run()
+
+    assert_result_values(result)
+    assert_result_types(result)
+    assert_inference_from_checkpoint(result, pipeline, tmp_path_module)
+
+
+def assert_result_values(result: Dict[str, Any]) -> None:
     np.testing.assert_almost_equal(
         result["accuracy"]["accuracy"], 0.3783783, decimal=pytest.decimal
     )
@@ -115,6 +125,8 @@ def test_lightning_classification_pipeline(
         result["recall__average_macro"]["recall"], 0.2333333, decimal=pytest.decimal
     )
 
+
+def assert_result_types(result: Dict[str, Any]) -> None:
     assert "data" in result
     assert "y_pred" in result["data"]
     assert "y_true" in result["data"]
@@ -128,3 +140,24 @@ def test_lightning_classification_pipeline(
     assert result["data"]["y_true"].dtype == np.int64
     assert result["data"]["y_probabilities"].dtype == np.float32
     assert isinstance(result["data"]["names"][0], str)
+
+
+def assert_inference_from_checkpoint(
+    result: Dict[str, Any],
+    pipeline: LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]],
+    tmp_path_module: Path,
+) -> None:
+    ckpt_path = tmp_path_module / "checkpoints" / "last.ckpt"
+    task_from_ckpt = TextClassificationTask.from_checkpoint(
+        checkpoint_path=ckpt_path.resolve(),
+        output_path=tmp_path_module,
+    )
+
+    model_state_dict = pipeline.model.task.model.model.state_dict()
+    model_from_ckpt_state_dict = task_from_ckpt.model.model.state_dict()
+    assert model_state_dict.keys() == model_from_ckpt_state_dict.keys()
+    for k in model_state_dict.keys():
+        assert torch.equal(model_state_dict[k], model_from_ckpt_state_dict[k])
+
+    predictions = task_from_ckpt.predict(pipeline.datamodule.test_dataloader())
+    assert np.array_equal(result["data"]["y_probabilities"], predictions["y_probabilities"])
