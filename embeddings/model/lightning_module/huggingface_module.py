@@ -1,7 +1,7 @@
 import abc
 import sys
 from collections import ChainMap
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, List, Optional, Type
 
 from torchmetrics import F1, Accuracy, MetricCollection, Precision, Recall
 from transformers import AutoConfig, AutoModel
@@ -25,13 +25,15 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
         self.save_hyperparameters({"downstream_model_type": downstream_model_type.__name__})
         self.downstream_model_type = downstream_model_type
         self.config_kwargs = config_kwargs if config_kwargs else {}
+        self.target_names: Optional[List[str]] = None
         self._init_model()
         self._init_metrics()
 
     def setup(self, stage: Optional[str] = None) -> None:
         if stage in ("fit", None):
+            assert self.trainer is not None
+            self.target_names = self.trainer.datamodule.target_names
             if self.hparams.use_scheduler:
-                assert self.trainer is not None
                 train_loader = self.trainer.datamodule.train_dataloader()
                 gpus = getattr(self.trainer, "gpus") if getattr(self.trainer, "gpus") else 0
                 tb_size = self.hparams.train_batch_size * max(1, gpus)
@@ -98,3 +100,10 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
         if isinstance(inputs, tuple):
             inputs = dict(ChainMap(*inputs))
         return self.model(**inputs)
+
+    def on_save_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
+        assert self.trainer is not None
+        checkpoint["target_names"] = self.trainer.datamodule.target_names
+
+    def on_load_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
+        self.target_names = checkpoint["target_names"]

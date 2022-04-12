@@ -75,9 +75,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
         self.dataloader_kwargs = dataloader_kwargs if dataloader_kwargs else {}
         self.seed = seed
-
         self.setup()
-
         super().__init__(
             dataset_info=self.dataset["train"].info,
             dataset_version=self.dataset["train"].info.version.version_str,

@@ -61,20 +61,15 @@ class SequenceLabelingTask(LightningTask):
             "y_probabilities": np.array(probabilities, dtype=object),
         }
         if return_names:
-            assert self.trainer is not None
-            assert hasattr(self.trainer, "datamodule")
-            results["names"] = np.array(getattr(self.trainer, "datamodule").target_names)
+            results["names"] = np.array(self.model.target_names)
         return results
 
     def _map_filter_data(
         self, data: nptyping.NDArray[Any], ground_truth_data: nptyping.NDArray[Any]
     ) -> List[str]:
         assert self.model is not None
-        assert self.trainer is not None
-        assert hasattr(self.trainer, "datamodule")
         return [
-            getattr(self.trainer, "datamodule").id2str(x.item())
-            for x in data[ground_truth_data != self.model.ignore_index]
+            self.model.int2str(x.item()) for x in data[ground_truth_data != self.model.ignore_index]
         ]
 
     @classmethod

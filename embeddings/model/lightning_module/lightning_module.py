@@ -15,8 +15,11 @@ from torchmetrics import MetricCollection
 from transformers import get_linear_schedule_with_warmup
 
 from embeddings.data.datamodule import HuggingFaceDataset
+from embeddings.utils.loggers import get_logger
 
 Model = TypeVar("Model")
+
+_logger = get_logger(__name__)
 
 
 class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
@@ -84,6 +87,9 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
                 model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="best"
             )
         except MisconfigurationException:  # model loaded but not fitted
+            _logger.warning(
+                "The best model checkpoint cannot be loaded because trainer.fit has not been called. Using current weights for prediction."
+            )
             return self.trainer.predict(
                 model=self,
                 dataloaders=dataloader,

@@ -62,7 +62,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
 
     def _get_callbacks(self, dataset_subsets: Sequence[str]) -> List[Callback]:
         callbacks: List[Callback] = [
-            ModelCheckpoint(dirpath=self.output_path.joinpath("checkpoints"))
+            ModelCheckpoint(dirpath=self.output_path.joinpath("checkpoints"), save_last=True)
         ]
         if "validation" in dataset_subsets:
             callbacks.append(BestEpochCallback())
