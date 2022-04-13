@@ -6,6 +6,7 @@ import numpy as np
 import pytorch_lightning as pl
 import torch
 from numpy import typing as nptyping
+from pytorch_lightning.utilities.exceptions import MisconfigurationException
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.nn.functional import softmax
 from torch.optim import Optimizer
@@ -14,8 +15,11 @@ from torchmetrics import MetricCollection
 from transformers import get_linear_schedule_with_warmup
 
 from embeddings.data.datamodule import HuggingFaceDataset
+from embeddings.utils.loggers import get_logger
 
 Model = TypeVar("Model")
+
+_logger = get_logger(__name__)
 
 
 class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
@@ -68,11 +72,7 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
     def predict(
         self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Dict[str, nptyping.NDArray[Any]]:
-        assert self.trainer is not None
-        logits_predictions = self.trainer.predict(
-            dataloaders=dataloader, return_predictions=True, ckpt_path="best"
-        )
-        logits, predictions = zip(*logits_predictions)
+        logits, predictions = zip(*self._predict_with_trainer(dataloader))
         probabilities = softmax(torch.cat(logits), dim=1).numpy()
         predictions = torch.cat(predictions).numpy()
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
@@ -80,7 +80,23 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         assert all(isinstance(x, np.ndarray) for x in result.values())
         return result
 
-    def configure_metrics(self) -> None:
+    def _predict_with_trainer(self, dataloader: DataLoader[HuggingFaceDataset]) -> torch.Tensor:
+        assert self.trainer is not None
+        try:
+            return self.trainer.predict(
+                model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="best"
+            )
+        except MisconfigurationException:  # model loaded but not fitted
+            _logger.warning(
+                "The best model checkpoint cannot be loaded because trainer.fit has not been called. Using current weights for prediction."
+            )
+            return self.trainer.predict(
+                model=self,
+                dataloaders=dataloader,
+                return_predictions=True,
+            )
+
+    def _init_metrics(self) -> None:
         if self.metrics is None:
             self.metrics = self.get_default_metrics()
         self.train_metrics = self.metrics.clone(prefix="train/")
@@ -132,13 +148,13 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         )
 
         if self.hparams.use_scheduler:
-            lr_schedulers = self.configure_schedulers(optimizer=optimizer)
+            lr_schedulers = self._get_schedulers(optimizer=optimizer)
         else:
             lr_schedulers = []
 
         return [optimizer], lr_schedulers
 
-    def configure_schedulers(self, optimizer: Optimizer) -> List[Dict[str, Any]]:
+    def _get_schedulers(self, optimizer: Optimizer) -> List[Dict[str, Any]]:
         scheduler = get_linear_schedule_with_warmup(
             optimizer,
             num_warmup_steps=self.hparams.warmup_steps,

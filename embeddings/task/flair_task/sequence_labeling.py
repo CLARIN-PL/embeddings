@@ -64,3 +64,17 @@ class SequenceLabeling(FlairTask):
         for sent in data:
             for token in sent:
                 token.remove_labels(y_type)
+
+    @classmethod
+    def from_checkpoint(
+        cls,
+        checkpoint_path: T_path,
+        output_path: T_path,
+        task_train_kwargs: Optional[Dict[str, Any]] = None,
+    ) -> "FlairTask":
+        return cls.restore_task_model(
+            checkpoint_path=checkpoint_path,
+            output_path=output_path,
+            flair_model=SequenceTagger,
+            task_train_kwargs=task_train_kwargs,
+        )

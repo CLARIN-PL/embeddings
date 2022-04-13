@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional, Tuple
 
 import torch
+from datasets import ClassLabel
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torchmetrics import MetricCollection
 from transformers import AutoModelForTokenClassification
@@ -18,6 +19,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
     def __init__(
         self,
         model_name_or_path: T_path,
+        num_classes: int,
         finetune_last_n_layers: int,
         metrics: Optional[MetricCollection] = None,
         ignore_index: int = -100,
@@ -27,12 +29,21 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         super().__init__(
             model_name_or_path=model_name_or_path,
             downstream_model_type=self.downstream_model_type,
+            num_classes=num_classes,
             finetune_last_n_layers=finetune_last_n_layers,
             metrics=metrics,
             config_kwargs=config_kwargs,
             task_model_kwargs=task_model_kwargs,
         )
         self.ignore_index = ignore_index
+        self.class_label: Optional[ClassLabel] = None
+
+    def setup(self, stage: Optional[str] = None) -> None:
+        if stage in ("fit", None):
+            assert self.trainer is not None
+            self.class_label = self.trainer.datamodule.dataset["train"].features["labels"].feature
+            assert isinstance(self.class_label, ClassLabel)
+        super().setup(stage=stage)
 
     def shared_step(self, **batch: Any) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         outputs = self.forward(**batch)
@@ -73,3 +84,11 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         else:
             _logger.warning("Missing labels for the test data")
         return None
+
+    def on_save_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
+        checkpoint["class_label"] = self.class_label
+        super().on_save_checkpoint(checkpoint=checkpoint)
+
+    def on_load_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
+        self.class_label = checkpoint["class_label"]
+        super().on_load_checkpoint(checkpoint=checkpoint)

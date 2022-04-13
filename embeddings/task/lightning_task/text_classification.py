@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import numpy as np
 from numpy import typing as nptyping
@@ -15,6 +15,7 @@ class TextClassificationTask(LightningTask):
         self,
         model_name_or_path: T_path,
         output_path: T_path,
+        num_classes: int,
         model_config_kwargs: Dict[str, Any],
         task_model_kwargs: Dict[str, Any],
         task_train_kwargs: Dict[str, Any],
@@ -24,22 +25,41 @@ class TextClassificationTask(LightningTask):
     ) -> None:
         super().__init__(output_path, task_train_kwargs, early_stopping_kwargs, logging_config)
         self.model_name_or_path = model_name_or_path
+        self.num_classes = num_classes
         self.model_config_kwargs = model_config_kwargs
         self.task_model_kwargs = task_model_kwargs
         self.finetune_last_n_layers = finetune_last_n_layers
+        self.task_train_kwargs = task_train_kwargs
 
     def build_task_model(self) -> None:
         self.model = TextClassificationModule(
             model_name_or_path=self.model_name_or_path,
+            num_classes=self.num_classes,
             finetune_last_n_layers=self.finetune_last_n_layers,
             config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
         )
 
-    def predict(self, dataloader: DataLoader[Any]) -> Dict[str, nptyping.NDArray[Any]]:
+    def predict(
+        self, dataloader: DataLoader[Any], return_names: bool = True
+    ) -> Dict[str, nptyping.NDArray[Any]]:
         assert self.model is not None
         results = self.model.predict(dataloader=dataloader)
-        assert self.trainer is not None
-        assert hasattr(self.trainer, "datamodule")
-        results["names"] = np.array(getattr(self.trainer, "datamodule").target_names)
+        results["names"] = np.array(self.model.target_names)
         return results
+
+    @classmethod
+    def from_checkpoint(
+        cls,
+        checkpoint_path: T_path,
+        output_path: T_path,
+        task_train_kwargs: Optional[Dict[str, Any]] = None,
+        logging_config: Optional[LightningLoggingConfig] = None,
+    ) -> "LightningTask":
+        return cls.restore_task_model(
+            checkpoint_path=checkpoint_path,
+            output_path=output_path,
+            task_train_kwargs=task_train_kwargs,
+            lightning_module=TextClassificationModule,
+            logging_config=logging_config,
+        )
