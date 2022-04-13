@@ -43,7 +43,6 @@ def run(
         input_column_name=input_column_name,
         target_column_name=target_column_name,
         output_path=output_path,
-        hidden_size=hidden_size,
         evaluation_mode=evaluation_mode,
         tagging_scheme=tagging_scheme,
     )

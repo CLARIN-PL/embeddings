@@ -1,6 +1,6 @@
 import abc
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence, Type
 
 import pytorch_lightning as pl
 import torch
@@ -8,11 +8,13 @@ from numpy import typing as nptyping
 from pytorch_lightning.callbacks import Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from torch.utils.data import DataLoader
+from transformers import AutoModel
 
 from embeddings.data.datamodule import HuggingFaceDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
+from embeddings.model.lightning_module.lightning_module import LightningModule
 from embeddings.task.task import Task
 from embeddings.utils.lightning_callbacks.best_epoch_callback import BestEpochCallback
 from embeddings.utils.loggers import LightningLoggingConfig, get_logger
@@ -60,7 +62,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
 
     def _get_callbacks(self, dataset_subsets: Sequence[str]) -> List[Callback]:
         callbacks: List[Callback] = [
-            ModelCheckpoint(dirpath=self.output_path.joinpath("checkpoints"))
+            ModelCheckpoint(dirpath=self.output_path.joinpath("checkpoints"), save_last=True)
         ]
         if "validation" in dataset_subsets:
             callbacks.append(BestEpochCallback())
@@ -91,7 +93,9 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
             raise e
 
     @abc.abstractmethod
-    def predict(self, dataloader: DataLoader[Any]) -> Dict[str, nptyping.NDArray[Any]]:
+    def predict(
+        self, dataloader: DataLoader[Any], return_names: bool = True
+    ) -> Dict[str, nptyping.NDArray[Any]]:
         pass
 
     def fit_predict(
@@ -113,4 +117,43 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
 
     @abc.abstractmethod
     def build_task_model(self) -> None:
+        pass
+
+    @classmethod
+    def restore_task_model(
+        cls,
+        checkpoint_path: T_path,
+        output_path: T_path,
+        lightning_module: Type[LightningModule[AutoModel]],
+        task_train_kwargs: Optional[Dict[str, Any]],
+        logging_config: Optional[LightningLoggingConfig],
+    ) -> "LightningTask":
+        model = lightning_module.load_from_checkpoint(str(checkpoint_path))
+        trainer = pl.Trainer(default_root_dir=str(output_path), **task_train_kwargs or {})
+        init_kwargs = {
+            "model_name_or_path": model.hparams.model_name_or_path,
+            "output_path": output_path,
+            "num_classes": model.hparams.num_classes,
+            "finetune_last_n_layers": model.hparams.finetune_last_n_layers,
+            "model_config_kwargs": model.hparams.config_kwargs,
+            "task_model_kwargs": model.hparams.task_model_kwargs,
+            "task_train_kwargs": task_train_kwargs or {},
+            "early_stopping_kwargs": {},
+            "logging_config": logging_config or LightningLoggingConfig(),
+        }
+        task = cls(**init_kwargs)
+        task.model = model
+        task.trainer = trainer
+        model.trainer = trainer
+        return task
+
+    @classmethod
+    @abc.abstractmethod
+    def from_checkpoint(
+        cls,
+        checkpoint_path: T_path,
+        output_path: T_path,
+        task_train_kwargs: Optional[Dict[str, Any]] = None,
+        logging_config: Optional[LightningLoggingConfig] = None,
+    ) -> "LightningTask":
         pass

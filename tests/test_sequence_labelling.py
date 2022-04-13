@@ -162,9 +162,23 @@ def test_pos_tagging_pipeline(
     flair.device = torch.device("cpu")
     pipeline, path = pos_tagging_pipeline
     result = pipeline.run()
-    path.cleanup()
 
     np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.1450381)
+
+    task_from_ckpt = SequenceLabeling.from_checkpoint(
+        checkpoint_path=(Path(path.name) / "final-model.pt"), output_path=path.name
+    )
+    loaded_data = pipeline.data_loader.load(pipeline.dataset)
+    transformed_data = pipeline.transformation.transform(loaded_data)
+    test_data = transformed_data.test
+
+    y_pred, loss = task_from_ckpt.predict(test_data)
+    y_true = task_from_ckpt.get_y(test_data, task_from_ckpt.y_type, task_from_ckpt.y_dictionary)
+    results_from_ckpt = pipeline.evaluator.evaluate({"y_pred": y_pred, "y_true": y_true})
+
+    assert np.array_equal(result["data"]["y_pred"], results_from_ckpt["data"]["y_pred"])
+
+    path.cleanup()
 
 
 def test_ner_tagging_pipeline(
@@ -179,9 +193,23 @@ def test_ner_tagging_pipeline(
     flair.device = torch.device("cpu")
     pipeline, path = ner_tagging_pipeline
     result = pipeline.run()
-    path.cleanup()
 
     np.testing.assert_almost_equal(result["seqeval__mode_None__scheme_None"]["overall_f1"], 0.0)
+
+    task_from_ckpt = SequenceLabeling.from_checkpoint(
+        checkpoint_path=(Path(path.name) / "final-model.pt"), output_path=path.name
+    )
+    loaded_data = pipeline.data_loader.load(pipeline.dataset)
+    transformed_data = pipeline.transformation.transform(loaded_data)
+    test_data = transformed_data.test
+
+    y_pred, loss = task_from_ckpt.predict(test_data)
+    y_true = task_from_ckpt.get_y(test_data, task_from_ckpt.y_type, task_from_ckpt.y_dictionary)
+    results_from_ckpt = pipeline.evaluator.evaluate({"y_pred": y_pred, "y_true": y_true})
+
+    assert np.array_equal(result["data"]["y_pred"], results_from_ckpt["data"]["y_pred"])
+
+    path.cleanup()
 
 
 def test_pos_tagging_pipeline_local_embedding(
@@ -196,9 +224,8 @@ def test_pos_tagging_pipeline_local_embedding(
     flair.device = torch.device("cpu")
     pipeline, path = pos_tagging_pipeline_local_embedding
     result = pipeline.run()
-    path.cleanup()
-
     np.testing.assert_almost_equal(result["UnitSeqeval"]["overall_f1"], 0.1832061)
+    path.cleanup()
 
 
 def test_ner_tagging_pipeline_local_embedding(
@@ -213,8 +240,7 @@ def test_ner_tagging_pipeline_local_embedding(
     flair.device = torch.device("cpu")
     pipeline, path = ner_tagging_pipeline_local_embedding
     result = pipeline.run()
-    path.cleanup()
-
     np.testing.assert_almost_equal(
         result["seqeval__mode_None__scheme_None"]["overall_f1"], 0.0107816
     )
+    path.cleanup()

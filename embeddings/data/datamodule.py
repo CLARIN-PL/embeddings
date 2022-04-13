@@ -60,6 +60,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         dataloader_kwargs: Optional[Dict[str, Any]] = None,
         seed: int = 441,
     ) -> None:
+        self.has_setup = False
         self.dataset_name_or_path = dataset_name_or_path
         self.tokenizer_name_or_path = tokenizer_name_or_path
         self.target_field = target_field
@@ -74,9 +75,10 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.load_dataset_kwargs = load_dataset_kwargs if load_dataset_kwargs else {}
         self.dataloader_kwargs = dataloader_kwargs if dataloader_kwargs else {}
         self.seed = seed
-        dataset_info = self.load_dataset()["train"].info
+        self.setup()
         super().__init__(
-            dataset_info=dataset_info, dataset_version=dataset_info.version.version_str
+            dataset_info=self.dataset["train"].info,
+            dataset_version=self.dataset["train"].info.version.version_str,
         )
 
     @abc.abstractmethod
@@ -94,13 +96,15 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         pass
 
     def prepare_data(self) -> None:
-        self.load_dataset(preparation_step=True)
         AutoTokenizer.from_pretrained(self.tokenizer_name_or_path)
 
     def setup(self, stage: Optional[str] = None) -> None:
-        self.dataset = self.load_dataset()
-        self.prepare_labels()
-        self.process_data()
+        if not self.has_setup:
+            self.dataset = self.load_dataset()
+            self.prepare_labels()
+            self.process_data()
+            self.has_setup = True
+        assert all(hasattr(self, attr) for attr in ["num_classes", "target_names", "dataset"])
 
     def load_dataset(self, preparation_step: bool = False) -> DatasetDict:
         dataset = embeddings_dataset.Dataset(

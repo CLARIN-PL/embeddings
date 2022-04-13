@@ -57,6 +57,7 @@ class LightningClassificationPipeline(
         task = TextClassificationTask(
             model_name_or_path=embedding_name_or_path,
             output_path=output_path,
+            num_classes=datamodule.num_classes,
             finetune_last_n_layers=config.finetune_last_n_layers,
             model_config_kwargs=config.model_config_kwargs,
             task_model_kwargs=config.task_model_kwargs,
