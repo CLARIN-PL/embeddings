@@ -59,9 +59,8 @@ class SequenceLabelingTask(LightningTask):
             "y_pred": np.array(predictions, dtype=object),
             "y_true": np.array(ground_truth, dtype=object),
             "y_probabilities": np.array(probabilities, dtype=object),
+            "names": np.array(self.model.target_names),
         }
-        if return_names:
-            results["names"] = np.array(self.model.target_names)
         return results
 
     def _map_filter_data(
@@ -69,7 +68,8 @@ class SequenceLabelingTask(LightningTask):
     ) -> List[str]:
         assert self.model is not None
         return [
-            self.model.int2str(x.item()) for x in data[ground_truth_data != self.model.ignore_index]
+            self.model.class_label.int2str(x.item())
+            for x in data[ground_truth_data != self.model.ignore_index]
         ]
 
     @classmethod
