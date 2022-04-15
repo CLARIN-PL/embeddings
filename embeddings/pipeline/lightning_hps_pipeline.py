@@ -58,6 +58,8 @@ class _OptimizedLightingPipelineBase(
     tokenizer_name_or_path: Optional[T_path] = None
     tokenizer_kwargs: Dict[str, Any] = field(default_factory=dict)
     batch_encoding_kwargs: Dict[str, Any] = field(default_factory=dict)
+    early_stopping_kwargs: Dict[str, Any] = field(default_factory=dict)
+    dataloader_kwargs: Dict[str, Any] = field(default_factory=dict)
     logging_config: LightningLoggingConfig = field(default_factory=LightningLoggingConfig)
 
 
@@ -230,8 +232,8 @@ class OptimizedLightingClassificationPipeline(
                 model_config_kwargs=model_config_kwargs,
                 tokenizer_kwargs=self.tokenizer_kwargs,
                 batch_encoding_kwargs=self.batch_encoding_kwargs,
-                early_stopping_kwargs={},
-                dataloader_kwargs={},
+                early_stopping_kwargs=self.early_stopping_kwargs,
+                dataloader_kwargs=self.dataloader_kwargs,
             ),
         }
         return metadata
@@ -301,8 +303,8 @@ class OptimizedLightingSequenceLabelingPipeline(
                 model_config_kwargs=model_config_kwargs,
                 tokenizer_kwargs=self.tokenizer_kwargs,
                 batch_encoding_kwargs=self.batch_encoding_kwargs,
-                early_stopping_kwargs={},
-                dataloader_kwargs={},
+                early_stopping_kwargs=self.early_stopping_kwargs,
+                dataloader_kwargs=self.dataloader_kwargs,
             ),
         }
         return metadata
