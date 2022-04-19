@@ -3,7 +3,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 import wandb
 from pytorch_lightning import loggers as pl_loggers
@@ -129,12 +129,14 @@ class ExperimentLogger(abc.ABC):
 
 
 class WandbWrapper(ExperimentLogger):
-    def log_output(self, output_path: T_path, run_name: Optional[str] = None) -> None:
-        wandb.log_artifact(
-            str(output_path),
-            name=run_name,
-            type="output",
-        )
+    def log_output(
+        self,
+        output_path: T_path,
+        ignore: Optional[Iterable[str]] = None,
+    ) -> None:
+        for entry in os.scandir(output_path):
+            if not ignore or entry.name not in ignore:
+                wandb.save(entry.path, output_path)
 
     def finish_logging(self) -> None:
         wandb.finish()

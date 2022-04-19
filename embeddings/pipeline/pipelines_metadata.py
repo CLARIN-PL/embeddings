@@ -63,7 +63,6 @@ class FlairClassificationEvaluationPipelineMetadata(FlairEvaluationPipelineMetad
 class LightningPipelineMetadata(EmbeddingPipelineBaseMetadata):
     embedding_name_or_path: T_path
     dataset_name_or_path: T_path
-    input_column_name: Union[str, Sequence[str]]
     target_column_name: str
     config: LightningConfig
     devices: Optional[Union[List[int], str, int]]
@@ -74,10 +73,11 @@ class LightningPipelineMetadata(EmbeddingPipelineBaseMetadata):
 
 
 class LightningClassificationPipelineMetadata(LightningPipelineMetadata):
-    pass
+    input_column_name: Union[str, Sequence[str]]
 
 
 class LightningSequenceLabelingPipelineMetadata(LightningPipelineMetadata):
+    input_column_name: str
     evaluation_mode: EvaluationMode
     tagging_scheme: Optional[TaggingScheme]
 

@@ -48,14 +48,16 @@ class LightningPipeline(
         self._save_artifacts()
         model_result = self.model.execute(data=self.datamodule, run_name=run_name)
         result = self.evaluator.evaluate(model_result)
-        self._finish_logging(run_name)
+        self._finish_logging()
         return result
 
     def _save_artifacts(self) -> None:
         srsly.write_json(self.output_path.joinpath("packages.json"), get_installed_packages())
 
-    def _finish_logging(self, run_name: Optional[str] = None) -> None:
+    def _finish_logging(self) -> None:
         if self.logging_config.use_wandb():
             logger = WandbWrapper()
-            logger.log_output(self.output_path, run_name)
+            logger.log_output(
+                self.output_path, ignore={"wandb", "csv", "tensorboard", "checkpoints"}
+            )
             logger.finish_logging()

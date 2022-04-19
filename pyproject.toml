@@ -63,10 +63,11 @@ black_fix = "black ./"
 isort_fix = "isort . "
 pyflakes = "pyflakes embeddings"
 mypy = "mypy -p embeddings"
+mypy_examples = "mypy examples"
 coverage_test = "coverage run -m pytest"
 coverage_report = "coverage report -mi"
 test = ["coverage_test", "coverage_report"]
-check = ["black", "isort", "mypy", "pyflakes"]
+check = ["black", "isort", "pyflakes", "mypy", "mypy_examples"]
 fix = ["black_fix", "isort_fix"]
 all = ["check", "test"]
 
