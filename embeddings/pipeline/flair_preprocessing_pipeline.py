@@ -39,6 +39,9 @@ from embeddings.transformation.flair_transformation.pair_classification_corpus_t
 from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
     SampleSplitsFlairCorpusTransformation,
 )
+from embeddings.transformation.hf_transformation.class_encode_column_transformation import (
+    ClassEncodeColumnTransformation,
+)
 from embeddings.transformation.transformation import DummyTransformation
 from embeddings.utils.flair_corpus_persister import FlairConllPersister, FlairPicklePersister
 
@@ -62,6 +65,7 @@ class FlairPreprocessingPipeline(
     ignore_test_subset: bool = False
     seed: int = 441
     load_dataset_kwargs: Optional[Dict[str, Any]] = None
+    encode_labels: bool = False
 
     def __post_init__(self) -> None:
         self.persister = self._get_persister()
@@ -71,7 +75,7 @@ class FlairPreprocessingPipeline(
         super(FlairPreprocessingPipeline, self).__init__(dataset, data_loader, transformation)
 
     @abc.abstractmethod
-    def _get_base_dataset_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
+    def _get_to_flair_dataset_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
         pass
 
     @abc.abstractmethod
@@ -89,17 +93,30 @@ class FlairPreprocessingPipeline(
 
     def _get_dataset_transformation(
         self, data_loader: FLAIR_DATALOADERS
-    ) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
+    ) -> Optional[FLAIR_DATASET_TRANSFORMATIONS_TYPE]:
         if isinstance(data_loader, (ConllFlairCorpusDataLoader, PickleFlairCorpusDataLoader)):
-            return DummyTransformation()
+            return None
 
-        return self._get_base_dataset_transformation()
+        return self._get_to_flair_dataset_transformation()
 
     def _get_transformations(
         self, data_loader: FLAIR_DATALOADERS
     ) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
 
-        transformation = self._get_dataset_transformation(data_loader)
+        transformation: FLAIR_DATASET_TRANSFORMATIONS_TYPE = DummyTransformation()
+        if self.encode_labels:
+            if isinstance(data_loader, (ConllFlairCorpusDataLoader, PickleFlairCorpusDataLoader)):
+                raise ValueError(
+                    "ClassEncodeColumnTransformation transformation is unavailable for Flair DataLoaders. "
+                    "Set parameter `encode_labels` value to True"
+                )
+            transformation = transformation.then(
+                ClassEncodeColumnTransformation(column=self.target_column_name)
+            )
+
+        to_flair_dataset_transformation = self._get_dataset_transformation(data_loader)
+        if to_flair_dataset_transformation:
+            transformation = transformation.then(to_flair_dataset_transformation)
 
         if self.sample_missing_splits:
             transformation = transformation.then(
@@ -126,7 +143,7 @@ class FlairTextClassificationPreprocessingPipeline(FlairPreprocessingPipeline):
     def _get_persister(self) -> FLAIR_PERSISTERS_TYPE:
         return FlairPicklePersister(self.persist_path)
 
-    def _get_base_dataset_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
+    def _get_to_flair_dataset_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
         assert isinstance(self.input_column_name, str)
         return ClassificationCorpusTransformation(
             input_column_name=self.input_column_name,
@@ -138,7 +155,7 @@ class FlairTextClassificationPreprocessingPipeline(FlairPreprocessingPipeline):
 class FlairTextPairClassificationPreprocessingPipeline(
     FlairTextClassificationPreprocessingPipeline
 ):
-    def _get_base_dataset_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
+    def _get_to_flair_dataset_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
         assert isinstance(self.input_column_name, (tuple, list))
         return PairClassificationCorpusTransformation(
             input_columns_names_pair=self.input_column_name,
@@ -151,7 +168,7 @@ class FlairSequenceLabelingPreprocessingPipeline(FlairPreprocessingPipeline):
     def _get_persister(self) -> FLAIR_PERSISTERS_TYPE:
         return FlairConllPersister(self.persist_path)
 
-    def _get_base_dataset_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
+    def _get_to_flair_dataset_transformation(self) -> FLAIR_DATASET_TRANSFORMATIONS_TYPE:
         assert isinstance(self.input_column_name, str)
         return ColumnCorpusTransformation(
             input_column_name=self.input_column_name,
