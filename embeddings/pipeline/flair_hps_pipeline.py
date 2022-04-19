@@ -104,6 +104,14 @@ class AbstractOptimizedFlairClassificationPipeline(
         assert isinstance(load_model_kwargs, dict)
         return embedding_name, document_embedding, task_train_kwargs, load_model_kwargs
 
+    @staticmethod
+    def _revert_default_hps_task_train_kwargs(
+        task_train_kwargs: Dict[str, ParameterValues]
+    ) -> Dict[str, ParameterValues]:
+        task_train_kwargs["param_selection_mode"] = False
+        task_train_kwargs["save_final_model"] = True
+        return task_train_kwargs
+
 
 @dataclass
 class OptimizedFlairClassificationPipeline(
@@ -157,6 +165,12 @@ class OptimizedFlairClassificationPipeline(
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
+
+        task_train_kwargs = (
+            OptimizedFlairClassificationPipeline._revert_default_hps_task_train_kwargs(
+                task_train_kwargs
+            )
+        )
         metadata: FlairClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
             "dataset_name": str(self.dataset_name_or_path),
@@ -257,6 +271,11 @@ class OptimizedFlairPairClassificationPipeline(
             task_train_kwargs,
             load_model_kwargs,
         ) = self._pop_sampled_parameters(parameters=parameters)
+        task_train_kwargs = (
+            OptimizedFlairPairClassificationPipeline._revert_default_hps_task_train_kwargs(
+                task_train_kwargs
+            )
+        )
         metadata: FlairPairClassificationPipelineMetadata = {
             "embedding_name": embedding_name,
             "dataset_name": str(self.dataset_name_or_path),
@@ -377,6 +396,14 @@ class OptimizedFlairSequenceLabelingPipeline(
         assert isinstance(task_model_kwargs, dict)
         return embedding_name, hidden_size, task_train_kwargs, task_model_kwargs
 
+    @staticmethod
+    def _revert_default_hps_task_train_kwargs(
+        task_train_kwargs: Dict[str, ParameterValues]
+    ) -> Dict[str, ParameterValues]:
+        task_train_kwargs["param_selection_mode"] = False
+        task_train_kwargs["save_final_model"] = True
+        return task_train_kwargs
+
     def _get_metadata(self, parameters: SampledParameters) -> FlairSequenceLabelingPipelineMetadata:
         (
             embedding_name,
@@ -384,6 +411,11 @@ class OptimizedFlairSequenceLabelingPipeline(
             task_train_kwargs,
             task_model_kwargs,
         ) = self._pop_sampled_parameters(parameters)
+        task_train_kwargs = (
+            OptimizedFlairSequenceLabelingPipeline._revert_default_hps_task_train_kwargs(
+                task_train_kwargs
+            )
+        )
         metadata: FlairSequenceLabelingPipelineMetadata = {
             "embedding_name": embedding_name,
             "dataset_name": str(self.dataset_name_or_path),
