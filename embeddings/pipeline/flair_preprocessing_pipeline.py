@@ -114,8 +114,7 @@ class FlairPreprocessingPipeline(
                 ClassEncodeColumnTransformation(column=self.target_column_name)
             )
 
-        to_flair_dataset_transformation = self._get_dataset_transformation(data_loader)
-        if to_flair_dataset_transformation:
+        if to_flair_dataset_transformation := self._get_dataset_transformation(data_loader):
             transformation = transformation.then(to_flair_dataset_transformation)
 
         if self.sample_missing_splits:
