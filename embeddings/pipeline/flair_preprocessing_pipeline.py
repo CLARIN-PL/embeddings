@@ -85,7 +85,7 @@ class FlairPreprocessingPipeline(
     def _get_dataset(self) -> Dataset:
         return Dataset(
             self.dataset_name_or_path,
-            **self.load_dataset_kwargs if self.load_dataset_kwargs else {}
+            **self.load_dataset_kwargs if self.load_dataset_kwargs else {},
         )
 
     def _get_dataloader(self, dataset: Dataset) -> FLAIR_DATALOADERS:
@@ -130,7 +130,7 @@ class FlairPreprocessingPipeline(
                 DownsampleFlairCorpusTransformation(
                     *self.downsample_splits,
                     stratify=self.downsample_splits_stratification,
-                    seed=self.seed
+                    seed=self.seed,
                 )
             )
 

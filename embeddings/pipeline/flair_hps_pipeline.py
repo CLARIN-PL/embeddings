@@ -1,4 +1,5 @@
 from abc import ABC
+from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -73,6 +74,15 @@ class _OptimizedFlairPipelineDefaultsBase(_HuggingFaceOptimizedPipelineDefaultsB
         init=False, default_factory=TemporaryDirectory
     )
 
+    @staticmethod
+    def _revert_default_hps_task_train_kwargs(
+        task_train_kwargs: Dict[str, ParameterValues]
+    ) -> Dict[str, ParameterValues]:
+        out = deepcopy(task_train_kwargs)
+        out["param_selection_mode"] = False
+        out["save_final_model"] = True
+        return out
+
 
 # Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
@@ -103,14 +113,6 @@ class AbstractOptimizedFlairClassificationPipeline(
         load_model_kwargs = parameters["load_model_kwargs"]
         assert isinstance(load_model_kwargs, dict)
         return embedding_name, document_embedding, task_train_kwargs, load_model_kwargs
-
-    @staticmethod
-    def _revert_default_hps_task_train_kwargs(
-        task_train_kwargs: Dict[str, ParameterValues]
-    ) -> Dict[str, ParameterValues]:
-        task_train_kwargs["param_selection_mode"] = False
-        task_train_kwargs["save_final_model"] = True
-        return task_train_kwargs
 
 
 @dataclass
@@ -395,14 +397,6 @@ class OptimizedFlairSequenceLabelingPipeline(
         task_model_kwargs = parameters["task_model_kwargs"]
         assert isinstance(task_model_kwargs, dict)
         return embedding_name, hidden_size, task_train_kwargs, task_model_kwargs
-
-    @staticmethod
-    def _revert_default_hps_task_train_kwargs(
-        task_train_kwargs: Dict[str, ParameterValues]
-    ) -> Dict[str, ParameterValues]:
-        task_train_kwargs["param_selection_mode"] = False
-        task_train_kwargs["save_final_model"] = True
-        return task_train_kwargs
 
     def _get_metadata(self, parameters: SampledParameters) -> FlairSequenceLabelingPipelineMetadata:
         (
