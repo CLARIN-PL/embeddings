@@ -62,12 +62,15 @@ isort = "isort .  -c"
 black_fix = "black ./"
 isort_fix = "isort . "
 pyflakes = "pyflakes embeddings"
-mypy = "mypy -p embeddings"
-mypy_examples = "mypy examples"
+mypy = "mypy -p embeddings --exclude 'experimental/' --exclude 'experimental/*' --exclude 'experimental/embeddings' --exclude 'experimental.embeddings'"
+mypy_local = "mypy -p embeddings"
+mypy_examples = "mypy examples --exclude 'experimental/' --exclude 'experimental/*' --exclude 'experimental/embeddings' --exclude 'experimental.embeddings'"
+mypy_examples_local = "mypy examples"
 coverage_test = "coverage run -m pytest"
 coverage_report = "coverage report -mi"
 test = ["coverage_test", "coverage_report"]
 check = ["black", "isort", "pyflakes", "mypy", "mypy_examples"]
+check_local = ["black", "isort", "pyflakes", "mypy_local", "mypy_examples_local"]
 fix = ["black_fix", "isort_fix"]
 all = ["check", "test"]
 
@@ -99,12 +102,6 @@ profile = "black"
 python_version = "3.9"
 strict = true
 plugins = "numpy.typing.mypy_plugin"
-exclude = [
-    "experimental",
-    "experimental/*",
-    "experimental/embeddings",
-    "experimental.embeddings"
-]
 
 [[tool.mypy.overrides]]
 module = [
