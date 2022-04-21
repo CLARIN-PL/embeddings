@@ -1,4 +1,5 @@
 import abc
+import gc
 import logging
 import os
 from abc import ABC
@@ -8,6 +9,7 @@ from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar, Union
 
 import optuna
 import pandas as pd
+import torch
 from optuna import Study
 
 from embeddings.config.config_space import ConfigSpace, SampledParameters
@@ -137,7 +139,16 @@ class OptunaPipeline(
         kwargs = self._get_evaluation_metadata(parsed_params, trial_name=trial_name)
         os.makedirs(kwargs["output_path"], exist_ok=True)
         pipeline = self._get_evaluation_pipeline(**kwargs)
-        results = pipeline.run(run_name=trial_name)
+
+        try:
+            results = pipeline.run(run_name=trial_name)
+        except Exception as e:
+            if "CUDA out of memory" in str(e):
+                del pipeline
+                gc.collect()
+                torch.cuda.empty_cache()  # type: ignore
+            raise e
+
         metric = results[self.metric_name][self.metric_key]
         assert isinstance(metric, float)
         return metric
