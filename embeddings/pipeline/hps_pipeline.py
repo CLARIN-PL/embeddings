@@ -26,6 +26,23 @@ from embeddings.utils.utils import PrimitiveTypes, standardize_name
 EvaluationResult = TypeVar("EvaluationResult", bound=Dict[str, Dict[str, PrimitiveTypes]])
 
 
+class OptunaCallback(ABC):
+    @abc.abstractmethod
+    def __call__(self, study: Study, trial: optuna.trial.FrozenTrial) -> None:
+        pass
+
+
+class TorchGarbageCollectorOptunaCallback(OptunaCallback):
+    @staticmethod
+    def _cleanup() -> None:
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()  # type: ignore
+
+    def __call__(self, study: Study, trial: optuna.trial.FrozenTrial) -> None:
+        TorchGarbageCollectorOptunaCallback._cleanup()
+
+
 class OptimizedPipeline(ABC, Generic[Metadata]):
     def __init__(self) -> None:
         pass
@@ -123,7 +140,13 @@ class OptunaPipeline(
         study: Study = optuna.create_study(
             direction="maximize", sampler=self.sampler, pruner=self.pruner, study_name=run_name
         )
-        study.optimize(self.objective, n_trials=self.n_trials, show_progress_bar=True, catch=catch)
+        study.optimize(
+            self.objective,
+            n_trials=self.n_trials,
+            show_progress_bar=True,
+            catch=catch,
+            callbacks=[TorchGarbageCollectorOptunaCallback()],
+        )
 
         if isinstance(self.dataset_path, TemporaryDirectory):
             self.dataset_path.cleanup()
@@ -139,16 +162,7 @@ class OptunaPipeline(
         kwargs = self._get_evaluation_metadata(parsed_params, trial_name=trial_name)
         os.makedirs(kwargs["output_path"], exist_ok=True)
         pipeline = self._get_evaluation_pipeline(**kwargs)
-
-        try:
-            results = pipeline.run(run_name=trial_name)
-        except Exception as e:
-            if "CUDA out of memory" in str(e):
-                del pipeline
-                gc.collect()
-                torch.cuda.empty_cache()  # type: ignore
-            raise e
-
+        results = pipeline.run(run_name=trial_name)
         metric = results[self.metric_name][self.metric_key]
         assert isinstance(metric, float)
         return metric
