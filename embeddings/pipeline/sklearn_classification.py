@@ -12,6 +12,7 @@ from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import Dataset
 from embeddings.data.io import T_path
 from embeddings.embedding.sklearn_embedding import SklearnEmbedding
+from embeddings.evaluator.evaluation_results import TextClassificationEvaluationResults
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.sklearn_model import SklearnModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -31,7 +32,7 @@ class SklearnClassificationPipeline(
         datasets.DatasetDict,
         Dict[str, pd.DataFrame],
         Dict[str, pd.DataFrame],
-        Dict[str, Any],
+        TextClassificationEvaluationResults,
     ]
 ):
     def __init__(

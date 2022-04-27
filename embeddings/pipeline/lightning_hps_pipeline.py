@@ -2,7 +2,7 @@ from abc import ABC
 from dataclasses import dataclass, field
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Generic, List, Optional, Tuple, Union
+from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar, Union
 
 import datasets
 from numpy import typing as nptyping
@@ -17,6 +17,11 @@ from embeddings.config.lightning_config import LightningAdvancedConfig
 from embeddings.config.parameters import ParameterValues
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
+from embeddings.evaluator.evaluation_results import (
+    EvaluationResults,
+    SequenceLabelingEvaluationResults,
+    TextClassificationEvaluationResults,
+)
 from embeddings.evaluator.sequence_labeling_evaluator import (
     EvaluationMode,
     SequenceLabelingEvaluator,
@@ -40,6 +45,8 @@ from embeddings.utils.loggers import LightningLoggingConfig, get_logger
 from embeddings.utils.utils import standardize_name
 
 _logger = get_logger(__name__)
+
+EvaluationResult = TypeVar("EvaluationResult", bound=EvaluationResults)
 
 
 @dataclass
@@ -75,12 +82,12 @@ class OptimizedLightingPipeline(
         datasets.DatasetDict,
         datasets.DatasetDict,
         Dict[str, nptyping.NDArray[Any]],
-        Dict[str, Any],
+        EvaluationResult,
     ],
     AbstractHuggingFaceOptimizedPipeline[ConfigSpace],
     _OptimizedLightingPipelineBase[ConfigSpace],
     ABC,
-    Generic[ConfigSpace, LightningMetadata],
+    Generic[ConfigSpace, LightningMetadata, EvaluationResult],
 ):
     def _get_evaluation_metadata(
         self, parameters: SampledParameters, trial_name: str = "", **kwargs: Any
@@ -120,7 +127,9 @@ class OptimizedLightingPipeline(
 
     def _get_evaluation_pipeline(
         self, **kwargs: Any
-    ) -> LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]:
+    ) -> LightningPipeline[
+        datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], EvaluationResult
+    ]:
         assert issubclass(self.evaluation_pipeline, LightningPipeline)
         return self.evaluation_pipeline(logging_config=self.logging_config, **kwargs)
 
@@ -180,7 +189,9 @@ class OptimizedLightingPipeline(
 @dataclass
 class OptimizedLightingClassificationPipeline(
     OptimizedLightingPipeline[
-        LightingTextClassificationConfigSpace, LightningClassificationPipelineMetadata
+        LightingTextClassificationConfigSpace,
+        LightningClassificationPipelineMetadata,
+        TextClassificationEvaluationResults,
     ]
 ):
     def __post_init__(self) -> None:
@@ -244,6 +255,7 @@ class OptimizedLightingSequenceLabelingPipeline(
     OptimizedLightingPipeline[
         LightingSequenceLabelingConfigSpace,
         LightningSequenceLabelingPipelineMetadata,
+        SequenceLabelingEvaluationResults,
     ]
 ):
     evaluation_mode: EvaluationMode = EvaluationMode.CONLL

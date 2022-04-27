@@ -9,6 +9,7 @@ from embeddings.config.lightning_config import LightningBasicConfig, LightningCo
 from embeddings.data.datamodule import SequenceLabelingDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
+from embeddings.evaluator.evaluation_results import SequenceLabelingEvaluationResults
 from embeddings.evaluator.sequence_labeling_evaluator import (
     EvaluationMode,
     SequenceLabelingEvaluator,
@@ -22,7 +23,9 @@ from embeddings.utils.loggers import LightningLoggingConfig
 
 
 class LightningSequenceLabelingPipeline(
-    LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
+    LightningPipeline[
+        datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], SequenceLabelingEvaluationResults
+    ]
 ):
     def __init__(
         self,

@@ -15,15 +15,16 @@ from optuna import Study
 from embeddings.config.config_space import ConfigSpace, SampledParameters
 from embeddings.data.dataset import Data
 from embeddings.data.io import T_path
+from embeddings.evaluator.evaluation_results import EvaluationResults
 from embeddings.pipeline.evaluation_pipeline import ModelEvaluationPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.pipeline.pipelines_metadata import EvaluationMetadata, Metadata
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
 from embeddings.pipeline.standard_pipeline import LoaderResult, ModelResult, TransformationResult
 from embeddings.utils.hps_persister import HPSResultsPersister
-from embeddings.utils.utils import PrimitiveTypes, standardize_name
+from embeddings.utils.utils import standardize_name
 
-EvaluationResult = TypeVar("EvaluationResult", bound=Dict[str, Dict[str, PrimitiveTypes]])
+EvaluationResult = TypeVar("EvaluationResult", bound=EvaluationResults)
 
 
 class OptunaCallback(ABC):
@@ -163,7 +164,7 @@ class OptunaPipeline(
         os.makedirs(kwargs["output_path"], exist_ok=True)
         pipeline = self._get_evaluation_pipeline(**kwargs)
         results = pipeline.run(run_name=trial_name)
-        metric = results[self.metric_name][self.metric_key]
+        metric = getattr(results, self.metric_name)[self.metric_key]
         assert isinstance(metric, float)
         return metric
 

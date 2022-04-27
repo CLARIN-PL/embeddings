@@ -19,6 +19,10 @@ from embeddings.config.flair_config_space import (
 )
 from embeddings.config.parameters import ParameterValues
 from embeddings.data.io import T_path
+from embeddings.evaluator.evaluation_results import (
+    SequenceLabelingEvaluationResults,
+    TextClassificationEvaluationResults,
+)
 from embeddings.evaluator.sequence_labeling_evaluator import (
     EvaluationMode,
     SequenceLabelingEvaluator,
@@ -115,7 +119,7 @@ class OptimizedFlairClassificationPipeline(
         datasets.DatasetDict,
         Corpus,
         Dict[str, nptyping.NDArray[Any]],
-        Dict[str, Any],
+        TextClassificationEvaluationResults,
     ],
     AbstractOptimizedFlairClassificationPipeline,
     _OptimizedFlairPipelineBase[FlairTextClassificationConfigSpace],
@@ -213,7 +217,7 @@ class OptimizedFlairPairClassificationPipeline(
         datasets.DatasetDict,
         Corpus,
         Dict[str, nptyping.NDArray[Any]],
-        Dict[str, Any],
+        TextClassificationEvaluationResults,
     ],
     AbstractOptimizedFlairClassificationPipeline,
     _OptimizedFlairPairClassificationPipelineBase[FlairTextClassificationConfigSpace],
@@ -312,7 +316,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         datasets.DatasetDict,
         Corpus,
         Dict[str, nptyping.NDArray[Any]],
-        Dict[str, Any],
+        SequenceLabelingEvaluationResults,
     ],
     AbstractHuggingFaceOptimizedPipeline[FlairSequenceLabelingConfigSpace],
     _OptimizedFlairPipelineDefaultsBase,

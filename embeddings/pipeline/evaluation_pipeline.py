@@ -21,6 +21,10 @@ from embeddings.embedding.flair_loader import (
     FlairDocumentPoolEmbeddingLoader,
     FlairWordEmbeddingLoader,
 )
+from embeddings.evaluator.evaluation_results import (
+    SequenceLabelingEvaluationResults,
+    TextClassificationEvaluationResults,
+)
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
@@ -57,7 +61,9 @@ class ModelEvaluationPipeline(
 
 
 class FlairTextClassificationEvaluationPipeline(
-    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
+    ModelEvaluationPipeline[
+        str, Corpus, Dict[str, nptyping.NDArray[Any]], TextClassificationEvaluationResults
+    ]
 ):
     def __init__(
         self,
@@ -83,14 +89,18 @@ class FlairTextClassificationEvaluationPipeline(
             task_train_kwargs=config.task_train_kwargs,
         )
         model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
-        evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = TextClassificationEvaluator()
+        evaluator: Evaluator[
+            Dict[str, Any], TextClassificationEvaluationResults
+        ] = TextClassificationEvaluator()
         if persist_path is not None:
             evaluator = evaluator.persisting(JsonPersister(path=persist_path))
         super().__init__(dataset, data_loader, model, evaluator)
 
 
 class FlairTextPairClassificationEvaluationPipeline(
-    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
+    ModelEvaluationPipeline[
+        str, Corpus, Dict[str, nptyping.NDArray[Any]], TextClassificationEvaluationResults
+    ]
 ):
     def __init__(
         self,
@@ -116,14 +126,18 @@ class FlairTextPairClassificationEvaluationPipeline(
             task_train_kwargs=config.task_train_kwargs,
         )
         model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
-        evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = TextClassificationEvaluator()
+        evaluator: Evaluator[
+            Dict[str, Any], TextClassificationEvaluationResults
+        ] = TextClassificationEvaluator()
         if persist_path:
             evaluator = evaluator.persisting(JsonPersister(path=persist_path))
         super().__init__(dataset, data_loader, model, evaluator)
 
 
 class FlairSequenceLabelingEvaluationPipeline(
-    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
+    ModelEvaluationPipeline[
+        str, Corpus, Dict[str, nptyping.NDArray[Any]], SequenceLabelingEvaluationResults
+    ]
 ):
     DEFAULT_EVAL_MODE = SequenceLabelingEvaluator.EvaluationMode.CONLL
 
@@ -152,7 +166,9 @@ class FlairSequenceLabelingEvaluationPipeline(
             task_train_kwargs=config.task_train_kwargs,
         )
         model = FlairModel(embedding=embedding, task=task, predict_subset=predict_subset)
-        evaluator: Evaluator[Dict[str, Any], Dict[str, Any]] = SequenceLabelingEvaluator(
+        evaluator: Evaluator[
+            Dict[str, Any], SequenceLabelingEvaluationResults
+        ] = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         )
         if persist_path:

@@ -73,6 +73,7 @@ check = ["black", "isort", "pyflakes", "mypy", "mypy_examples"]
 check_local = ["black", "isort", "pyflakes", "mypy_local", "mypy_examples_local"]
 fix = ["black_fix", "isort_fix"]
 all = ["check", "test"]
+fix_check = ["fix", "check"]
 
 [tool.poetry.extras]
 developer = ["black", "mypy", "typing-extensions"]

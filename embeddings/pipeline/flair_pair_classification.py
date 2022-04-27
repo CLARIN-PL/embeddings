@@ -13,6 +13,7 @@ from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import Dataset
 from embeddings.data.io import T_path
 from embeddings.embedding.flair_loader import FlairDocumentPoolEmbeddingLoader
+from embeddings.evaluator.evaluation_results import TextClassificationEvaluationResults
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -29,7 +30,11 @@ from embeddings.utils.json_dict_persister import JsonPersister
 
 class FlairPairClassificationPipeline(
     StandardPipeline[
-        str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+        str,
+        datasets.DatasetDict,
+        Corpus,
+        Dict[str, nptyping.NDArray[Any]],
+        TextClassificationEvaluationResults,
     ]
 ):
     def __init__(

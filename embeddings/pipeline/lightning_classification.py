@@ -9,6 +9,7 @@ from embeddings.config.lightning_config import LightningBasicConfig, LightningCo
 from embeddings.data.datamodule import TextClassificationDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
+from embeddings.evaluator.evaluation_results import TextClassificationEvaluationResults
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
@@ -18,7 +19,9 @@ from embeddings.utils.loggers import LightningLoggingConfig
 
 
 class LightningClassificationPipeline(
-    LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]
+    LightningPipeline[
+        datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], TextClassificationEvaluationResults
+    ]
 ):
     def __init__(
         self,
