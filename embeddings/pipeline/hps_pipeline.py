@@ -1,4 +1,5 @@
 import abc
+import gc
 import logging
 import os
 from abc import ABC
@@ -8,6 +9,7 @@ from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar, Union
 
 import optuna
 import pandas as pd
+import torch
 from optuna import Study
 
 from embeddings.config.config_space import ConfigSpace, SampledParameters
@@ -22,6 +24,23 @@ from embeddings.utils.hps_persister import HPSResultsPersister
 from embeddings.utils.utils import PrimitiveTypes, standardize_name
 
 EvaluationResult = TypeVar("EvaluationResult", bound=Dict[str, Dict[str, PrimitiveTypes]])
+
+
+class OptunaCallback(ABC):
+    @abc.abstractmethod
+    def __call__(self, study: Study, trial: optuna.trial.FrozenTrial) -> None:
+        pass
+
+
+class TorchGarbageCollectorOptunaCallback(OptunaCallback):
+    @staticmethod
+    def _cleanup() -> None:
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()  # type: ignore
+
+    def __call__(self, study: Study, trial: optuna.trial.FrozenTrial) -> None:
+        TorchGarbageCollectorOptunaCallback._cleanup()
 
 
 class OptimizedPipeline(ABC, Generic[Metadata]):
@@ -121,7 +140,13 @@ class OptunaPipeline(
         study: Study = optuna.create_study(
             direction="maximize", sampler=self.sampler, pruner=self.pruner, study_name=run_name
         )
-        study.optimize(self.objective, n_trials=self.n_trials, show_progress_bar=True, catch=catch)
+        study.optimize(
+            self.objective,
+            n_trials=self.n_trials,
+            show_progress_bar=True,
+            catch=catch,
+            callbacks=[TorchGarbageCollectorOptunaCallback()],
+        )
 
         if isinstance(self.dataset_path, TemporaryDirectory):
             self.dataset_path.cleanup()
