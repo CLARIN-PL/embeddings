@@ -14,6 +14,7 @@ from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import Dataset
 from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
 from embeddings.embedding.flair_embedding import FlairEmbedding
+from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelingEvaluationResults
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -48,7 +49,7 @@ def pos_tagging_pipeline(
     allegro_embedding: FlairEmbedding,
 ) -> Tuple[
     StandardPipeline[
-        str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+        str, datasets.DatasetDict, Corpus, Predictions, SequenceLabelingEvaluationResults
     ],
     "TemporaryDirectory[str]",
 ]:
@@ -73,7 +74,7 @@ def ner_tagging_pipeline(
     allegro_embedding: FlairEmbedding,
 ) -> Tuple[
     StandardPipeline[
-        str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+        str, datasets.DatasetDict, Corpus, Predictions, SequenceLabelingEvaluationResults
     ],
     "TemporaryDirectory[str]",
 ]:
@@ -102,7 +103,7 @@ def pos_tagging_pipeline_local_embedding(
     ipipan_embedding_local_file: FlairEmbedding,
 ) -> Tuple[
     StandardPipeline[
-        str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+        str, datasets.DatasetDict, Corpus, Predictions, SequenceLabelingEvaluationResults
     ],
     "TemporaryDirectory[str]",
 ]:
@@ -127,7 +128,7 @@ def ner_tagging_pipeline_local_embedding(
     ipipan_embedding_local_file: FlairEmbedding,
 ) -> Tuple[
     StandardPipeline[
-        str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+        str, datasets.DatasetDict, Corpus, Predictions, SequenceLabelingEvaluationResults
     ],
     "TemporaryDirectory[str]",
 ]:

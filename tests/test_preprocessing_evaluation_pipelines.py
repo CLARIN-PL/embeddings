@@ -15,6 +15,7 @@ from embeddings.config.flair_config import (
 )
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import Dataset
+from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelingEvaluationResults
 from embeddings.pipeline.evaluation_pipeline import (
     FlairSequenceLabelingEvaluationPipeline,
     ModelEvaluationPipeline,
@@ -78,7 +79,7 @@ def sequence_labeling_evaluation_pipeline(
     ner_dataset_name: str,
     default_config: FlairSequenceLabelingConfig,
 ) -> Tuple[
-    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]],
+    ModelEvaluationPipeline[str, Corpus, Predictions, SequenceLabelingEvaluationResults],
     "TemporaryDirectory[str]",
 ]:
     pipeline = FlairSequenceLabelingEvaluationPipeline(
@@ -98,7 +99,7 @@ def test_sequence_labeling_preprocessing_pipeline(
         PreprocessingPipeline[str, datasets.DatasetDict, Corpus], "TemporaryDirectory[str]"
     ],
     sequence_labeling_evaluation_pipeline: Tuple[
-        ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]],
+        ModelEvaluationPipeline[str, Corpus, Predictions, SequenceLabelingEvaluationResults],
         "TemporaryDirectory[str]",
     ],
 ) -> None:
@@ -110,9 +111,7 @@ def test_sequence_labeling_preprocessing_pipeline(
     evaluation_pipeline, _ = sequence_labeling_evaluation_pipeline
     result = evaluation_pipeline.run()
 
-    np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.0024630
-    )
-    np.testing.assert_almost_equal(result["seqeval__mode_None__scheme_None"]["overall_f1"], 0)
+    np.testing.assert_almost_equal(result.accuracy, 0.0024630)
+    np.testing.assert_almost_equal(result.f1_micro, 0)
 
     path.cleanup()

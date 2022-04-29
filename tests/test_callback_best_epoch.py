@@ -69,13 +69,10 @@ def config() -> LightningAdvancedConfig:
 
 @pytest.fixture(scope="module")
 def lightning_classification_pipeline(
-    dataset_kwargs: Dict[str, Any],
+    dataset_kwargs: Tuple[Dict[str, Any], "TemporaryDirectory[str]"],
     config: LightningAdvancedConfig,
     result_path: "TemporaryDirectory[str]",
-) -> Tuple[
-    LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]],
-    "TemporaryDirectory[str]",
-]:
+) -> Tuple[LightningClassificationPipeline, "TemporaryDirectory[str]",]:
     return (
         LightningClassificationPipeline(
             embedding_name_or_path="allegro/herbert-base-cased",

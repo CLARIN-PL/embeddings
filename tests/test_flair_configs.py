@@ -86,10 +86,7 @@ def sequence_labeling_preprocessing_pipeline(
 def sequence_labeling_evaluation_pipeline(
     result_path: Path,
     flair_basic_config: FlairSequenceLabelingConfig,
-) -> Tuple[
-    ModelEvaluationPipeline[str, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]],
-    Path,
-]:
+) -> Tuple[FlairSequenceLabelingEvaluationPipeline, Path,]:
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=str(result_path),
         embedding_name="hf-internal-testing/tiny-albert",

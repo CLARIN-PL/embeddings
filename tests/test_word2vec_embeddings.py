@@ -95,7 +95,7 @@ def assert_close_embedding(embedding: KGR10Word2VecEmbedding) -> None:
 
 
 @pytest.fixture()
-def ipipan_embedding_config(local_embedding_filepath: Path):
+def ipipan_embedding_config(local_embedding_filepath: Path) -> IPIPANWord2VecConfig:
     return IPIPANWord2VecConfig(local_embedding_filepath)
 
 

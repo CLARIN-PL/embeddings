@@ -14,6 +14,7 @@ from embeddings.config.flair_config import (
 )
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import Dataset
+from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelingEvaluationResults
 from embeddings.pipeline.evaluation_pipeline import (
     FlairSequenceLabelingEvaluationPipeline,
     ModelEvaluationPipeline,
@@ -74,7 +75,7 @@ def sequence_labeling_evaluation_pipeline(
     embedding_name: str,
     ner_dataset_name: str,
     default_config: FlairSequenceLabelingConfig,
-) -> ModelEvaluationPipeline[str, Corpus, Dict[str, np.ndarray], Dict[str, Any]]:
+) -> ModelEvaluationPipeline[str, Corpus, Predictions, SequenceLabelingEvaluationResults]:
 
     pipeline = FlairSequenceLabelingEvaluationPipeline(
         dataset_path=result_path.name,
