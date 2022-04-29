@@ -6,7 +6,6 @@ from typing import Any, Dict, Generic, Optional, Tuple
 
 import datasets
 from flair.data import Corpus
-from numpy import typing as nptyping
 
 from embeddings.config.config_space import ConfigSpace, SampledParameters
 from embeddings.config.flair_config import (
@@ -20,6 +19,7 @@ from embeddings.config.flair_config_space import (
 from embeddings.config.parameters import ParameterValues
 from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import (
+    Predictions,
     SequenceLabelingEvaluationResults,
     TextClassificationEvaluationResults,
 )
@@ -118,7 +118,7 @@ class OptimizedFlairClassificationPipeline(
         str,
         datasets.DatasetDict,
         Corpus,
-        Dict[str, nptyping.NDArray[Any]],
+        Predictions,
         TextClassificationEvaluationResults,
     ],
     AbstractOptimizedFlairClassificationPipeline,
@@ -216,7 +216,7 @@ class OptimizedFlairPairClassificationPipeline(
         str,
         datasets.DatasetDict,
         Corpus,
-        Dict[str, nptyping.NDArray[Any]],
+        Predictions,
         TextClassificationEvaluationResults,
     ],
     AbstractOptimizedFlairClassificationPipeline,
@@ -315,7 +315,7 @@ class OptimizedFlairSequenceLabelingPipeline(
         str,
         datasets.DatasetDict,
         Corpus,
-        Dict[str, nptyping.NDArray[Any]],
+        Predictions,
         SequenceLabelingEvaluationResults,
     ],
     AbstractHuggingFaceOptimizedPipeline[FlairSequenceLabelingConfigSpace],

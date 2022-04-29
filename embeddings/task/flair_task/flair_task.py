@@ -12,13 +12,14 @@ from typing_extensions import Literal
 from embeddings.data.io import T_path
 from embeddings.defaults import RESULTS_PATH
 from embeddings.embedding.flair_embedding import FlairEmbedding
+from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.task.task import Task
 from embeddings.utils.loggers import get_logger
 
 _logger = get_logger(__name__)
 
 
-class FlairTask(Task[Corpus, Dict[str, nptyping.NDArray[Any]]]):
+class FlairTask(Task[Corpus, Predictions]):
     MODEL_UNDEFINED_EXCEPTION = ValueError("Model undefined. Use build_task_model() first!")
 
     def __init__(
@@ -64,7 +65,7 @@ class FlairTask(Task[Corpus, Dict[str, nptyping.NDArray[Any]]]):
 
     def fit_predict(
         self, data: Corpus, predict_subset: Literal["dev", "test"] = "test"
-    ) -> Dict[str, nptyping.NDArray[Any]]:
+    ) -> Predictions:
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
         if data.dev is None:
@@ -72,7 +73,7 @@ class FlairTask(Task[Corpus, Dict[str, nptyping.NDArray[Any]]]):
         self.fit(data)
         y_pred, _ = self.predict(getattr(data, predict_subset))
         y_true = self.get_y(getattr(data, predict_subset), self.y_type, self.y_dictionary)
-        return {"y_true": y_true, "y_pred": y_pred}
+        return Predictions(y_true=y_true, y_pred=y_pred)
 
     def _wrap_missing_dev_subset(self, data: Corpus) -> Corpus:
         _logger.warning("Dev subset is missing in the corpus - wrapping with an empty list")

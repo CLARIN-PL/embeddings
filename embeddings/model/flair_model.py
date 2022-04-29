@@ -1,15 +1,15 @@
-from typing import Any, Dict
+from typing import Any
 
 from flair.data import Corpus
-from numpy import typing as nptyping
 from typing_extensions import Literal
 
 from embeddings.embedding.flair_embedding import FlairEmbedding
+from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.model.model import Model
 from embeddings.task.flair_task.flair_task import FlairTask
 
 
-class FlairModel(Model[Corpus, Dict[str, nptyping.NDArray[Any]]]):
+class FlairModel(Model[Corpus, Predictions]):
     def __init__(
         self,
         embedding: FlairEmbedding,
@@ -21,7 +21,7 @@ class FlairModel(Model[Corpus, Dict[str, nptyping.NDArray[Any]]]):
         self.task = task
         self.predict_subset = predict_subset
 
-    def execute(self, data: Corpus, **kwargs: Any) -> Dict[str, nptyping.NDArray[Any]]:
+    def execute(self, data: Corpus, **kwargs: Any) -> Predictions:
         self.task.build_task_model(
             embedding=self.embedding, y_dictionary=self.task.make_y_dictionary(data)
         )

@@ -9,16 +9,27 @@ from numpy import typing as nptyping
 class Predictions:
     y_pred: nptyping.NDArray[Any]
     y_true: nptyping.NDArray[Any]
+    y_probabilities: Optional[nptyping.NDArray[Any]] = None
+    names: Optional[nptyping.NDArray[Any]] = None
+
+    def __post_init__(self) -> None:
+        if self.y_probabilities and self.names:
+            assert self.names.shape[0] == self.y_probabilities.shape[1]
 
     @staticmethod
     def from_evaluation_json(data: str) -> "Predictions":
         evaluation = srsly.json_loads(data)
-        return Predictions(y_pred=evaluation["data"]["y_pred"], y_true=evaluation["data"]["y_true"])
+        return Predictions(
+            y_pred=evaluation["data"]["y_pred"],
+            y_true=evaluation["data"]["y_true"],
+            y_probabilities=evaluation["data"]["y_probabilities"],
+            names=evaluation["data"]["names"],
+        )
 
 
 @dataclass
 class EvaluationResults:
-    data: Optional[Union[Dict[str, nptyping.NDArray[Any]], Predictions]]
+    data: Optional[Predictions]
 
     @property
     def metrics(self) -> Dict[str, Any]:

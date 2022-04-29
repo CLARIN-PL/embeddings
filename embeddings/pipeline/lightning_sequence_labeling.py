@@ -2,14 +2,13 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import datasets
-from numpy import typing as nptyping
 from pytorch_lightning.accelerators import Accelerator
 
 from embeddings.config.lightning_config import LightningBasicConfig, LightningConfig
 from embeddings.data.datamodule import SequenceLabelingDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
-from embeddings.evaluator.evaluation_results import SequenceLabelingEvaluationResults
+from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelingEvaluationResults
 from embeddings.evaluator.sequence_labeling_evaluator import (
     EvaluationMode,
     SequenceLabelingEvaluator,
@@ -23,9 +22,7 @@ from embeddings.utils.loggers import LightningLoggingConfig
 
 
 class LightningSequenceLabelingPipeline(
-    LightningPipeline[
-        datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], SequenceLabelingEvaluationResults
-    ]
+    LightningPipeline[datasets.DatasetDict, Predictions, SequenceLabelingEvaluationResults]
 ):
     def __init__(
         self,

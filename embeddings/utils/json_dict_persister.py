@@ -1,3 +1,4 @@
+import dataclasses
 import json
 from typing import Any, TypeVar
 
@@ -10,7 +11,7 @@ from embeddings.utils.results_persister import ResultsPersister
 EvaluationResultsType = TypeVar("EvaluationResultsType", bound=EvaluationResults)
 
 
-class JsonEncoder(json.JSONEncoder):
+class CustomJsonEncoder(json.JSONEncoder):
     def default(self, obj: Any) -> Any:
         if isinstance(obj, np.integer):
             return int(obj)
@@ -18,8 +19,10 @@ class JsonEncoder(json.JSONEncoder):
             return float(obj)
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
+        elif dataclasses.is_dataclass(obj):
+            return dataclasses.asdict(obj)
         else:
-            return super(JsonEncoder, self).default(obj)
+            return super(CustomJsonEncoder, self).default(obj)
 
 
 class JsonPersister(ResultsPersister[EvaluationResultsType]):
@@ -28,4 +31,4 @@ class JsonPersister(ResultsPersister[EvaluationResultsType]):
 
     def persist(self, result: EvaluationResultsType, **kwargs: Any) -> None:
         with open(self.path, "w") as f:
-            json.dump(result, f, cls=JsonEncoder, indent=2)
+            json.dump(result, f, cls=CustomJsonEncoder, indent=2)

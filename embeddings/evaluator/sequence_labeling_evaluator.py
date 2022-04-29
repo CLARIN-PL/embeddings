@@ -1,6 +1,6 @@
 from dataclasses import asdict
 from enum import Enum
-from typing import Any, Dict, Final, List, Optional, Sequence, Set, Type, Union
+from typing import Any, Dict, Final, List, Optional, Set, Type, Union
 
 import torch
 from numpy import typing as nptyping
@@ -63,8 +63,8 @@ class SequenceLabelingEvaluator(MetricsEvaluator[SequenceLabelingEvaluationResul
 
     def metrics(
         self,
-    ) -> Sequence[Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
-        return [self._get_metric()]
+    ) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
+        return {self.get_metric_name(self.evaluation_mode, self.tagging_scheme): self._get_metric()}
 
     @property
     def evaluation_results_cls(self) -> Type[SequenceLabelingEvaluationResults]:
@@ -94,7 +94,7 @@ class SequenceLabelingEvaluator(MetricsEvaluator[SequenceLabelingEvaluationResul
         if isinstance(data, Predictions):
             data = asdict(data)
         result = {}
-        [metric] = self.metrics()
+        [metric] = self.metrics().values()
         computed = metric.compute(y_true=data["y_true"], y_pred=data["y_pred"])
         result["accuracy"] = computed.pop("overall_accuracy")
         result["f1_micro"] = computed.pop("overall_f1")

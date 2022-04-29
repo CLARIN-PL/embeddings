@@ -3,7 +3,6 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 import datasets
 from flair.data import Corpus
-from numpy import typing as nptyping
 
 from embeddings.config.flair_config import (
     FlairSequenceLabelingBasicConfig,
@@ -13,7 +12,7 @@ from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import Dataset
 from embeddings.data.io import T_path
 from embeddings.embedding.flair_loader import FlairWordEmbeddingLoader
-from embeddings.evaluator.evaluation_results import SequenceLabelingEvaluationResults
+from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelingEvaluationResults
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -33,7 +32,7 @@ class FlairSequenceLabelingPipeline(
         str,
         datasets.DatasetDict,
         Corpus,
-        Dict[str, nptyping.NDArray[Any]],
+        Predictions,
         SequenceLabelingEvaluationResults,
     ]
 ):

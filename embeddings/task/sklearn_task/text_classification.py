@@ -1,9 +1,9 @@
 from typing import Any, Dict, Optional
 
-from numpy import typing as nptyping
 from sklearn.base import ClassifierMixin as AnySklearnClassifier
 
 from embeddings.embedding.sklearn_embedding import SklearnEmbedding
+from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.task.sklearn_task.sklearn_task import SklearnTask
 from embeddings.utils.array_like import ArrayLike
 
@@ -34,18 +34,15 @@ class TextClassification(SklearnTask):
         self,
         data: Dict[str, ArrayLike],
         predict_subset: str = "test",
-    ) -> Dict[str, nptyping.NDArray[Any]]:
+    ) -> Predictions:
         predictions = self.classifier.predict(self.embedding.embed(data[predict_subset]["x"]))
-        model_result = {
-            "y_pred": predictions,
-            "y_true": data[predict_subset]["y"].values,
-        }
+        model_result = Predictions(y_pred=predictions, y_true=data[predict_subset]["y"].values)
         return model_result
 
     def fit_predict(
         self,
         data: Dict[str, ArrayLike],
         predict_subset: str = "test",
-    ) -> Dict[str, nptyping.NDArray[Any]]:
+    ) -> Predictions:
         self.fit(data)
         return self.predict(data)

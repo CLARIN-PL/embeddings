@@ -1,6 +1,5 @@
 import abc
-from dataclasses import asdict
-from typing import Any, Dict, Generic, List, Sequence, Type, TypeVar, Union
+from typing import Any, Dict, Generic, List, Type, TypeVar, Union
 
 import torch
 from numpy import typing as nptyping
@@ -13,7 +12,7 @@ EvaluationResultsType = TypeVar("EvaluationResultsType", bound=EvaluationResults
 
 
 class MetricsEvaluator(
-    Evaluator[Dict[str, nptyping.NDArray[Any]], EvaluationResultsType],
+    Evaluator[Predictions, EvaluationResultsType],
     Generic[EvaluationResultsType],
 ):
     def __init__(self, return_input_data: bool = True):
@@ -23,7 +22,7 @@ class MetricsEvaluator(
     @abc.abstractmethod
     def metrics(
         self,
-    ) -> Sequence[Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
+    ) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
         pass
 
     @property
@@ -31,14 +30,14 @@ class MetricsEvaluator(
     def evaluation_results_cls(self) -> Type[EvaluationResultsType]:
         pass
 
+    @abc.abstractmethod
     def evaluate(
         self, data: Union[Dict[str, nptyping.NDArray[Any]], Predictions]
     ) -> EvaluationResultsType:
-        if isinstance(data, Predictions):
-            data = asdict(data)
+        data = Predictions(**data) if isinstance(data, dict) else data
         result: Dict[Any, Any] = {
-            str(metric): metric.compute(y_true=data["y_true"], y_pred=data["y_pred"])
-            for metric in self.metrics()
+            name: metric.compute(y_true=data.y_true, y_pred=data.y_pred)
+            for name, metric in self.metrics().items()
         }
         a = data if self.return_input_data else None
         result["data"] = a

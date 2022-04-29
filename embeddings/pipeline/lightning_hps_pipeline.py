@@ -5,7 +5,6 @@ from tempfile import TemporaryDirectory
 from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar, Union
 
 import datasets
-from numpy import typing as nptyping
 from pytorch_lightning.accelerators import Accelerator
 
 from embeddings.config.config_space import ConfigSpace, SampledParameters
@@ -19,6 +18,7 @@ from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import (
     EvaluationResults,
+    Predictions,
     SequenceLabelingEvaluationResults,
     TextClassificationEvaluationResults,
 )
@@ -81,7 +81,7 @@ class OptimizedLightingPipeline(
         str,
         datasets.DatasetDict,
         datasets.DatasetDict,
-        Dict[str, nptyping.NDArray[Any]],
+        Predictions,
         EvaluationResult,
     ],
     AbstractHuggingFaceOptimizedPipeline[ConfigSpace],
@@ -127,9 +127,7 @@ class OptimizedLightingPipeline(
 
     def _get_evaluation_pipeline(
         self, **kwargs: Any
-    ) -> LightningPipeline[
-        datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], EvaluationResult
-    ]:
+    ) -> LightningPipeline[datasets.DatasetDict, Predictions, EvaluationResult]:
         assert issubclass(self.evaluation_pipeline, LightningPipeline)
         return self.evaluation_pipeline(logging_config=self.logging_config, **kwargs)
 

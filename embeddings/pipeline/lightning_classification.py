@@ -2,14 +2,13 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Union
 
 import datasets
-from numpy import typing as nptyping
 from pytorch_lightning.accelerators import Accelerator
 
 from embeddings.config.lightning_config import LightningBasicConfig, LightningConfig
 from embeddings.data.datamodule import TextClassificationDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
-from embeddings.evaluator.evaluation_results import TextClassificationEvaluationResults
+from embeddings.evaluator.evaluation_results import Predictions, TextClassificationEvaluationResults
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
@@ -19,9 +18,7 @@ from embeddings.utils.loggers import LightningLoggingConfig
 
 
 class LightningClassificationPipeline(
-    LightningPipeline[
-        datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], TextClassificationEvaluationResults
-    ]
+    LightningPipeline[datasets.DatasetDict, Predictions, TextClassificationEvaluationResults]
 ):
     def __init__(
         self,
