@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from enum import Enum
 from typing import Any, Dict, Final, List, Optional, Set, Type, Union
 
@@ -91,11 +90,10 @@ class SequenceLabelingEvaluator(MetricsEvaluator[SequenceLabelingEvaluationResul
     def evaluate(
         self, data: Union[Dict[str, nptyping.NDArray[Any]], Predictions]
     ) -> SequenceLabelingEvaluationResults:
-        if isinstance(data, Predictions):
-            data = asdict(data)
+        data = Predictions(**data) if isinstance(data, dict) else data
         result = {}
         [metric] = self.metrics().values()
-        computed = metric.compute(y_true=data["y_true"], y_pred=data["y_pred"])
+        computed = metric.compute(y_true=data.y_true, y_pred=data.y_pred)
         result["accuracy"] = computed.pop("overall_accuracy")
         result["f1_micro"] = computed.pop("overall_f1")
         result["recall_micro"] = computed.pop("overall_recall")

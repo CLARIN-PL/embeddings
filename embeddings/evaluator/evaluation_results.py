@@ -13,8 +13,13 @@ class Predictions:
     names: Optional[nptyping.NDArray[Any]] = None
 
     def __post_init__(self) -> None:
-        if self.y_probabilities and self.names:
-            assert self.names.shape[0] == self.y_probabilities.shape[1]
+        if self.y_probabilities is not None and self.names is not None:
+            if len(self.y_probabilities.shape) == 2:  # text classification
+                if self.names.shape[0] != self.y_probabilities.shape[1]:
+                    raise ValueError("Wrong dimensionality of names and y_probabilities.")
+            else:  # sequence labelling
+                if self.names.shape[0] != len(self.y_probabilities[0][0]):
+                    raise ValueError("Wrong dimensionality of names and y_probabilities.")
 
     @staticmethod
     def from_evaluation_json(data: str) -> "Predictions":

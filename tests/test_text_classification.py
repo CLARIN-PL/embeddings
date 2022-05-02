@@ -56,7 +56,7 @@ def text_classification_pipeline(
 def test_text_classification_pipeline(
     text_classification_pipeline: Tuple[
         StandardPipeline[
-            str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+            str, datasets.DatasetDict, Corpus, Predictions, TextClassificationEvaluationResults
         ],
         "TemporaryDirectory[str]",
     ],
@@ -64,10 +64,10 @@ def test_text_classification_pipeline(
     flair.set_seed(441)
     pipeline, path = text_classification_pipeline
     result = pipeline.run()
-    np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.3333333)
-    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.1666666)
-    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.1111111)
-    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.3333333)
+    np.testing.assert_almost_equal(result.accuracy, 0.3333333)
+    np.testing.assert_almost_equal(result.f1_macro, 0.1666666)
+    np.testing.assert_almost_equal(result.precision_macro, 0.1111111)
+    np.testing.assert_almost_equal(result.recall_macro, 0.3333333)
 
     task_from_ckpt = TextClassification.from_checkpoint(
         checkpoint_path=(Path(path.name) / "final-model.pt"), output_path=path.name
@@ -78,8 +78,8 @@ def test_text_classification_pipeline(
 
     y_pred, loss = task_from_ckpt.predict(test_data)
     y_true = task_from_ckpt.get_y(test_data, task_from_ckpt.y_type, task_from_ckpt.y_dictionary)
-    results_from_ckpt = pipeline.evaluator.evaluate({"y_pred": y_pred, "y_true": y_true})
-    assert np.array_equal(result["data"]["y_pred"], results_from_ckpt["data"]["y_pred"])
+    results_from_ckpt = pipeline.evaluator.evaluate(Predictions(y_pred=y_pred, y_true=y_true))
+    assert np.array_equal(result.data.y_pred, results_from_ckpt.data.y_pred)
 
     path.cleanup()
 
@@ -117,7 +117,7 @@ def text_classification_pipeline_local_embedding(
 def test_text_classification_pipeline_local_embedding(
     text_classification_pipeline_local_embedding: Tuple[
         StandardPipeline[
-            str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+            str, datasets.DatasetDict, Corpus, Predictions, TextClassificationEvaluationResults
         ],
         "TemporaryDirectory[str]",
     ],
@@ -126,10 +126,10 @@ def test_text_classification_pipeline_local_embedding(
     pipeline, path = text_classification_pipeline_local_embedding
     result = pipeline.run()
 
-    np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.3333333)
-    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.3333333)
-    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.3333333)
-    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.3333333)
+    np.testing.assert_almost_equal(result.accuracy, 0.3333333)
+    np.testing.assert_almost_equal(result.f1_macro, 0.3333333)
+    np.testing.assert_almost_equal(result.precision_macro, 0.3333333)
+    np.testing.assert_almost_equal(result.recall_macro, 0.3333333)
 
     task_from_ckpt = TextClassification.from_checkpoint(
         checkpoint_path=(Path(path.name) / "final-model.pt"), output_path=path.name
@@ -140,7 +140,7 @@ def test_text_classification_pipeline_local_embedding(
 
     y_pred, loss = task_from_ckpt.predict(test_data)
     y_true = task_from_ckpt.get_y(test_data, task_from_ckpt.y_type, task_from_ckpt.y_dictionary)
-    results_from_ckpt = pipeline.evaluator.evaluate({"y_pred": y_pred, "y_true": y_true})
-    assert np.array_equal(result["data"]["y_pred"], results_from_ckpt["data"]["y_pred"])
+    results_from_ckpt = pipeline.evaluator.evaluate(Predictions(y_pred=y_pred, y_true=y_true))
+    assert np.array_equal(result.data.y_pred, results_from_ckpt.data.y_pred)
 
     path.cleanup()

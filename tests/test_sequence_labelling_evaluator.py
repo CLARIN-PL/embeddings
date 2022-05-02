@@ -77,19 +77,24 @@ def sklearn_metrics(
     accuracy = accuracy_score(
         list(chain.from_iterable(data["y_true"])), list(chain.from_iterable(data["y_pred"]))
     )
-    out_dict = {
+    out_dict["classes"] = {
         tag: {
-            metric.replace("support", "number").replace("f1-score", "f1"): metric_value
+            metric.replace("f1-score", "f1"): metric_value
             for metric, metric_value in tag_scores.items()
+            if metric != "support"
         }
         for tag, tag_scores in out_dict.items()
     }
+    for k in list(out_dict.keys()):
+        if k != "classes":
+            out_dict.pop(k)
+
     out_dict.update(
         {
-            "overall_accuracy": accuracy,
-            "overall_precision": prfs[0],
-            "overall_recall": prfs[1],
-            "overall_f1": prfs[2],
+            "accuracy": accuracy,
+            "precision_micro": prfs[0],
+            "recall_micro": prfs[1],
+            "f1_micro": prfs[2],
         }
     )
     return out_dict
@@ -107,10 +112,10 @@ def seqeval_metrics(data: Dict[str, nptyping.NDArray[Any]]) -> SequenceLabelingE
 
 def test_pos_tagging_metrics(
     sklearn_metrics: Dict[str, Union[Dict[str, float], float]],
-    seqeval_metrics: Dict[str, Union[Dict[str, float], float]],
+    seqeval_metrics: SequenceLabelingEvaluationResults,
 ) -> None:
     assert all(
-        sklearn_metrics[metric] == pytest.approx(seqeval_metrics[metric])
+        sklearn_metrics[metric] == seqeval_metrics.metrics[metric]
         for metric in sklearn_metrics.keys()
     )
 

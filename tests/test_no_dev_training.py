@@ -1,3 +1,4 @@
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict
 
@@ -6,6 +7,7 @@ import flair
 import numpy as np
 import pytest
 import torch
+from _pytest.tmpdir import TempdirFactory
 from flair.data import Corpus
 
 from embeddings.config.flair_config import (
@@ -31,8 +33,9 @@ from embeddings.utils.flair_corpus_persister import FlairConllPersister
 
 
 @pytest.fixture(scope="module")
-def result_path() -> "TemporaryDirectory[str]":
-    return TemporaryDirectory()
+def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
+    path = tmpdir_factory.mktemp(__name__)
+    return Path(path)
 
 
 @pytest.fixture(scope="module")
@@ -52,7 +55,7 @@ def default_config() -> FlairSequenceLabelingConfig:
 
 @pytest.fixture(scope="module")
 def sequence_labeling_preprocessing_pipeline(
-    result_path: "TemporaryDirectory[str]",
+    tmp_path_module: Path,
     embedding_name: str,
     ner_dataset_name: str,
 ) -> PreprocessingPipeline[str, datasets.DatasetDict, Corpus]:
@@ -61,7 +64,7 @@ def sequence_labeling_preprocessing_pipeline(
     transformation = (
         ColumnCorpusTransformation("tokens", "ner")
         .then(DownsampleFlairCorpusTransformation(*(0.005, 0.005, 0.005), seed=14))
-        .persisting(FlairConllPersister(result_path.name))
+        .persisting(FlairConllPersister(str(tmp_path_module)))
     )
     pipeline = PreprocessingPipeline(
         dataset=dataset, data_loader=data_loader, transformation=transformation
@@ -71,16 +74,16 @@ def sequence_labeling_preprocessing_pipeline(
 
 @pytest.fixture(scope="module")
 def sequence_labeling_evaluation_pipeline(
-    result_path: "TemporaryDirectory[str]",
+    tmp_path_module: Path,
     embedding_name: str,
     ner_dataset_name: str,
     default_config: FlairSequenceLabelingConfig,
 ) -> ModelEvaluationPipeline[str, Corpus, Predictions, SequenceLabelingEvaluationResults]:
-
+    result_path = tmp_path_module
     pipeline = FlairSequenceLabelingEvaluationPipeline(
-        dataset_path=result_path.name,
+        dataset_path=str(result_path),
         embedding_name=embedding_name,
-        output_path=result_path.name,
+        output_path=str(result_path),
         config=default_config,
         persist_path=None,
     )
@@ -104,9 +107,5 @@ def test_no_dev_pipeline(
 
     result = sequence_labeling_evaluation_pipeline.run()
 
-    np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_accuracy"], 0.8935483
-    )
-    np.testing.assert_almost_equal(result["seqeval__mode_None__scheme_None"]["overall_f1"], 0)
-
-    result_path.cleanup()
+    np.testing.assert_almost_equal(result.accuracy, 0.8935483)
+    np.testing.assert_almost_equal(result.f1_micro, 0)
