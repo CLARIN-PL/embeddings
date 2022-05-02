@@ -19,9 +19,11 @@ class SampleSplitsSklearnTransformation(SampleSplitTransformation):
         target_field_name: Optional[str] = None,
         seed: int = 441,
     ):
-        super().__init__(dev_fraction, test_fraction, seed)
+        if stratify and not target_field_name:
+            raise ValueError("Parameter `target_field_name` must be set for stratified sampling")
         self.stratify = stratify
         self.target_field_name = target_field_name
+        super().__init__(dev_fraction, test_fraction, seed)
 
     def _train_test_split(
         self, data: datasets.Dataset, test_fraction: float
