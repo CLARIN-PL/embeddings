@@ -36,7 +36,8 @@ class LightningClassificationPipeline(
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        config.task_train_kwargs.update({"devices": devices, "accelerator": accelerator})
+        task_train_kwargs = config.task_train_kwargs
+        task_train_kwargs.update({"devices": devices, "accelerator": accelerator})
         tokenizer_name_or_path = tokenizer_name_or_path or embedding_name_or_path
         output_path = Path(output_path)
         self.evaluation_filename = evaluation_filename
@@ -61,7 +62,7 @@ class LightningClassificationPipeline(
             finetune_last_n_layers=config.finetune_last_n_layers,
             model_config_kwargs=config.model_config_kwargs,
             task_model_kwargs=config.task_model_kwargs,
-            task_train_kwargs=config.task_train_kwargs,
+            task_train_kwargs=task_train_kwargs,
             early_stopping_kwargs=config.early_stopping_kwargs,
             logging_config=logging_config,
         )
