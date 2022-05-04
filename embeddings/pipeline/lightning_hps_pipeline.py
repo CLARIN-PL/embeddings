@@ -202,8 +202,7 @@ class OptimizedLightingClassificationPipeline(
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
             dataset_path=self.dataset_path,
-            metric_name="f1__average_macro",
-            metric_key="f1",
+            metric_name="f1_macro",
             config_space=self.config_space,
         )
 
@@ -262,9 +261,6 @@ class OptimizedLightingSequenceLabelingPipeline(
     def __post_init__(self) -> None:
         self._init_dataset_path()
         self._init_preprocessing_pipeline()
-        self.metric_name = SequenceLabelingEvaluator.get_metric_name(
-            evaluation_mode=self.evaluation_mode, tagging_scheme=self.tagging_scheme
-        )
         super(OptimizedLightingPipeline, self).__init__(
             preprocessing_pipeline=self.preprocessing_pipeline,
             evaluation_pipeline=LightningSequenceLabelingPipeline,
@@ -272,8 +268,7 @@ class OptimizedLightingSequenceLabelingPipeline(
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
             dataset_path=self.dataset_path,
-            metric_name=self.metric_name,
-            metric_key="overall_f1",
+            metric_name="f1_micro",
             config_space=self.config_space,
         )
 
