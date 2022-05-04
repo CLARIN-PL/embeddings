@@ -1,6 +1,7 @@
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, Optional, Union
 
+import numpy as np
 import srsly
 from numpy import typing as nptyping
 
@@ -24,11 +25,12 @@ class Predictions:
     @staticmethod
     def from_evaluation_json(data: str) -> "Predictions":
         evaluation = srsly.json_loads(data)
+        dtype = object if isinstance(evaluation["data"]["y_pred"], list) else None
         return Predictions(
-            y_pred=evaluation["data"]["y_pred"],
-            y_true=evaluation["data"]["y_true"],
-            y_probabilities=evaluation["data"]["y_probabilities"],
-            names=evaluation["data"]["names"],
+            y_pred=np.array(evaluation["data"]["y_pred"], dtype=dtype),
+            y_true=np.array(evaluation["data"]["y_true"], dtype=dtype),
+            y_probabilities=np.array(evaluation["data"]["y_probabilities"], dtype=dtype),
+            names=np.array(evaluation["data"]["names"], dtype=dtype),
         )
 
 

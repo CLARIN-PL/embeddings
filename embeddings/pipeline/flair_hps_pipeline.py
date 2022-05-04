@@ -23,11 +23,7 @@ from embeddings.evaluator.evaluation_results import (
     SequenceLabelingEvaluationResults,
     TextClassificationEvaluationResults,
 )
-from embeddings.evaluator.sequence_labeling_evaluator import (
-    EvaluationMode,
-    SequenceLabelingEvaluator,
-    TaggingScheme,
-)
+from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 from embeddings.pipeline.evaluation_pipeline import (
     FlairSequenceLabelingEvaluationPipeline,
     FlairTextClassificationEvaluationPipeline,
@@ -246,8 +242,7 @@ class OptimizedFlairPairClassificationPipeline(
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
             dataset_path=self.dataset_path,
-            metric_name="f1__average_macro",
-            metric_key="f1",
+            metric_name="f1_macro",
             config_space=self.config_space,
         )
 

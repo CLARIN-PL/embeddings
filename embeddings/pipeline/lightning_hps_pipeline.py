@@ -22,11 +22,7 @@ from embeddings.evaluator.evaluation_results import (
     SequenceLabelingEvaluationResults,
     TextClassificationEvaluationResults,
 )
-from embeddings.evaluator.sequence_labeling_evaluator import (
-    EvaluationMode,
-    SequenceLabelingEvaluator,
-    TaggingScheme,
-)
+from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.hps_pipeline import (
     AbstractHuggingFaceOptimizedPipeline,

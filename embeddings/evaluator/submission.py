@@ -1,5 +1,7 @@
+import json
 import tempfile
-from dataclasses import asdict, dataclass
+import zipfile
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional, Type, Union
 
@@ -10,6 +12,7 @@ from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
+from embeddings.utils.json_dict_persister import CustomJsonEncoder
 
 
 @dataclass
@@ -75,6 +78,18 @@ class Submission:
         else:
             raise ValueError(f"Unrecognised task {task}.")
 
-    def save_json(self, root: T_path = ".", filename: Optional[str] = None) -> None:
+    def save_json(
+        self, root: T_path = ".", filename: Optional[str] = None, compress: bool = True
+    ) -> None:
+        root = Path(root)
+        root.mkdir(parents=True, exist_ok=True)
         filename = filename if filename else f"{self.submission_name}.json"
-        srsly.write_json(Path(root).joinpath(filename), asdict(self))
+        file_path = root.joinpath(filename)
+        with open(file_path, "w") as f:
+            json.dump(self, f, cls=CustomJsonEncoder, indent=2)
+        if compress:
+            with zipfile.ZipFile(
+                root.joinpath(f"{filename}.zip"), mode="w", compression=zipfile.ZIP_DEFLATED
+            ) as arc:
+                arc.write(root.joinpath(filename), arcname=filename)
+            root.joinpath(filename).unlink()

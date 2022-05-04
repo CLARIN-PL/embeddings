@@ -72,3 +72,6 @@ def run(
         **metadata,
     )
     retrain_pipeline.run(run_name=f"best-params-retrain-{run_name}")
+
+
+typer.run(run)
