@@ -65,4 +65,4 @@ class SequenceLabelingEvaluationResults(EvaluationResults):
     f1_micro: float
     recall_micro: float
     precision_micro: float
-    classes: dict[str, dict[str, Union[float, int]]]
+    classes: Dict[str, Dict[str, Union[float, int]]]

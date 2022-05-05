@@ -3,7 +3,7 @@ import tempfile
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional, Type, Union
+from typing import Any, Optional, Type, Union, Dict, List
 
 import srsly
 import yaml
@@ -22,11 +22,11 @@ class Submission:
     dataset_name: str
     dataset_version: str
     embedding_name: str
-    metrics: dict[str, Any]
-    hparams: dict[str, Any]
+    metrics: Dict[str, Any]
+    hparams: Dict[str, Any]
     predictions: Predictions
-    packages: list[str]
-    config: Optional[dict[str, Any]] = None  # any additional config
+    packages: List[str]
+    config: Optional[Dict[str, Any]] = None  # any additional config
 
     @staticmethod
     def from_run(

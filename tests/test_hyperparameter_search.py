@@ -3,13 +3,12 @@ from typing import Any, Dict, Tuple, Union
 
 import optuna
 import pytest
-from pydantic import create_model_from_typeddict
 
 from embeddings.config.flair_config import (
     FlairSequenceLabelingAdvancedConfig,
     FlairTextClassificationAdvancedConfig,
 )
-from embeddings.config.lightning_config import LightningAdvancedConfig, LightningBasicConfig
+from embeddings.config.lightning_config import LightningBasicConfig
 from embeddings.config.parameters import SearchableParameter
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.pipeline.flair_classification import FlairClassificationPipeline
