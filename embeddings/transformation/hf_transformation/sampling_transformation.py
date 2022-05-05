@@ -92,12 +92,12 @@ class SampleSplitsHuggingFaceTransformation(SampleSplitTransformation):
         return data.train_test_split(test_size=test_fraction, seed=self.seed)  # type: ignore
 
 
-class SampleSplitsSklearnTransformation(SampleSplitTransformation):
+class SampleSplitsStratifiedTransformation(SampleSplitTransformation):
     def __init__(
         self,
         dev_fraction: Optional[float] = None,
         test_fraction: Optional[float] = None,
-        stratify: bool = False,
+        stratify: bool = True,
         target_field_name: Optional[str] = None,
         seed: int = 441,
     ):
