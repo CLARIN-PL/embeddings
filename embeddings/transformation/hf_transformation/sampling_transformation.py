@@ -95,10 +95,10 @@ class SampleSplitsHuggingFaceTransformation(SampleSplitTransformation):
 class SampleSplitsStratifiedTransformation(SampleSplitTransformation):
     def __init__(
         self,
+        target_field_name: Optional[str],
         dev_fraction: Optional[float] = None,
         test_fraction: Optional[float] = None,
         stratify: bool = True,
-        target_field_name: Optional[str] = None,
         seed: int = 441,
     ):
         if stratify and not target_field_name:
