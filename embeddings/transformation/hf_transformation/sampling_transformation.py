@@ -95,15 +95,11 @@ class SampleSplitsHuggingFaceTransformation(SampleSplitTransformation):
 class SampleSplitsStratifiedTransformation(SampleSplitTransformation):
     def __init__(
         self,
-        target_field_name: Optional[str],
+        target_field_name: str,
         dev_fraction: Optional[float] = None,
         test_fraction: Optional[float] = None,
-        stratify: bool = True,
         seed: int = 441,
     ):
-        if stratify and not target_field_name:
-            raise ValueError("Parameter `target_field_name` must be set for stratified sampling")
-        self.stratify = stratify
         self.target_field_name = target_field_name
         super().__init__(dev_fraction, test_fraction, seed)
 
@@ -116,7 +112,7 @@ class SampleSplitsStratifiedTransformation(SampleSplitTransformation):
             data_idx,
             test_size=test_fraction,
             random_state=self.seed,
-            stratify=data[self.target_field_name] if self.stratify else None,  # type: ignore
+            stratify=data[self.target_field_name],
         )
 
         train_split = data.select(train_idx)
