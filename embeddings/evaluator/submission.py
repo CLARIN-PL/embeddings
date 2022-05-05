@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Optional, Type, Union
 
 import srsly
+import yaml
 from wandb.apis.public import Run
 
 from embeddings.data.io import T_path
@@ -25,6 +26,7 @@ class Submission:
     hparams: dict[str, Any]
     predictions: Predictions
     packages: list[str]
+    config: Optional[dict[str, Any]] = None  # any additional config
 
     @staticmethod
     def from_run(
@@ -48,6 +50,8 @@ class Submission:
         predictions = Predictions.from_evaluation_json(files["evaluation.json"].read())
         evaluator = Submission._get_evaluator_cls(task)(return_input_data=False)
         metrics = evaluator.evaluate(data=predictions).metrics
+        hparams = yaml.load(files["best_params.yaml"].read(), Loader=yaml.Loader)
+        packages = srsly.json_loads(files["packages.json"].read())
         submission = Submission(
             submission_name=submission_name,
             dataset_name=config["dataset_name_or_path"],
@@ -55,8 +59,9 @@ class Submission:
             embedding_name=config["embedding_name_or_path"],
             metrics=metrics,
             predictions=predictions,
-            hparams=config,
-            packages=srsly.json_loads(files["packages.json"].read()),
+            hparams=hparams,
+            packages=packages,
+            config=config,
         )
 
         for file in files.values():
