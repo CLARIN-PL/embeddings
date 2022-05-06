@@ -11,7 +11,7 @@ from embeddings.utils.loggers import get_logger
 _logger = get_logger(__name__)
 
 
-class SampleSplitTransformation(Transformation[datasets.DatasetDict, datasets.DatasetDict]):
+class SampleSplitsTransformation(Transformation[datasets.DatasetDict, datasets.DatasetDict]):
     def __init__(
         self,
         dev_fraction: Optional[float] = None,
@@ -85,14 +85,14 @@ class SampleSplitTransformation(Transformation[datasets.DatasetDict, datasets.Da
         return dataset
 
 
-class SampleSplitsHuggingFaceTransformation(SampleSplitTransformation):
+class SampleSplitsHuggingFaceTransformation(SampleSplitsTransformation):
     def _train_test_split(
         self, data: datasets.Dataset, test_fraction: float
     ) -> datasets.DatasetDict:
         return data.train_test_split(test_size=test_fraction, seed=self.seed)  # type: ignore
 
 
-class SampleSplitsStratifiedTransformation(SampleSplitTransformation):
+class SampleSplitsStratifiedTransformation(SampleSplitsTransformation):
     def __init__(
         self,
         target_field_name: str,
@@ -100,8 +100,8 @@ class SampleSplitsStratifiedTransformation(SampleSplitTransformation):
         test_fraction: Optional[float] = None,
         seed: int = 441,
     ):
-        self.target_field_name = target_field_name
         super().__init__(dev_fraction, test_fraction, seed)
+        self.target_field_name = target_field_name
 
     def _train_test_split(
         self, data: datasets.Dataset, test_fraction: float
