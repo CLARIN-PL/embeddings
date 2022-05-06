@@ -22,11 +22,11 @@ class Predictions:
                 if self.names.shape[0] != len(self.y_probabilities[0][0]):
                     raise ValueError("Wrong dimensionality of names and y_probabilities.")
 
-    @staticmethod
-    def from_evaluation_json(data: str) -> "Predictions":
+    @classmethod
+    def from_evaluation_json(cls, data: str) -> "Predictions":
         evaluation = srsly.json_loads(data)
         dtype = object if isinstance(evaluation["data"]["y_pred"], list) else None
-        return Predictions(
+        return cls(
             y_pred=np.array(evaluation["data"]["y_pred"], dtype=dtype),
             y_true=np.array(evaluation["data"]["y_true"], dtype=dtype),
             y_probabilities=np.array(evaluation["data"]["y_probabilities"], dtype=dtype),

@@ -37,10 +37,9 @@ def run(
     )  # type: ignore
     for run in runs:
         submission_name = run.name
-        submission = Submission.from_run(run.name, run, task)
+        submission = Submission.from_wandb_run(run.name, run, task)
         pprint.pprint(submission)
         submission.save_json(root)
-        pass
 
 
 typer.run(run)

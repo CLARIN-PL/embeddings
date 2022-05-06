@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, Final, List, Optional, Set, Type, Union
+from typing import Any, Dict, Final, List, Optional, Set, Union
 
 import torch
 from numpy import typing as nptyping
@@ -65,10 +65,6 @@ class SequenceLabelingEvaluator(MetricsEvaluator[SequenceLabelingEvaluationResul
     ) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
         return {self.get_metric_name(self.evaluation_mode, self.tagging_scheme): self._get_metric()}
 
-    @property
-    def evaluation_results_cls(self) -> Type[SequenceLabelingEvaluationResults]:
-        return SequenceLabelingEvaluationResults
-
     @staticmethod
     def get_metric_name(
         evaluation_mode: EvaluationMode, tagging_scheme: Optional[TaggingScheme] = None
@@ -94,14 +90,16 @@ class SequenceLabelingEvaluator(MetricsEvaluator[SequenceLabelingEvaluationResul
         result = {}
         [metric] = self.metrics().values()
         computed = metric.compute(y_true=data.y_true, y_pred=data.y_pred)
-        result["accuracy"] = computed.pop("overall_accuracy")
-        result["f1_micro"] = computed.pop("overall_f1")
-        result["recall_micro"] = computed.pop("overall_recall")
-        result["precision_micro"] = computed.pop("overall_precision")
+        result = {
+            "accuracy": computed.pop("overall_accuracy"),
+            "f1_micro": computed.pop("overall_f1"),
+            "recall_micro": computed.pop("overall_recall"),
+            "precision_micro": computed.pop("overall_precision"),
+            "data": data if self.return_input_data else None,
+        }
         for class_metrics in computed.values():
             class_metrics.pop("number")
-        result["data"] = data if self.return_input_data else None
-        return self.evaluation_results_cls(**result, classes=computed)
+        return SequenceLabelingEvaluationResults(**result, classes=computed)
 
 
 EvaluationMode = SequenceLabelingEvaluator.EvaluationMode

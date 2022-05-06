@@ -29,7 +29,7 @@ class Submission:
     config: Optional[Dict[str, Any]] = None  # any additional config
 
     @staticmethod
-    def from_run(
+    def from_wandb_run(
         submission_name: str, run: Run, task: str, root: Optional[T_path] = None
     ) -> "Submission":
         assert run.state == "finished"

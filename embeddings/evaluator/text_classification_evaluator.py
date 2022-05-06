@@ -41,4 +41,4 @@ class TextClassificationEvaluator(MetricsEvaluator[TextClassificationEvaluationR
             [computed] = metric.compute(y_true=data.y_true, y_pred=data.y_pred).values()
             result[field] = computed
         result["data"] = data if self.return_input_data else None
-        return self.evaluation_results_cls(**result)
+        return TextClassificationEvaluationResults(**result)
