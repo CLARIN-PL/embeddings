@@ -3,7 +3,7 @@ import tempfile
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional, Type, Union, Dict, List
+from typing import Any, Dict, List, Optional, Type, Union
 
 import srsly
 import yaml
