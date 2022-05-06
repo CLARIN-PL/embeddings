@@ -1,6 +1,9 @@
+import abc
 from typing import Optional
 
 import datasets
+import sklearn.model_selection
+from datasets import DatasetDict
 
 from embeddings.transformation.transformation import Transformation
 from embeddings.utils.loggers import get_logger
@@ -8,9 +11,7 @@ from embeddings.utils.loggers import get_logger
 _logger = get_logger(__name__)
 
 
-class SampleSplitsHuggingFaceTransformation(
-    Transformation[datasets.DatasetDict, datasets.DatasetDict]
-):
+class SampleSplitsTransformation(Transformation[datasets.DatasetDict, datasets.DatasetDict]):
     def __init__(
         self,
         dev_fraction: Optional[float] = None,
@@ -26,10 +27,11 @@ class SampleSplitsHuggingFaceTransformation(
                 "At least one of parameters `dev_fraction` and `test_fraction` must be set for SampleSplitsHuggingFaceTransformation"
             )
 
+    @abc.abstractmethod
     def _train_test_split(
         self, data: datasets.Dataset, test_fraction: float
     ) -> datasets.DatasetDict:
-        return data.train_test_split(test_size=test_fraction, seed=self.seed)  # type: ignore
+        pass
 
     def _check_args(self, data: datasets.DatasetDict) -> None:
         if "test" in data.keys() and self.test_fraction:
@@ -81,3 +83,39 @@ class SampleSplitsHuggingFaceTransformation(
             return data
 
         return dataset
+
+
+class SampleSplitsHuggingFaceTransformation(SampleSplitsTransformation):
+    def _train_test_split(
+        self, data: datasets.Dataset, test_fraction: float
+    ) -> datasets.DatasetDict:
+        return data.train_test_split(test_size=test_fraction, seed=self.seed)  # type: ignore
+
+
+class SampleSplitsStratifiedTransformation(SampleSplitsTransformation):
+    def __init__(
+        self,
+        target_field_name: str,
+        dev_fraction: Optional[float] = None,
+        test_fraction: Optional[float] = None,
+        seed: int = 441,
+    ):
+        super().__init__(dev_fraction, test_fraction, seed)
+        self.target_field_name = target_field_name
+
+    def _train_test_split(
+        self, data: datasets.Dataset, test_fraction: float
+    ) -> datasets.DatasetDict:
+        data_idx = range(len(data))
+
+        train_idx, test_idx = sklearn.model_selection.train_test_split(
+            data_idx,
+            test_size=test_fraction,
+            random_state=self.seed,
+            stratify=data[self.target_field_name],
+        )
+
+        train_split = data.select(train_idx)
+        test_split = data.select(test_idx)
+
+        return DatasetDict({"train": train_split, "test": test_split})
