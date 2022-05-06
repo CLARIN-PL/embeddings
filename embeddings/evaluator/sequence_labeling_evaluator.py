@@ -87,7 +87,6 @@ class SequenceLabelingEvaluator(MetricsEvaluator[SequenceLabelingEvaluationResul
         self, data: Union[Dict[str, nptyping.NDArray[Any]], Predictions]
     ) -> SequenceLabelingEvaluationResults:
         data = Predictions(**data) if isinstance(data, dict) else data
-        result = {}
         [metric] = self.metrics().values()
         computed = metric.compute(y_true=data.y_true, y_pred=data.y_pred)
         result = {

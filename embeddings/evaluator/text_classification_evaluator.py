@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Type, Union
+from typing import Any, Dict, List, Union
 
 import torch
 from numpy import typing as nptyping
@@ -27,10 +27,6 @@ class TextClassificationEvaluator(MetricsEvaluator[TextClassificationEvaluationR
                 "precision", compute_kwargs={"average": "weighted"}
             ),
         }
-
-    @property
-    def evaluation_results_cls(self) -> Type[TextClassificationEvaluationResults]:
-        return TextClassificationEvaluationResults
 
     def evaluate(
         self, data: Union[Dict[str, nptyping.NDArray[Any]], Predictions]
