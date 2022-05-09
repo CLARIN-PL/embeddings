@@ -50,7 +50,7 @@ class Submission:
         predictions = Predictions.from_evaluation_json(files["evaluation.json"].read())
         evaluator = Submission._get_evaluator_cls(task)(return_input_data=False)
         metrics = evaluator.evaluate(data=predictions).metrics
-        hparams = yaml.load(files["best_params.yaml"].read(), Loader=yaml.Loader)
+        hparams = yaml.load(files["best_params.yaml"].read(), Loader=yaml.Loader)["config"]
         packages = srsly.json_loads(files["packages.json"].read())
         submission = Submission(
             submission_name=submission_name,
