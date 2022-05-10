@@ -6,7 +6,6 @@ from typing import Any, Dict, Generic, Optional, Tuple
 
 import datasets
 from flair.data import Corpus
-from numpy import typing as nptyping
 
 from embeddings.config.config_space import ConfigSpace, SampledParameters
 from embeddings.config.flair_config import (
@@ -19,11 +18,12 @@ from embeddings.config.flair_config_space import (
 )
 from embeddings.config.parameters import ParameterValues
 from embeddings.data.io import T_path
-from embeddings.evaluator.sequence_labeling_evaluator import (
-    EvaluationMode,
-    SequenceLabelingEvaluator,
-    TaggingScheme,
+from embeddings.evaluator.evaluation_results import (
+    Predictions,
+    SequenceLabelingEvaluationResults,
+    TextClassificationEvaluationResults,
 )
+from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 from embeddings.pipeline.evaluation_pipeline import (
     FlairSequenceLabelingEvaluationPipeline,
     FlairTextClassificationEvaluationPipeline,
@@ -114,8 +114,8 @@ class OptimizedFlairClassificationPipeline(
         str,
         datasets.DatasetDict,
         Corpus,
-        Dict[str, nptyping.NDArray[Any]],
-        Dict[str, Any],
+        Predictions,
+        TextClassificationEvaluationResults,
     ],
     AbstractOptimizedFlairClassificationPipeline,
     _OptimizedFlairPipelineBase[FlairTextClassificationConfigSpace],
@@ -145,8 +145,7 @@ class OptimizedFlairClassificationPipeline(
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
             dataset_path=self.dataset_path,
-            metric_name="f1__average_macro",
-            metric_key="f1",
+            metric_name="f1_macro",
             config_space=self.config_space,
         )
 
@@ -212,8 +211,8 @@ class OptimizedFlairPairClassificationPipeline(
         str,
         datasets.DatasetDict,
         Corpus,
-        Dict[str, nptyping.NDArray[Any]],
-        Dict[str, Any],
+        Predictions,
+        TextClassificationEvaluationResults,
     ],
     AbstractOptimizedFlairClassificationPipeline,
     _OptimizedFlairPairClassificationPipelineBase[FlairTextClassificationConfigSpace],
@@ -243,8 +242,7 @@ class OptimizedFlairPairClassificationPipeline(
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
             dataset_path=self.dataset_path,
-            metric_name="f1__average_macro",
-            metric_key="f1",
+            metric_name="f1_macro",
             config_space=self.config_space,
         )
 
@@ -311,8 +309,8 @@ class OptimizedFlairSequenceLabelingPipeline(
         str,
         datasets.DatasetDict,
         Corpus,
-        Dict[str, nptyping.NDArray[Any]],
-        Dict[str, Any],
+        Predictions,
+        SequenceLabelingEvaluationResults,
     ],
     AbstractHuggingFaceOptimizedPipeline[FlairSequenceLabelingConfigSpace],
     _OptimizedFlairPipelineDefaultsBase,
@@ -348,9 +346,6 @@ class OptimizedFlairSequenceLabelingPipeline(
     def __post_init__(self) -> None:
         self._init_dataset_path()
         self._init_preprocessing_pipeline()
-        self.metric_name = SequenceLabelingEvaluator.get_metric_name(
-            evaluation_mode=self.evaluation_mode, tagging_scheme=self.tagging_scheme
-        )
         super().__init__(
             preprocessing_pipeline=self.preprocessing_pipeline,
             evaluation_pipeline=FlairSequenceLabelingEvaluationPipeline,
@@ -358,8 +353,7 @@ class OptimizedFlairSequenceLabelingPipeline(
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
             dataset_path=self.dataset_path,
-            metric_name=self.metric_name,
-            metric_key="overall_f1",
+            metric_name="f1_micro",
             config_space=self.config_space,
         )
 

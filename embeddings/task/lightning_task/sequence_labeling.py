@@ -5,6 +5,7 @@ from numpy import typing as nptyping
 from torch.utils.data import DataLoader
 
 from embeddings.data.io import T_path
+from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.model.lightning_module.sequence_labeling import SequenceLabelingModule
 from embeddings.task.lightning_task.lightning_task import LightningTask
 from embeddings.utils.loggers import LightningLoggingConfig
@@ -39,9 +40,7 @@ class SequenceLabelingTask(LightningTask):
             task_model_kwargs=self.task_model_kwargs,
         )
 
-    def predict(
-        self, dataloader: DataLoader[Any], return_names: bool = True
-    ) -> Dict[str, nptyping.NDArray[Any]]:
+    def predict(self, dataloader: DataLoader[Any], return_names: bool = True) -> Predictions:
         assert self.model is not None
         results = self.model.predict(dataloader=dataloader)
         predictions, ground_truth, probabilities = (
@@ -61,7 +60,7 @@ class SequenceLabelingTask(LightningTask):
             "y_probabilities": np.array(probabilities, dtype=object),
             "names": np.array(self.model.target_names),
         }
-        return results
+        return Predictions(**results)
 
     def _map_filter_data(
         self, data: nptyping.NDArray[Any], ground_truth_data: nptyping.NDArray[Any]

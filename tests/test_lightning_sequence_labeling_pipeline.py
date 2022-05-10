@@ -9,6 +9,7 @@ import torch
 from _pytest.tmpdir import TempdirFactory
 
 from embeddings.config.lightning_config import LightningAdvancedConfig
+from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelingEvaluationResults
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
@@ -81,7 +82,7 @@ def lightning_sequence_labeling_pipeline(
     dataset_kwargs: Dict[str, Any],
     config: LightningAdvancedConfig,
     tmp_path_module: Path,
-) -> LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]]:
+) -> LightningSequenceLabelingPipeline:
     return LightningSequenceLabelingPipeline(
         output_path=tmp_path_module,
         embedding_name_or_path="allegro/herbert-base-cased",
@@ -91,9 +92,7 @@ def lightning_sequence_labeling_pipeline(
 
 
 def test_lightning_sequence_labeling_pipeline(
-    lightning_sequence_labeling_pipeline: LightningPipeline[
-        datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]
-    ],
+    lightning_sequence_labeling_pipeline: LightningSequenceLabelingPipeline,
     tmp_path_module: Path,
 ) -> None:
     pl.seed_everything(441)
@@ -105,51 +104,44 @@ def test_lightning_sequence_labeling_pipeline(
     assert_inference_from_checkpoint(result, pipeline, tmp_path_module)
 
 
-def assert_result_values(result: Dict[str, Any]) -> None:
+def assert_result_values(result: SequenceLabelingEvaluationResults) -> None:
     np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_accuracy"],
+        result.accuracy,
         0.0015690,
         decimal=pytest.decimal,
     )
+    np.testing.assert_almost_equal(result.f1_micro, 0.0019846, decimal=pytest.decimal)
     np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_f1"], 0.0019846, decimal=pytest.decimal
-    )
-    np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_precision"],
+        result.precision_micro,
         0.0010559,
         decimal=pytest.decimal,
     )
     np.testing.assert_almost_equal(
-        result["seqeval__mode_None__scheme_None"]["overall_recall"],
+        result.recall_micro,
         0.0164609,
         decimal=pytest.decimal,
     )
 
 
-def assert_result_types(result: Dict[str, Any]) -> None:
-    assert "data" in result
-    assert "y_pred" in result["data"]
-    assert "y_true" in result["data"]
-    assert "y_probabilities" in result["data"]
-    assert "names" in result["data"]
-    assert isinstance(result["data"]["y_pred"], np.ndarray)
-    assert isinstance(result["data"]["y_true"], np.ndarray)
-    assert isinstance(result["data"]["y_probabilities"], np.ndarray)
-    assert isinstance(result["data"]["names"], np.ndarray)
-    assert isinstance(result["data"]["y_pred"][0], list)
-    assert isinstance(result["data"]["y_true"][0], list)
-    assert isinstance(result["data"]["y_probabilities"][0], list)
-    assert isinstance(result["data"]["names"], np.ndarray)
-    assert isinstance(result["data"]["y_pred"][0][0], str)
-    assert isinstance(result["data"]["y_true"][0][0], str)
-    assert isinstance(result["data"]["y_probabilities"][0][0], np.ndarray)
-    assert isinstance(result["data"]["names"][0], str)
-    assert isinstance(result["data"]["y_probabilities"][0][0][0], np.float32)
+def assert_result_types(result: SequenceLabelingEvaluationResults) -> None:
+    assert isinstance(result.data.y_true, np.ndarray)
+    assert isinstance(result.data.y_probabilities, np.ndarray)
+    assert isinstance(result.data.y_pred, np.ndarray)
+    assert isinstance(result.data.names, np.ndarray)
+    assert isinstance(result.data.y_pred[0], list)
+    assert isinstance(result.data.y_true[0], list)
+    assert isinstance(result.data.y_probabilities[0], list)
+    assert isinstance(result.data.names, np.ndarray)
+    assert isinstance(result.data.y_pred[0][0], str)
+    assert isinstance(result.data.y_true[0][0], str)
+    assert isinstance(result.data.y_probabilities[0][0], np.ndarray)
+    assert isinstance(result.data.names[0], str)
+    assert isinstance(result.data.y_probabilities[0][0][0], np.float32)
 
 
 def assert_inference_from_checkpoint(
     result: Dict[str, Any],
-    pipeline: LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]],
+    pipeline: LightningSequenceLabelingPipeline,
     tmp_path_module: Path,
 ) -> None:
     ckpt_path = tmp_path_module / "checkpoints" / "last.ckpt"
@@ -165,6 +157,4 @@ def assert_inference_from_checkpoint(
         assert torch.equal(model_state_dict[k], model_from_ckpt_state_dict[k])
 
     predictions = task_from_ckpt.predict(pipeline.datamodule.test_dataloader())
-    assert np.array_equal(
-        result["data"]["y_probabilities"][0][0], predictions["y_probabilities"][0][0]
-    )
+    assert np.array_equal(result.data.y_probabilities[0][0], predictions.y_probabilities[0][0])

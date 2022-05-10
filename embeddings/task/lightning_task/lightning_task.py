@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional, Sequence, Type
 
 import pytorch_lightning as pl
 import torch
-from numpy import typing as nptyping
 from pytorch_lightning.callbacks import Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from torch.utils.data import DataLoader
@@ -13,6 +12,7 @@ from transformers import AutoModel
 from embeddings.data.datamodule import HuggingFaceDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
+from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.model.lightning_module.lightning_module import LightningModule
 from embeddings.task.task import Task
@@ -22,7 +22,7 @@ from embeddings.utils.loggers import LightningLoggingConfig, get_logger
 _logger = get_logger(__name__)
 
 
-class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]]):
+class LightningTask(Task[HuggingFaceDataModule, Predictions]):
     MODEL_UNDEFINED_EXCEPTION = ValueError("Model undefined. Use build_task_model() first!")
 
     def __init__(
@@ -93,9 +93,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
             raise e
 
     @abc.abstractmethod
-    def predict(
-        self, dataloader: DataLoader[Any], return_names: bool = True
-    ) -> Dict[str, nptyping.NDArray[Any]]:
+    def predict(self, dataloader: DataLoader[Any], return_names: bool = True) -> Predictions:
         pass
 
     def fit_predict(
@@ -103,7 +101,7 @@ class LightningTask(Task[HuggingFaceDataModule, Dict[str, nptyping.NDArray[Any]]
         data: HuggingFaceDataModule,
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
         run_name: Optional[str] = None,
-    ) -> Dict[str, nptyping.NDArray[Any]]:
+    ) -> Predictions:
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
         self.fit(data, run_name=run_name)

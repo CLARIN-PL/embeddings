@@ -32,7 +32,7 @@ def dataset_kwargs(tmp_path_module: Path) -> Dict[str, Any]:
             "test_domains": ["hotels", "medicine"],
             "text_cfg": "text",
         },
-        persist_path=path.name,
+        persist_path=str(path),
         sample_missing_splits=None,
         ignore_test_subset=False,
         downsample_splits=(0.01, 0.01, 0.05),
@@ -41,7 +41,7 @@ def dataset_kwargs(tmp_path_module: Path) -> Dict[str, Any]:
     pipeline.run()
 
     return {
-        "dataset_name_or_path": path.name,
+        "dataset_name_or_path": str(path),
         "input_column_name": ["text"],
         "target_column_name": "target",
     }

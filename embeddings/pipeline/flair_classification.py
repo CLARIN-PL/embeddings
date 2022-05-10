@@ -3,7 +3,6 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 import datasets
 from flair.data import Corpus
-from numpy import typing as nptyping
 
 from embeddings.config.flair_config import (
     FlairTextClassificationBasicConfig,
@@ -13,6 +12,7 @@ from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import Dataset
 from embeddings.data.io import T_path
 from embeddings.embedding.flair_loader import FlairDocumentPoolEmbeddingLoader
+from embeddings.evaluator.evaluation_results import Predictions, TextClassificationEvaluationResults
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -29,7 +29,11 @@ from embeddings.utils.json_dict_persister import JsonPersister
 
 class FlairClassificationPipeline(
     StandardPipeline[
-        str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+        str,
+        datasets.DatasetDict,
+        Corpus,
+        Predictions,
+        TextClassificationEvaluationResults,
     ]
 ):
     def __init__(

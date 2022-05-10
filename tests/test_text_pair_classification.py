@@ -1,17 +1,17 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Tuple
+from typing import Tuple
 
 import datasets
 import flair
 import numpy as np
 import pytest
 from flair.data import Corpus
-from numpy import typing as nptyping
 
 from embeddings.data.data_loader import HuggingFaceDataLoader
 from embeddings.data.dataset import Dataset
 from embeddings.embedding.auto_flair import AutoFlairDocumentEmbedding
+from embeddings.evaluator.evaluation_results import Predictions, TextClassificationEvaluationResults
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
@@ -32,7 +32,7 @@ def text_pair_classification_pipeline(
     result_path: "TemporaryDirectory[str]",
 ) -> Tuple[
     StandardPipeline[
-        str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+        str, datasets.DatasetDict, Corpus, Predictions, TextClassificationEvaluationResults
     ],
     "TemporaryDirectory[str]",
 ]:
@@ -54,7 +54,7 @@ def text_pair_classification_pipeline(
 def test_text_pair_classification_pipeline(
     text_pair_classification_pipeline: Tuple[
         StandardPipeline[
-            str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+            str, datasets.DatasetDict, Corpus, Predictions, TextClassificationEvaluationResults
         ],
         "TemporaryDirectory[str]",
     ],
@@ -63,10 +63,10 @@ def test_text_pair_classification_pipeline(
     pipeline, path = text_pair_classification_pipeline
     result = pipeline.run()
     path.cleanup()
-    np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.1538461)
-    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.0222222)
-    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.0128205)
-    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.0833333)
+    np.testing.assert_almost_equal(result.accuracy, 0.1538461)
+    np.testing.assert_almost_equal(result.f1_macro, 0.0222222)
+    np.testing.assert_almost_equal(result.precision_macro, 0.0128205)
+    np.testing.assert_almost_equal(result.recall_macro, 0.0833333)
 
 
 @pytest.fixture(scope="module")
@@ -76,7 +76,7 @@ def text_pair_classification_pipeline_local_embedding(
     model_type_reference: str = "embeddings.embedding.static.word2vec.IPIPANWord2VecEmbedding",
 ) -> Tuple[
     StandardPipeline[
-        str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+        str, datasets.DatasetDict, Corpus, Predictions, TextClassificationEvaluationResults
     ],
     "TemporaryDirectory[str]",
 ]:
@@ -98,7 +98,7 @@ def text_pair_classification_pipeline_local_embedding(
 def test_text_pair_classification_pipeline_local_embedding(
     text_pair_classification_pipeline_local_embedding: Tuple[
         StandardPipeline[
-            str, datasets.DatasetDict, Corpus, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]
+            str, datasets.DatasetDict, Corpus, Predictions, TextClassificationEvaluationResults
         ],
         "TemporaryDirectory[str]",
     ],
@@ -107,7 +107,7 @@ def test_text_pair_classification_pipeline_local_embedding(
     pipeline, path = text_pair_classification_pipeline_local_embedding
     result = pipeline.run()
     path.cleanup()
-    np.testing.assert_almost_equal(result["accuracy"]["accuracy"], 0.1025641)
-    np.testing.assert_almost_equal(result["f1__average_macro"]["f1"], 0.062160)
-    np.testing.assert_almost_equal(result["precision__average_macro"]["precision"], 0.051282)
-    np.testing.assert_almost_equal(result["recall__average_macro"]["recall"], 0.08205128)
+    np.testing.assert_almost_equal(result.accuracy, 0.1025641)
+    np.testing.assert_almost_equal(result.f1_macro, 0.062160)
+    np.testing.assert_almost_equal(result.precision_macro, 0.051282)
+    np.testing.assert_almost_equal(result.recall_macro, 0.08205128)

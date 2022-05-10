@@ -10,6 +10,7 @@ from _pytest.tmpdir import TempdirFactory
 
 from embeddings.config.lighting_config_space import LightingSequenceLabelingConfigSpace
 from embeddings.config.parameters import ConstantParameter
+from embeddings.evaluator.evaluation_results import SequenceLabelingEvaluationResults
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingSequenceLabelingPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
@@ -210,7 +211,7 @@ def retrain_model_result(
     sequence_labelling_hps_run_result: Tuple[
         pd.DataFrame, LightningSequenceLabelingPipelineMetadata
     ],
-) -> Dict[str, Any]:
+) -> SequenceLabelingEvaluationResults:
     df, metadata = sequence_labelling_hps_run_result
     metadata["dataset_name_or_path"] = dataset_path.name
     metadata["output_path"] = retrain_tmp_path
@@ -270,7 +271,9 @@ def test_hparams_best_params_files_compatibility(
 
 
 def assert_compare_config_values(
-    best_params: Dict[str, Any], hparams: Dict[str, Any], metadata: Dict[str, Any]
+    best_params: Dict[str, Any],
+    hparams: Dict[str, Any],
+    metadata: LightningSequenceLabelingPipelineMetadata,
 ) -> None:
     best_params_config = _flatten(best_params["config"].__dict__)
     best_params_config.update(
@@ -282,7 +285,9 @@ def assert_compare_config_values(
 
 
 def assert_compare_params_values(
-    best_params: Dict[str, Any], hparams: Dict[str, Any], metadata: Dict[str, Any]
+    best_params: Dict[str, Any],
+    hparams: Dict[str, Any],
+    metadata: LightningSequenceLabelingPipelineMetadata,
 ) -> None:
     assert hparams["model_name_or_path"] == best_params["embedding_name_or_path"]
     hparams = {k: v for k, v in hparams.items() if k in best_params.keys() and k != "config"}
@@ -291,8 +296,8 @@ def assert_compare_params_values(
             continue
         elif not k.endswith("_kwargs") and k not in ["tagging_scheme"]:
             assert hparams[k] is not None
-        elif isinstance(metadata[k], Enum):  # type: ignore
-            enum_hparam = getattr(type(metadata[k]), hparams[k])  # type: ignore
-            assert enum_hparam == best_params[k] == metadata[k]  # type: ignore
+        elif isinstance(metadata[k], Enum):
+            enum_hparam = getattr(type(metadata[k]), hparams[k])
+            assert enum_hparam == best_params[k] == metadata[k]
         else:
-            assert hparams[k] == best_params[k] == metadata[k]  # type: ignore
+            assert hparams[k] == best_params[k] == metadata[k]

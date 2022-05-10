@@ -1,10 +1,10 @@
 from typing import Any, Dict, Optional
 
 import numpy as np
-from numpy import typing as nptyping
 from torch.utils.data import DataLoader
 
 from embeddings.data.io import T_path
+from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.model.lightning_module.text_classification import TextClassificationModule
 from embeddings.task.lightning_task.lightning_task import LightningTask
 from embeddings.utils.loggers import LightningLoggingConfig
@@ -40,13 +40,11 @@ class TextClassificationTask(LightningTask):
             task_model_kwargs=self.task_model_kwargs,
         )
 
-    def predict(
-        self, dataloader: DataLoader[Any], return_names: bool = True
-    ) -> Dict[str, nptyping.NDArray[Any]]:
+    def predict(self, dataloader: DataLoader[Any], return_names: bool = True) -> Predictions:
         assert self.model is not None
         results = self.model.predict(dataloader=dataloader)
         results["names"] = np.array(self.model.target_names)
-        return results
+        return Predictions(**results)
 
     @classmethod
     def from_checkpoint(

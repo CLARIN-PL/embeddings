@@ -328,7 +328,7 @@ def test_wrong_config_given(
     lightning_classification_yaml_config_file_path: Path,
     flair_sequence_labeling_yaml_config_file_path: Path,
     flair_trainer_yaml_config_file_path: Path,
-):
+) -> None:
     with pytest.raises(KeyError):
         LightingTextClassificationConfigSpace.from_yaml(
             flair_sequence_labeling_yaml_config_file_path
@@ -341,7 +341,7 @@ def test_wrong_config_given(
 
 def test_no_embedding_name_given(
     base_yaml_config_file_path: Path,
-):
+) -> None:
     with pytest.raises(KeyError):
         LightingTextClassificationConfigSpace.from_yaml(base_yaml_config_file_path)
     with pytest.raises(KeyError):
@@ -350,7 +350,7 @@ def test_no_embedding_name_given(
 
 def test_wrong_param_given(
     lightning_classification_wrong_param_yaml_config_file_path: Path,
-):
+) -> None:
     with pytest.raises(TypeError):
         LightingTextClassificationConfigSpace.from_yaml(
             lightning_classification_wrong_param_yaml_config_file_path
