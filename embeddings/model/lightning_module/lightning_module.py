@@ -11,7 +11,7 @@ from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.nn.functional import softmax
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
-from torchmetrics import MetricCollection
+from torchmetrics import F1, Accuracy, MetricCollection, Precision, Recall
 from transformers import get_linear_schedule_with_warmup
 
 from embeddings.data.datamodule import HuggingFaceDataset
@@ -41,7 +41,7 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         self.metrics = metrics
 
     @abc.abstractmethod
-    def get_default_metrics(self) -> MetricCollection:
+    def _init_model(self) -> None:
         pass
 
     @abc.abstractmethod
@@ -96,13 +96,6 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
                 return_predictions=True,
             )
 
-    def _init_metrics(self) -> None:
-        if self.metrics is None:
-            self.metrics = self.get_default_metrics()
-        self.train_metrics = self.metrics.clone(prefix="train/")
-        self.val_metrics = self.metrics.clone(prefix="val/")
-        self.test_metrics = self.metrics.clone(prefix="test/")
-
     def training_epoch_end(self, outputs: List[Any]) -> None:
         self._aggregate_and_log_metrics(self.train_metrics)
 
@@ -119,6 +112,23 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         metrics.reset()
         self.log_dict(metric_values, prog_bar=prog_bar)
         return metric_values
+
+    def _init_metrics(self) -> None:
+        if self.metrics is None:
+            self.metrics = self.get_default_metrics()
+        self.train_metrics = self.metrics.clone(prefix="train/")
+        self.val_metrics = self.metrics.clone(prefix="val/")
+        self.test_metrics = self.metrics.clone(prefix="test/")
+
+    def get_default_metrics(self) -> MetricCollection:
+        return MetricCollection(
+            [
+                Accuracy(num_classes=self.hparams.num_classes),
+                Precision(num_classes=self.hparams.num_classes, average="macro"),
+                Recall(num_classes=self.hparams.num_classes, average="macro"),
+                F1(num_classes=self.hparams.num_classes, average="macro"),
+            ]
+        )
 
     def configure_optimizers(self) -> Tuple[List[Optimizer], List[Any]]:
         """Prepare optimizer and schedule (linear warmup and decay)"""

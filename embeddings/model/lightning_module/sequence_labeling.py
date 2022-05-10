@@ -7,6 +7,8 @@ from torchmetrics import MetricCollection
 from transformers import AutoModelForTokenClassification
 
 from embeddings.data.io import T_path
+from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
+from embeddings.metric.lightning_seqeval_metric import SeqEvalMetric
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.utils.loggers import get_logger
 
@@ -21,6 +23,8 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         model_name_or_path: T_path,
         num_classes: int,
         finetune_last_n_layers: int,
+        evaluation_mode: EvaluationMode = EvaluationMode.CONLL,
+        tagging_scheme: Optional[TaggingScheme] = None,
         metrics: Optional[MetricCollection] = None,
         ignore_index: int = -100,
         config_kwargs: Optional[Dict[str, Any]] = None,
@@ -36,6 +40,8 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
             task_model_kwargs=task_model_kwargs,
         )
         self.ignore_index = ignore_index
+        self.evaluation_mode = evaluation_mode
+        self.tagging_scheme = tagging_scheme
         self.class_label: Optional[ClassLabel] = None
 
     def setup(self, stage: Optional[str] = None) -> None:
@@ -55,7 +61,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         batch, batch_idx = args
         labels = batch["labels"]
         loss, logits, preds = self.shared_step(**batch)
-        self.train_metrics(preds[labels != self.ignore_index], labels[labels != self.ignore_index])
+        self.train_metrics(preds, labels)
         self.log("train/Loss", loss)
         if self.hparams.use_scheduler:
             assert self.trainer is not None
@@ -68,7 +74,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         batch, batch_idx = args
         labels = batch["labels"]
         loss, logits, preds = self.shared_step(**batch)
-        self.val_metrics(preds[labels != self.ignore_index], labels[labels != self.ignore_index])
+        self.val_metrics(preds, labels)
         self.log("val/Loss", loss, on_epoch=True)
         return None
 
@@ -77,9 +83,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         labels = batch["labels"]
         loss, logits, preds = self.shared_step(**batch)
         if -1 not in labels:
-            self.test_metrics(
-                preds[labels != self.ignore_index], labels[labels != self.ignore_index]
-            )
+            self.test_metrics(preds, labels)
             self.log("test/Loss", loss, on_epoch=True)
         else:
             _logger.warning("Missing labels for the test data")
@@ -92,3 +96,15 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
     def on_load_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
         self.class_label = checkpoint["class_label"]
         super().on_load_checkpoint(checkpoint=checkpoint)
+
+    def get_default_metrics(self) -> MetricCollection:
+        return MetricCollection(
+            [
+                SeqEvalMetric(
+                    class_label=self.class_label,
+                    metric_name="f1_macro",
+                    evaluation_mode=self.evaluation_mode,
+                    tagging_scheme=self.tagging_scheme,
+                )
+            ]
+        )

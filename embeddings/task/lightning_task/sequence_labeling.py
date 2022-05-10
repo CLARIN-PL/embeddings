@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 
 from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import Predictions
+from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 from embeddings.model.lightning_module.sequence_labeling import SequenceLabelingModule
 from embeddings.task.lightning_task.lightning_task import LightningTask
 from embeddings.utils.loggers import LightningLoggingConfig
@@ -23,6 +24,8 @@ class SequenceLabelingTask(LightningTask):
         early_stopping_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
         finetune_last_n_layers: int = -1,
+        evaluation_mode: EvaluationMode = EvaluationMode.CONLL,
+        tagging_scheme: Optional[TaggingScheme] = None,
     ) -> None:
         super().__init__(output_path, task_train_kwargs, early_stopping_kwargs, logging_config)
         self.model_name_or_path = model_name_or_path
@@ -30,12 +33,16 @@ class SequenceLabelingTask(LightningTask):
         self.model_config_kwargs = model_config_kwargs
         self.task_model_kwargs = task_model_kwargs
         self.finetune_last_n_layers = finetune_last_n_layers
+        self.evaluation_mode = evaluation_mode
+        self.tagging_scheme = tagging_scheme
 
     def build_task_model(self) -> None:
         self.model = SequenceLabelingModule(
             model_name_or_path=self.model_name_or_path,
             num_classes=self.num_classes,
             finetune_last_n_layers=self.finetune_last_n_layers,
+            evaluation_mode=self.evaluation_mode,
+            tagging_scheme=self.tagging_scheme,
             config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
         )
