@@ -40,7 +40,7 @@ class SequenceLabelingEvaluator(MetricsEvaluator[SequenceLabelingEvaluationResul
 
     def _get_metric(
         self,
-    ) -> Union[HuggingFaceMetric, UnitSeqevalMetric]:
+    ) -> HuggingFaceMetric:
         if self.evaluation_mode in SequenceLabelingEvaluator.SEQEVAL_EVALUATION_MODES:
             if self.evaluation_mode == "strict" and not self.tagging_scheme:
                 raise ValueError("Tagging scheme must be set, when using strict evaluation mode!")
