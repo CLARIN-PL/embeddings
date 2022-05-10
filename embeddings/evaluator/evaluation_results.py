@@ -1,9 +1,15 @@
 from dataclasses import asdict, dataclass
+from enum import Enum
 from typing import Any, Dict, Optional, Union
 
 import numpy as np
 import srsly
 from numpy import typing as nptyping
+
+
+class Task(str, Enum):
+    sequence_labeling = "sequence_labeling"
+    text_classification = "text_classification"
 
 
 @dataclass
