@@ -8,6 +8,7 @@ from embeddings.evaluator.evaluation_results import Predictions, TextClassificat
 from embeddings.evaluator.metrics_evaluator import MetricsEvaluator
 from embeddings.metric.hugging_face_metric import HuggingFaceMetric
 from embeddings.metric.metric import Metric
+from embeddings.metric.prfs_per_class_metric import PRFSPerClassMetric
 
 
 class TextClassificationEvaluator(MetricsEvaluator[TextClassificationEvaluationResults]):
@@ -27,6 +28,7 @@ class TextClassificationEvaluator(MetricsEvaluator[TextClassificationEvaluationR
             "precision_weighted": HuggingFaceMetric(
                 "precision", compute_kwargs={"average": "weighted"}
             ),
+            "classes": PRFSPerClassMetric(),
         }
 
     def evaluate(
