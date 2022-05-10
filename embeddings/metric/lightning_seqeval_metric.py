@@ -14,7 +14,7 @@ from embeddings.metric.seqeval_metric import SeqevalMetric
 from embeddings.metric.unit_seqeval_metric import UnitSeqevalMetric
 
 
-class SeqEvalMetric(Metric):
+class SeqevalTorchMetric(Metric):
     def __init__(
         self,
         class_label: ClassLabel,
@@ -59,21 +59,17 @@ class SeqEvalMetric(Metric):
 
     def update(self, preds: torch.Tensor, target: torch.Tensor):
         assert preds.shape == target.shape
-        preds, target = self._input_format(preds, target)
-        self.y_pred += preds
-        self.y_true += target
+        self.y_pred += [preds]
+        self.y_true += [target]
 
     def compute(self) -> float:
-        result = self.metric.compute(y_true=self.y_true, y_pred=self.y_pred)
+        result = self.metric.compute(
+            y_true=self._input_format(self.y_true), y_pred=self._input_format(self.y_pred)
+        )
         assert isinstance(result, dict)
         metric_value = result[self.metric_name]
         assert isinstance(metric_value, float)
         return metric_value
 
-    def _input_format(
-        self, preds: torch.Tensor, target: torch.Tensor
-    ) -> Tuple[List[str], List[str]]:
-        return (
-            [self.class_label.int2str(x.item()) for x in preds[target != self.ignore_index]],
-            [self.class_label.int2str(x.item()) for x in target[target != self.ignore_index]],
-        )
+    def _input_format(self, outputs: List[torch.Tensor]) -> List[List[str]]:
+        return [self.class_label.int2str(x) for x in outputs]

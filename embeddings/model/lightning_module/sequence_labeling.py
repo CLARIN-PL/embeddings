@@ -8,7 +8,7 @@ from transformers import AutoModelForTokenClassification
 
 from embeddings.data.io import T_path
 from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
-from embeddings.metric.lightning_seqeval_metric import SeqEvalMetric
+from embeddings.metric.lightning_seqeval_metric import SeqevalTorchMetric
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.utils.loggers import get_logger
 
@@ -61,7 +61,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         batch, batch_idx = args
         labels = batch["labels"]
         loss, logits, preds = self.shared_step(**batch)
-        self.train_metrics(preds, labels)
+        self.train_metrics(preds[labels != self.ignore_index], labels[labels != self.ignore_index])
         self.log("train/Loss", loss)
         if self.hparams.use_scheduler:
             assert self.trainer is not None
@@ -74,7 +74,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         batch, batch_idx = args
         labels = batch["labels"]
         loss, logits, preds = self.shared_step(**batch)
-        self.val_metrics(preds, labels)
+        self.val_metrics(preds[labels != self.ignore_index], labels[labels != self.ignore_index])
         self.log("val/Loss", loss, on_epoch=True)
         return None
 
@@ -83,7 +83,9 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         labels = batch["labels"]
         loss, logits, preds = self.shared_step(**batch)
         if -1 not in labels:
-            self.test_metrics(preds, labels)
+            self.test_metrics(
+                preds[labels != self.ignore_index], labels[labels != self.ignore_index]
+            )
             self.log("test/Loss", loss, on_epoch=True)
         else:
             _logger.warning("Missing labels for the test data")
@@ -97,14 +99,14 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         self.class_label = checkpoint["class_label"]
         super().on_load_checkpoint(checkpoint=checkpoint)
 
-    def get_default_metrics(self) -> MetricCollection:
-        return MetricCollection(
-            [
-                SeqEvalMetric(
-                    class_label=self.class_label,
-                    metric_name="f1_macro",
-                    evaluation_mode=self.evaluation_mode,
-                    tagging_scheme=self.tagging_scheme,
-                )
-            ]
-        )
+    # def get_default_metrics(self) -> MetricCollection:
+    #     return MetricCollection(
+    #         [
+    #             SeqevalTorchMetric(
+    #                 class_label=self.class_label,
+    #                 metric_name="f1_macro",
+    #                 evaluation_mode=self.evaluation_mode,
+    #                 tagging_scheme=self.tagging_scheme,
+    #             )
+    #         ]
+    #     )
