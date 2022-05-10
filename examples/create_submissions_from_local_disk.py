@@ -29,7 +29,6 @@ def run(
         wandb_log_dir=wandb_log_dir,
         best_params_path=best_params_path,
     )
-    SUBMISSIONS_PATH.mkdir(exist_ok=True)
     submission.save_json(SUBMISSIONS_PATH / submission_name)
 
 

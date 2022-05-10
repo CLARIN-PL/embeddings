@@ -29,7 +29,7 @@ class Submission:
     config: Optional[Dict[str, Any]] = None  # any additional config
 
     @staticmethod
-    def _init_evaluator_kwargs(hparams: Dict[str, Any]) -> Dict[str, Any]:
+    def _get_evaluator_kwargs(hparams: Dict[str, Any]) -> Dict[str, Any]:
         evaluator_kwargs = {}
         evaluation_mode = hparams.get("evaluation_mode", None)
         tagging_scheme = hparams.get("tagging_scheme", None)
@@ -43,8 +43,9 @@ class Submission:
             )
         return evaluator_kwargs
 
-    @staticmethod
+    @classmethod
     def from_local_disk(
+        cls,
         submission_name: str,
         evaluation_file_path: T_path,
         packages_file_path: T_path,
@@ -52,7 +53,7 @@ class Submission:
         best_params_path: T_path,
         task: str,
     ) -> "Submission":
-        [wandb_run_dir] = [it for it in Path(wandb_log_dir).iterdir() if "run" in str(it)]
+        [wandb_run_dir] = list(Path(wandb_log_dir).glob("*run*"))
         wandb_config_path = wandb_run_dir / "files" / "config.yaml"
 
         with wandb_config_path.open() as f:
@@ -62,12 +63,12 @@ class Submission:
         with Path(best_params_path).open() as f:
             hparams = yaml.load(f, Loader=yaml.Loader)
 
-        evaluator_kwargs = Submission._init_evaluator_kwargs(hparams)
+        evaluator_kwargs = cls._get_evaluator_kwargs(hparams)
         predictions = Predictions.from_evaluation_json(evaluation_json)
-        evaluator = Submission._get_evaluator_cls(task)(return_input_data=False, **evaluator_kwargs)
+        evaluator = cls._get_evaluator_cls(task)(return_input_data=False, **evaluator_kwargs)
         metrics = evaluator.evaluate(data=predictions).metrics
         packages = srsly.read_json(str(packages_file_path))
-        submission = Submission(
+        return cls(
             submission_name=submission_name,
             dataset_name=wandb_cfg["dataset_name_or_path"],
             dataset_version=wandb_cfg["dataset_version"],
@@ -78,11 +79,10 @@ class Submission:
             packages=packages,
             config=wandb_cfg,
         )
-        return submission
 
-    @staticmethod
+    @classmethod
     def from_wandb_run(
-        submission_name: str, run: Run, task: str, root: Optional[T_path] = None
+        cls, submission_name: str, run: Run, task: str, root: Optional[T_path] = None
     ) -> "Submission":
         assert run.state == "finished"
 
@@ -100,13 +100,20 @@ class Submission:
 
         config = run.config
         hparams = yaml.load(files["best_params.yaml"].read(), Loader=yaml.Loader)
-        evaluator_kwargs = Submission._init_evaluator_kwargs(hparams)
+        evaluator_kwargs = cls._get_evaluator_kwargs(hparams)
         predictions = Predictions.from_evaluation_json(files["evaluation.json"].read())
-        evaluator = Submission._get_evaluator_cls(task)(return_input_data=False, **evaluator_kwargs)
+        evaluator = cls._get_evaluator_cls(task)(return_input_data=False, **evaluator_kwargs)
         metrics = evaluator.evaluate(data=predictions).metrics
 
         packages = srsly.json_loads(files["packages.json"].read())
-        submission = Submission(
+
+        for file in files.values():
+            file.close()
+
+        if tmp_dir:
+            tmp_dir.cleanup()
+
+        return cls(
             submission_name=submission_name,
             dataset_name=config["dataset_name_or_path"],
             dataset_version=config["dataset_version"],
@@ -117,14 +124,6 @@ class Submission:
             packages=packages,
             config=config,
         )
-
-        for file in files.values():
-            file.close()
-
-        if tmp_dir:
-            tmp_dir.cleanup()
-
-        return submission
 
     @staticmethod
     def _get_evaluator_cls(
