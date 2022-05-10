@@ -27,11 +27,13 @@ class PRFSPerClassMetric(Metric[HF_metric_input, Dict[str, Any]]):
         assert len(class_names) == len(p)
 
         return {
-            class_name: {
-                "precision": p_,
-                "recall": r_,
-                "f1": f1_,
-                "support": s_,
+            "classes": {
+                class_name: {
+                    "precision": p_,
+                    "recall": r_,
+                    "f1": f1_,
+                    "support": s_,
+                }
+                for class_name, p_, r_, f1_, s_ in zip(class_names, p, r, f1, s)
             }
-            for class_name, p_, r_, f1_, s_ in zip(class_names, p, r, f1, s)
         }
