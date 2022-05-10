@@ -118,7 +118,8 @@ module = [
     "spacy.*",
     "spacy",
     "appdirs",
-    "dataset.arrow_dataset"
+    "dataset.arrow_dataset",
+    "seqeval.*"
 ]
 ignore_missing_imports = true
 

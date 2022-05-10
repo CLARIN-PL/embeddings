@@ -64,15 +64,15 @@ def sklearn_metrics(
             output_dict=True,
         )
     )
-    prfs = precision_recall_fscore_support(
+    micro_score = precision_recall_fscore_support(
         list(filter(lambda tag: tag != "O", chain.from_iterable(data["y_true"]))),
         list(filter(lambda tag: tag != "O", chain.from_iterable(data["y_pred"]))),
         average="micro",
     )
 
-    del out_dict["macro avg"]
-    del out_dict["weighted avg"]
-    del out_dict["accuracy"]
+    macro_score = out_dict.pop("macro avg")
+    weighted_score = out_dict.pop("weighted avg")
+    out_dict.pop("accuracy")
 
     accuracy = accuracy_score(
         list(chain.from_iterable(data["y_true"])), list(chain.from_iterable(data["y_pred"]))
@@ -81,7 +81,7 @@ def sklearn_metrics(
         tag: {
             metric.replace("f1-score", "f1"): metric_value
             for metric, metric_value in tag_scores.items()
-            if metric != "support"
+            # if metric != "support"
         }
         for tag, tag_scores in out_dict.items()
     }
@@ -89,12 +89,19 @@ def sklearn_metrics(
         if k != "classes":
             out_dict.pop(k)
 
+    out_dict["precision_macro"] = macro_score["precision"]
+    out_dict["recall_macro"] = macro_score["recall"]
+    out_dict["f1_macro"] = macro_score["f1-score"]
+    out_dict["precision_weighted"] = weighted_score["precision"]
+    out_dict["recall_weighted"] = weighted_score["recall"]
+    out_dict["f1_weighted"] = weighted_score["f1-score"]
+
     out_dict.update(
         {
             "accuracy": accuracy,
-            "precision_micro": prfs[0],
-            "recall_micro": prfs[1],
-            "f1_micro": prfs[2],
+            "precision_micro": micro_score[0],
+            "recall_micro": micro_score[1],
+            "f1_micro": micro_score[2],
         }
     )
     return out_dict

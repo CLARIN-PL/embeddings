@@ -36,6 +36,17 @@ class Predictions:
 
 @dataclass
 class EvaluationResults:
+    accuracy: float
+    f1_macro: float
+    f1_micro: float
+    f1_weighted: float
+    recall_macro: float
+    recall_micro: float
+    recall_weighted: float
+    precision_macro: float
+    precision_micro: float
+    precision_weighted: float
+    classes: Dict[str, Dict[str, Union[float, int]]]
     data: Optional[Predictions]
 
     @property
@@ -47,22 +58,9 @@ class EvaluationResults:
 
 @dataclass
 class TextClassificationEvaluationResults(EvaluationResults):
-    accuracy: float
-    f1_macro: float
-    f1_micro: float
-    f1_weighted: float
-    recall_macro: float
-    recall_micro: float
-    recall_weighted: float
-    precision_macro: float
-    precision_micro: float
-    precision_weighted: float
+    pass
 
 
 @dataclass
 class SequenceLabelingEvaluationResults(EvaluationResults):
-    accuracy: float
-    f1_micro: float
-    recall_micro: float
-    precision_micro: float
-    classes: Dict[str, Dict[str, Union[float, int]]]
+    pass

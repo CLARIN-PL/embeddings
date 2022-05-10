@@ -8,6 +8,7 @@ from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelin
 from embeddings.evaluator.metrics_evaluator import MetricsEvaluator
 from embeddings.metric.hugging_face_metric import HuggingFaceMetric
 from embeddings.metric.metric import Metric
+from embeddings.metric.seqeval_metric import SeqevalMetric
 from embeddings.metric.unit_seqeval_metric import UnitSeqevalMetric
 
 
@@ -46,7 +47,7 @@ class SequenceLabelingEvaluator(MetricsEvaluator[SequenceLabelingEvaluationResul
             elif self.evaluation_mode == "conll" and self.tagging_scheme:
                 raise ValueError("Tagging scheme can be set only in strict mode!")
             return HuggingFaceMetric(
-                name="seqeval",
+                metric=SeqevalMetric(),
                 compute_kwargs={
                     "mode": self.evaluation_mode if self.evaluation_mode == "strict" else None,
                     "scheme": self.tagging_scheme,
@@ -88,17 +89,9 @@ class SequenceLabelingEvaluator(MetricsEvaluator[SequenceLabelingEvaluationResul
     ) -> SequenceLabelingEvaluationResults:
         data = Predictions(**data) if isinstance(data, dict) else data
         [metric] = self.metrics().values()
-        computed = metric.compute(y_true=data.y_true, y_pred=data.y_pred)
-        result = {
-            "accuracy": computed.pop("overall_accuracy"),
-            "f1_micro": computed.pop("overall_f1"),
-            "recall_micro": computed.pop("overall_recall"),
-            "precision_micro": computed.pop("overall_precision"),
-            "data": data if self.return_input_data else None,
-        }
-        for class_metrics in computed.values():
-            class_metrics.pop("number")
-        return SequenceLabelingEvaluationResults(**result, classes=computed)
+        result = metric.compute(y_true=data.y_true, y_pred=data.y_pred)
+        result["data"] = data if self.return_input_data else None
+        return SequenceLabelingEvaluationResults(**result)
 
 
 EvaluationMode = SequenceLabelingEvaluator.EvaluationMode
