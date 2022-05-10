@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Union
 
 import torch
 from numpy import typing as nptyping
+from sklearn.metrics import precision_recall_fscore_support
 
 from embeddings.evaluator.evaluation_results import Predictions, TextClassificationEvaluationResults
 from embeddings.evaluator.metrics_evaluator import MetricsEvaluator
@@ -39,4 +40,20 @@ class TextClassificationEvaluator(MetricsEvaluator[TextClassificationEvaluationR
             [computed] = metric.compute(y_true=data.y_true, y_pred=data.y_pred).values()
             result[field] = computed
         result["data"] = data if self.return_input_data else None
+
+        p, r, f1, s = precision_recall_fscore_support(y_true=data.y_true, y_pred=data.y_pred)
+        names = (
+            range(len(p)) if data.names is None else list(data.names)
+        )  # todo: add names to all of the pipelines
+        assert names is not None and len(names) == len(p)
+
+        result["classes"] = {
+            class_name: {
+                "precision": p_,
+                "recall": r_,
+                "f1": f1_,
+                "support": s_,
+            }
+            for class_name, p_, r_, f1_, s_ in zip(names, p, r, f1, s)
+        }
         return TextClassificationEvaluationResults(**result)

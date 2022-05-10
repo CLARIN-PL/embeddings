@@ -31,7 +31,7 @@ def dataset_kwargs(tmp_path_module: Path) -> Dict[str, Any]:
             "test_domains": ["hotels", "medicine"],
             "text_cfg": "text",
         },
-        persist_path=str(path.name),
+        persist_path=str(path),
         sample_missing_splits=None,
         ignore_test_subset=False,
         downsample_splits=(0.01, 0.01, 0.05),
