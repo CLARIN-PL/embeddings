@@ -99,14 +99,15 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         self.class_label = checkpoint["class_label"]
         super().on_load_checkpoint(checkpoint=checkpoint)
 
-    # def get_default_metrics(self) -> MetricCollection:
-    #     return MetricCollection(
-    #         [
-    #             SeqevalTorchMetric(
-    #                 class_label=self.class_label,
-    #                 metric_name="f1_macro",
-    #                 evaluation_mode=self.evaluation_mode,
-    #                 tagging_scheme=self.tagging_scheme,
-    #             )
-    #         ]
-    #     )
+    def get_default_metrics(self) -> MetricCollection:
+        assert isinstance(self.class_label, ClassLabel)
+        return MetricCollection(
+            [
+                SeqevalTorchMetric(
+                    class_label=self.class_label,
+                    metric_name="f1_macro",
+                    evaluation_mode=self.evaluation_mode,
+                    tagging_scheme=self.tagging_scheme,
+                )
+            ]
+        )

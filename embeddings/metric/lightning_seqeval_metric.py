@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import torch
 from datasets import ClassLabel
@@ -19,15 +19,13 @@ class SeqevalTorchMetric(Metric):
         self,
         class_label: ClassLabel,
         metric_name: str = "f1_macro",
-        ignore_index: int = -100,
         evaluation_mode: EvaluationMode = EvaluationMode.CONLL,
         tagging_scheme: Optional[TaggingScheme] = None,
-        dist_sync_on_step=False,
-    ):
+        dist_sync_on_step: bool = False,
+    ) -> None:
         super().__init__(dist_sync_on_step=dist_sync_on_step)
         self.class_label = class_label
         self.metric_name = metric_name
-        self.ignore_index = ignore_index
         self.evaluation_mode = evaluation_mode
         self.tagging_scheme = tagging_scheme
         self.metric = self._get_metric()
@@ -57,19 +55,23 @@ class SeqevalTorchMetric(Metric):
                 f"[unit, conll, strict]."
             )
 
-    def update(self, preds: torch.Tensor, target: torch.Tensor):
+    # ignoring due to different types defined in parent abstract method
+    def update(self, preds: torch.Tensor, target: torch.Tensor) -> None:  # type: ignore
         assert preds.shape == target.shape
         self.y_pred += [preds]
         self.y_true += [target]
 
     def compute(self) -> float:
-        result = self.metric.compute(
-            y_true=self._input_format(self.y_true), y_pred=self._input_format(self.y_pred)
-        )
+        result = self.metric.compute(**self._input_format(preds=self.y_pred, targets=self.y_true))
         assert isinstance(result, dict)
         metric_value = result[self.metric_name]
         assert isinstance(metric_value, float)
         return metric_value
 
-    def _input_format(self, outputs: List[torch.Tensor]) -> List[List[str]]:
-        return [self.class_label.int2str(x) for x in outputs]
+    def _input_format(
+        self, preds: List[torch.Tensor], targets: List[torch.Tensor]
+    ) -> Dict[str, List[List[str]]]:
+        return {
+            "y_true": [self.class_label.int2str(x) for x in preds],
+            "y_pred": [self.class_label.int2str(x) for x in targets],
+        }
