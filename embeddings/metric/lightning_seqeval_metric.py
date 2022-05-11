@@ -18,14 +18,15 @@ class SeqevalTorchMetric(Metric):
     def __init__(
         self,
         class_label: ClassLabel,
-        metric_name: str = "f1_macro",
+        average: str = "macro",
         evaluation_mode: EvaluationMode = EvaluationMode.CONLL,
         tagging_scheme: Optional[TaggingScheme] = None,
         dist_sync_on_step: bool = False,
     ) -> None:
+        assert average in ["macro", "micro", "weighted"]
         super().__init__(dist_sync_on_step=dist_sync_on_step)
         self.class_label = class_label
-        self.metric_name = metric_name
+        self.average = average
         self.evaluation_mode = evaluation_mode
         self.tagging_scheme = tagging_scheme
         self.metric = self._get_metric()
@@ -61,12 +62,11 @@ class SeqevalTorchMetric(Metric):
         self.y_pred += [preds]
         self.y_true += [target]
 
-    def compute(self) -> float:
+    def compute(self) -> Dict[str, float]:
         result = self.metric.compute(**self._input_format(preds=self.y_pred, targets=self.y_true))
-        assert isinstance(result, dict)
-        metric_value = result[self.metric_name]
-        assert isinstance(metric_value, float)
-        return metric_value
+        result.pop("classes")
+        result = {k: v for k, v in result.items() if self.average in k}
+        return result
 
     def _input_format(
         self, preds: List[torch.Tensor], targets: List[torch.Tensor]

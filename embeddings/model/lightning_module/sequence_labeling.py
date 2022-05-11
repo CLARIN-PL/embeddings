@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import torch
 from datasets import ClassLabel
@@ -61,8 +61,13 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         batch, batch_idx = args
         labels = batch["labels"]
         loss, logits, preds = self.shared_step(**batch)
-        self.train_metrics(preds[labels != self.ignore_index], labels[labels != self.ignore_index])
         self.log("train/Loss", loss)
+        output = self.train_metrics(
+            preds[labels != self.ignore_index], labels[labels != self.ignore_index]
+        )
+        output = output["train/SeqevalTorchMetric"]
+        output = {"train/" + k: v for k, v in output.items()}
+        self.log_dict(output)
         if self.hparams.use_scheduler:
             assert self.trainer is not None
             last_lr = self.trainer.lr_schedulers[0]["scheduler"].get_last_lr()
@@ -70,26 +75,43 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
             self.log("train/LambdaLR", last_lr[1], prog_bar=True)
         return {"loss": loss}
 
+    def training_epoch_end(self, outputs: List[Any]) -> None:
+        self.train_metrics.reset()
+
     def validation_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         batch, batch_idx = args
         labels = batch["labels"]
         loss, logits, preds = self.shared_step(**batch)
-        self.val_metrics(preds[labels != self.ignore_index], labels[labels != self.ignore_index])
         self.log("val/Loss", loss, on_epoch=True)
+        self.val_metrics.update(
+            preds[labels != self.ignore_index], labels[labels != self.ignore_index]
+        )
         return None
+
+    def validation_epoch_end(self, outputs: List[Any]) -> None:
+        output = self.val_metrics.compute()["val/SeqevalTorchMetric"]
+        output = {"val/" + k: v for k, v in output.items()}
+        self.log_dict(output)
+        self.val_metrics.reset()
 
     def test_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         batch, batch_idx = args
         labels = batch["labels"]
         loss, logits, preds = self.shared_step(**batch)
+        self.log("test/Loss", loss, on_epoch=True)
         if -1 not in labels:
-            self.test_metrics(
+            self.test_metrics.update(
                 preds[labels != self.ignore_index], labels[labels != self.ignore_index]
             )
-            self.log("test/Loss", loss, on_epoch=True)
         else:
             _logger.warning("Missing labels for the test data")
         return None
+
+    def test_epoch_end(self, outputs: List[Any]) -> None:
+        output = self.test_metrics.compute()["test/SeqevalTorchMetric"]
+        output = {"test/" + k: v for k, v in output.items()}
+        self.log_dict(output)
+        self.test_metrics.reset()
 
     def on_save_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
         checkpoint["class_label"] = self.class_label
@@ -105,7 +127,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
             [
                 SeqevalTorchMetric(
                     class_label=self.class_label,
-                    metric_name="f1_macro",
+                    average="macro",
                     evaluation_mode=self.evaluation_mode,
                     tagging_scheme=self.tagging_scheme,
                 )
