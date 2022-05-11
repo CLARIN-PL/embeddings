@@ -1,18 +1,12 @@
 import pprint
-from enum import Enum
 from pathlib import Path
 
 import typer
 import wandb
 
 from embeddings.defaults import SUBMISSIONS_PATH
+from embeddings.evaluator.evaluation_results import Task
 from embeddings.evaluator.submission import Submission
-
-
-class Task(str, Enum):
-    sequence_labeling = "sequence_labeling"
-    text_classification = "text_classification"
-
 
 app = typer.Typer()
 
