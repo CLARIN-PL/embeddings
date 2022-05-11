@@ -56,7 +56,7 @@ def seqeval_torch_metric(
 ) -> SeqevalTorchMetric:
     return SeqevalTorchMetric(
         class_label=dataset.features["ner"].feature,
-        metric_name="f1_macro",
+        average="macro",
         **seqeval_computing_kwargs
     )
 
@@ -105,5 +105,5 @@ def test_lightning_seqeval_metric(
 ):
     for preds, targets in zip(y_pred, dataset["ner"]):
         seqeval_torch_metric(torch.tensor(preds), torch.tensor(targets))
-    f1_macro = seqeval_torch_metric.compute()
-    np.testing.assert_almost_equal(f1_macro, 0.34666666, decimal=pytest.decimal)
+    results = seqeval_torch_metric.compute()
+    np.testing.assert_almost_equal(results["f1_macro"], 0.34666666, decimal=pytest.decimal)
