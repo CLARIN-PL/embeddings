@@ -11,7 +11,7 @@ from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.nn.functional import softmax
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
-from torchmetrics import F1, Accuracy, MetricCollection, Precision, Recall
+from torchmetrics import Accuracy, F1Score, MetricCollection, Precision, Recall
 from transformers import get_linear_schedule_with_warmup
 
 from embeddings.data.datamodule import HuggingFaceDataset
@@ -126,7 +126,7 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
                 Accuracy(num_classes=self.hparams.num_classes),
                 Precision(num_classes=self.hparams.num_classes, average="macro"),
                 Recall(num_classes=self.hparams.num_classes, average="macro"),
-                F1(num_classes=self.hparams.num_classes, average="macro"),
+                F1Score(num_classes=self.hparams.num_classes, average="macro"),
             ]
         )
 
