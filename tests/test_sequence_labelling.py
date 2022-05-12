@@ -16,6 +16,7 @@ from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
 from embeddings.embedding.flair_embedding import FlairEmbedding
 from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelingEvaluationResults
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
+from embeddings.metric.sequence_labeling import EvaluationMode
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
 from embeddings.task.flair_task.sequence_labeling import SequenceLabeling
@@ -60,9 +61,7 @@ def pos_tagging_pipeline(
     )
     task = SequenceLabeling(result_path.name, hidden_size=16, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(allegro_embedding, task)
-    evaluator = SequenceLabelingEvaluator(
-        evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.UNIT
-    )
+    evaluator = SequenceLabelingEvaluator(evaluation_mode=EvaluationMode.UNIT)
 
     pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)
     return pipeline, result_path
@@ -114,9 +113,7 @@ def pos_tagging_pipeline_local_embedding(
     )
     task = SequenceLabeling(result_path.name, hidden_size=16, task_train_kwargs={"max_epochs": 1})
     model = FlairModel(ipipan_embedding_local_file, task)
-    evaluator = SequenceLabelingEvaluator(
-        evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.UNIT
-    )
+    evaluator = SequenceLabelingEvaluator(evaluation_mode=EvaluationMode.UNIT)
 
     pipeline = StandardPipeline(dataset, data_loader, transformation, model, evaluator)
     return pipeline, result_path

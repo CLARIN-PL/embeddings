@@ -157,4 +157,6 @@ def assert_inference_from_checkpoint(
         assert torch.equal(model_state_dict[k], model_from_ckpt_state_dict[k])
 
     predictions = task_from_ckpt.predict(pipeline.datamodule.test_dataloader())
-    assert np.array_equal(result.data.y_probabilities[0][0], predictions.y_probabilities[0][0])
+    np.testing.assert_almost_equal(
+        result.data.y_probabilities[0][0], predictions.y_probabilities[0][0]
+    )

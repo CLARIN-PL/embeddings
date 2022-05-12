@@ -14,6 +14,7 @@ from embeddings.data.io import T_path
 from embeddings.embedding.flair_loader import FlairWordEmbeddingLoader
 from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelingEvaluationResults
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
+from embeddings.metric.sequence_labeling import EvaluationMode, TaggingScheme
 from embeddings.model.flair_model import FlairModel
 from embeddings.pipeline.standard_pipeline import StandardPipeline
 from embeddings.task.flair_task.sequence_labeling import SequenceLabeling
@@ -45,8 +46,8 @@ class FlairSequenceLabelingPipeline(
         output_path: T_path,
         model_type_reference: str = "",
         evaluation_filename: str = "evaluation.json",
-        evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = SequenceLabelingEvaluator.EvaluationMode.CONLL,
-        tagging_scheme: Optional[SequenceLabelingEvaluator.TaggingScheme] = None,
+        evaluation_mode: EvaluationMode = EvaluationMode.CONLL,
+        tagging_scheme: Optional[TaggingScheme] = None,
         config: FlairSequenceLabelingConfig = FlairSequenceLabelingBasicConfig(),
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,

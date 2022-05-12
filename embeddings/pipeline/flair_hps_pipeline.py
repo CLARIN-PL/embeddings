@@ -23,7 +23,7 @@ from embeddings.evaluator.evaluation_results import (
     SequenceLabelingEvaluationResults,
     TextClassificationEvaluationResults,
 )
-from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
+from embeddings.metric.sequence_labeling import EvaluationMode, TaggingScheme
 from embeddings.pipeline.evaluation_pipeline import (
     FlairSequenceLabelingEvaluationPipeline,
     FlairTextClassificationEvaluationPipeline,
