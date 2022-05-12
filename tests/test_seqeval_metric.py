@@ -64,7 +64,7 @@ def evaluator(seqeval_computing_kwargs: Dict[str, Optional[str]]) -> SequenceLab
     return SequenceLabelingEvaluator(**seqeval_computing_kwargs)
 
 
-def test_examplar(hf_seqeval_metric: Metric, predictions: Predictions):
+def test_examplar_hf_seqeval(hf_seqeval_metric: Metric, predictions: Predictions):
     results = hf_seqeval_metric.compute(
         predictions=predictions.y_pred, references=predictions.y_true
     )
