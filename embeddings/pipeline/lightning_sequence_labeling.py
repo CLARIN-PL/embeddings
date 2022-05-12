@@ -9,11 +9,8 @@ from embeddings.data.datamodule import SequenceLabelingDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelingEvaluationResults
-from embeddings.evaluator.sequence_labeling_evaluator import (
-    EvaluationMode,
-    SequenceLabelingEvaluator,
-    TaggingScheme,
-)
+from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
+from embeddings.metric.sequence_labeling import EvaluationMode, TaggingScheme
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task.sequence_labeling import SequenceLabelingTask

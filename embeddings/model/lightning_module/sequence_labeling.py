@@ -7,8 +7,8 @@ from torchmetrics import MetricCollection
 from transformers import AutoModelForTokenClassification
 
 from embeddings.data.io import T_path
-from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 from embeddings.metric.lightning_seqeval_metric import SeqevalTorchMetric
+from embeddings.metric.sequence_labeling import EvaluationMode, TaggingScheme
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.utils.loggers import get_logger
 

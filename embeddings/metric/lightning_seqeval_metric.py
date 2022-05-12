@@ -4,10 +4,10 @@ import torch
 from datasets import ClassLabel
 from torchmetrics import Metric
 
-from embeddings.evaluator.sequence_labeling_evaluator import (
+from embeddings.metric.sequence_labeling import (
     EvaluationMode,
-    SequenceLabelingEvaluator,
     TaggingScheme,
+    get_sequence_labeling_metric,
 )
 
 
@@ -24,7 +24,7 @@ class SeqevalTorchMetric(Metric):
         super().__init__(dist_sync_on_step=dist_sync_on_step)
         self.class_label = class_label
         self.average = average
-        self.metric = SequenceLabelingEvaluator.get_metric(
+        self.metric = get_sequence_labeling_metric(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         )
         self.add_state("y_pred", default=list(), dist_reduce_fx="cat")

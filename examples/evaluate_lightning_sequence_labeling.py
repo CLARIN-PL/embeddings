@@ -4,7 +4,7 @@ from typing import Optional
 import typer
 
 from embeddings.defaults import RESULTS_PATH
-from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
+from embeddings.metric.sequence_labeling import EvaluationMode, TaggingScheme
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
 from embeddings.utils.loggers import LightningLoggingConfig
 from embeddings.utils.utils import build_output_path, format_eval_results

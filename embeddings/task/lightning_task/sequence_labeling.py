@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 
 from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import Predictions
-from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
+from embeddings.metric.sequence_labeling import EvaluationMode, TaggingScheme
 from embeddings.model.lightning_module.sequence_labeling import SequenceLabelingModule
 from embeddings.task.lightning_task.lightning_task import LightningTask
 from embeddings.utils.loggers import LightningLoggingConfig
