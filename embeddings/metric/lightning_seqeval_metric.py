@@ -65,7 +65,8 @@ class SeqevalTorchMetric(Metric):
     def compute(self) -> Dict[str, float]:
         result = self.metric.compute(**self._input_format(preds=self.y_pred, targets=self.y_true))
         result.pop("classes")
-        result = {k: v for k, v in result.items() if self.average in k}
+        # TODO: uncomment
+        # result = {k: v for k, v in result.items() if self.average in k}
         return result
 
     def _input_format(

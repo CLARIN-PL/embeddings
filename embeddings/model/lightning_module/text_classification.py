@@ -55,7 +55,7 @@ class TextClassificationModule(HuggingFaceLightningModule):
     def validation_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         batch, batch_idx = args
         loss, logits, _ = self.shared_step(**batch)
-        self.val_metrics(logits, batch["labels"])
+        self.val_metrics.update(logits, batch["labels"])
         self.log("val/Loss", loss, on_epoch=True)
         return None
 
@@ -63,7 +63,7 @@ class TextClassificationModule(HuggingFaceLightningModule):
         batch, batch_idx = args
         loss, logits, _ = self.shared_step(**batch)
         if -1 not in batch["labels"]:
-            self.test_metrics(logits, batch["labels"])
+            self.test_metrics.update(logits, batch["labels"])
             self.log("test/Loss", loss, on_epoch=True)
         else:
             _logger.warning("Missing labels for the test data")

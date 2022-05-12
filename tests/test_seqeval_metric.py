@@ -55,9 +55,7 @@ def seqeval_torch_metric(
     dataset: Dataset, seqeval_computing_kwargs: Dict[str, Optional[str]]
 ) -> SeqevalTorchMetric:
     return SeqevalTorchMetric(
-        class_label=dataset.features["ner"].feature,
-        average="macro",
-        **seqeval_computing_kwargs
+        class_label=dataset.features["ner"].feature, average="macro", **seqeval_computing_kwargs
     )
 
 

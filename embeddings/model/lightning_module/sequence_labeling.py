@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import torch
 from datasets import ClassLabel
@@ -61,22 +61,14 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         batch, batch_idx = args
         labels = batch["labels"]
         loss, logits, preds = self.shared_step(**batch)
+        self.train_metrics(preds[labels != self.ignore_index], labels[labels != self.ignore_index])
         self.log("train/Loss", loss)
-        output = self.train_metrics(
-            preds[labels != self.ignore_index], labels[labels != self.ignore_index]
-        )
-        output = output["train/SeqevalTorchMetric"]
-        output = {"train/" + k: v for k, v in output.items()}
-        self.log_dict(output)
         if self.hparams.use_scheduler:
             assert self.trainer is not None
             last_lr = self.trainer.lr_schedulers[0]["scheduler"].get_last_lr()
             self.log("train/BaseLR", last_lr[0], prog_bar=True)
             self.log("train/LambdaLR", last_lr[1], prog_bar=True)
         return {"loss": loss}
-
-    def training_epoch_end(self, outputs: List[Any]) -> None:
-        self.train_metrics.reset()
 
     def validation_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         batch, batch_idx = args
@@ -87,12 +79,6 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
             preds[labels != self.ignore_index], labels[labels != self.ignore_index]
         )
         return None
-
-    def validation_epoch_end(self, outputs: List[Any]) -> None:
-        output = self.val_metrics.compute()["val/SeqevalTorchMetric"]
-        output = {"val/" + k: v for k, v in output.items()}
-        self.log_dict(output)
-        self.val_metrics.reset()
 
     def test_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         batch, batch_idx = args
@@ -107,11 +93,17 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
             _logger.warning("Missing labels for the test data")
         return None
 
-    def test_epoch_end(self, outputs: List[Any]) -> None:
-        output = self.test_metrics.compute()["test/SeqevalTorchMetric"]
-        output = {"test/" + k: v for k, v in output.items()}
-        self.log_dict(output)
-        self.test_metrics.reset()
+    def _aggregate_and_log_metrics(
+        self,
+        metrics: MetricCollection,
+        prog_bar: bool = False,
+    ) -> Dict[str, float]:
+        metric_values = metrics.compute()[metrics.prefix + next(iter(metrics))]
+        metric_values = {metrics.prefix + k: v for k, v in metric_values.items()}
+        assert isinstance(metric_values, dict)
+        metrics.reset()
+        self.log_dict(metric_values, prog_bar=prog_bar)
+        return metric_values
 
     def on_save_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
         checkpoint["class_label"] = self.class_label
