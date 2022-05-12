@@ -8,17 +8,17 @@ from embeddings.transformation.hf_transformation.to_pandas_transformation import
 
 
 @pytest.fixture(scope="module")
-def hf_dataset(dataset_name: str = "clarin-pl/polemo2-official"):
+def hf_dataset(dataset_name: str = "clarin-pl/polemo2-official") -> Dataset:
     return Dataset(dataset_name)
 
 
 @pytest.fixture(scope="module")
-def data_loader():
+def data_loader() -> HuggingFaceDataLoader:
     return HuggingFaceDataLoader()
 
 
 @pytest.fixture(scope="module")
-def to_pandas_transformation():
+def to_pandas_transformation() -> ToPandasHuggingFaceCorpusTransformation:
     return ToPandasHuggingFaceCorpusTransformation()
 
 
@@ -26,7 +26,7 @@ def test_to_pandas_transformation(
     hf_dataset: Dataset,
     data_loader: HuggingFaceDataLoader,
     to_pandas_transformation: ToPandasHuggingFaceCorpusTransformation,
-):
+) -> None:
     dataset = hf_dataset
     loader = data_loader
     transformation = to_pandas_transformation

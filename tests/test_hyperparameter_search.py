@@ -3,13 +3,12 @@ from typing import Any, Dict, Tuple, Union
 
 import optuna
 import pytest
-from pydantic import create_model_from_typeddict
 
 from embeddings.config.flair_config import (
     FlairSequenceLabelingAdvancedConfig,
     FlairTextClassificationAdvancedConfig,
 )
-from embeddings.config.lightning_config import LightningAdvancedConfig, LightningBasicConfig
+from embeddings.config.lightning_config import LightningBasicConfig
 from embeddings.config.parameters import SearchableParameter
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.pipeline.flair_classification import FlairClassificationPipeline
@@ -94,8 +93,8 @@ def lightning_classification_kwargs(output_path: "TemporaryDirectory[str]") -> D
 
 @pytest.fixture(scope="module")
 def flair_classification_pipeline_metadata(
-    flair_pipeline_kwargs,
-    flair_text_classification_dataset_kwargs,
+    flair_pipeline_kwargs: Dict[str, PrimitiveTypes],
+    flair_text_classification_dataset_kwargs: Dict[str, PrimitiveTypes],
 ) -> Dict[str, Any]:
     return {
         **flair_pipeline_kwargs,
@@ -113,8 +112,8 @@ def flair_classification_pipeline_metadata(
 
 @pytest.fixture(scope="module")
 def flair_pair_classification_pipeline_metadata(
-    flair_pipeline_kwargs,
-    flair_text_pair_classification_dataset_kwargs,
+    flair_pipeline_kwargs: Dict[str, Any],
+    flair_text_pair_classification_dataset_kwargs: Dict[str, Any],
 ) -> Dict[str, Any]:
     return {
         **flair_pipeline_kwargs,
@@ -132,9 +131,9 @@ def flair_pair_classification_pipeline_metadata(
 
 @pytest.fixture(scope="module")
 def flair_sequence_labeling_pipeline_metadata(
-    flair_pipeline_kwargs,
-    flair_sequence_labeling_pipeline_kwargs,
-    flair_sequence_labeling_dataset_kwargs,
+    flair_pipeline_kwargs: Dict[str, PrimitiveTypes],
+    flair_sequence_labeling_pipeline_kwargs: Dict[str, PrimitiveTypes],
+    flair_sequence_labeling_dataset_kwargs: Dict[str, PrimitiveTypes],
 ) -> Dict[str, Any]:
     return {
         **flair_pipeline_kwargs,
@@ -150,7 +149,8 @@ def flair_sequence_labeling_pipeline_metadata(
 
 @pytest.fixture(scope="module")
 def lightning_classification_pipeline_metadata(
-    lightning_text_classification_dataset_kwargs, lightning_classification_kwargs
+    lightning_text_classification_dataset_kwargs: Dict[str, PrimitiveTypes],
+    lightning_classification_kwargs: Dict[str, PrimitiveTypes],
 ) -> Dict[str, Any]:
     return {**lightning_text_classification_dataset_kwargs, **lightning_classification_kwargs}
 

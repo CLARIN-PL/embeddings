@@ -15,6 +15,7 @@ from numpy import typing as nptyping
 from tqdm.auto import tqdm
 
 from embeddings.data.io import T_path
+from embeddings.evaluator.evaluation_results import EvaluationResults
 from embeddings.utils.loggers import get_logger
 
 Numeric = Union[float, int]
@@ -97,7 +98,7 @@ def standardize_name(text: str) -> str:
         return text
 
 
-def format_eval_result(result: Dict[str, Any]) -> str:
+def format_eval_results(result: EvaluationResults) -> str:
     return pprint.pformat(result, sort_dicts=False)
 
 
@@ -118,7 +119,8 @@ def download_file(url: str, chunk_size: int = 1024) -> Tuple[Any, str]:
     r = requests.get(url, stream=True)
     if r.status_code != 200:
         raise RuntimeError(
-            f"Error while downloading file, response code status: {r.status_code}. Check download url."
+            f"Error while downloading file, response code status: {r.status_code}. "
+            f"Check download url."
         )
 
     filename = (

@@ -7,7 +7,7 @@ from embeddings.defaults import RESULTS_PATH
 from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
 from embeddings.utils.loggers import LightningLoggingConfig
-from embeddings.utils.utils import build_output_path, format_eval_result
+from embeddings.utils.utils import build_output_path, format_eval_results
 
 
 def run(
@@ -59,7 +59,7 @@ def run(
     )
 
     result = pipeline.run()
-    typer.echo(format_eval_result(result))
+    typer.echo(format_eval_results(result))
 
 
 typer.run(run)

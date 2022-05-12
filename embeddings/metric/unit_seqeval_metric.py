@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 
 from embeddings.metric.hugging_face_metric import HF_metric_input, HuggingFaceMetric
+from embeddings.metric.seqeval_metric import SeqevalMetric
 
 
 class UnitSeqevalMetric(HuggingFaceMetric):
@@ -11,7 +12,7 @@ class UnitSeqevalMetric(HuggingFaceMetric):
 
     def __init__(self) -> None:
         super().__init__(
-            "seqeval", compute_kwargs={"suffix": None, "scheme": "BILOU", "mode": "strict"}
+            SeqevalMetric(), compute_kwargs={"suffix": None, "scheme": "BILOU", "mode": "strict"}
         )
 
     @staticmethod

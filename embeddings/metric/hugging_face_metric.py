@@ -11,16 +11,21 @@ HF_metric_input = Union[List[Any], nptyping.NDArray[Any], torch.Tensor]
 
 class HuggingFaceMetric(Metric[HF_metric_input, Dict[Any, Any]]):
     def __init__(
-        self, name: str, compute_kwargs: Optional[Dict[str, Any]] = None, **init_kwargs: Any
+        self,
+        metric: Union[str, datasets.Metric],
+        compute_kwargs: Optional[Dict[str, Any]] = None,
+        **init_kwargs: Any,
     ):
-        super().__init__(name)
+        super().__init__(metric if isinstance(metric, str) else str(metric))
         if init_kwargs.get("process_id", 0) != 0:
             raise ValueError(
                 "Metric computation should be run on the main process. "
                 "Otherwise it would not return results in dict."
             )
 
-        self.metric = datasets.load_metric(name, **init_kwargs)
+        self.metric = (
+            datasets.load_metric(metric, **init_kwargs) if isinstance(metric, str) else metric
+        )
         self.compute_kwargs = {} if compute_kwargs is None else compute_kwargs
 
     def compute(

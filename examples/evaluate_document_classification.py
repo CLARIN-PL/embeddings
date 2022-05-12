@@ -4,7 +4,7 @@ import typer
 
 from embeddings.defaults import RESULTS_PATH
 from embeddings.pipeline.flair_classification import FlairClassificationPipeline
-from embeddings.utils.utils import build_output_path, format_eval_result
+from embeddings.utils.utils import build_output_path, format_eval_results
 
 app = typer.Typer()
 
@@ -35,7 +35,7 @@ def run(
         output_path=output_path,
     )
     result = pipeline.run()
-    typer.echo(format_eval_result(result))
+    typer.echo(format_eval_results(result))
 
 
 typer.run(run)

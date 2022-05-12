@@ -2,10 +2,9 @@ from abc import ABC
 from dataclasses import dataclass, field
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Generic, List, Optional, Tuple, Union
+from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar, Union
 
 import datasets
-from numpy import typing as nptyping
 from pytorch_lightning.accelerators import Accelerator
 
 from embeddings.config.config_space import ConfigSpace, SampledParameters
@@ -17,11 +16,13 @@ from embeddings.config.lightning_config import LightningAdvancedConfig
 from embeddings.config.parameters import ParameterValues
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
-from embeddings.evaluator.sequence_labeling_evaluator import (
-    EvaluationMode,
-    SequenceLabelingEvaluator,
-    TaggingScheme,
+from embeddings.evaluator.evaluation_results import (
+    EvaluationResults,
+    Predictions,
+    SequenceLabelingEvaluationResults,
+    TextClassificationEvaluationResults,
 )
+from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.hps_pipeline import (
     AbstractHuggingFaceOptimizedPipeline,
@@ -40,6 +41,8 @@ from embeddings.utils.loggers import LightningLoggingConfig, get_logger
 from embeddings.utils.utils import standardize_name
 
 _logger = get_logger(__name__)
+
+EvaluationResult = TypeVar("EvaluationResult", bound=EvaluationResults)
 
 
 @dataclass
@@ -74,13 +77,13 @@ class OptimizedLightingPipeline(
         str,
         datasets.DatasetDict,
         datasets.DatasetDict,
-        Dict[str, nptyping.NDArray[Any]],
-        Dict[str, Any],
+        Predictions,
+        EvaluationResult,
     ],
     AbstractHuggingFaceOptimizedPipeline[ConfigSpace],
     _OptimizedLightingPipelineBase[ConfigSpace],
     ABC,
-    Generic[ConfigSpace, LightningMetadata],
+    Generic[ConfigSpace, LightningMetadata, EvaluationResult],
 ):
     def _get_evaluation_metadata(
         self, parameters: SampledParameters, trial_name: str = "", **kwargs: Any
@@ -120,7 +123,7 @@ class OptimizedLightingPipeline(
 
     def _get_evaluation_pipeline(
         self, **kwargs: Any
-    ) -> LightningPipeline[datasets.DatasetDict, Dict[str, nptyping.NDArray[Any]], Dict[str, Any]]:
+    ) -> LightningPipeline[datasets.DatasetDict, Predictions, EvaluationResult]:
         assert issubclass(self.evaluation_pipeline, LightningPipeline)
         return self.evaluation_pipeline(logging_config=self.logging_config, **kwargs)
 
@@ -180,7 +183,9 @@ class OptimizedLightingPipeline(
 @dataclass
 class OptimizedLightingClassificationPipeline(
     OptimizedLightingPipeline[
-        LightingTextClassificationConfigSpace, LightningClassificationPipelineMetadata
+        LightingTextClassificationConfigSpace,
+        LightningClassificationPipelineMetadata,
+        TextClassificationEvaluationResults,
     ]
 ):
     def __post_init__(self) -> None:
@@ -193,8 +198,7 @@ class OptimizedLightingClassificationPipeline(
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
             dataset_path=self.dataset_path,
-            metric_name="f1__average_macro",
-            metric_key="f1",
+            metric_name="f1_macro",
             config_space=self.config_space,
         )
 
@@ -244,6 +248,7 @@ class OptimizedLightingSequenceLabelingPipeline(
     OptimizedLightingPipeline[
         LightingSequenceLabelingConfigSpace,
         LightningSequenceLabelingPipelineMetadata,
+        SequenceLabelingEvaluationResults,
     ]
 ):
     evaluation_mode: EvaluationMode = EvaluationMode.CONLL
@@ -252,9 +257,6 @@ class OptimizedLightingSequenceLabelingPipeline(
     def __post_init__(self) -> None:
         self._init_dataset_path()
         self._init_preprocessing_pipeline()
-        self.metric_name = SequenceLabelingEvaluator.get_metric_name(
-            evaluation_mode=self.evaluation_mode, tagging_scheme=self.tagging_scheme
-        )
         super(OptimizedLightingPipeline, self).__init__(
             preprocessing_pipeline=self.preprocessing_pipeline,
             evaluation_pipeline=LightningSequenceLabelingPipeline,
@@ -262,8 +264,7 @@ class OptimizedLightingSequenceLabelingPipeline(
             sampler=self.sampler_cls(seed=self.seed),
             n_trials=self.n_trials,
             dataset_path=self.dataset_path,
-            metric_name=self.metric_name,
-            metric_key="overall_f1",
+            metric_name="f1_micro",
             config_space=self.config_space,
         )
 

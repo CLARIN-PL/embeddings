@@ -1,8 +1,6 @@
 from pathlib import Path
-from tempfile import TemporaryDirectory
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
-import datasets
 import numpy as np
 import pytest
 import pytorch_lightning as pl
@@ -10,9 +8,9 @@ import torch
 from _pytest.tmpdir import TempdirFactory
 
 from embeddings.config.lightning_config import LightningAdvancedConfig
+from embeddings.evaluator.evaluation_results import TextClassificationEvaluationResults
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
-from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task.text_classification import TextClassificationTask
 
 
@@ -85,7 +83,7 @@ def lightning_classification_pipeline(
     dataset_kwargs: Dict[str, Any],
     config: LightningAdvancedConfig,
     tmp_path_module: Path,
-) -> LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]]:
+) -> LightningClassificationPipeline:
     return LightningClassificationPipeline(
         embedding_name_or_path="allegro/herbert-base-cased",
         output_path=tmp_path_module,
@@ -97,9 +95,7 @@ def lightning_classification_pipeline(
 
 
 def test_lightning_classification_pipeline(
-    lightning_classification_pipeline: LightningPipeline[
-        datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]
-    ],
+    lightning_classification_pipeline: LightningClassificationPipeline,
     tmp_path_module: Path,
 ) -> None:
     pl.seed_everything(441, workers=True)
@@ -111,40 +107,28 @@ def test_lightning_classification_pipeline(
     assert_inference_from_checkpoint(result, pipeline, tmp_path_module)
 
 
-def assert_result_values(result: Dict[str, Any]) -> None:
-    np.testing.assert_almost_equal(
-        result["accuracy"]["accuracy"], 0.3783783, decimal=pytest.decimal
-    )
-    np.testing.assert_almost_equal(
-        result["f1__average_macro"]["f1"], 0.1399999, decimal=pytest.decimal
-    )
-    np.testing.assert_almost_equal(
-        result["precision__average_macro"]["precision"], 0.1, decimal=pytest.decimal
-    )
-    np.testing.assert_almost_equal(
-        result["recall__average_macro"]["recall"], 0.2333333, decimal=pytest.decimal
-    )
+def assert_result_values(result: TextClassificationEvaluationResults) -> None:
+    np.testing.assert_almost_equal(result.accuracy, 0.3783783, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(result.f1_macro, 0.1399999, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(result.precision_macro, 0.1, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(result.recall_macro, 0.2333333, decimal=pytest.decimal)
 
 
-def assert_result_types(result: Dict[str, Any]) -> None:
-    assert "data" in result
-    assert "y_pred" in result["data"]
-    assert "y_true" in result["data"]
-    assert "y_probabilities" in result["data"]
-    assert "names" in result["data"]
-    assert isinstance(result["data"]["y_pred"], np.ndarray)
-    assert isinstance(result["data"]["y_true"], np.ndarray)
-    assert isinstance(result["data"]["y_probabilities"], np.ndarray)
-    assert isinstance(result["data"]["names"], np.ndarray)
-    assert result["data"]["y_pred"].dtype == np.int64
-    assert result["data"]["y_true"].dtype == np.int64
-    assert result["data"]["y_probabilities"].dtype == np.float32
-    assert isinstance(result["data"]["names"][0], str)
+def assert_result_types(result: TextClassificationEvaluationResults) -> None:
+    assert isinstance(result, TextClassificationEvaluationResults)
+    assert isinstance(result.data.y_pred, np.ndarray)
+    assert isinstance(result.data.y_true, np.ndarray)
+    assert isinstance(result.data.y_probabilities, np.ndarray)
+    assert isinstance(result.data.names, np.ndarray)
+    assert result.data.y_pred.dtype == np.int64
+    assert result.data.y_true.dtype == np.int64
+    assert result.data.y_probabilities.dtype == np.float32
+    assert isinstance(result.data.names[0], str)
 
 
 def assert_inference_from_checkpoint(
-    result: Dict[str, Any],
-    pipeline: LightningPipeline[datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]],
+    result: TextClassificationEvaluationResults,
+    pipeline: LightningClassificationPipeline,
     tmp_path_module: Path,
 ) -> None:
     ckpt_path = tmp_path_module / "checkpoints" / "last.ckpt"
@@ -160,4 +144,4 @@ def assert_inference_from_checkpoint(
         assert torch.equal(model_state_dict[k], model_from_ckpt_state_dict[k])
 
     predictions = task_from_ckpt.predict(pipeline.datamodule.test_dataloader())
-    assert np.array_equal(result["data"]["y_probabilities"], predictions["y_probabilities"])
+    assert np.array_equal(result.data.y_probabilities, predictions.y_probabilities)

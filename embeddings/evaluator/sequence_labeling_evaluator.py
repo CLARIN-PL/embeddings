@@ -1,16 +1,18 @@
 from enum import Enum
-from typing import Any, Dict, Final, List, Optional, Sequence, Set, Union
+from typing import Any, Dict, Final, List, Optional, Set, Union
 
 import torch
 from numpy import typing as nptyping
 
+from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelingEvaluationResults
 from embeddings.evaluator.metrics_evaluator import MetricsEvaluator
 from embeddings.metric.hugging_face_metric import HuggingFaceMetric
 from embeddings.metric.metric import Metric
+from embeddings.metric.seqeval_metric import SeqevalMetric
 from embeddings.metric.unit_seqeval_metric import UnitSeqevalMetric
 
 
-class SequenceLabelingEvaluator(MetricsEvaluator):
+class SequenceLabelingEvaluator(MetricsEvaluator[SequenceLabelingEvaluationResults]):
     class EvaluationMode(str, Enum):
         UNIT = "unit"
         CONLL = "conll"
@@ -28,42 +30,41 @@ class SequenceLabelingEvaluator(MetricsEvaluator):
 
     def __init__(
         self,
+        return_input_data: bool = True,
         evaluation_mode: EvaluationMode = EvaluationMode.CONLL,
         tagging_scheme: Optional[TaggingScheme] = None,
     ) -> None:
-        super().__init__()
-        self.metric = self._get_metric(evaluation_mode, tagging_scheme)
+        super().__init__(return_input_data)
+        self.evaluation_mode = evaluation_mode
+        self.tagging_scheme = tagging_scheme
 
     def _get_metric(
         self,
-        evaluation_mode: EvaluationMode,
-        tagging_scheme: Optional[TaggingScheme] = None,
-    ) -> Union[HuggingFaceMetric, UnitSeqevalMetric]:
-        if evaluation_mode in SequenceLabelingEvaluator.SEQEVAL_EVALUATION_MODES:
-            if evaluation_mode == "strict" and not tagging_scheme:
+    ) -> HuggingFaceMetric:
+        if self.evaluation_mode in SequenceLabelingEvaluator.SEQEVAL_EVALUATION_MODES:
+            if self.evaluation_mode == "strict" and not self.tagging_scheme:
                 raise ValueError("Tagging scheme must be set, when using strict evaluation mode!")
-            elif evaluation_mode == "conll" and tagging_scheme:
+            elif self.evaluation_mode == "conll" and self.tagging_scheme:
                 raise ValueError("Tagging scheme can be set only in strict mode!")
             return HuggingFaceMetric(
-                name="seqeval",
+                metric=SeqevalMetric(),
                 compute_kwargs={
-                    "mode": evaluation_mode if evaluation_mode == "strict" else None,
-                    "scheme": tagging_scheme,
+                    "mode": self.evaluation_mode if self.evaluation_mode == "strict" else None,
+                    "scheme": self.tagging_scheme,
                 },
             )
-        elif evaluation_mode == "unit":
+        elif self.evaluation_mode == "unit":
             return UnitSeqevalMetric()
         else:
             raise ValueError(
-                f"Evaluation mode {evaluation_mode} not supported. Must be one of "
+                f"Evaluation mode {self.evaluation_mode} not supported. Must be one of "
                 f"[unit, conll, strict]."
             )
 
-    @property
     def metrics(
         self,
-    ) -> Sequence[Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
-        return [self.metric]
+    ) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
+        return {self.get_metric_name(self.evaluation_mode, self.tagging_scheme): self._get_metric()}
 
     @staticmethod
     def get_metric_name(
@@ -82,6 +83,15 @@ class SequenceLabelingEvaluator(MetricsEvaluator):
             return metric_name
         else:
             raise ValueError(f"Evaluation Mode {evaluation_mode} unsupported.")
+
+    def evaluate(
+        self, data: Union[Dict[str, nptyping.NDArray[Any]], Predictions]
+    ) -> SequenceLabelingEvaluationResults:
+        data = Predictions(**data) if isinstance(data, dict) else data
+        [metric] = self.metrics().values()
+        result = metric.compute(y_true=data.y_true, y_pred=data.y_pred)
+        result["data"] = data if self.return_input_data else None
+        return SequenceLabelingEvaluationResults(**result)
 
 
 EvaluationMode = SequenceLabelingEvaluator.EvaluationMode

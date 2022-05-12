@@ -1,13 +1,17 @@
+import dataclasses
 import json
-from typing import Any, Dict
+from typing import Any, TypeVar
 
 import numpy as np
 
 from embeddings.data.io import T_path
+from embeddings.evaluator.evaluation_results import EvaluationResults
 from embeddings.utils.results_persister import ResultsPersister
 
+EvaluationResultsType = TypeVar("EvaluationResultsType", bound=EvaluationResults)
 
-class JsonEncoder(json.JSONEncoder):
+
+class CustomJsonEncoder(json.JSONEncoder):
     def default(self, obj: Any) -> Any:
         if isinstance(obj, np.integer):
             return int(obj)
@@ -15,14 +19,16 @@ class JsonEncoder(json.JSONEncoder):
             return float(obj)
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
+        elif dataclasses.is_dataclass(obj):
+            return dataclasses.asdict(obj)
         else:
-            return super(JsonEncoder, self).default(obj)
+            return super(CustomJsonEncoder, self).default(obj)
 
 
-class JsonPersister(ResultsPersister[Dict[str, Any]]):
+class JsonPersister(ResultsPersister[EvaluationResultsType]):
     def __init__(self, path: T_path):
         self.path = path
 
-    def persist(self, result: Dict[str, Any], **kwargs: Any) -> None:
+    def persist(self, result: EvaluationResultsType, **kwargs: Any) -> None:
         with open(self.path, "w") as f:
-            json.dump(result, f, cls=JsonEncoder, indent=2)
+            json.dump(result, f, cls=CustomJsonEncoder, indent=2)
