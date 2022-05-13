@@ -28,6 +28,7 @@ from embeddings.evaluator.evaluation_results import (
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
+from embeddings.metric.sequence_labeling import EvaluationMode, TaggingScheme
 from embeddings.model.flair_model import FlairModel
 from embeddings.model.model import Model
 from embeddings.pipeline.pipeline import Pipeline
@@ -133,7 +134,7 @@ class FlairTextPairClassificationEvaluationPipeline(
 class FlairSequenceLabelingEvaluationPipeline(
     ModelEvaluationPipeline[str, Corpus, Predictions, SequenceLabelingEvaluationResults]
 ):
-    DEFAULT_EVAL_MODE = SequenceLabelingEvaluator.EvaluationMode.CONLL
+    DEFAULT_EVAL_MODE = EvaluationMode.CONLL
 
     def __init__(
         self,
@@ -141,8 +142,8 @@ class FlairSequenceLabelingEvaluationPipeline(
         embedding_name: T_path,
         output_path: T_path,
         model_type_reference: str = "",
-        evaluation_mode: SequenceLabelingEvaluator.EvaluationMode = DEFAULT_EVAL_MODE,
-        tagging_scheme: Optional[SequenceLabelingEvaluator.TaggingScheme] = None,
+        evaluation_mode: EvaluationMode = DEFAULT_EVAL_MODE,
+        tagging_scheme: Optional[TaggingScheme] = None,
         config: FlairSequenceLabelingConfig = FlairSequenceLabelingBasicConfig(),
         persist_path: Optional[T_path] = None,
         predict_subset: Literal["dev", "test"] = "test",

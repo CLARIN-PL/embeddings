@@ -8,6 +8,7 @@ from sklearn.metrics import accuracy_score, classification_report, precision_rec
 
 from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelingEvaluationResults
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
+from embeddings.metric.sequence_labeling import EvaluationMode, TaggingScheme
 
 
 @pytest.fixture(scope="module")
@@ -109,9 +110,7 @@ def sklearn_metrics(
 
 @pytest.fixture(scope="module")
 def seqeval_metrics(data: Dict[str, nptyping.NDArray[Any]]) -> SequenceLabelingEvaluationResults:
-    evaluator = SequenceLabelingEvaluator(
-        evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.UNIT
-    )
+    evaluator = SequenceLabelingEvaluator(evaluation_mode=EvaluationMode.UNIT)
     out = evaluator.evaluate(data)
     assert isinstance(out, SequenceLabelingEvaluationResults)
     return out
@@ -128,17 +127,15 @@ def test_pos_tagging_metrics(
 
 
 def test_conll_metrics(ner_data: Dict[str, nptyping.NDArray[Any]]) -> None:
-    evaluator = SequenceLabelingEvaluator(
-        evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.CONLL
-    )
+    evaluator = SequenceLabelingEvaluator(evaluation_mode=EvaluationMode.CONLL)
     out = evaluator.evaluate(ner_data)
     np.testing.assert_almost_equal(out.f1_micro, 1.0)
 
 
 def test_strict_metrics(ner_data: Dict[str, nptyping.NDArray[Any]]) -> None:
     evaluator = SequenceLabelingEvaluator(
-        evaluation_mode=SequenceLabelingEvaluator.EvaluationMode.STRICT,
-        tagging_scheme=SequenceLabelingEvaluator.TaggingScheme.IOB2,
+        evaluation_mode=EvaluationMode.STRICT,
+        tagging_scheme=TaggingScheme.IOB2,
     )
     out = evaluator.evaluate(ner_data)
     np.testing.assert_almost_equal(out.f1_micro, 0.5)

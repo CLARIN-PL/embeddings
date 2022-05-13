@@ -10,7 +10,7 @@ from embeddings.config.flair_config import (
 from embeddings.config.lightning_config import LightningConfig
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
-from embeddings.evaluator.sequence_labeling_evaluator import EvaluationMode, TaggingScheme
+from embeddings.metric.sequence_labeling import EvaluationMode, TaggingScheme
 
 
 class EmbeddingPipelineBaseMetadata(TypedDict, total=False):

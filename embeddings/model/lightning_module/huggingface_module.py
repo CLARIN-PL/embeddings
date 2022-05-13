@@ -3,7 +3,7 @@ import sys
 from collections import ChainMap
 from typing import Any, Dict, List, Optional, Type
 
-from torchmetrics import F1, Accuracy, MetricCollection, Precision, Recall
+from torchmetrics import MetricCollection
 from transformers import AutoConfig, AutoModel
 
 from embeddings.data.io import T_path
@@ -27,7 +27,6 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
         self.config_kwargs = config_kwargs if config_kwargs else {}
         self.target_names: Optional[List[str]] = None
         self._init_model()
-        self._init_metrics()
 
     def setup(self, stage: Optional[str] = None) -> None:
         if stage in ("fit", None):
@@ -41,6 +40,7 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
                 self.total_steps: int = int(
                     (len(train_loader.dataset) / ab_size) * float(self.trainer.max_epochs)
                 )
+            self._init_metrics()
 
     def _init_model(self) -> None:
         self.config = AutoConfig.from_pretrained(
@@ -72,27 +72,6 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
                 if layer >= (no_layers - finetune_last_n_layers):
                     break
                 param.requires_grad = False
-
-    def get_default_metrics(self) -> MetricCollection:
-        if self.hparams.num_classes > 2:
-            metrics = MetricCollection(
-                [
-                    Accuracy(num_classes=self.hparams.num_classes),
-                    Precision(num_classes=self.hparams.num_classes, average="macro"),
-                    Recall(num_classes=self.hparams.num_classes, average="macro"),
-                    F1(num_classes=self.hparams.num_classes, average="macro"),
-                ]
-            )
-        else:
-            metrics = MetricCollection(
-                [
-                    Accuracy(num_classes=self.hparams.num_classes),
-                    Precision(num_classes=self.hparams.num_classes),
-                    Recall(num_classes=self.hparams.num_classes),
-                    F1(num_classes=self.hparams.num_classes),
-                ]
-            )
-        return metrics
 
     def forward(self, *args: Any, **kwargs: Any) -> Any:
         assert (not (args and kwargs)) and (args or kwargs)
