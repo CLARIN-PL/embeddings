@@ -2,6 +2,7 @@ from itertools import chain
 from typing import Any, Dict, List, Optional
 
 import numpy as np
+import torch
 
 from embeddings.metric.hugging_face_metric import HF_metric_input, HuggingFaceMetric
 from embeddings.metric.seqeval_metric import SeqevalMetric
@@ -17,12 +18,12 @@ class UnitSeqevalMetric(HuggingFaceMetric):
 
     @staticmethod
     def _convert_single_tag_to_bilou_scheme(tags: Optional[HF_metric_input]) -> List[List[str]]:
-        assert isinstance(tags, np.ndarray)
+        assert isinstance(tags, (np.ndarray, list, torch.Tensor))
         return [[f"U-{tag}" if tag != "O" else tag for tag in sequence] for sequence in tags]
 
     @staticmethod
     def _have_tags_unit_prefix(tags: Optional[HF_metric_input]) -> bool:
-        assert isinstance(tags, np.ndarray)
+        assert isinstance(tags, (np.ndarray, list, torch.Tensor))
         unique_tags = set(chain.from_iterable(tags))
         tag_prefixes = set(it[0:2] for it in unique_tags)
         return not tag_prefixes.difference(UnitSeqevalMetric.ALLOWED_TAG_PREFIXES)
