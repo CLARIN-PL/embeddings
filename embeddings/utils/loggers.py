@@ -124,7 +124,15 @@ class ExperimentLogger(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def init_logging(self) -> None:
+        pass
+
+    @abc.abstractmethod
     def finish_logging(self) -> None:
+        pass
+
+    @abc.abstractmethod
+    def log_artifact(self, paths: Iterable[T_path], artifact_name: str, artifact_type: str) -> None:
         pass
 
 
@@ -138,5 +146,21 @@ class WandbWrapper(ExperimentLogger):
             if not ignore or entry.name not in ignore:
                 wandb.save(entry.path, output_path)
 
+    def init_logging(
+        self,
+        name: Optional[str] = None,
+        project_name: Optional[str] = None,
+        entity: Optional[str] = None,
+        **kwargs: Any
+    ) -> None:
+        assert wandb.run is None, "The last logging is not finished."
+        wandb.init(name=name, project=project_name, entity=entity, **kwargs)
+
     def finish_logging(self) -> None:
         wandb.finish()
+
+    def log_artifact(self, paths: Iterable[T_path], artifact_name: str, artifact_type: str) -> None:
+        artifact = wandb.Artifact(name=artifact_name, type=artifact_type)
+        for path in paths:
+            artifact.add_file(path)
+        wandb.log_artifact(artifact)
