@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional
 
 import typer
@@ -60,12 +61,14 @@ def run(
         best_params_path=output_path.joinpath("best_params.yaml"),
         log_path=output_path.joinpath("hps_log.pickle"),
         logging_config=logging_config,
+        logging_hps_summary_name=f"hps_summary_{embedding_name_or_path}",
     )
     df, metadata = pipeline.run(run_name=f"search-{run_name}")
     del pipeline
 
     for i in range(n_retrains):
         retrain_run_name = f"best-params-retrain-{run_name}-{i}"
+        assert isinstance(metadata["output_path"], Path)
         metadata["output_path"] = output_path / standardize_name(retrain_run_name)
         metadata["output_path"].mkdir()
         retrain_pipeline = LightningClassificationPipeline(

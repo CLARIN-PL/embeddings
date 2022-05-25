@@ -78,7 +78,7 @@ class Submission(_BaseSubmission):
         task: str,
     ) -> "Submission":
         [wandb_run_dir] = list(Path(wandb_log_dir).glob("*run*"))
-        wandb_config_path = wandb_run_dir / "files" / "config.yaml"
+        wandb_config_path = Path(wandb_run_dir) / "files" / "config.yaml"
 
         with wandb_config_path.open() as f:
             wandb_cfg = yaml.load(f, Loader=yaml.Loader)
@@ -180,6 +180,32 @@ class AveragedSubmission(_BaseSubmission):
     averaged_over: int
 
     @classmethod
+    def from_local_disk(
+        cls,
+        submission_name: str,
+        evaluation_file_paths: List[T_path],
+        packages_file_paths: List[T_path],
+        wandb_log_dirs: List[T_path],
+        best_params_path: T_path,
+        task: str,
+    ) -> "AveragedSubmission":
+        assert len(evaluation_file_paths) == len(packages_file_paths) == len(wandb_log_dirs)
+        submissions = [
+            Submission.from_local_disk(
+                submission_name,
+                evaluation_file_path,
+                packages_file_path,
+                wandb_log_dir,
+                best_params_path,
+                task,
+            )
+            for evaluation_file_path, packages_file_path, wandb_log_dir in zip(
+                evaluation_file_paths, packages_file_paths, wandb_log_dirs
+            )
+        ]
+        return cls.from_submissions(submissions)
+
+    @classmethod
     def from_wandb(
         cls,
         submission_name: str,
@@ -191,11 +217,13 @@ class AveragedSubmission(_BaseSubmission):
         submissions = [
             Submission.from_wandb(submission_name, run, hps_summary_run, task, root) for run in runs
         ]
-        cls._check_equal_submissions_dicts([asdict(submission) for submission in submissions])
+        return cls.from_submissions(submissions)
 
+    @classmethod
+    def from_submissions(cls, submissions: Sequence[Submission]) -> "AveragedSubmission":
+        cls._check_equal_submissions_dicts([asdict(submission) for submission in submissions])
         metrics = cls._average_metrics_dicts([submission.metrics for submission in submissions])
         predictions = [submission.predictions for submission in submissions]
-
         return AveragedSubmission(
             predictions=predictions,
             metrics=metrics,
