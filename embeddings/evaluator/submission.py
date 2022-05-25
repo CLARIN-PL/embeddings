@@ -1,10 +1,13 @@
 import json
 import tempfile
 import zipfile
-from dataclasses import dataclass
+from abc import ABC
+from dataclasses import asdict, dataclass
+from io import TextIOWrapper
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Dict, List, Optional, Sequence, Type, Union
 
+import numpy as np
 import srsly
 import yaml
 from wandb.apis.public import Run
@@ -14,19 +17,40 @@ from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.utils.json_dict_persister import CustomJsonEncoder
+from embeddings.utils.utils import standardize_name
 
 
 @dataclass
-class Submission:
+class _BaseSubmission(ABC):
     submission_name: str
     dataset_name: str
     dataset_version: str
     embedding_name: str
     metrics: Dict[str, Any]
     hparams: Dict[str, Any]
-    predictions: Predictions
     packages: List[str]
-    config: Optional[Dict[str, Any]] = None  # any additional config
+    config: Optional[Dict[str, Any]]  # any additional config
+
+    def save_json(
+        self, root: T_path = ".", filename: Optional[str] = None, compress: bool = True
+    ) -> None:
+        root = Path(root)
+        root.mkdir(parents=True, exist_ok=True)
+        filename = filename if filename else f"{standardize_name(self.submission_name)}.json"
+        file_path = root.joinpath(filename)
+        with open(file_path, "w") as f:
+            json.dump(self, f, cls=CustomJsonEncoder, indent=2)
+        if compress:
+            with zipfile.ZipFile(
+                root.joinpath(f"{filename}.zip"), mode="w", compression=zipfile.ZIP_DEFLATED
+            ) as arc:
+                arc.write(root.joinpath(filename), arcname=filename)
+            root.joinpath(filename).unlink()
+
+
+@dataclass
+class Submission(_BaseSubmission):
+    predictions: Predictions
 
     @staticmethod
     def _get_evaluator_kwargs(hparams: Dict[str, Any]) -> Dict[str, Any]:
@@ -80,11 +104,15 @@ class Submission:
             config=wandb_cfg,
         )
 
-    @classmethod
-    def from_wandb_run(
-        cls, submission_name: str, run: Run, task: str, root: Optional[T_path] = None
+    @staticmethod
+    def from_wandb(
+        submission_name: str,
+        retrain_run: Run,
+        hps_summary_run: Run,
+        task: str,
+        root: Optional[T_path] = None,
     ) -> "Submission":
-        assert run.state == "finished"
+        assert retrain_run.state == "finished"
 
         if root is None:
             tmp_dir = tempfile.TemporaryDirectory()
@@ -93,27 +121,36 @@ class Submission:
             tmp_dir = None
 
         files = {
-            file.name: file.download(root=Path(root).joinpath(run.name))
-            for file in run.files()
-            if file.name in ["evaluation.json", "packages.json", "best_params.yaml"]
+            file.name: file.download(root=Path(root).joinpath(retrain_run.name))
+            for file in retrain_run.files(["evaluation.json", "packages.json"])
         }
+        [hps_output_artifact] = [
+            artifact
+            for artifact in hps_summary_run.logged_artifacts()
+            if artifact.name.split(":")[0] == "hps_output"
+        ]
+        files["best_params.yaml"] = hps_output_artifact.download(
+            root=Path(root).joinpath(hps_summary_run.name)
+        ).joinpath("best_params.yaml")
 
-        config = run.config
-        hparams = yaml.load(files["best_params.yaml"].read(), Loader=yaml.Loader)
-        evaluator_kwargs = cls._get_evaluator_kwargs(hparams)
+        config = retrain_run.config
+        with open(files["best_params.yaml"]) as f:
+            hparams = yaml.load(f, Loader=yaml.Loader)
+        evaluator_kwargs = Submission._get_evaluator_kwargs(hparams)
         predictions = Predictions.from_evaluation_json(files["evaluation.json"].read())
-        evaluator = cls._get_evaluator_cls(task)(return_input_data=False, **evaluator_kwargs)
+        evaluator = Submission._get_evaluator_cls(task)(return_input_data=False, **evaluator_kwargs)
         metrics = evaluator.evaluate(data=predictions).metrics
 
         packages = srsly.json_loads(files["packages.json"].read())
 
         for file in files.values():
-            file.close()
+            if isinstance(file, TextIOWrapper):
+                file.close()
 
         if tmp_dir:
             tmp_dir.cleanup()
 
-        return cls(
+        return Submission(
             submission_name=submission_name,
             dataset_name=config["dataset_name_or_path"],
             dataset_version=config["dataset_version"],
@@ -136,18 +173,67 @@ class Submission:
         else:
             raise ValueError(f"Unrecognised task {task}.")
 
-    def save_json(
-        self, root: T_path = ".", filename: Optional[str] = None, compress: bool = True
-    ) -> None:
-        root = Path(root)
-        root.mkdir(parents=True, exist_ok=True)
-        filename = filename if filename else f"{self.submission_name}.json"
-        file_path = root.joinpath(filename)
-        with open(file_path, "w") as f:
-            json.dump(self, f, cls=CustomJsonEncoder, indent=2)
-        if compress:
-            with zipfile.ZipFile(
-                root.joinpath(f"{filename}.zip"), mode="w", compression=zipfile.ZIP_DEFLATED
-            ) as arc:
-                arc.write(root.joinpath(filename), arcname=filename)
-            root.joinpath(filename).unlink()
+
+@dataclass
+class AveragedSubmission(_BaseSubmission):
+    predictions: List[Predictions]
+    averaged_over: int
+
+    @classmethod
+    def from_wandb(
+        cls,
+        submission_name: str,
+        runs: Sequence[Run],
+        hps_summary_run: Run,
+        task: str,
+        root: Optional[T_path] = None,
+    ) -> "AveragedSubmission":
+        submissions = [
+            Submission.from_wandb(submission_name, run, hps_summary_run, task, root) for run in runs
+        ]
+        cls._check_equal_submissions_dicts([asdict(submission) for submission in submissions])
+
+        metrics = cls._average_metrics_dicts([submission.metrics for submission in submissions])
+        predictions = [submission.predictions for submission in submissions]
+
+        return AveragedSubmission(
+            predictions=predictions,
+            metrics=metrics,
+            averaged_over=len(submissions),
+            **cls._get_common_fields(submissions[0]),
+        )
+
+    @classmethod
+    def _average_metrics_dicts(cls, dicts: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
+        avg_dict = dict()
+        for k in dicts[0].keys():
+            if k in {"support"}:
+                if not all(d[k] == dicts[0][k] for d in dicts):
+                    raise ValueError(f"During averaging dict values of key '{k}' were not equal.")
+                avg_dict[k] = dicts[0][k]
+            elif isinstance(dicts[0][k], (int, float)):
+                print(k, ":", sum(d[k] for d in dicts) / len(dicts))
+                avg_dict[k] = sum(d[k] for d in dicts) / len(dicts)
+            elif isinstance(dicts[0][k], dict):
+                avg_dict[k] = cls._average_metrics_dicts([d[k] for d in dicts])
+        return avg_dict
+
+    @classmethod
+    def _check_equal_submissions_dicts(cls, dicts: Sequence[Dict[str, Any]]) -> None:
+        for k in dicts[0].keys():
+            if k in {"metrics", "y_pred", "y_probabilities", "output_path"}:
+                continue
+            elif isinstance(dicts[0][k], dict):
+                cls._check_equal_submissions_dicts([d[k] for d in dicts])
+            elif isinstance(dicts[0][k], np.ndarray):
+                if not all((d[k] == dicts[0][k]).all() for d in dicts):
+                    raise ValueError(f"Fields '{k}' of submissions are not equal.")
+            elif not all(d[k] == dicts[0][k] for d in dicts):
+                raise ValueError(f"Fields '{k}' of submissions are not equal.")
+
+    @staticmethod
+    def _get_common_fields(submission: Submission) -> Dict[str, Any]:
+        result = asdict(submission)
+        result.pop("predictions")
+        result.pop("metrics")
+        return result

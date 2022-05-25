@@ -58,8 +58,11 @@ class OptimizedPipeline(ABC, Generic[Metadata]):
         best_params_path: T_path,
         log_path: T_path,
         logging_config: LightningLoggingConfig = LightningLoggingConfig(),
+        logging_hps_summary_name: Optional[str] = None,
     ) -> "PersistingPipeline[Metadata]":
-        return PersistingPipeline(self, best_params_path, log_path, logging_config)
+        return PersistingPipeline(
+            self, best_params_path, log_path, logging_config, logging_hps_summary_name
+        )
 
 
 class PersistingPipeline(OptimizedPipeline[Metadata]):
@@ -69,10 +72,14 @@ class PersistingPipeline(OptimizedPipeline[Metadata]):
         best_params_path: T_path,
         log_path: T_path,
         logging_config: LightningLoggingConfig = LightningLoggingConfig(),
+        logging_hps_summary_name: Optional[str] = None,
     ):
         self.base_pipeline = base_pipeline
         self.persister: HPSResultsPersister[Metadata] = HPSResultsPersister(
-            best_params_path=best_params_path, log_path=log_path, logging_config=logging_config
+            best_params_path=best_params_path,
+            log_path=log_path,
+            logging_config=logging_config,
+            logging_hps_summary_name=logging_hps_summary_name,
         )
 
     def run(self, **kwargs: Any) -> Tuple[pd.DataFrame, Metadata]:

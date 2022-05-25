@@ -1,4 +1,5 @@
 import pprint
+from itertools import groupby
 from pathlib import Path
 
 import typer
@@ -6,12 +7,13 @@ import wandb
 
 from embeddings.defaults import SUBMISSIONS_PATH
 from embeddings.evaluator.evaluation_results import Task
-from embeddings.evaluator.submission import Submission
+from embeddings.evaluator.submission import AveragedSubmission
+from embeddings.evaluator.submission_utils import filter_hps_summary_runs, filter_retrains
 
 app = typer.Typer()
 
 
-def run(
+def main(
     entity: str = typer.Option(..., help="Wandb entity."),
     project: str = typer.Option(..., help="Wandb project."),
     task: Task = typer.Option(...),
@@ -26,14 +28,21 @@ def run(
     typer.echo(pprint.pformat(locals()))
     api = wandb.Api()
     # Call to untyped function "runs" in typed context
-    runs = api.runs(
-        entity + "/" + project, filters={"config.predict_subset": "LightingDataModuleSubset.TEST"}
-    )  # type: ignore
-    for run in runs:
-        submission_name = run.name
-        submission = Submission.from_wandb_run(run.name, run, task)
+    runs = api.runs(entity + "/" + project)  # type: ignore
+
+    embeddings = {run.config["embedding_name_or_path"] for run in runs}
+    hps_summary_runs = {
+        run.config["embedding_name_or_path"]: run for run in filter_hps_summary_runs(runs)
+    }
+    c = runs[0].config["embedding_name_or_path"]
+    for key, run_group in groupby(
+        filter_retrains(runs), lambda x: x.config["embedding_name_or_path"]  # type: ignore
+    ):
+        submission = AveragedSubmission.from_wandb(
+            key, list(run_group), hps_summary_runs[key], task
+        )
         pprint.pprint(submission)
         submission.save_json(root)
 
 
-typer.run(run)
+typer.run(main)
