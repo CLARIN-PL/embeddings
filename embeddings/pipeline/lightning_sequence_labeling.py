@@ -38,10 +38,16 @@ class LightningSequenceLabelingPipeline(
         accelerator: Optional[Union[str, Accelerator]] = "auto",
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
+        model_checkpoint_kwargs: Optional[Dict[str, Any]] = None,
     ):
         task_train_kwargs = config.task_train_kwargs
         task_train_kwargs.update({"devices": devices, "accelerator": accelerator})
         tokenizer_name_or_path = tokenizer_name_or_path or embedding_name_or_path
+        model_checkpoint_kwargs = (
+            model_checkpoint_kwargs
+            if model_checkpoint_kwargs
+            else LightningPipeline.DEFAULT_MODEL_CHECKPOINT_KWARGS
+        )
         output_path = Path(output_path)
 
         datamodule = SequenceLabelingDataModule(
@@ -69,6 +75,7 @@ class LightningSequenceLabelingPipeline(
             logging_config=logging_config,
             evaluation_mode=evaluation_mode,
             tagging_scheme=tagging_scheme,
+            model_checkpoint_kwargs=model_checkpoint_kwargs,
         )
         model = LightningModel(task=task, predict_subset=predict_subset)
         evaluator = SequenceLabelingEvaluator(

@@ -30,12 +30,14 @@ class LightningTask(Task[HuggingFaceDataModule, Predictions]):
         output_path: T_path,
         task_train_kwargs: Dict[str, Any],
         early_stopping_kwargs: Dict[str, Any],
+        model_checkpoint_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
     ):
         super().__init__()
         self.output_path: Path = Path(output_path)
         self.task_train_kwargs = task_train_kwargs
         self.early_stopping_kwargs = early_stopping_kwargs
+        self.model_checkpoint_kwargs = model_checkpoint_kwargs
         self.logging_config = logging_config
         self.model: Optional[HuggingFaceLightningModule] = None
         self.trainer: Optional[pl.Trainer] = None
@@ -62,7 +64,9 @@ class LightningTask(Task[HuggingFaceDataModule, Predictions]):
 
     def _get_callbacks(self, dataset_subsets: Sequence[str]) -> List[Callback]:
         callbacks: List[Callback] = [
-            ModelCheckpoint(dirpath=self.output_path.joinpath("checkpoints"), save_last=True)
+            ModelCheckpoint(
+                dirpath=self.output_path.joinpath("checkpoints"), **self.model_checkpoint_kwargs
+            )
         ]
         if "validation" in dataset_subsets:
             callbacks.append(BestEpochCallback())
@@ -137,6 +141,7 @@ class LightningTask(Task[HuggingFaceDataModule, Predictions]):
             "task_model_kwargs": model.hparams.task_model_kwargs,
             "task_train_kwargs": task_train_kwargs or {},
             "early_stopping_kwargs": {},
+            "model_checkpoint_kwargs": {},
             "logging_config": logging_config or LightningLoggingConfig(),
         }
         task = cls(**init_kwargs)

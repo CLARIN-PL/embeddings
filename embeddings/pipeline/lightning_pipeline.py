@@ -27,6 +27,11 @@ class LightningPipeline(
         "mode": "min",
         "patience": 3,
     }
+    DEFAULT_MODEL_CHECKPOINT_KWARGS: Dict[str, Any] = {
+        "filename": "last",
+        "monitor": None,
+        "save_last": False,
+    }
 
     def __init__(
         self,
