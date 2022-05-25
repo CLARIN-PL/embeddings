@@ -31,12 +31,12 @@ class Predictions:
     @classmethod
     def from_evaluation_json(cls, data: str) -> "Predictions":
         evaluation = srsly.json_loads(data)
-        dtype = object if isinstance(evaluation["data"]["y_pred"], list) else None
+        evaluation_dtype = object if isinstance(evaluation["data"]["y_pred"][0], list) else None
         return cls(
-            y_pred=np.array(evaluation["data"]["y_pred"], dtype=dtype),
-            y_true=np.array(evaluation["data"]["y_true"], dtype=dtype),
-            y_probabilities=np.array(evaluation["data"]["y_probabilities"], dtype=dtype),
-            names=np.array(evaluation["data"]["names"], dtype=dtype),
+            y_pred=np.array(evaluation["data"]["y_pred"], dtype=evaluation_dtype),
+            y_true=np.array(evaluation["data"]["y_true"], dtype=evaluation_dtype),
+            y_probabilities=np.array(evaluation["data"]["y_probabilities"], dtype=evaluation_dtype),
+            names=np.array(evaluation["data"]["names"], dtype=evaluation_dtype),
         )
 
 
