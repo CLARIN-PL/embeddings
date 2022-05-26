@@ -43,11 +43,7 @@ class LightningSequenceLabelingPipeline(
         task_train_kwargs = config.task_train_kwargs
         task_train_kwargs.update({"devices": devices, "accelerator": accelerator})
         tokenizer_name_or_path = tokenizer_name_or_path or embedding_name_or_path
-        model_checkpoint_kwargs = (
-            model_checkpoint_kwargs
-            if model_checkpoint_kwargs
-            else LightningPipeline.DEFAULT_MODEL_CHECKPOINT_KWARGS
-        )
+        model_checkpoint_kwargs = model_checkpoint_kwargs if model_checkpoint_kwargs else {}
         output_path = Path(output_path)
 
         datamodule = SequenceLabelingDataModule(
