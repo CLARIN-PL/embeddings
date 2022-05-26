@@ -77,7 +77,7 @@ class Submission(_BaseSubmission):
         best_params_path: T_path,
         task: str,
     ) -> "Submission":
-        [wandb_run_dir] = list(Path(wandb_log_dir).glob("*run*"))
+        [wandb_run_dir] = list(Path(wandb_log_dir).glob("run*"))
         wandb_config_path = Path(wandb_run_dir) / "files" / "config.yaml"
 
         with wandb_config_path.open() as f:
@@ -127,7 +127,7 @@ class Submission(_BaseSubmission):
         [hps_output_artifact] = [
             artifact
             for artifact in hps_summary_run.logged_artifacts()
-            if artifact.name.split(":")[0] == "hps_output"
+            if artifact.name.split(":")[0] == "hps_result"
         ]
         files["best_params.yaml"] = hps_output_artifact.download(
             root=Path(root).joinpath(hps_summary_run.name)
@@ -240,7 +240,6 @@ class AveragedSubmission(_BaseSubmission):
                     raise ValueError(f"During averaging dict values of key '{k}' were not equal.")
                 avg_dict[k] = dicts[0][k]
             elif isinstance(dicts[0][k], (int, float)):
-                print(k, ":", sum(d[k] for d in dicts) / len(dicts))
                 avg_dict[k] = sum(d[k] for d in dicts) / len(dicts)
             elif isinstance(dicts[0][k], dict):
                 avg_dict[k] = cls._average_metrics_dicts([d[k] for d in dicts])
@@ -249,7 +248,7 @@ class AveragedSubmission(_BaseSubmission):
     @classmethod
     def _check_equal_submissions_dicts(cls, dicts: Sequence[Dict[str, Any]]) -> None:
         for k in dicts[0].keys():
-            if k in {"metrics", "y_pred", "y_probabilities", "output_path"}:
+            if k in {"metrics", "y_pred", "y_probabilities", "output_path", "start_time"}:
                 continue
             elif isinstance(dicts[0][k], dict):
                 cls._check_equal_submissions_dicts([d[k] for d in dicts])

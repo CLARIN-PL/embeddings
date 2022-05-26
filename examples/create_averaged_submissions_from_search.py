@@ -7,7 +7,7 @@ import wandb
 
 from embeddings.defaults import SUBMISSIONS_PATH
 from embeddings.evaluator.evaluation_results import Task
-from embeddings.evaluator.submission import Submission
+from embeddings.evaluator.submission import AveragedSubmission
 from embeddings.evaluator.submission_utils import filter_hps_summary_runs, filter_retrains
 
 app = typer.Typer()
@@ -37,8 +37,9 @@ def main(
     for key, run_group in groupby(
         filter_retrains(runs), lambda x: x.config["embedding_name_or_path"]  # type: ignore
     ):
-        [run] = run_group
-        submission = Submission.from_wandb(key, run, hps_summary_runs[key], task)
+        submission = AveragedSubmission.from_wandb(
+            key, list(run_group), hps_summary_runs[key], task
+        )
         pprint.pprint(submission)
         submission.save_json(root)
 

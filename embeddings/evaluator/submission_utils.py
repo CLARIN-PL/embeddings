@@ -6,7 +6,7 @@ from wandb.apis.public import Run
 def filter_hps_summary_runs(runs: Iterable[Run]) -> Iterable[Run]:
     for run in runs:
         for artifact in run.logged_artifacts():
-            if artifact.name.split(":")[0] == "hps_output":
+            if artifact.name.split(":")[0] == "hps_result":
                 yield run
 
 
