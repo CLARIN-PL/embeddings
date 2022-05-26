@@ -1,0 +1,1098 @@
+{
+  "submission_name": "punctuation_restoration_allegro__herbert-large-cased",
+  "dataset_name": {
+    "desc": null,
+    "value": "data/datasets/punctuation_restoration/lightning/"
+  },
+  "dataset_version": {
+    "desc": null,
+    "value": "1.0.0"
+  },
+  "embedding_name": {
+    "desc": null,
+    "value": "allegro/herbert-large-cased"
+  },
+  "hparams": {
+    "finetune_last_n_layers": 4,
+    "task_model_kwargs": {
+      "adam_epsilon": 1e-08,
+      "eval_batch_size": 16,
+      "learning_rate": 0.001,
+      "optimizer": "AdamW",
+      "train_batch_size": 16,
+      "use_scheduler": true,
+      "warmup_steps": 100,
+      "weight_decay": 0.1
+    },
+    "datamodule_kwargs": {
+      "label_all_tokens": false,
+      "max_seq_length": 512
+    },
+    "task_train_kwargs": {
+      "max_epochs": 3
+    },
+    "model_config_kwargs": {
+      "classifier_dropout": 0.0
+    },
+    "early_stopping_kwargs": {
+      "mode": "min",
+      "monitor": "val/Loss",
+      "patience": 3
+    },
+    "tokenizer_kwargs": {},
+    "batch_encoding_kwargs": {},
+    "dataloader_kwargs": {}
+  },
+  "packages": [
+    "absl-py==1.0.0",
+    "aiobotocore==2.3.2",
+    "aiohttp-retry==2.4.6",
+    "aiohttp==3.8.1",
+    "aioitertools==0.8.0",
+    "aiosignal==1.2.0",
+    "alembic==1.4.1",
+    "appdirs==1.4.4",
+    "argon2-cffi-bindings==21.2.0",
+    "argon2-cffi==21.3.0",
+    "asttokens==2.0.5",
+    "async-timeout==4.0.2",
+    "asyncssh==2.10.1",
+    "atpublic==3.0.1",
+    "attrs==21.4.0",
+    "autopage==0.5.1",
+    "backcall==0.2.0",
+    "beautifulsoup4==4.11.1",
+    "black==21.10b0",
+    "bleach==5.0.0",
+    "boto3==1.21.21",
+    "botocore==1.24.21",
+    "bpemb==0.3.3",
+    "cachecontrol==0.12.11",
+    "cachetools==5.2.0",
+    "cachy==0.3.0",
+    "catalogue==2.0.7",
+    "certifi==2022.5.18.1",
+    "cffi==1.15.0",
+    "charset-normalizer==2.0.12",
+    "clarinpl-embeddings==0.0.1rc241317216295",
+    "cleo==0.8.1",
+    "click==8.0.4",
+    "cliff==3.10.1",
+    "clikit==0.6.2",
+    "cloudpickle==2.1.0",
+    "cmaes==0.8.2",
+    "cmd2==2.4.1",
+    "colorama==0.4.4",
+    "colorlog==6.6.0",
+    "commonmark==0.9.1",
+    "configobj==5.0.6",
+    "conllu==4.4.2",
+    "coverage==6.4",
+    "crashtest==0.3.1",
+    "cryptography==37.0.2",
+    "cycler==0.11.0",
+    "databricks-cli==0.16.6",
+    "datasets==2.2.2",
+    "debugpy==1.6.0",
+    "decorator==5.1.1",
+    "defusedxml==0.7.1",
+    "deprecated==1.2.13",
+    "dictdiffer==0.9.0",
+    "dill==0.3.4",
+    "diskcache==5.4.0",
+    "distlib==0.3.4",
+    "distro==1.7.0",
+    "docker-pycreds==0.4.0",
+    "docker==5.0.3",
+    "dpath==2.0.6",
+    "dulwich==0.20.42",
+    "dvc-render==0.0.4",
+    "dvc==2.10.1",
+    "entrypoints==0.4",
+    "executing==0.8.3",
+    "fastjsonschema==2.15.3",
+    "filelock==3.7.0",
+    "flair==0.10",
+    "flask==2.1.2",
+    "flatten-dict==0.4.2",
+    "flufl.lock==7.0",
+    "fonttools==4.33.3",
+    "frozenlist==1.3.0",
+    "fsspec==2022.5.0",
+    "ftfy==6.1.1",
+    "funcy==1.17",
+    "future==0.18.2",
+    "gdown==3.12.2",
+    "gensim==4.2.0",
+    "gitdb==4.0.9",
+    "gitpython==3.1.27",
+    "google-auth-oauthlib==0.4.6",
+    "google-auth==2.6.6",
+    "grandalf==0.6",
+    "greenlet==1.1.2",
+    "grpcio==1.46.3",
+    "gunicorn==20.1.0",
+    "html5lib==1.1",
+    "huggingface-hub==0.7.0",
+    "idna==3.3",
+    "importlib-metadata==3.10.1",
+    "iniconfig==1.1.1",
+    "ipykernel==6.13.0",
+    "ipython-genutils==0.2.0",
+    "ipython==8.4.0",
+    "ipywidgets==7.7.0",
+    "isort==5.10.1",
+    "itsdangerous==2.1.2",
+    "janome==0.4.2",
+    "jedi==0.18.1",
+    "jeepney==0.8.0",
+    "jinja2==3.1.2",
+    "jmespath==1.0.0",
+    "joblib==1.1.0",
+    "jsonschema==4.5.1",
+    "jupyter-client==7.3.1",
+    "jupyter-console==6.4.3",
+    "jupyter-core==4.10.0",
+    "jupyter==1.0.0",
+    "jupyterlab-pygments==0.2.2",
+    "jupyterlab-widgets==1.1.0",
+    "keyring==23.5.0",
+    "kiwisolver==1.4.2",
+    "konoha==4.6.5",
+    "langdetect==1.0.9",
+    "leaderboard==0.0.1",
+    "lockfile==0.12.2",
+    "lxml==4.8.0",
+    "mailchecker==4.1.17",
+    "mako==1.2.0",
+    "markdown==3.3.5",
+    "markupsafe==2.1.1",
+    "matplotlib-inline==0.1.3",
+    "matplotlib==3.5.2",
+    "mistune==0.8.4",
+    "mlflow==1.19.0",
+    "more-itertools==8.8.0",
+    "mpld3==0.3",
+    "msgpack==1.0.3",
+    "multidict==6.0.2",
+    "multiprocess==0.70.12.2",
+    "mypy-extensions==0.4.3",
+    "mypy==0.950",
+    "nanotime==0.5.2",
+    "nbclient==0.6.3",
+    "nbconvert==6.5.0",
+    "nbformat==5.4.0",
+    "nest-asyncio==1.5.5",
+    "networkx==2.8.2",
+    "notebook==6.4.11",
+    "numpy==1.22.4",
+    "oauthlib==3.2.0",
+    "optuna==2.10.0",
+    "overrides==3.1.0",
+    "packaging==21.3",
+    "pandas==1.4.2",
+    "pandocfilters==1.5.0",
+    "parso==0.8.3",
+    "pastel==0.2.1",
+    "pathspec==0.9.0",
+    "pathtools==0.1.2",
+    "pbr==5.9.0",
+    "pexpect==4.8.0",
+    "phonenumbers==8.12.49",
+    "pickleshare==0.7.5",
+    "pillow==9.1.1",
+    "pip==21.2.4",
+    "pkginfo==1.8.2",
+    "platformdirs==2.5.2",
+    "pluggy==1.0.0",
+    "poethepoet==0.11.0",
+    "poetry-core==1.0.8",
+    "poetry==1.1.13",
+    "prettytable==3.3.0",
+    "prometheus-client==0.14.1",
+    "prometheus-flask-exporter==0.20.1",
+    "promise==2.3",
+    "prompt-toolkit==3.0.29",
+    "protobuf==3.20.0",
+    "psutil==5.9.1",
+    "ptyprocess==0.7.0",
+    "pure-eval==0.2.2",
+    "py==1.11.0",
+    "pyarrow==8.0.0",
+    "pyasn1-modules==0.2.8",
+    "pyasn1==0.4.8",
+    "pycparser==2.21",
+    "pydantic==1.9.1",
+    "pydeprecate==0.3.1",
+    "pydot==1.4.2",
+    "pyflakes==2.4.0",
+    "pygit2==1.9.2",
+    "pygments==2.12.0",
+    "pygtrie==2.4.2",
+    "pyjwt==2.4.0",
+    "pylev==1.4.0",
+    "pyparsing==3.0.9",
+    "pyperclip==1.8.2",
+    "pyrsistent==0.18.1",
+    "pysocks==1.7.1",
+    "pytest==6.2.5",
+    "python-benedict==0.25.1",
+    "python-dateutil==2.8.2",
+    "python-editor==1.0.4",
+    "python-fsutil==0.6.1",
+    "python-slugify==6.1.2",
+    "pytorch-lightning==1.5.4",
+    "pytz==2022.1",
+    "pyyaml==6.0",
+    "pyzmq==23.0.0",
+    "qtconsole==5.3.0",
+    "qtpy==2.1.0",
+    "querystring-parser==1.2.4",
+    "regex==2022.4.24",
+    "requests-oauthlib==1.3.1",
+    "requests-toolbelt==0.9.1",
+    "requests==2.27.1",
+    "responses==0.18.0",
+    "rich==12.4.4",
+    "rsa==4.8",
+    "ruamel.yaml.clib==0.2.6",
+    "ruamel.yaml==0.17.21",
+    "s3fs==2022.5.0",
+    "s3transfer==0.5.2",
+    "sacremoses==0.0.53",
+    "scikit-learn==1.1.1",
+    "scipy==1.8.1",
+    "scmrepo==0.0.16",
+    "secretstorage==3.3.2",
+    "segtok==1.5.11",
+    "send2trash==1.8.0",
+    "sentencepiece==0.1.95",
+    "sentry-sdk==1.5.12",
+    "seqeval==1.2.2",
+    "setproctitle==1.2.3",
+    "setuptools-scm==6.4.2",
+    "setuptools==61.2.0",
+    "shellingham==1.4.0",
+    "shortuuid==1.0.9",
+    "shtab==1.5.4",
+    "six==1.16.0",
+    "smart-open==6.0.0",
+    "smmap==5.0.0",
+    "soupsieve==2.3.2.post1",
+    "sqlalchemy==1.4.36",
+    "sqlitedict==2.0.0",
+    "sqlparse==0.4.2",
+    "srsly==2.4.3",
+    "stack-data==0.2.0",
+    "stevedore==3.5.0",
+    "tabulate==0.8.9",
+    "tensorboard-data-server==0.6.1",
+    "tensorboard-plugin-wit==1.8.1",
+    "tensorboard==2.9.0",
+    "terminado==0.15.0",
+    "text-unidecode==1.3",
+    "threadpoolctl==3.1.0",
+    "tinycss2==1.1.1",
+    "tokenizers==0.12.1",
+    "toml==0.10.2",
+    "tomli==1.2.3",
+    "tomlkit==0.10.2",
+    "torch==1.11.0+cu113",
+    "torchmetrics==0.7.3",
+    "tornado==6.1",
+    "tqdm==4.64.0",
+    "traitlets==5.2.1.post0",
+    "transformers==4.18.0",
+    "typer==0.4.1",
+    "types-pyyaml==6.0.7",
+    "types-requests==2.26.1",
+    "types-setuptools==57.4.17",
+    "typing-extensions==3.10.0.0",
+    "urllib3==1.26.9",
+    "virtualenv==20.14.1",
+    "voluptuous==0.13.1",
+    "wandb==0.12.14",
+    "wcwidth==0.2.5",
+    "webencodings==0.5.1",
+    "websocket-client==1.3.2",
+    "werkzeug==2.1.2",
+    "wheel==0.37.1",
+    "widgetsnbextension==3.6.0",
+    "wikipedia-api==0.5.4",
+    "wrapt==1.14.1",
+    "xmltodict==0.13.0",
+    "xxhash==3.0.0",
+    "yarl==1.7.2",
+    "zc.lockfile==2.0",
+    "zipp==3.8.0"
+  ],
+  "config": {
+    "wandb_version": 1,
+    "_wandb": {
+      "desc": null,
+      "value": {
+        "cli_version": "0.12.14",
+        "framework": "huggingface",
+        "huggingface_version": "4.18.0",
+        "is_jupyter_run": false,
+        "is_kaggle_kernel": false,
+        "m": [
+          {
+            "1": "trainer/global_step",
+            "6": [
+              3
+            ]
+          },
+          {
+            "1": "train/Loss",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/BaseLR",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/LambdaLR",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "epoch",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/precision_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/recall_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/f1_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/Loss",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/precision_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/recall_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/f1_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          }
+        ],
+        "python_version": "3.9.12",
+        "start_time": 1653996766,
+        "t": {
+          "1": [
+            1,
+            5,
+            9,
+            11,
+            44,
+            49,
+            51,
+            53,
+            55
+          ],
+          "2": [
+            1,
+            5,
+            9,
+            11,
+            44,
+            49,
+            51,
+            53,
+            55
+          ],
+          "3": [
+            2,
+            3,
+            7,
+            13
+          ],
+          "4": "3.9.12",
+          "5": "0.12.14",
+          "6": "4.18.0",
+          "8": [
+            5
+          ]
+        }
+      }
+    },
+    "accelerator": {
+      "desc": null,
+      "value": "auto"
+    },
+    "adam_epsilon": {
+      "desc": null,
+      "value": 1e-08
+    },
+    "config": {
+      "desc": null,
+      "value": "LightningAdvancedConfig(finetune_last_n_layers=4, task_model_kwargs={'adam_epsilon': 1e-08, 'eval_batch_size': 16, 'learning_rate': 0.001, 'optimizer': 'AdamW', 'train_batch_size': 16, 'use_scheduler': True, 'warmup_steps': 100, 'weight_decay': 0.1}, datamodule_kwargs={'label_all_tokens': False, 'max_seq_length': 512}, task_train_kwargs={'max_epochs': 3, 'devices': 'auto', 'accelerator': 'auto'}, model_config_kwargs={'classifier_dropout': 0.0}, early_stopping_kwargs={'mode': 'min', 'monitor': 'val/Loss', 'patience': 3}, tokenizer_kwargs={}, batch_encoding_kwargs={}, dataloader_kwargs={})"
+    },
+    "config_kwargs/classifier_dropout": {
+      "desc": null,
+      "value": 0.0
+    },
+    "dataset_info": {
+      "desc": null,
+      "value": "DatasetInfo(description='This dataset is designed to be used in training models\\nthat restore punctuation marks from the output of \\nAutomatic Speech Recognition system for Polish language.\\n', citation='', homepage='https://github.com/poleval/2021-punctuation-restoration', license='', features={'input_ids': Sequence(feature=Value(dtype='int32', id=None), length=-1, id=None), 'token_type_ids': Sequence(feature=Value(dtype='int8', id=None), length=-1, id=None), 'attention_mask': Sequence(feature=Value(dtype='int8', id=None), length=-1, id=None), 'labels': Sequence(feature=ClassLabel(num_classes=8, names=['B-.', 'B-,', 'B--', 'B-!', 'B-?', 'B-:', 'B-;', 'O'], id=None), length=-1, id=None)}, post_processed=None, supervised_keys=None, task_templates=None, builder_name='punctuation_dataset', config_name='punctuation_dataset', version=1.0.0, splits={'train': SplitInfo(name='train', num_bytes=5397172, num_examples=800, dataset_name='punctuation_dataset'), 'test': SplitInfo(name='test', num_bytes=1343722, num_examples=200, dataset_name='punctuation_dataset')}, download_checksums={'https://raw.githubusercontent.com/poleval/2021-punctuation-restoration/main/train/in.tsv': {'num_bytes': 1194117, 'checksum': '5d6f6f0877b015afd88b04096879aa85d1a9e3fa52427b545258b2ef4d4cdb6e'}, 'https://raw.githubusercontent.com/poleval/2021-punctuation-restoration/main/train/expected.tsv': {'num_bytes': 1206847, 'checksum': '246d79bb9fc1411e658d1c80299c0e2d8e9ad6c05b2e95d553a529ea96d4dedd'}, 'https://raw.githubusercontent.com/poleval/2021-punctuation-restoration/main/test-A/in.tsv': {'num_bytes': 298329, 'checksum': 'a41dc55aef0ced62d5c1c43495150a6762d6b52e6261f952d13cd80bfbf1373b'}, 'https://raw.githubusercontent.com/poleval/2021-punctuation-restoration/main/test-A/expected.tsv': {'num_bytes': 301479, 'checksum': '67537e5ee05b9c3a3a7282fa7b8754f4777a9dcfb3d179cc478c2416c98abfd0'}}, download_size=3000772, post_processing_size=None, dataset_size=6740894, size_in_bytes=9741666)"
+    },
+    "dataset_name_or_path": {
+      "desc": null,
+      "value": "data/datasets/punctuation_restoration/lightning/"
+    },
+    "dataset_version": {
+      "desc": null,
+      "value": "1.0.0"
+    },
+    "devices": {
+      "desc": null,
+      "value": "auto"
+    },
+    "downstream_model_type": {
+      "desc": null,
+      "value": "AutoModelForTokenClassification"
+    },
+    "embedding_name_or_path": {
+      "desc": null,
+      "value": "allegro/herbert-large-cased"
+    },
+    "eval_batch_size": {
+      "desc": null,
+      "value": 16
+    },
+    "evaluation_filename": {
+      "desc": null,
+      "value": "evaluation.json"
+    },
+    "evaluation_mode": {
+      "desc": null,
+      "value": "EvaluationMode.UNIT"
+    },
+    "finetune_last_n_layers": {
+      "desc": null,
+      "value": 4
+    },
+    "ignore_index": {
+      "desc": null,
+      "value": -100
+    },
+    "input_column_name": {
+      "desc": null,
+      "value": "tokens"
+    },
+    "label_all_tokens": {
+      "desc": null,
+      "value": false
+    },
+    "learning_rate": {
+      "desc": null,
+      "value": 0.001
+    },
+    "load_dataset_kwargs": {
+      "desc": null,
+      "value": "None"
+    },
+    "logging_config": {
+      "desc": null,
+      "value": "LightningLoggingConfig(loggers_names=['wandb'], tracking_project_name='punctuation_restoration', wandb_entity='embeddings', wandb_logger_kwargs={})"
+    },
+    "max_seq_length": {
+      "desc": null,
+      "value": 512
+    },
+    "metrics": {
+      "desc": null,
+      "value": "None"
+    },
+    "model_checkpoint_kwargs/filename": {
+      "desc": null,
+      "value": "last"
+    },
+    "model_checkpoint_kwargs/monitor": {
+      "desc": null,
+      "value": "None"
+    },
+    "model_checkpoint_kwargs/save_last": {
+      "desc": null,
+      "value": false
+    },
+    "model_name_or_path": {
+      "desc": null,
+      "value": "allegro/herbert-large-cased"
+    },
+    "num_classes": {
+      "desc": null,
+      "value": 8
+    },
+    "optimizer": {
+      "desc": null,
+      "value": "AdamW"
+    },
+    "output_path": {
+      "desc": null,
+      "value": "/embeddings-internal/leaderboard/data/models/lightning/allegro__herbert-large-cased/punctuation_restoration/run-4"
+    },
+    "predict_subset": {
+      "desc": null,
+      "value": "LightingDataModuleSubset.TEST"
+    },
+    "processing_batch_size": {
+      "desc": null,
+      "value": "None"
+    },
+    "seed": {
+      "desc": null,
+      "value": 441
+    },
+    "tagging_scheme": {
+      "desc": null,
+      "value": "None"
+    },
+    "target_column_name": {
+      "desc": null,
+      "value": "tags"
+    },
+    "target_field": {
+      "desc": null,
+      "value": "tags"
+    },
+    "task_model_kwargs/adam_epsilon": {
+      "desc": null,
+      "value": 1e-08
+    },
+    "task_model_kwargs/eval_batch_size": {
+      "desc": null,
+      "value": 16
+    },
+    "task_model_kwargs/learning_rate": {
+      "desc": null,
+      "value": 0.001
+    },
+    "task_model_kwargs/optimizer": {
+      "desc": null,
+      "value": "AdamW"
+    },
+    "task_model_kwargs/train_batch_size": {
+      "desc": null,
+      "value": 16
+    },
+    "task_model_kwargs/use_scheduler": {
+      "desc": null,
+      "value": true
+    },
+    "task_model_kwargs/warmup_steps": {
+      "desc": null,
+      "value": 100
+    },
+    "task_model_kwargs/weight_decay": {
+      "desc": null,
+      "value": 0.1
+    },
+    "text_field": {
+      "desc": null,
+      "value": "tokens"
+    },
+    "tokenizer_name_or_path": {
+      "desc": null,
+      "value": "allegro/herbert-large-cased"
+    },
+    "train_batch_size": {
+      "desc": null,
+      "value": 16
+    },
+    "use_scheduler": {
+      "desc": null,
+      "value": true
+    },
+    "warmup_steps": {
+      "desc": null,
+      "value": 100
+    },
+    "weight_decay": {
+      "desc": null,
+      "value": 0.1
+    }
+  },
+  "metrics": [
+    {
+      "accuracy": 0.9413379746525139,
+      "f1_macro": 0.47159509715343695,
+      "f1_micro": 0.7505463103042528,
+      "f1_weighted": 0.7381385557750901,
+      "recall_macro": 0.4395116938633228,
+      "recall_micro": 0.7233111939089584,
+      "recall_weighted": 0.7233111939089584,
+      "precision_macro": 0.5342010830901177,
+      "precision_micro": 0.7799126637554585,
+      "precision_weighted": 0.7734865784588251,
+      "classes": {
+        "B": {
+          "precision": 0.7773851590106007,
+          "recall": 0.35947712418300654,
+          "f1": 0.49162011173184356,
+          "support": 612
+        },
+        "B-!": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 23
+        },
+        "B-,": {
+          "precision": 0.7573626373626373,
+          "recall": 0.6916900843034925,
+          "f1": 0.7230381871590432,
+          "support": 2491
+        },
+        "B-.": {
+          "precision": 0.8074047703809185,
+          "recall": 0.8814613291877186,
+          "f1": 0.842809364548495,
+          "support": 2573
+        },
+        "B-:": {
+          "precision": 0.7681159420289855,
+          "recall": 0.5063694267515924,
+          "f1": 0.6103646833013435,
+          "support": 314
+        },
+        "B-;": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 11
+        },
+        "B-?": {
+          "precision": 0.6291390728476821,
+          "recall": 0.6375838926174496,
+          "f1": 0.6333333333333333,
+          "support": 149
+        }
+      }
+    },
+    {
+      "accuracy": 0.9417792268281323,
+      "f1_macro": 0.464226055672228,
+      "f1_micro": 0.7514585764294048,
+      "f1_weighted": 0.7385331538464072,
+      "recall_macro": 0.4302036930176058,
+      "recall_micro": 0.7302770127976672,
+      "recall_weighted": 0.7302770127976672,
+      "precision_macro": 0.5392290867143379,
+      "precision_micro": 0.7739055793991416,
+      "precision_weighted": 0.7714266705901941,
+      "classes": {
+        "B": {
+          "precision": 0.8310344827586207,
+          "recall": 0.3937908496732026,
+          "f1": 0.5343680709534367,
+          "support": 612
+        },
+        "B-!": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 23
+        },
+        "B-,": {
+          "precision": 0.7507481829841812,
+          "recall": 0.7049377759935769,
+          "f1": 0.7271221532091098,
+          "support": 2491
+        },
+        "B-.": {
+          "precision": 0.7947295423023578,
+          "recall": 0.8907889623008162,
+          "f1": 0.840021990104453,
+          "support": 2573
+        },
+        "B-:": {
+          "precision": 0.7888198757763976,
+          "recall": 0.40445859872611467,
+          "f1": 0.5347368421052632,
+          "support": 314
+        },
+        "B-;": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 11
+        },
+        "B-?": {
+          "precision": 0.609271523178808,
+          "recall": 0.6174496644295302,
+          "f1": 0.6133333333333334,
+          "support": 149
+        }
+      }
+    },
+    {
+      "accuracy": 0.9411173485647047,
+      "f1_macro": 0.4749707440414044,
+      "f1_micro": 0.7528579652931985,
+      "f1_weighted": 0.740980177437115,
+      "recall_macro": 0.44930607316649496,
+      "recall_micro": 0.7414547221772234,
+      "recall_weighted": 0.7414547221772234,
+      "precision_macro": 0.5297650791534289,
+      "precision_micro": 0.7646174406949549,
+      "precision_weighted": 0.7607638784174122,
+      "classes": {
+        "B": {
+          "precision": 0.8047138047138047,
+          "recall": 0.39052287581699346,
+          "f1": 0.5258525852585259,
+          "support": 612
+        },
+        "B-!": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 23
+        },
+        "B-,": {
+          "precision": 0.7430846605196982,
+          "recall": 0.711762344439984,
+          "f1": 0.7270863235595653,
+          "support": 2491
+        },
+        "B-.": {
+          "precision": 0.7863945578231293,
+          "recall": 0.8985619898950641,
+          "f1": 0.8387447850535099,
+          "support": 2573
+        },
+        "B-:": {
+          "precision": 0.7548076923076923,
+          "recall": 0.5,
+          "f1": 0.6015325670498084,
+          "support": 314
+        },
+        "B-;": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 11
+        },
+        "B-?": {
+          "precision": 0.6193548387096774,
+          "recall": 0.6442953020134228,
+          "f1": 0.631578947368421,
+          "support": 149
+        }
+      }
+    },
+    {
+      "accuracy": 0.9406025543598167,
+      "f1_macro": 0.4626370366857778,
+      "f1_micro": 0.7470627727425311,
+      "f1_weighted": 0.7339133007796179,
+      "recall_macro": 0.42093044605187885,
+      "recall_micro": 0.7210432528754253,
+      "recall_weighted": 0.7210432528754253,
+      "precision_macro": 0.5402008151087357,
+      "precision_micro": 0.775030471878809,
+      "precision_weighted": 0.7672192040963258,
+      "classes": {
+        "B": {
+          "precision": 0.7363344051446945,
+          "recall": 0.3741830065359477,
+          "f1": 0.4962080173347779,
+          "support": 612
+        },
+        "B-!": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 23
+        },
+        "B-,": {
+          "precision": 0.7515204170286707,
+          "recall": 0.6945002007226013,
+          "f1": 0.7218860838723138,
+          "support": 2491
+        },
+        "B-.": {
+          "precision": 0.8004223864836325,
+          "recall": 0.883793237465993,
+          "f1": 0.8400443295160694,
+          "support": 2573
+        },
+        "B-:": {
+          "precision": 0.7964071856287425,
+          "recall": 0.42356687898089174,
+          "f1": 0.5530145530145529,
+          "support": 314
+        },
+        "B-;": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 11
+        },
+        "B-?": {
+          "precision": 0.6967213114754098,
+          "recall": 0.5704697986577181,
+          "f1": 0.6273062730627306,
+          "support": 149
+        }
+      }
+    },
+    {
+      "accuracy": 0.9401367881744417,
+      "f1_macro": 0.4607079192382321,
+      "f1_micro": 0.7487256622378207,
+      "f1_weighted": 0.7367143493235262,
+      "recall_macro": 0.43785311115168346,
+      "recall_micro": 0.725741130730601,
+      "recall_weighted": 0.725741130730601,
+      "precision_macro": 0.5163317488949138,
+      "precision_micro": 0.7732136693130826,
+      "precision_weighted": 0.7672465324655816,
+      "classes": {
+        "B": {
+          "precision": 0.7788778877887789,
+          "recall": 0.38562091503267976,
+          "f1": 0.5158469945355191,
+          "support": 612
+        },
+        "B-!": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 23
+        },
+        "B-,": {
+          "precision": 0.7491379310344828,
+          "recall": 0.69771176234444,
+          "f1": 0.7225109124922053,
+          "support": 2491
+        },
+        "B-.": {
+          "precision": 0.8100498930862438,
+          "recall": 0.8834045860862806,
+          "f1": 0.8451385015802193,
+          "support": 2573
+        },
+        "B-:": {
+          "precision": 0.7213114754098361,
+          "recall": 0.42038216560509556,
+          "f1": 0.5311871227364185,
+          "support": 314
+        },
+        "B-;": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 11
+        },
+        "B-?": {
+          "precision": 0.554945054945055,
+          "recall": 0.6778523489932886,
+          "f1": 0.6102719033232629,
+          "support": 149
+        }
+      }
+    }
+  ],
+  "metrics_avg": {
+    "accuracy": 0.9409947785159218,
+    "f1_macro": 0.4668273705582159,
+    "f1_micro": 0.7501302574014416,
+    "f1_weighted": 0.7376559074323513,
+    "recall_macro": 0.43556100345019716,
+    "recall_micro": 0.7283654624979751,
+    "recall_weighted": 0.7283654624979751,
+    "precision_macro": 0.5319455625923069,
+    "precision_micro": 0.7733359650082893,
+    "precision_weighted": 0.7680285728056677,
+    "classes": {
+      "B": {
+        "precision": 0.7856691478832999,
+        "recall": 0.380718954248366,
+        "f1": 0.5127791559628206,
+        "support": 612
+      },
+      "B-!": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 23
+      },
+      "B-,": {
+        "precision": 0.7503707657859341,
+        "recall": 0.700120433560819,
+        "f1": 0.7243287320584475,
+        "support": 2491
+      },
+      "B-.": {
+        "precision": 0.7998002300152564,
+        "recall": 0.8876020209871744,
+        "f1": 0.8413517941605493,
+        "support": 2573
+      },
+      "B-:": {
+        "precision": 0.7658924342303308,
+        "recall": 0.45095541401273886,
+        "f1": 0.5661671536414773,
+        "support": 314
+      },
+      "B-;": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 11
+      },
+      "B-?": {
+        "precision": 0.6218863602313265,
+        "recall": 0.6295302013422819,
+        "f1": 0.6231647580842162,
+        "support": 149
+      }
+    }
+  },
+  "metrics_median": {
+    "accuracy": 0.9411173485647047,
+    "f1_macro": 0.464226055672228,
+    "f1_micro": 0.7505463103042528,
+    "f1_weighted": 0.7381385557750901,
+    "recall_macro": 0.43785311115168346,
+    "recall_micro": 0.725741130730601,
+    "recall_weighted": 0.725741130730601,
+    "precision_macro": 0.5342010830901177,
+    "precision_micro": 0.7739055793991416,
+    "precision_weighted": 0.7672465324655816,
+    "classes": {
+      "B": {
+        "precision": 0.7788778877887789,
+        "recall": 0.38562091503267976,
+        "f1": 0.5158469945355191
+      },
+      "B-!": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "B-,": {
+        "precision": 0.7507481829841812,
+        "recall": 0.69771176234444,
+        "f1": 0.7230381871590432
+      },
+      "B-.": {
+        "precision": 0.8004223864836325,
+        "recall": 0.883793237465993,
+        "f1": 0.8400443295160694
+      },
+      "B-:": {
+        "precision": 0.7681159420289855,
+        "recall": 0.42356687898089174,
+        "f1": 0.5530145530145529
+      },
+      "B-;": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "B-?": {
+        "precision": 0.6193548387096774,
+        "recall": 0.6375838926174496,
+        "f1": 0.6273062730627306
+      }
+    }
+  },
+  "metrics_std": {
+    "accuracy": 0.0006399518290984626,
+    "f1_macro": 0.006140422830100761,
+    "f1_micro": 0.0022781720472265865,
+    "f1_weighted": 0.002595521045362201,
+    "recall_macro": 0.01063652479452407,
+    "recall_micro": 0.00807821523374409,
+    "recall_weighted": 0.00807821523374409,
+    "precision_macro": 0.009680288950573443,
+    "precision_micro": 0.00553345287634204,
+    "precision_weighted": 0.004883117437125472,
+    "classes": {
+      "B": {
+        "precision": 0.03524689734054796,
+        "recall": 0.014008519770818828,
+        "f1": 0.018498075749441102
+      },
+      "B-!": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "B-,": {
+        "precision": 0.0051224413452382435,
+        "recall": 0.008173132505621197,
+        "f1": 0.002566321145434542
+      },
+      "B-.": {
+        "precision": 0.00960072427889427,
+        "recall": 0.007073028008442945,
+        "f1": 0.0025854401765638135
+      },
+      "B-:": {
+        "precision": 0.029883503009737654,
+        "recall": 0.04827756576213298,
+        "f1": 0.03737844312638847
+      },
+      "B-;": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "B-?": {
+        "precision": 0.050743356305298096,
+        "recall": 0.03953470194637087,
+        "f1": 0.010656374462545307
+      }
+    }
+  },
+  "averaged_over": 5
+}

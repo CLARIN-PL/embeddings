@@ -1,0 +1,1218 @@
+{
+  "submission_name": "political_advertising_sentence-transformers__paraphrase-xlm-r-multilingual-v1",
+  "dataset_name": {
+    "desc": null,
+    "value": "data/datasets/political_advertising/lightning/"
+  },
+  "dataset_version": {
+    "desc": null,
+    "value": "1.0.0"
+  },
+  "embedding_name": {
+    "desc": null,
+    "value": "sentence-transformers/paraphrase-xlm-r-multilingual-v1"
+  },
+  "hparams": {
+    "finetune_last_n_layers": 4,
+    "task_model_kwargs": {
+      "adam_epsilon": 1e-06,
+      "eval_batch_size": 16,
+      "learning_rate": 5e-05,
+      "optimizer": "AdamW",
+      "train_batch_size": 16,
+      "use_scheduler": true,
+      "warmup_steps": 50,
+      "weight_decay": 0.01
+    },
+    "datamodule_kwargs": {
+      "label_all_tokens": false,
+      "max_seq_length": 512
+    },
+    "task_train_kwargs": {
+      "max_epochs": 15
+    },
+    "model_config_kwargs": {
+      "classifier_dropout": 0.0
+    },
+    "early_stopping_kwargs": {
+      "mode": "min",
+      "monitor": "val/Loss",
+      "patience": 3
+    },
+    "tokenizer_kwargs": {},
+    "batch_encoding_kwargs": {},
+    "dataloader_kwargs": {}
+  },
+  "packages": [
+    "absl-py==1.0.0",
+    "aiobotocore==2.3.2",
+    "aiohttp-retry==2.4.6",
+    "aiohttp==3.8.1",
+    "aioitertools==0.8.0",
+    "aiosignal==1.2.0",
+    "alembic==1.4.1",
+    "appdirs==1.4.4",
+    "argon2-cffi-bindings==21.2.0",
+    "argon2-cffi==21.3.0",
+    "asttokens==2.0.5",
+    "async-timeout==4.0.2",
+    "asyncssh==2.10.1",
+    "atpublic==3.0.1",
+    "attrs==21.4.0",
+    "autopage==0.5.1",
+    "backcall==0.2.0",
+    "beautifulsoup4==4.11.1",
+    "black==21.10b0",
+    "bleach==5.0.0",
+    "boto3==1.21.21",
+    "botocore==1.24.21",
+    "bpemb==0.3.3",
+    "cachecontrol==0.12.11",
+    "cachetools==5.2.0",
+    "cachy==0.3.0",
+    "catalogue==2.0.7",
+    "certifi==2022.5.18.1",
+    "cffi==1.15.0",
+    "charset-normalizer==2.0.12",
+    "clarinpl-embeddings==0.0.1rc241317216295",
+    "cleo==0.8.1",
+    "click==8.0.4",
+    "cliff==3.10.1",
+    "clikit==0.6.2",
+    "cloudpickle==2.1.0",
+    "cmaes==0.8.2",
+    "cmd2==2.4.1",
+    "colorama==0.4.4",
+    "colorlog==6.6.0",
+    "commonmark==0.9.1",
+    "configobj==5.0.6",
+    "conllu==4.4.2",
+    "coverage==6.4",
+    "crashtest==0.3.1",
+    "cryptography==37.0.2",
+    "cycler==0.11.0",
+    "databricks-cli==0.16.6",
+    "datasets==2.2.2",
+    "debugpy==1.6.0",
+    "decorator==5.1.1",
+    "defusedxml==0.7.1",
+    "deprecated==1.2.13",
+    "dictdiffer==0.9.0",
+    "dill==0.3.4",
+    "diskcache==5.4.0",
+    "distlib==0.3.4",
+    "distro==1.7.0",
+    "docker-pycreds==0.4.0",
+    "docker==5.0.3",
+    "dpath==2.0.6",
+    "dulwich==0.20.42",
+    "dvc-render==0.0.4",
+    "dvc==2.10.1",
+    "entrypoints==0.4",
+    "executing==0.8.3",
+    "fastjsonschema==2.15.3",
+    "filelock==3.7.0",
+    "flair==0.10",
+    "flask==2.1.2",
+    "flatten-dict==0.4.2",
+    "flufl.lock==7.0",
+    "fonttools==4.33.3",
+    "frozenlist==1.3.0",
+    "fsspec==2022.5.0",
+    "ftfy==6.1.1",
+    "funcy==1.17",
+    "future==0.18.2",
+    "gdown==3.12.2",
+    "gensim==4.2.0",
+    "gitdb==4.0.9",
+    "gitpython==3.1.27",
+    "google-auth-oauthlib==0.4.6",
+    "google-auth==2.6.6",
+    "grandalf==0.6",
+    "greenlet==1.1.2",
+    "grpcio==1.46.3",
+    "gunicorn==20.1.0",
+    "html5lib==1.1",
+    "huggingface-hub==0.7.0",
+    "idna==3.3",
+    "importlib-metadata==3.10.1",
+    "iniconfig==1.1.1",
+    "ipykernel==6.13.0",
+    "ipython-genutils==0.2.0",
+    "ipython==8.4.0",
+    "ipywidgets==7.7.0",
+    "isort==5.10.1",
+    "itsdangerous==2.1.2",
+    "janome==0.4.2",
+    "jedi==0.18.1",
+    "jeepney==0.8.0",
+    "jinja2==3.1.2",
+    "jmespath==1.0.0",
+    "joblib==1.1.0",
+    "jsonschema==4.5.1",
+    "jupyter-client==7.3.1",
+    "jupyter-console==6.4.3",
+    "jupyter-core==4.10.0",
+    "jupyter==1.0.0",
+    "jupyterlab-pygments==0.2.2",
+    "jupyterlab-widgets==1.1.0",
+    "keyring==23.5.0",
+    "kiwisolver==1.4.2",
+    "konoha==4.6.5",
+    "langdetect==1.0.9",
+    "leaderboard==0.0.1",
+    "lockfile==0.12.2",
+    "lxml==4.8.0",
+    "mailchecker==4.1.17",
+    "mako==1.2.0",
+    "markdown==3.3.5",
+    "markupsafe==2.1.1",
+    "matplotlib-inline==0.1.3",
+    "matplotlib==3.5.2",
+    "mistune==0.8.4",
+    "mlflow==1.19.0",
+    "more-itertools==8.8.0",
+    "mpld3==0.3",
+    "msgpack==1.0.3",
+    "multidict==6.0.2",
+    "multiprocess==0.70.12.2",
+    "mypy-extensions==0.4.3",
+    "mypy==0.950",
+    "nanotime==0.5.2",
+    "nbclient==0.6.3",
+    "nbconvert==6.5.0",
+    "nbformat==5.4.0",
+    "nest-asyncio==1.5.5",
+    "networkx==2.8.2",
+    "notebook==6.4.11",
+    "numpy==1.22.4",
+    "oauthlib==3.2.0",
+    "optuna==2.10.0",
+    "overrides==3.1.0",
+    "packaging==21.3",
+    "pandas==1.4.2",
+    "pandocfilters==1.5.0",
+    "parso==0.8.3",
+    "pastel==0.2.1",
+    "pathspec==0.9.0",
+    "pathtools==0.1.2",
+    "pbr==5.9.0",
+    "pexpect==4.8.0",
+    "phonenumbers==8.12.49",
+    "pickleshare==0.7.5",
+    "pillow==9.1.1",
+    "pip==21.2.4",
+    "pkginfo==1.8.2",
+    "platformdirs==2.5.2",
+    "pluggy==1.0.0",
+    "poethepoet==0.11.0",
+    "poetry-core==1.0.8",
+    "poetry==1.1.13",
+    "prettytable==3.3.0",
+    "prometheus-client==0.14.1",
+    "prometheus-flask-exporter==0.20.1",
+    "promise==2.3",
+    "prompt-toolkit==3.0.29",
+    "protobuf==3.20.0",
+    "psutil==5.9.1",
+    "ptyprocess==0.7.0",
+    "pure-eval==0.2.2",
+    "py==1.11.0",
+    "pyarrow==8.0.0",
+    "pyasn1-modules==0.2.8",
+    "pyasn1==0.4.8",
+    "pycparser==2.21",
+    "pydantic==1.9.1",
+    "pydeprecate==0.3.1",
+    "pydot==1.4.2",
+    "pyflakes==2.4.0",
+    "pygit2==1.9.2",
+    "pygments==2.12.0",
+    "pygtrie==2.4.2",
+    "pyjwt==2.4.0",
+    "pylev==1.4.0",
+    "pyparsing==3.0.9",
+    "pyperclip==1.8.2",
+    "pyrsistent==0.18.1",
+    "pysocks==1.7.1",
+    "pytest==6.2.5",
+    "python-benedict==0.25.1",
+    "python-dateutil==2.8.2",
+    "python-editor==1.0.4",
+    "python-fsutil==0.6.1",
+    "python-slugify==6.1.2",
+    "pytorch-lightning==1.5.4",
+    "pytz==2022.1",
+    "pyyaml==6.0",
+    "pyzmq==23.0.0",
+    "qtconsole==5.3.0",
+    "qtpy==2.1.0",
+    "querystring-parser==1.2.4",
+    "regex==2022.4.24",
+    "requests-oauthlib==1.3.1",
+    "requests-toolbelt==0.9.1",
+    "requests==2.27.1",
+    "responses==0.18.0",
+    "rich==12.4.4",
+    "rsa==4.8",
+    "ruamel.yaml.clib==0.2.6",
+    "ruamel.yaml==0.17.21",
+    "s3fs==2022.5.0",
+    "s3transfer==0.5.2",
+    "sacremoses==0.0.53",
+    "scikit-learn==1.1.1",
+    "scipy==1.8.1",
+    "scmrepo==0.0.16",
+    "secretstorage==3.3.2",
+    "segtok==1.5.11",
+    "send2trash==1.8.0",
+    "sentencepiece==0.1.95",
+    "sentry-sdk==1.5.12",
+    "seqeval==1.2.2",
+    "setproctitle==1.2.3",
+    "setuptools-scm==6.4.2",
+    "setuptools==61.2.0",
+    "shellingham==1.4.0",
+    "shortuuid==1.0.9",
+    "shtab==1.5.4",
+    "six==1.16.0",
+    "smart-open==6.0.0",
+    "smmap==5.0.0",
+    "soupsieve==2.3.2.post1",
+    "sqlalchemy==1.4.36",
+    "sqlitedict==2.0.0",
+    "sqlparse==0.4.2",
+    "srsly==2.4.3",
+    "stack-data==0.2.0",
+    "stevedore==3.5.0",
+    "tabulate==0.8.9",
+    "tensorboard-data-server==0.6.1",
+    "tensorboard-plugin-wit==1.8.1",
+    "tensorboard==2.9.0",
+    "terminado==0.15.0",
+    "text-unidecode==1.3",
+    "threadpoolctl==3.1.0",
+    "tinycss2==1.1.1",
+    "tokenizers==0.12.1",
+    "toml==0.10.2",
+    "tomli==1.2.3",
+    "tomlkit==0.10.2",
+    "torch==1.11.0+cu113",
+    "torchmetrics==0.7.3",
+    "tornado==6.1",
+    "tqdm==4.64.0",
+    "traitlets==5.2.1.post0",
+    "transformers==4.18.0",
+    "typer==0.4.1",
+    "types-pyyaml==6.0.7",
+    "types-requests==2.26.1",
+    "types-setuptools==57.4.17",
+    "typing-extensions==3.10.0.0",
+    "urllib3==1.26.9",
+    "virtualenv==20.14.1",
+    "voluptuous==0.13.1",
+    "wandb==0.12.14",
+    "wcwidth==0.2.5",
+    "webencodings==0.5.1",
+    "websocket-client==1.3.2",
+    "werkzeug==2.1.2",
+    "wheel==0.37.1",
+    "widgetsnbextension==3.6.0",
+    "wikipedia-api==0.5.4",
+    "wrapt==1.14.1",
+    "xmltodict==0.13.0",
+    "xxhash==3.0.0",
+    "yarl==1.7.2",
+    "zc.lockfile==2.0",
+    "zipp==3.8.0"
+  ],
+  "config": {
+    "wandb_version": 1,
+    "_wandb": {
+      "desc": null,
+      "value": {
+        "cli_version": "0.12.14",
+        "framework": "huggingface",
+        "huggingface_version": "4.18.0",
+        "is_jupyter_run": false,
+        "is_kaggle_kernel": false,
+        "m": [
+          {
+            "1": "trainer/global_step",
+            "6": [
+              3
+            ]
+          },
+          {
+            "1": "train/Loss",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/BaseLR",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/LambdaLR",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "epoch",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "val/Loss",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "val/precision_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "val/recall_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "val/f1_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/precision_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/recall_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/f1_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/Loss",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/precision_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/recall_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/f1_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          }
+        ],
+        "python_version": "3.9.12",
+        "start_time": 1654100708,
+        "t": {
+          "1": [
+            1,
+            5,
+            9,
+            11,
+            44,
+            49,
+            51,
+            53,
+            55
+          ],
+          "2": [
+            1,
+            5,
+            9,
+            11,
+            44,
+            49,
+            51,
+            53,
+            55
+          ],
+          "3": [
+            2,
+            3,
+            7,
+            13
+          ],
+          "4": "3.9.12",
+          "5": "0.12.14",
+          "6": "4.18.0",
+          "8": [
+            5
+          ]
+        }
+      }
+    },
+    "accelerator": {
+      "desc": null,
+      "value": "auto"
+    },
+    "adam_epsilon": {
+      "desc": null,
+      "value": 1e-06
+    },
+    "config": {
+      "desc": null,
+      "value": "LightningAdvancedConfig(finetune_last_n_layers=4, task_model_kwargs={'adam_epsilon': 1e-06, 'eval_batch_size': 16, 'learning_rate': 5e-05, 'optimizer': 'AdamW', 'train_batch_size': 16, 'use_scheduler': True, 'warmup_steps': 50, 'weight_decay': 0.01}, datamodule_kwargs={'label_all_tokens': False, 'max_seq_length': 512}, task_train_kwargs={'max_epochs': 15, 'devices': 'auto', 'accelerator': 'auto'}, model_config_kwargs={'classifier_dropout': 0.0}, early_stopping_kwargs={'mode': 'min', 'monitor': 'val/Loss', 'patience': 3}, tokenizer_kwargs={}, batch_encoding_kwargs={}, dataloader_kwargs={})"
+    },
+    "config_kwargs/classifier_dropout": {
+      "desc": null,
+      "value": 0.0
+    },
+    "dataset_info": {
+      "desc": null,
+      "value": "DatasetInfo(description='Polish Political Advertising Dataset', citation='@inproceedings{augustyniak-etal-2020-political,\\n    title = \"Political Advertising Dataset: the use case of the Polish 2020 Presidential Elections\",\\n    author = \"Augustyniak, Lukasz  and\\n      Rajda, Krzysztof  and\\n      Kajdanowicz, Tomasz  and\\n      Bernaczyk, Micha{\\\\l}\",\\n    booktitle = \"Proceedings of the The Fourth Widening Natural Language Processing Workshop\",\\n    month = jul,\\n    year = \"2020\",\\n    address = \"Seattle, USA\",\\n    publisher = \"Association for Computational Linguistics\",\\n    url = \"https://www.aclweb.org/anthology/2020.winlp-1.28\",\\n    pages = \"110--114\"\\n}\\n', homepage='https://github.com/laugustyniak/misinformation', license='', features={'input_ids': Sequence(feature=Value(dtype='int32', id=None), length=-1, id=None), 'attention_mask': Sequence(feature=Value(dtype='int8', id=None), length=-1, id=None), 'labels': Sequence(feature=ClassLabel(num_classes=19, names=['O', 'B-DEFENSE_AND_SECURITY', 'I-DEFENSE_AND_SECURITY', 'B-EDUCATION', 'I-EDUCATION', 'B-FOREIGN_POLICY', 'I-FOREIGN_POLICY', 'B-HEALHCARE', 'I-HEALHCARE', 'B-IMMIGRATION', 'I-IMMIGRATION', 'B-INFRASTRUCTURE_AND_ENVIROMENT', 'I-INFRASTRUCTURE_AND_ENVIROMENT', 'B-POLITICAL_AND_LEGAL_SYSTEM', 'I-POLITICAL_AND_LEGAL_SYSTEM', 'B-SOCIETY', 'I-SOCIETY', 'B-WELFARE', 'I-WELFARE'], id=None), length=-1, id=None)}, post_processed=None, supervised_keys=None, task_templates=None, builder_name='political_advertising_dataset', config_name='political-advertising-pl', version=1.0.0, splits={'train': SplitInfo(name='train', num_bytes=606982, num_examples=1020, dataset_name='political_advertising_dataset'), 'test': SplitInfo(name='test', num_bytes=194615, num_examples=341, dataset_name='political_advertising_dataset'), 'validation': SplitInfo(name='validation', num_bytes=200144, num_examples=340, dataset_name='political_advertising_dataset')}, download_checksums={'https://huggingface.co/datasets/laugustyniak/political-advertising-pl/resolve/main/train.parquet': {'num_bytes': 180137, 'checksum': 'ae6d5d8b226e52c8d47540bc1180be5b3c69a603b7aec4211adc0f0486f4afab'}, 'https://huggingface.co/datasets/laugustyniak/political-advertising-pl/resolve/main/test.parquet': {'num_bytes': 67275, 'checksum': 'e09aeb0170a55b6005cc83dfbe269df048770208b2dc5e2ea6c018d67d4d6b08'}, 'https://huggingface.co/datasets/laugustyniak/political-advertising-pl/resolve/main/dev.parquet': {'num_bytes': 66658, 'checksum': 'de664603570769f3f3940309f1bad02a2b6c5612631860e7cc0d307ca41f2edb'}}, download_size=314070, post_processing_size=None, dataset_size=1001741, size_in_bytes=1315811)"
+    },
+    "dataset_name_or_path": {
+      "desc": null,
+      "value": "data/datasets/political_advertising/lightning/"
+    },
+    "dataset_version": {
+      "desc": null,
+      "value": "1.0.0"
+    },
+    "devices": {
+      "desc": null,
+      "value": "auto"
+    },
+    "downstream_model_type": {
+      "desc": null,
+      "value": "AutoModelForTokenClassification"
+    },
+    "embedding_name_or_path": {
+      "desc": null,
+      "value": "sentence-transformers/paraphrase-xlm-r-multilingual-v1"
+    },
+    "eval_batch_size": {
+      "desc": null,
+      "value": 16
+    },
+    "evaluation_filename": {
+      "desc": null,
+      "value": "evaluation.json"
+    },
+    "evaluation_mode": {
+      "desc": null,
+      "value": "EvaluationMode.CONLL"
+    },
+    "finetune_last_n_layers": {
+      "desc": null,
+      "value": 4
+    },
+    "ignore_index": {
+      "desc": null,
+      "value": -100
+    },
+    "input_column_name": {
+      "desc": null,
+      "value": "tokens"
+    },
+    "label_all_tokens": {
+      "desc": null,
+      "value": false
+    },
+    "learning_rate": {
+      "desc": null,
+      "value": 5e-05
+    },
+    "load_dataset_kwargs": {
+      "desc": null,
+      "value": "None"
+    },
+    "logging_config": {
+      "desc": null,
+      "value": "LightningLoggingConfig(loggers_names=['wandb'], tracking_project_name='political_advertising', wandb_entity='embeddings', wandb_logger_kwargs={})"
+    },
+    "max_seq_length": {
+      "desc": null,
+      "value": 512
+    },
+    "metrics": {
+      "desc": null,
+      "value": "None"
+    },
+    "model_checkpoint_kwargs/filename": {
+      "desc": null,
+      "value": "last"
+    },
+    "model_checkpoint_kwargs/monitor": {
+      "desc": null,
+      "value": "None"
+    },
+    "model_checkpoint_kwargs/save_last": {
+      "desc": null,
+      "value": false
+    },
+    "model_name_or_path": {
+      "desc": null,
+      "value": "sentence-transformers/paraphrase-xlm-r-multilingual-v1"
+    },
+    "num_classes": {
+      "desc": null,
+      "value": 19
+    },
+    "optimizer": {
+      "desc": null,
+      "value": "AdamW"
+    },
+    "output_path": {
+      "desc": null,
+      "value": "/embeddings-internal/leaderboard/data/models/lightning/sentence-transformers__paraphrase-xlm-r-multilingual-v1/political_advertising/run-4"
+    },
+    "predict_subset": {
+      "desc": null,
+      "value": "LightingDataModuleSubset.TEST"
+    },
+    "processing_batch_size": {
+      "desc": null,
+      "value": "None"
+    },
+    "seed": {
+      "desc": null,
+      "value": 441
+    },
+    "tagging_scheme": {
+      "desc": null,
+      "value": "None"
+    },
+    "target_column_name": {
+      "desc": null,
+      "value": "tags"
+    },
+    "target_field": {
+      "desc": null,
+      "value": "tags"
+    },
+    "task_model_kwargs/adam_epsilon": {
+      "desc": null,
+      "value": 1e-06
+    },
+    "task_model_kwargs/eval_batch_size": {
+      "desc": null,
+      "value": 16
+    },
+    "task_model_kwargs/learning_rate": {
+      "desc": null,
+      "value": 5e-05
+    },
+    "task_model_kwargs/optimizer": {
+      "desc": null,
+      "value": "AdamW"
+    },
+    "task_model_kwargs/train_batch_size": {
+      "desc": null,
+      "value": 16
+    },
+    "task_model_kwargs/use_scheduler": {
+      "desc": null,
+      "value": true
+    },
+    "task_model_kwargs/warmup_steps": {
+      "desc": null,
+      "value": 50
+    },
+    "task_model_kwargs/weight_decay": {
+      "desc": null,
+      "value": 0.01
+    },
+    "text_field": {
+      "desc": null,
+      "value": "tokens"
+    },
+    "tokenizer_name_or_path": {
+      "desc": null,
+      "value": "sentence-transformers/paraphrase-xlm-r-multilingual-v1"
+    },
+    "train_batch_size": {
+      "desc": null,
+      "value": 16
+    },
+    "use_scheduler": {
+      "desc": null,
+      "value": true
+    },
+    "warmup_steps": {
+      "desc": null,
+      "value": 50
+    },
+    "weight_decay": {
+      "desc": null,
+      "value": 0.01
+    }
+  },
+  "metrics": [
+    {
+      "accuracy": 0.9564554549785612,
+      "f1_macro": 0.5561172380182013,
+      "f1_micro": 0.5970149253731344,
+      "f1_weighted": 0.5988245608379846,
+      "recall_macro": 0.5983003687654348,
+      "recall_micro": 0.6361829025844931,
+      "recall_weighted": 0.6361829025844931,
+      "precision_macro": 0.5238921547473994,
+      "precision_micro": 0.562390158172232,
+      "precision_weighted": 0.5679845990188855,
+      "classes": {
+        "DEFENSE_AND_SECURITY": {
+          "precision": 0.5,
+          "recall": 0.7142857142857143,
+          "f1": 0.588235294117647,
+          "support": 14
+        },
+        "EDUCATION": {
+          "precision": 0.6857142857142857,
+          "recall": 0.6,
+          "f1": 0.64,
+          "support": 40
+        },
+        "FOREIGN_POLICY": {
+          "precision": 0.3157894736842105,
+          "recall": 0.42857142857142855,
+          "f1": 0.36363636363636365,
+          "support": 14
+        },
+        "HEALHCARE": {
+          "precision": 0.6821705426356589,
+          "recall": 0.7521367521367521,
+          "f1": 0.7154471544715447,
+          "support": 117
+        },
+        "IMMIGRATION": {
+          "precision": 0.4,
+          "recall": 0.4444444444444444,
+          "f1": 0.4210526315789474,
+          "support": 9
+        },
+        "INFRASTRUCTURE_AND_ENVIROMENT": {
+          "precision": 0.5769230769230769,
+          "recall": 0.6716417910447762,
+          "f1": 0.6206896551724138,
+          "support": 67
+        },
+        "POLITICAL_AND_LEGAL_SYSTEM": {
+          "precision": 0.5421686746987951,
+          "recall": 0.6,
+          "f1": 0.569620253164557,
+          "support": 75
+        },
+        "SOCIETY": {
+          "precision": 0.5301204819277109,
+          "recall": 0.5866666666666667,
+          "f1": 0.5569620253164557,
+          "support": 75
+        },
+        "WELFARE": {
+          "precision": 0.48214285714285715,
+          "recall": 0.5869565217391305,
+          "f1": 0.5294117647058824,
+          "support": 92
+        }
+      }
+    },
+    {
+      "accuracy": 0.9574082896617437,
+      "f1_macro": 0.5709422570066204,
+      "f1_micro": 0.6106280193236715,
+      "f1_weighted": 0.6116837476787319,
+      "recall_macro": 0.600553149912873,
+      "recall_micro": 0.6282306163021869,
+      "recall_weighted": 0.6282306163021869,
+      "precision_macro": 0.5512696746733993,
+      "precision_micro": 0.5939849624060151,
+      "precision_weighted": 0.5996246520970311,
+      "classes": {
+        "DEFENSE_AND_SECURITY": {
+          "precision": 0.6,
+          "recall": 0.8571428571428571,
+          "f1": 0.7058823529411764,
+          "support": 14
+        },
+        "EDUCATION": {
+          "precision": 0.75,
+          "recall": 0.6,
+          "f1": 0.6666666666666665,
+          "support": 40
+        },
+        "FOREIGN_POLICY": {
+          "precision": 0.2777777777777778,
+          "recall": 0.35714285714285715,
+          "f1": 0.31250000000000006,
+          "support": 14
+        },
+        "HEALHCARE": {
+          "precision": 0.7016129032258065,
+          "recall": 0.7435897435897436,
+          "f1": 0.7219917012448134,
+          "support": 117
+        },
+        "IMMIGRATION": {
+          "precision": 0.36363636363636365,
+          "recall": 0.4444444444444444,
+          "f1": 0.39999999999999997,
+          "support": 9
+        },
+        "INFRASTRUCTURE_AND_ENVIROMENT": {
+          "precision": 0.5945945945945946,
+          "recall": 0.6567164179104478,
+          "f1": 0.624113475177305,
+          "support": 67
+        },
+        "POLITICAL_AND_LEGAL_SYSTEM": {
+          "precision": 0.5714285714285714,
+          "recall": 0.64,
+          "f1": 0.6037735849056605,
+          "support": 75
+        },
+        "SOCIETY": {
+          "precision": 0.5972222222222222,
+          "recall": 0.5733333333333334,
+          "f1": 0.5850340136054423,
+          "support": 75
+        },
+        "WELFARE": {
+          "precision": 0.5051546391752577,
+          "recall": 0.532608695652174,
+          "f1": 0.5185185185185186,
+          "support": 92
+        }
+      }
+    },
+    {
+      "accuracy": 0.957503573130062,
+      "f1_macro": 0.5617348350902873,
+      "f1_micro": 0.6134852801519468,
+      "f1_weighted": 0.612796772369777,
+      "recall_macro": 0.588852301110575,
+      "recall_micro": 0.6421471172962226,
+      "recall_weighted": 0.6421471172962226,
+      "precision_macro": 0.540937171806251,
+      "precision_micro": 0.5872727272727273,
+      "precision_weighted": 0.5883346773428085,
+      "classes": {
+        "DEFENSE_AND_SECURITY": {
+          "precision": 0.5263157894736842,
+          "recall": 0.7142857142857143,
+          "f1": 0.6060606060606061,
+          "support": 14
+        },
+        "EDUCATION": {
+          "precision": 0.6857142857142857,
+          "recall": 0.6,
+          "f1": 0.64,
+          "support": 40
+        },
+        "FOREIGN_POLICY": {
+          "precision": 0.3076923076923077,
+          "recall": 0.2857142857142857,
+          "f1": 0.29629629629629634,
+          "support": 14
+        },
+        "HEALHCARE": {
+          "precision": 0.6742424242424242,
+          "recall": 0.7606837606837606,
+          "f1": 0.7148594377510039,
+          "support": 117
+        },
+        "IMMIGRATION": {
+          "precision": 0.4,
+          "recall": 0.4444444444444444,
+          "f1": 0.4210526315789474,
+          "support": 9
+        },
+        "INFRASTRUCTURE_AND_ENVIROMENT": {
+          "precision": 0.6027397260273972,
+          "recall": 0.6567164179104478,
+          "f1": 0.6285714285714286,
+          "support": 67
+        },
+        "POLITICAL_AND_LEGAL_SYSTEM": {
+          "precision": 0.6071428571428571,
+          "recall": 0.68,
+          "f1": 0.6415094339622641,
+          "support": 75
+        },
+        "SOCIETY": {
+          "precision": 0.56,
+          "recall": 0.56,
+          "f1": 0.56,
+          "support": 75
+        },
+        "WELFARE": {
+          "precision": 0.5045871559633027,
+          "recall": 0.5978260869565217,
+          "f1": 0.5472636815920398,
+          "support": 92
+        }
+      }
+    },
+    {
+      "accuracy": 0.9562648880419248,
+      "f1_macro": 0.564538180805488,
+      "f1_micro": 0.6139534883720931,
+      "f1_weighted": 0.6134236966509267,
+      "recall_macro": 0.6109722379590431,
+      "recall_micro": 0.6560636182902585,
+      "recall_weighted": 0.6560636182902585,
+      "precision_macro": 0.5283765077517697,
+      "precision_micro": 0.5769230769230769,
+      "precision_weighted": 0.5773500169802813,
+      "classes": {
+        "DEFENSE_AND_SECURITY": {
+          "precision": 0.5,
+          "recall": 0.7857142857142857,
+          "f1": 0.6111111111111112,
+          "support": 14
+        },
+        "EDUCATION": {
+          "precision": 0.6,
+          "recall": 0.6,
+          "f1": 0.6,
+          "support": 40
+        },
+        "FOREIGN_POLICY": {
+          "precision": 0.3333333333333333,
+          "recall": 0.35714285714285715,
+          "f1": 0.3448275862068965,
+          "support": 14
+        },
+        "HEALHCARE": {
+          "precision": 0.6691176470588235,
+          "recall": 0.7777777777777778,
+          "f1": 0.7193675889328063,
+          "support": 117
+        },
+        "IMMIGRATION": {
+          "precision": 0.4,
+          "recall": 0.4444444444444444,
+          "f1": 0.4210526315789474,
+          "support": 9
+        },
+        "INFRASTRUCTURE_AND_ENVIROMENT": {
+          "precision": 0.6164383561643836,
+          "recall": 0.6716417910447762,
+          "f1": 0.6428571428571429,
+          "support": 67
+        },
+        "POLITICAL_AND_LEGAL_SYSTEM": {
+          "precision": 0.5813953488372093,
+          "recall": 0.6666666666666666,
+          "f1": 0.6211180124223603,
+          "support": 75
+        },
+        "SOCIETY": {
+          "precision": 0.5365853658536586,
+          "recall": 0.5866666666666667,
+          "f1": 0.5605095541401274,
+          "support": 75
+        },
+        "WELFARE": {
+          "precision": 0.5185185185185185,
+          "recall": 0.6086956521739131,
+          "f1": 0.5599999999999999,
+          "support": 92
+        }
+      }
+    },
+    {
+      "accuracy": 0.9580752739399714,
+      "f1_macro": 0.580667744580174,
+      "f1_micro": 0.6121212121212122,
+      "f1_weighted": 0.6115696056926021,
+      "recall_macro": 0.5785898831302249,
+      "recall_micro": 0.6023856858846919,
+      "recall_weighted": 0.6023856858846919,
+      "precision_macro": 0.5895832251574549,
+      "precision_micro": 0.62217659137577,
+      "precision_weighted": 0.6250494740662974,
+      "classes": {
+        "DEFENSE_AND_SECURITY": {
+          "precision": 0.6111111111111112,
+          "recall": 0.7857142857142857,
+          "f1": 0.6875000000000001,
+          "support": 14
+        },
+        "EDUCATION": {
+          "precision": 0.7333333333333333,
+          "recall": 0.55,
+          "f1": 0.6285714285714286,
+          "support": 40
+        },
+        "FOREIGN_POLICY": {
+          "precision": 0.46153846153846156,
+          "recall": 0.42857142857142855,
+          "f1": 0.4444444444444445,
+          "support": 14
+        },
+        "HEALHCARE": {
+          "precision": 0.7142857142857143,
+          "recall": 0.7264957264957265,
+          "f1": 0.7203389830508475,
+          "support": 117
+        },
+        "IMMIGRATION": {
+          "precision": 0.4,
+          "recall": 0.4444444444444444,
+          "f1": 0.4210526315789474,
+          "support": 9
+        },
+        "INFRASTRUCTURE_AND_ENVIROMENT": {
+          "precision": 0.6363636363636364,
+          "recall": 0.6268656716417911,
+          "f1": 0.6315789473684211,
+          "support": 67
+        },
+        "POLITICAL_AND_LEGAL_SYSTEM": {
+          "precision": 0.6307692307692307,
+          "recall": 0.5466666666666666,
+          "f1": 0.5857142857142857,
+          "support": 75
+        },
+        "SOCIETY": {
+          "precision": 0.5882352941176471,
+          "recall": 0.5333333333333333,
+          "f1": 0.5594405594405595,
+          "support": 75
+        },
+        "WELFARE": {
+          "precision": 0.5306122448979592,
+          "recall": 0.5652173913043478,
+          "f1": 0.5473684210526316,
+          "support": 92
+        }
+      }
+    }
+  ],
+  "metrics_avg": {
+    "accuracy": 0.9571414959504526,
+    "f1_macro": 0.5668000511001542,
+    "f1_micro": 0.6094405850684116,
+    "f1_weighted": 0.6096596766460045,
+    "recall_macro": 0.5954535881756301,
+    "recall_micro": 0.6330019880715706,
+    "recall_weighted": 0.6330019880715706,
+    "precision_macro": 0.5468117468272549,
+    "precision_micro": 0.5885495032299642,
+    "precision_weighted": 0.5916686839010608,
+    "classes": {
+      "DEFENSE_AND_SECURITY": {
+        "precision": 0.547485380116959,
+        "recall": 0.7714285714285715,
+        "f1": 0.6397578728461082,
+        "support": 14
+      },
+      "EDUCATION": {
+        "precision": 0.690952380952381,
+        "recall": 0.59,
+        "f1": 0.635047619047619,
+        "support": 40
+      },
+      "FOREIGN_POLICY": {
+        "precision": 0.33922627080521817,
+        "recall": 0.37142857142857144,
+        "f1": 0.35234093811680023,
+        "support": 14
+      },
+      "HEALHCARE": {
+        "precision": 0.6882858462896855,
+        "recall": 0.7521367521367521,
+        "f1": 0.7184009730902031,
+        "support": 117
+      },
+      "IMMIGRATION": {
+        "precision": 0.39272727272727276,
+        "recall": 0.4444444444444444,
+        "f1": 0.4168421052631579,
+        "support": 9
+      },
+      "INFRASTRUCTURE_AND_ENVIROMENT": {
+        "precision": 0.6054118780146177,
+        "recall": 0.6567164179104478,
+        "f1": 0.6295621298293422,
+        "support": 67
+      },
+      "POLITICAL_AND_LEGAL_SYSTEM": {
+        "precision": 0.5865809365753327,
+        "recall": 0.6266666666666667,
+        "f1": 0.6043471140338256,
+        "support": 75
+      },
+      "SOCIETY": {
+        "precision": 0.5624326728242478,
+        "recall": 0.5680000000000001,
+        "f1": 0.5643892305005169,
+        "support": 75
+      },
+      "WELFARE": {
+        "precision": 0.5082030831395791,
+        "recall": 0.5782608695652174,
+        "f1": 0.5405124771738145,
+        "support": 92
+      }
+    }
+  },
+  "metrics_median": {
+    "accuracy": 0.9574082896617437,
+    "f1_macro": 0.564538180805488,
+    "f1_micro": 0.6121212121212122,
+    "f1_weighted": 0.6116837476787319,
+    "recall_macro": 0.5983003687654348,
+    "recall_micro": 0.6361829025844931,
+    "recall_weighted": 0.6361829025844931,
+    "precision_macro": 0.540937171806251,
+    "precision_micro": 0.5872727272727273,
+    "precision_weighted": 0.5883346773428085,
+    "classes": {
+      "DEFENSE_AND_SECURITY": {
+        "precision": 0.5263157894736842,
+        "recall": 0.7857142857142857,
+        "f1": 0.6111111111111112
+      },
+      "EDUCATION": {
+        "precision": 0.6857142857142857,
+        "recall": 0.6,
+        "f1": 0.64
+      },
+      "FOREIGN_POLICY": {
+        "precision": 0.3157894736842105,
+        "recall": 0.35714285714285715,
+        "f1": 0.3448275862068965
+      },
+      "HEALHCARE": {
+        "precision": 0.6821705426356589,
+        "recall": 0.7521367521367521,
+        "f1": 0.7193675889328063
+      },
+      "IMMIGRATION": {
+        "precision": 0.4,
+        "recall": 0.4444444444444444,
+        "f1": 0.4210526315789474
+      },
+      "INFRASTRUCTURE_AND_ENVIROMENT": {
+        "precision": 0.6027397260273972,
+        "recall": 0.6567164179104478,
+        "f1": 0.6285714285714286
+      },
+      "POLITICAL_AND_LEGAL_SYSTEM": {
+        "precision": 0.5813953488372093,
+        "recall": 0.64,
+        "f1": 0.6037735849056605
+      },
+      "SOCIETY": {
+        "precision": 0.56,
+        "recall": 0.5733333333333334,
+        "f1": 0.56
+      },
+      "WELFARE": {
+        "precision": 0.5051546391752577,
+        "recall": 0.5869565217391305,
+        "f1": 0.5472636815920398
+      }
+    }
+  },
+  "metrics_std": {
+    "accuracy": 0.0007604790829627252,
+    "f1_macro": 0.00941230256137938,
+    "f1_micro": 0.007066092182330354,
+    "f1_weighted": 0.006106423733645816,
+    "recall_macro": 0.012277008181071187,
+    "recall_micro": 0.019910514447004823,
+    "recall_weighted": 0.019910514447004823,
+    "precision_macro": 0.026215209572817033,
+    "precision_micro": 0.022256687494909607,
+    "precision_weighted": 0.022105713519447998,
+    "classes": {
+      "DEFENSE_AND_SECURITY": {
+        "precision": 0.054230741198393405,
+        "recall": 0.05976143046671965,
+        "f1": 0.05306240768794546
+      },
+      "EDUCATION": {
+        "precision": 0.05833090373949095,
+        "recall": 0.02236067977499787,
+        "f1": 0.02407848090371117
+      },
+      "FOREIGN_POLICY": {
+        "precision": 0.0712646306000633,
+        "recall": 0.059761430466719674,
+        "f1": 0.057869238804505924
+      },
+      "HEALHCARE": {
+        "precision": 0.019076412698159528,
+        "recall": 0.019111692115382824,
+        "f1": 0.0031165315041632832
+      },
+      "IMMIGRATION": {
+        "precision": 0.016262312563634838,
+        "recall": 0.0,
+        "f1": 0.009415023063157038
+      },
+      "INFRASTRUCTURE_AND_ENVIROMENT": {
+        "precision": 0.022446382613622848,
+        "recall": 0.01827977419987447,
+        "f1": 0.008517849749683924
+      },
+      "POLITICAL_AND_LEGAL_SYSTEM": {
+        "precision": 0.03392761196987042,
+        "recall": 0.05416025603090642,
+        "f1": 0.028353867231393735
+      },
+      "SOCIETY": {
+        "precision": 0.029975685430697955,
+        "recall": 0.022310934040908684,
+        "f1": 0.011620854364065179
+      },
+      "WELFARE": {
+        "precision": 0.01809752784718319,
+        "recall": 0.03016181940328611,
+        "f1": 0.016426398784379233
+      }
+    }
+  },
+  "averaged_over": 5
+}

@@ -1,6 +1,4 @@
 baseURL = "https://embeddings.ml"
 languageCode = "en-us"
 title = "Clarin-PL Embeddigs Library"
-theme="book"
-[params]
-    BookSearch = false
+theme = "hugo-geekdoc"

@@ -1,0 +1,1052 @@
+{
+  "submission_name": "aspectemo_allegro__herbert-base-cased",
+  "dataset_name": {
+    "desc": null,
+    "value": "data/datasets/aspectemo/lightning/"
+  },
+  "dataset_version": {
+    "desc": null,
+    "value": "1.0.0"
+  },
+  "embedding_name": {
+    "desc": null,
+    "value": "allegro/herbert-base-cased"
+  },
+  "hparams": {
+    "finetune_last_n_layers": 4,
+    "task_model_kwargs": {
+      "adam_epsilon": 1e-05,
+      "eval_batch_size": 64,
+      "learning_rate": 0.0005,
+      "optimizer": "AdamW",
+      "train_batch_size": 64,
+      "use_scheduler": true,
+      "warmup_steps": 25,
+      "weight_decay": 0
+    },
+    "datamodule_kwargs": {
+      "label_all_tokens": false,
+      "max_seq_length": 512
+    },
+    "task_train_kwargs": {
+      "max_epochs": 20
+    },
+    "model_config_kwargs": {
+      "classifier_dropout": 0.2
+    },
+    "early_stopping_kwargs": {
+      "mode": "min",
+      "monitor": "val/Loss",
+      "patience": 3
+    },
+    "tokenizer_kwargs": {},
+    "batch_encoding_kwargs": {},
+    "dataloader_kwargs": {}
+  },
+  "packages": [
+    "absl-py==1.0.0",
+    "aiobotocore==2.3.2",
+    "aiohttp-retry==2.4.6",
+    "aiohttp==3.8.1",
+    "aioitertools==0.8.0",
+    "aiosignal==1.2.0",
+    "alembic==1.4.1",
+    "appdirs==1.4.4",
+    "argon2-cffi-bindings==21.2.0",
+    "argon2-cffi==21.3.0",
+    "asttokens==2.0.5",
+    "async-timeout==4.0.2",
+    "asyncssh==2.10.1",
+    "atpublic==3.0.1",
+    "attrs==21.4.0",
+    "autopage==0.5.1",
+    "backcall==0.2.0",
+    "beautifulsoup4==4.11.1",
+    "black==21.10b0",
+    "bleach==5.0.0",
+    "boto3==1.21.21",
+    "botocore==1.24.21",
+    "bpemb==0.3.3",
+    "cachecontrol==0.12.11",
+    "cachetools==5.2.0",
+    "cachy==0.3.0",
+    "catalogue==2.0.7",
+    "certifi==2022.5.18.1",
+    "cffi==1.15.0",
+    "charset-normalizer==2.0.12",
+    "clarinpl-embeddings==0.0.1rc241317216295",
+    "cleo==0.8.1",
+    "click==8.0.4",
+    "cliff==3.10.1",
+    "clikit==0.6.2",
+    "cloudpickle==2.1.0",
+    "cmaes==0.8.2",
+    "cmd2==2.4.1",
+    "colorama==0.4.4",
+    "colorlog==6.6.0",
+    "commonmark==0.9.1",
+    "configobj==5.0.6",
+    "conllu==4.4.2",
+    "coverage==6.4",
+    "crashtest==0.3.1",
+    "cryptography==37.0.2",
+    "cycler==0.11.0",
+    "databricks-cli==0.16.6",
+    "datasets==2.2.2",
+    "debugpy==1.6.0",
+    "decorator==5.1.1",
+    "defusedxml==0.7.1",
+    "deprecated==1.2.13",
+    "dictdiffer==0.9.0",
+    "dill==0.3.4",
+    "diskcache==5.4.0",
+    "distlib==0.3.4",
+    "distro==1.7.0",
+    "docker-pycreds==0.4.0",
+    "docker==5.0.3",
+    "dpath==2.0.6",
+    "dulwich==0.20.42",
+    "dvc-render==0.0.4",
+    "dvc==2.10.1",
+    "entrypoints==0.4",
+    "executing==0.8.3",
+    "fastjsonschema==2.15.3",
+    "filelock==3.7.0",
+    "flair==0.10",
+    "flask==2.1.2",
+    "flatten-dict==0.4.2",
+    "flufl.lock==7.0",
+    "fonttools==4.33.3",
+    "frozenlist==1.3.0",
+    "fsspec==2022.5.0",
+    "ftfy==6.1.1",
+    "funcy==1.17",
+    "future==0.18.2",
+    "gdown==3.12.2",
+    "gensim==4.2.0",
+    "gitdb==4.0.9",
+    "gitpython==3.1.27",
+    "google-auth-oauthlib==0.4.6",
+    "google-auth==2.6.6",
+    "grandalf==0.6",
+    "greenlet==1.1.2",
+    "grpcio==1.46.3",
+    "gunicorn==20.1.0",
+    "html5lib==1.1",
+    "huggingface-hub==0.7.0",
+    "idna==3.3",
+    "importlib-metadata==3.10.1",
+    "iniconfig==1.1.1",
+    "ipykernel==6.13.0",
+    "ipython-genutils==0.2.0",
+    "ipython==8.4.0",
+    "ipywidgets==7.7.0",
+    "isort==5.10.1",
+    "itsdangerous==2.1.2",
+    "janome==0.4.2",
+    "jedi==0.18.1",
+    "jeepney==0.8.0",
+    "jinja2==3.1.2",
+    "jmespath==1.0.0",
+    "joblib==1.1.0",
+    "jsonschema==4.5.1",
+    "jupyter-client==7.3.1",
+    "jupyter-console==6.4.3",
+    "jupyter-core==4.10.0",
+    "jupyter==1.0.0",
+    "jupyterlab-pygments==0.2.2",
+    "jupyterlab-widgets==1.1.0",
+    "keyring==23.5.0",
+    "kiwisolver==1.4.2",
+    "konoha==4.6.5",
+    "langdetect==1.0.9",
+    "leaderboard==0.0.1",
+    "lockfile==0.12.2",
+    "lxml==4.8.0",
+    "mailchecker==4.1.17",
+    "mako==1.2.0",
+    "markdown==3.3.5",
+    "markupsafe==2.1.1",
+    "matplotlib-inline==0.1.3",
+    "matplotlib==3.5.2",
+    "mistune==0.8.4",
+    "mlflow==1.19.0",
+    "more-itertools==8.8.0",
+    "mpld3==0.3",
+    "msgpack==1.0.3",
+    "multidict==6.0.2",
+    "multiprocess==0.70.12.2",
+    "mypy-extensions==0.4.3",
+    "mypy==0.950",
+    "nanotime==0.5.2",
+    "nbclient==0.6.3",
+    "nbconvert==6.5.0",
+    "nbformat==5.4.0",
+    "nest-asyncio==1.5.5",
+    "networkx==2.8.2",
+    "notebook==6.4.11",
+    "numpy==1.22.4",
+    "oauthlib==3.2.0",
+    "optuna==2.10.0",
+    "overrides==3.1.0",
+    "packaging==21.3",
+    "pandas==1.4.2",
+    "pandocfilters==1.5.0",
+    "parso==0.8.3",
+    "pastel==0.2.1",
+    "pathspec==0.9.0",
+    "pathtools==0.1.2",
+    "pbr==5.9.0",
+    "pexpect==4.8.0",
+    "phonenumbers==8.12.49",
+    "pickleshare==0.7.5",
+    "pillow==9.1.1",
+    "pip==21.2.4",
+    "pkginfo==1.8.2",
+    "platformdirs==2.5.2",
+    "pluggy==1.0.0",
+    "poethepoet==0.11.0",
+    "poetry-core==1.0.8",
+    "poetry==1.1.13",
+    "prettytable==3.3.0",
+    "prometheus-client==0.14.1",
+    "prometheus-flask-exporter==0.20.1",
+    "promise==2.3",
+    "prompt-toolkit==3.0.29",
+    "protobuf==3.20.0",
+    "psutil==5.9.1",
+    "ptyprocess==0.7.0",
+    "pure-eval==0.2.2",
+    "py==1.11.0",
+    "pyarrow==8.0.0",
+    "pyasn1-modules==0.2.8",
+    "pyasn1==0.4.8",
+    "pycparser==2.21",
+    "pydantic==1.9.1",
+    "pydeprecate==0.3.1",
+    "pydot==1.4.2",
+    "pyflakes==2.4.0",
+    "pygit2==1.9.2",
+    "pygments==2.12.0",
+    "pygtrie==2.4.2",
+    "pyjwt==2.4.0",
+    "pylev==1.4.0",
+    "pyparsing==3.0.9",
+    "pyperclip==1.8.2",
+    "pyrsistent==0.18.1",
+    "pysocks==1.7.1",
+    "pytest==6.2.5",
+    "python-benedict==0.25.1",
+    "python-dateutil==2.8.2",
+    "python-editor==1.0.4",
+    "python-fsutil==0.6.1",
+    "python-slugify==6.1.2",
+    "pytorch-lightning==1.5.4",
+    "pytz==2022.1",
+    "pyyaml==6.0",
+    "pyzmq==23.0.0",
+    "qtconsole==5.3.0",
+    "qtpy==2.1.0",
+    "querystring-parser==1.2.4",
+    "regex==2022.4.24",
+    "requests-oauthlib==1.3.1",
+    "requests-toolbelt==0.9.1",
+    "requests==2.27.1",
+    "responses==0.18.0",
+    "rich==12.4.4",
+    "rsa==4.8",
+    "ruamel.yaml.clib==0.2.6",
+    "ruamel.yaml==0.17.21",
+    "s3fs==2022.5.0",
+    "s3transfer==0.5.2",
+    "sacremoses==0.0.53",
+    "scikit-learn==1.1.1",
+    "scipy==1.8.1",
+    "scmrepo==0.0.16",
+    "secretstorage==3.3.2",
+    "segtok==1.5.11",
+    "send2trash==1.8.0",
+    "sentencepiece==0.1.95",
+    "sentry-sdk==1.5.12",
+    "seqeval==1.2.2",
+    "setproctitle==1.2.3",
+    "setuptools-scm==6.4.2",
+    "setuptools==61.2.0",
+    "shellingham==1.4.0",
+    "shortuuid==1.0.9",
+    "shtab==1.5.4",
+    "six==1.16.0",
+    "smart-open==6.0.0",
+    "smmap==5.0.0",
+    "soupsieve==2.3.2.post1",
+    "sqlalchemy==1.4.36",
+    "sqlitedict==2.0.0",
+    "sqlparse==0.4.2",
+    "srsly==2.4.3",
+    "stack-data==0.2.0",
+    "stevedore==3.5.0",
+    "tabulate==0.8.9",
+    "tensorboard-data-server==0.6.1",
+    "tensorboard-plugin-wit==1.8.1",
+    "tensorboard==2.9.0",
+    "terminado==0.15.0",
+    "text-unidecode==1.3",
+    "threadpoolctl==3.1.0",
+    "tinycss2==1.1.1",
+    "tokenizers==0.12.1",
+    "toml==0.10.2",
+    "tomli==1.2.3",
+    "tomlkit==0.10.2",
+    "torch==1.11.0+cu113",
+    "torchmetrics==0.7.3",
+    "tornado==6.1",
+    "tqdm==4.64.0",
+    "traitlets==5.2.1.post0",
+    "transformers==4.18.0",
+    "typer==0.4.1",
+    "types-pyyaml==6.0.7",
+    "types-requests==2.26.1",
+    "types-setuptools==57.4.17",
+    "typing-extensions==3.10.0.0",
+    "urllib3==1.26.9",
+    "virtualenv==20.14.1",
+    "voluptuous==0.13.1",
+    "wandb==0.12.14",
+    "wcwidth==0.2.5",
+    "webencodings==0.5.1",
+    "websocket-client==1.3.2",
+    "werkzeug==2.1.2",
+    "wheel==0.37.1",
+    "widgetsnbextension==3.6.0",
+    "wikipedia-api==0.5.4",
+    "wrapt==1.14.1",
+    "xmltodict==0.13.0",
+    "xxhash==3.0.0",
+    "yarl==1.7.2",
+    "zc.lockfile==2.0",
+    "zipp==3.8.0"
+  ],
+  "config": {
+    "wandb_version": 1,
+    "_wandb": {
+      "desc": null,
+      "value": {
+        "cli_version": "0.12.14",
+        "framework": "huggingface",
+        "huggingface_version": "4.18.0",
+        "is_jupyter_run": false,
+        "is_kaggle_kernel": false,
+        "m": [
+          {
+            "1": "trainer/global_step",
+            "6": [
+              3
+            ]
+          },
+          {
+            "1": "train/precision_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/recall_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/f1_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "epoch",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/Loss",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/BaseLR",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/LambdaLR",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/Loss",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/precision_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/recall_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/f1_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          }
+        ],
+        "python_version": "3.9.12",
+        "start_time": 1653999805,
+        "t": {
+          "1": [
+            1,
+            5,
+            9,
+            11,
+            44,
+            49,
+            51,
+            53,
+            55
+          ],
+          "2": [
+            1,
+            5,
+            9,
+            11,
+            44,
+            49,
+            51,
+            53,
+            55
+          ],
+          "3": [
+            2,
+            3,
+            7,
+            13
+          ],
+          "4": "3.9.12",
+          "5": "0.12.14",
+          "6": "4.18.0",
+          "8": [
+            5
+          ]
+        }
+      }
+    },
+    "accelerator": {
+      "desc": null,
+      "value": "auto"
+    },
+    "adam_epsilon": {
+      "desc": null,
+      "value": 1e-05
+    },
+    "config": {
+      "desc": null,
+      "value": "LightningAdvancedConfig(finetune_last_n_layers=4, task_model_kwargs={'adam_epsilon': 1e-05, 'eval_batch_size': 64, 'learning_rate': 0.0005, 'optimizer': 'AdamW', 'train_batch_size': 64, 'use_scheduler': True, 'warmup_steps': 25, 'weight_decay': 0}, datamodule_kwargs={'label_all_tokens': False, 'max_seq_length': 512}, task_train_kwargs={'max_epochs': 20, 'devices': 'auto', 'accelerator': 'auto'}, model_config_kwargs={'classifier_dropout': 0.2}, early_stopping_kwargs={'mode': 'min', 'monitor': 'val/Loss', 'patience': 3}, tokenizer_kwargs={}, batch_encoding_kwargs={}, dataloader_kwargs={})"
+    },
+    "config_kwargs/classifier_dropout": {
+      "desc": null,
+      "value": 0.2
+    },
+    "dataset_info": {
+      "desc": null,
+      "value": "DatasetInfo(description='AspectEmo dataset: Multi-Domain Corpus of Consumer Reviews for Aspect-Based \\n                Sentiment Analysis', citation=\"@misc{11321/849,\\t\\n title = {{AspectEmo} 1.0: Multi-Domain Corpus of Consumer Reviews for Aspect-Based Sentiment Analysis},\\t\\n author = {Koco{'n}, Jan and Radom, Jarema and Kaczmarz-Wawryk, Ewa and Wabnic, Kamil and Zaj{\\\\c a}czkowska, Ada and Za{'s}ko-Zieli{'n}ska, Monika},\\t\\n url = {http://hdl.handle.net/11321/849},\\t\\n note = {{CLARIN}-{PL} digital repository},\\t\\n copyright = {The {MIT} License},\\t\\n year = {2021}\\t\\n}\", homepage='https://clarin-pl.eu/dspace/handle/11321/849', license='The MIT License', features={'labels': Sequence(feature=ClassLabel(num_classes=7, names=['O', 'a_minus_m', 'a_minus_s', 'a_zero', 'a_plus_s', 'a_plus_m', 'a_amb'], id=None), length=-1, id=None), 'input_ids': Sequence(feature=Value(dtype='int32', id=None), length=-1, id=None), 'token_type_ids': Sequence(feature=Value(dtype='int8', id=None), length=-1, id=None), 'attention_mask': Sequence(feature=Value(dtype='int8', id=None), length=-1, id=None)}, post_processed=None, supervised_keys=SupervisedKeysData(input='tokens', output='labels'), task_templates=None, builder_name='aspect_emo', config_name='1.0', version=1.0.0, splits={'train': SplitInfo(name='train', num_bytes=2285783, num_examples=1173, dataset_name='aspect_emo'), 'test': SplitInfo(name='test', num_bytes=634292, num_examples=292, dataset_name='aspect_emo')}, download_checksums={'https://huggingface.co/datasets/clarin-pl/aspectemo/resolve/main/data/aspectemo1.zip': {'num_bytes': 694842, 'checksum': '4fc2289f47a5864d95018c6cec9cd7d038ca8c675d33f6dac384a786a7666a26'}}, download_size=694842, post_processing_size=None, dataset_size=2920075, size_in_bytes=3614917)"
+    },
+    "dataset_name_or_path": {
+      "desc": null,
+      "value": "data/datasets/aspectemo/lightning/"
+    },
+    "dataset_version": {
+      "desc": null,
+      "value": "1.0.0"
+    },
+    "devices": {
+      "desc": null,
+      "value": "auto"
+    },
+    "downstream_model_type": {
+      "desc": null,
+      "value": "AutoModelForTokenClassification"
+    },
+    "embedding_name_or_path": {
+      "desc": null,
+      "value": "allegro/herbert-base-cased"
+    },
+    "eval_batch_size": {
+      "desc": null,
+      "value": 64
+    },
+    "evaluation_filename": {
+      "desc": null,
+      "value": "evaluation.json"
+    },
+    "evaluation_mode": {
+      "desc": null,
+      "value": "EvaluationMode.UNIT"
+    },
+    "finetune_last_n_layers": {
+      "desc": null,
+      "value": 4
+    },
+    "ignore_index": {
+      "desc": null,
+      "value": -100
+    },
+    "input_column_name": {
+      "desc": null,
+      "value": "tokens"
+    },
+    "label_all_tokens": {
+      "desc": null,
+      "value": false
+    },
+    "learning_rate": {
+      "desc": null,
+      "value": 0.0005
+    },
+    "load_dataset_kwargs": {
+      "desc": null,
+      "value": "None"
+    },
+    "logging_config": {
+      "desc": null,
+      "value": "LightningLoggingConfig(loggers_names=['wandb'], tracking_project_name='aspectemo', wandb_entity='embeddings', wandb_logger_kwargs={})"
+    },
+    "max_seq_length": {
+      "desc": null,
+      "value": 512
+    },
+    "metrics": {
+      "desc": null,
+      "value": "None"
+    },
+    "model_checkpoint_kwargs/filename": {
+      "desc": null,
+      "value": "last"
+    },
+    "model_checkpoint_kwargs/monitor": {
+      "desc": null,
+      "value": "None"
+    },
+    "model_checkpoint_kwargs/save_last": {
+      "desc": null,
+      "value": false
+    },
+    "model_name_or_path": {
+      "desc": null,
+      "value": "allegro/herbert-base-cased"
+    },
+    "num_classes": {
+      "desc": null,
+      "value": 7
+    },
+    "optimizer": {
+      "desc": null,
+      "value": "AdamW"
+    },
+    "output_path": {
+      "desc": null,
+      "value": "/embeddings-internal/leaderboard/data/models/lightning/allegro__herbert-base-cased/aspectemo/run-4"
+    },
+    "predict_subset": {
+      "desc": null,
+      "value": "LightingDataModuleSubset.TEST"
+    },
+    "processing_batch_size": {
+      "desc": null,
+      "value": "None"
+    },
+    "seed": {
+      "desc": null,
+      "value": 441
+    },
+    "tagging_scheme": {
+      "desc": null,
+      "value": "None"
+    },
+    "target_column_name": {
+      "desc": null,
+      "value": "labels"
+    },
+    "target_field": {
+      "desc": null,
+      "value": "labels"
+    },
+    "task_model_kwargs/adam_epsilon": {
+      "desc": null,
+      "value": 1e-05
+    },
+    "task_model_kwargs/eval_batch_size": {
+      "desc": null,
+      "value": 64
+    },
+    "task_model_kwargs/learning_rate": {
+      "desc": null,
+      "value": 0.0005
+    },
+    "task_model_kwargs/optimizer": {
+      "desc": null,
+      "value": "AdamW"
+    },
+    "task_model_kwargs/train_batch_size": {
+      "desc": null,
+      "value": 64
+    },
+    "task_model_kwargs/use_scheduler": {
+      "desc": null,
+      "value": true
+    },
+    "task_model_kwargs/warmup_steps": {
+      "desc": null,
+      "value": 25
+    },
+    "task_model_kwargs/weight_decay": {
+      "desc": null,
+      "value": 0
+    },
+    "text_field": {
+      "desc": null,
+      "value": "tokens"
+    },
+    "tokenizer_name_or_path": {
+      "desc": null,
+      "value": "allegro/herbert-base-cased"
+    },
+    "train_batch_size": {
+      "desc": null,
+      "value": 64
+    },
+    "use_scheduler": {
+      "desc": null,
+      "value": true
+    },
+    "warmup_steps": {
+      "desc": null,
+      "value": 25
+    },
+    "weight_decay": {
+      "desc": null,
+      "value": 0
+    }
+  },
+  "metrics": [
+    {
+      "accuracy": 0.9511279203884015,
+      "f1_macro": 0.37596552843793024,
+      "f1_micro": 0.582727103152397,
+      "f1_weighted": 0.5814928043625256,
+      "recall_macro": 0.37628031164832243,
+      "recall_micro": 0.5684133915574964,
+      "recall_weighted": 0.5684133915574964,
+      "precision_macro": 0.39109985428391747,
+      "precision_micro": 0.5977803291236127,
+      "precision_weighted": 0.6017011298260442,
+      "classes": {
+        "a_amb": {
+          "precision": 0.1,
+          "recall": 0.01098901098901099,
+          "f1": 0.019801980198019806,
+          "support": 91
+        },
+        "a_minus_m": {
+          "precision": 0.6161934805467929,
+          "recall": 0.5672797676669894,
+          "f1": 0.590725806451613,
+          "support": 1033
+        },
+        "a_minus_s": {
+          "precision": 0.1625,
+          "recall": 0.19402985074626866,
+          "f1": 0.17687074829931973,
+          "support": 67
+        },
+        "a_plus_m": {
+          "precision": 0.770764119601329,
+          "recall": 0.6857142857142857,
+          "f1": 0.7257559958289886,
+          "support": 1015
+        },
+        "a_plus_s": {
+          "precision": 0.2926829268292683,
+          "recall": 0.2926829268292683,
+          "f1": 0.2926829268292683,
+          "support": 41
+        },
+        "a_zero": {
+          "precision": 0.40445859872611467,
+          "recall": 0.5069860279441117,
+          "f1": 0.449955713020372,
+          "support": 501
+        }
+      }
+    },
+    {
+      "accuracy": 0.951288860277353,
+      "f1_macro": 0.3727487387757605,
+      "f1_micro": 0.580932912098123,
+      "f1_weighted": 0.5837872697876442,
+      "recall_macro": 0.3737327595693772,
+      "recall_micro": 0.5687772925764192,
+      "recall_weighted": 0.5687772925764192,
+      "precision_macro": 0.4003457874326484,
+      "precision_micro": 0.5936194454994304,
+      "precision_weighted": 0.6124230570791644,
+      "classes": {
+        "a_amb": {
+          "precision": 0.2727272727272727,
+          "recall": 0.06593406593406594,
+          "f1": 0.10619469026548672,
+          "support": 91
+        },
+        "a_minus_m": {
+          "precision": 0.6314580941446614,
+          "recall": 0.5324298160696999,
+          "f1": 0.5777310924369748,
+          "support": 1033
+        },
+        "a_minus_s": {
+          "precision": 0.1744186046511628,
+          "recall": 0.22388059701492538,
+          "f1": 0.19607843137254904,
+          "support": 67
+        },
+        "a_plus_m": {
+          "precision": 0.7774122807017544,
+          "recall": 0.6985221674876847,
+          "f1": 0.7358588479501817,
+          "support": 1015
+        },
+        "a_plus_s": {
+          "precision": 0.14893617021276595,
+          "recall": 0.17073170731707318,
+          "f1": 0.1590909090909091,
+          "support": 41
+        },
+        "a_zero": {
+          "precision": 0.3971223021582734,
+          "recall": 0.5508982035928144,
+          "f1": 0.4615384615384615,
+          "support": 501
+        }
+      }
+    },
+    {
+      "accuracy": 0.9524690861296639,
+      "f1_macro": 0.3680599547700934,
+      "f1_micro": 0.5852465186300337,
+      "f1_weighted": 0.5863153941086646,
+      "recall_macro": 0.37101383083856715,
+      "recall_micro": 0.5658660844250364,
+      "recall_weighted": 0.5658660844250364,
+      "precision_macro": 0.3920667440844367,
+      "precision_micro": 0.6060015588464536,
+      "precision_weighted": 0.6174457183383055,
+      "classes": {
+        "a_amb": {
+          "precision": 0.2,
+          "recall": 0.03296703296703297,
+          "f1": 0.05660377358490567,
+          "support": 91
+        },
+        "a_minus_m": {
+          "precision": 0.6320541760722348,
+          "recall": 0.542110358180058,
+          "f1": 0.583637311099531,
+          "support": 1033
+        },
+        "a_minus_s": {
+          "precision": 0.15555555555555556,
+          "recall": 0.208955223880597,
+          "f1": 0.17834394904458598,
+          "support": 67
+        },
+        "a_plus_m": {
+          "precision": 0.781354051054384,
+          "recall": 0.6935960591133005,
+          "f1": 0.7348643006263048,
+          "support": 1015
+        },
+        "a_plus_s": {
+          "precision": 0.15254237288135594,
+          "recall": 0.21951219512195122,
+          "f1": 0.18000000000000002,
+          "support": 41
+        },
+        "a_zero": {
+          "precision": 0.43089430894308944,
+          "recall": 0.5289421157684631,
+          "f1": 0.474910394265233,
+          "support": 501
+        }
+      }
+    },
+    {
+      "accuracy": 0.9526300260186154,
+      "f1_macro": 0.3828224797475233,
+      "f1_micro": 0.5833173537871524,
+      "f1_weighted": 0.5857055219864488,
+      "recall_macro": 0.3833581853831631,
+      "recall_micro": 0.5534934497816594,
+      "recall_weighted": 0.5534934497816594,
+      "precision_macro": 0.4188992680156844,
+      "precision_micro": 0.6165383056343737,
+      "precision_weighted": 0.6346567929724316,
+      "classes": {
+        "a_amb": {
+          "precision": 0.2777777777777778,
+          "recall": 0.054945054945054944,
+          "f1": 0.09174311926605504,
+          "support": 91
+        },
+        "a_minus_m": {
+          "precision": 0.6675062972292192,
+          "recall": 0.5130687318489835,
+          "f1": 0.5801860974274767,
+          "support": 1033
+        },
+        "a_minus_s": {
+          "precision": 0.16964285714285715,
+          "recall": 0.2835820895522388,
+          "f1": 0.2122905027932961,
+          "support": 67
+        },
+        "a_plus_m": {
+          "precision": 0.7798882681564245,
+          "recall": 0.6876847290640394,
+          "f1": 0.7308900523560209,
+          "support": 1015
+        },
+        "a_plus_s": {
+          "precision": 0.18181818181818182,
+          "recall": 0.24390243902439024,
+          "f1": 0.20833333333333334,
+          "support": 41
+        },
+        "a_zero": {
+          "precision": 0.43676222596964587,
+          "recall": 0.5169660678642715,
+          "f1": 0.473491773308958,
+          "support": 501
+        }
+      }
+    },
+    {
+      "accuracy": 0.952147206351761,
+      "f1_macro": 0.36458941745032614,
+      "f1_micro": 0.5768859733744934,
+      "f1_weighted": 0.5764341280954952,
+      "recall_macro": 0.36376694068480847,
+      "recall_micro": 0.5440320232896652,
+      "recall_weighted": 0.5440320232896652,
+      "precision_macro": 0.40158264552672124,
+      "precision_micro": 0.6139630390143738,
+      "precision_weighted": 0.6233032831920655,
+      "classes": {
+        "a_amb": {
+          "precision": 0.2222222222222222,
+          "recall": 0.02197802197802198,
+          "f1": 0.04,
+          "support": 91
+        },
+        "a_minus_m": {
+          "precision": 0.6442542787286064,
+          "recall": 0.510164569215876,
+          "f1": 0.5694219340896813,
+          "support": 1033
+        },
+        "a_minus_s": {
+          "precision": 0.18811881188118812,
+          "recall": 0.2835820895522388,
+          "f1": 0.22619047619047616,
+          "support": 67
+        },
+        "a_plus_m": {
+          "precision": 0.776536312849162,
+          "recall": 0.6847290640394089,
+          "f1": 0.7277486910994765,
+          "support": 1015
+        },
+        "a_plus_s": {
+          "precision": 0.13793103448275862,
+          "recall": 0.1951219512195122,
+          "f1": 0.16161616161616163,
+          "support": 41
+        },
+        "a_zero": {
+          "precision": 0.4404332129963899,
+          "recall": 0.4870259481037924,
+          "f1": 0.4625592417061611,
+          "support": 501
+        }
+      }
+    }
+  ],
+  "metrics_avg": {
+    "accuracy": 0.9519326198331589,
+    "f1_macro": 0.3728372238363267,
+    "f1_micro": 0.5818219722084399,
+    "f1_weighted": 0.5827470236681557,
+    "recall_macro": 0.3736304056248477,
+    "recall_micro": 0.5601164483260553,
+    "recall_weighted": 0.5601164483260553,
+    "precision_macro": 0.40079885986868163,
+    "precision_micro": 0.6055805356236488,
+    "precision_weighted": 0.6179059962816023,
+    "classes": {
+      "a_amb": {
+        "precision": 0.21454545454545454,
+        "recall": 0.03736263736263736,
+        "f1": 0.06286871266289344,
+        "support": 91
+      },
+      "a_minus_m": {
+        "precision": 0.638293265344303,
+        "recall": 0.5330106485963214,
+        "f1": 0.5803404483010554,
+        "support": 1033
+      },
+      "a_minus_s": {
+        "precision": 0.17004716584615273,
+        "recall": 0.23880597014925373,
+        "f1": 0.1979548215400454,
+        "support": 67
+      },
+      "a_plus_m": {
+        "precision": 0.7771910064726107,
+        "recall": 0.6900492610837439,
+        "f1": 0.7310235775721945,
+        "support": 1015
+      },
+      "a_plus_s": {
+        "precision": 0.1827821372448661,
+        "recall": 0.22439024390243903,
+        "f1": 0.20034466617393448,
+        "support": 41
+      },
+      "a_zero": {
+        "precision": 0.42193412975870265,
+        "recall": 0.5181636726546907,
+        "f1": 0.4644911167678371,
+        "support": 501
+      }
+    }
+  },
+  "metrics_median": {
+    "accuracy": 0.952147206351761,
+    "f1_macro": 0.3727487387757605,
+    "f1_micro": 0.582727103152397,
+    "f1_weighted": 0.5837872697876442,
+    "recall_macro": 0.3737327595693772,
+    "recall_micro": 0.5658660844250364,
+    "recall_weighted": 0.5658660844250364,
+    "precision_macro": 0.4003457874326484,
+    "precision_micro": 0.6060015588464536,
+    "precision_weighted": 0.6174457183383055,
+    "classes": {
+      "a_amb": {
+        "precision": 0.2222222222222222,
+        "recall": 0.03296703296703297,
+        "f1": 0.05660377358490567
+      },
+      "a_minus_m": {
+        "precision": 0.6320541760722348,
+        "recall": 0.5324298160696999,
+        "f1": 0.5801860974274767
+      },
+      "a_minus_s": {
+        "precision": 0.16964285714285715,
+        "recall": 0.22388059701492538,
+        "f1": 0.19607843137254904
+      },
+      "a_plus_m": {
+        "precision": 0.7774122807017544,
+        "recall": 0.6876847290640394,
+        "f1": 0.7308900523560209
+      },
+      "a_plus_s": {
+        "precision": 0.15254237288135594,
+        "recall": 0.21951219512195122,
+        "f1": 0.18000000000000002
+      },
+      "a_zero": {
+        "precision": 0.43089430894308944,
+        "recall": 0.5169660678642715,
+        "f1": 0.4625592417061611
+      }
+    }
+  },
+  "metrics_std": {
+    "accuracy": 0.0006859639952010168,
+    "f1_macro": 0.007077218111846376,
+    "f1_micro": 0.003159804529309926,
+    "f1_weighted": 0.003999806509916548,
+    "recall_macro": 0.0071728059628899925,
+    "recall_micro": 0.010948523232105871,
+    "recall_weighted": 0.010948523232105871,
+    "precision_macro": 0.011166522792266974,
+    "precision_micro": 0.009930096244000873,
+    "precision_weighted": 0.012273875413826553,
+    "classes": {
+      "a_amb": {
+        "precision": 0.07206700846299383,
+        "recall": 0.022787298190470023,
+        "f1": 0.03580447813338088
+      },
+      "a_minus_m": {
+        "precision": 0.01912446862560159,
+        "recall": 0.02332990564397613,
+        "f1": 0.007822587216338477
+      },
+      "a_minus_s": {
+        "precision": 0.01237763925687159,
+        "recall": 0.04221533022009238,
+        "f1": 0.021420838306701048
+      },
+      "a_plus_m": {
+        "precision": 0.004073960654637076,
+        "recall": 0.005853576661088816,
+        "f1": 0.004376674565823826
+      },
+      "a_plus_s": {
+        "precision": 0.0635427553176116,
+        "recall": 0.046915570882125224,
+        "f1": 0.05524004019801117
+      },
+      "a_zero": {
+        "precision": 0.019769890633464293,
+        "recall": 0.02389380798665936,
+        "f1": 0.010164908238620131
+      }
+    }
+  },
+  "averaged_over": 5
+}

@@ -1,0 +1,4432 @@
+{
+  "submission_name": "kpwr_ner_allegro__herbert-large-cased",
+  "dataset_name": {
+    "desc": null,
+    "value": "data/datasets/kpwr_ner/lightning/"
+  },
+  "dataset_version": {
+    "desc": null,
+    "value": "0.0.0"
+  },
+  "embedding_name": {
+    "desc": null,
+    "value": "allegro/herbert-large-cased"
+  },
+  "hparams": {
+    "finetune_last_n_layers": 4,
+    "task_model_kwargs": {
+      "adam_epsilon": 0.0001,
+      "eval_batch_size": 32,
+      "learning_rate": 0.0005,
+      "optimizer": "Adam",
+      "train_batch_size": 32,
+      "use_scheduler": true,
+      "warmup_steps": 0,
+      "weight_decay": 0.0001
+    },
+    "datamodule_kwargs": {
+      "label_all_tokens": false,
+      "max_seq_length": 512
+    },
+    "task_train_kwargs": {
+      "max_epochs": 15
+    },
+    "model_config_kwargs": {
+      "classifier_dropout": 0.3
+    },
+    "early_stopping_kwargs": {
+      "mode": "min",
+      "monitor": "val/Loss",
+      "patience": 3
+    },
+    "tokenizer_kwargs": {},
+    "batch_encoding_kwargs": {},
+    "dataloader_kwargs": {}
+  },
+  "packages": [
+    "absl-py==1.0.0",
+    "aiobotocore==2.3.2",
+    "aiohttp-retry==2.4.6",
+    "aiohttp==3.8.1",
+    "aioitertools==0.8.0",
+    "aiosignal==1.2.0",
+    "alembic==1.4.1",
+    "appdirs==1.4.4",
+    "argon2-cffi-bindings==21.2.0",
+    "argon2-cffi==21.3.0",
+    "asttokens==2.0.5",
+    "async-timeout==4.0.2",
+    "asyncssh==2.10.1",
+    "atpublic==3.0.1",
+    "attrs==21.4.0",
+    "autopage==0.5.1",
+    "backcall==0.2.0",
+    "beautifulsoup4==4.11.1",
+    "black==21.10b0",
+    "bleach==5.0.0",
+    "boto3==1.21.21",
+    "botocore==1.24.21",
+    "bpemb==0.3.3",
+    "cachecontrol==0.12.11",
+    "cachetools==5.2.0",
+    "cachy==0.3.0",
+    "catalogue==2.0.7",
+    "certifi==2022.5.18.1",
+    "cffi==1.15.0",
+    "charset-normalizer==2.0.12",
+    "clarinpl-embeddings==0.0.1rc241317216295",
+    "cleo==0.8.1",
+    "click==8.0.4",
+    "cliff==3.10.1",
+    "clikit==0.6.2",
+    "cloudpickle==2.1.0",
+    "cmaes==0.8.2",
+    "cmd2==2.4.1",
+    "colorama==0.4.4",
+    "colorlog==6.6.0",
+    "commonmark==0.9.1",
+    "configobj==5.0.6",
+    "conllu==4.4.2",
+    "coverage==6.4",
+    "crashtest==0.3.1",
+    "cryptography==37.0.2",
+    "cycler==0.11.0",
+    "databricks-cli==0.16.6",
+    "datasets==2.2.2",
+    "debugpy==1.6.0",
+    "decorator==5.1.1",
+    "defusedxml==0.7.1",
+    "deprecated==1.2.13",
+    "dictdiffer==0.9.0",
+    "dill==0.3.4",
+    "diskcache==5.4.0",
+    "distlib==0.3.4",
+    "distro==1.7.0",
+    "docker-pycreds==0.4.0",
+    "docker==5.0.3",
+    "dpath==2.0.6",
+    "dulwich==0.20.42",
+    "dvc-render==0.0.4",
+    "dvc==2.10.1",
+    "entrypoints==0.4",
+    "executing==0.8.3",
+    "fastjsonschema==2.15.3",
+    "filelock==3.7.0",
+    "flair==0.10",
+    "flask==2.1.2",
+    "flatten-dict==0.4.2",
+    "flufl.lock==7.0",
+    "fonttools==4.33.3",
+    "frozenlist==1.3.0",
+    "fsspec==2022.5.0",
+    "ftfy==6.1.1",
+    "funcy==1.17",
+    "future==0.18.2",
+    "gdown==3.12.2",
+    "gensim==4.2.0",
+    "gitdb==4.0.9",
+    "gitpython==3.1.27",
+    "google-auth-oauthlib==0.4.6",
+    "google-auth==2.6.6",
+    "grandalf==0.6",
+    "greenlet==1.1.2",
+    "grpcio==1.46.3",
+    "gunicorn==20.1.0",
+    "html5lib==1.1",
+    "huggingface-hub==0.7.0",
+    "idna==3.3",
+    "importlib-metadata==3.10.1",
+    "iniconfig==1.1.1",
+    "ipykernel==6.13.0",
+    "ipython-genutils==0.2.0",
+    "ipython==8.4.0",
+    "ipywidgets==7.7.0",
+    "isort==5.10.1",
+    "itsdangerous==2.1.2",
+    "janome==0.4.2",
+    "jedi==0.18.1",
+    "jeepney==0.8.0",
+    "jinja2==3.1.2",
+    "jmespath==1.0.0",
+    "joblib==1.1.0",
+    "jsonschema==4.5.1",
+    "jupyter-client==7.3.1",
+    "jupyter-console==6.4.3",
+    "jupyter-core==4.10.0",
+    "jupyter==1.0.0",
+    "jupyterlab-pygments==0.2.2",
+    "jupyterlab-widgets==1.1.0",
+    "keyring==23.5.0",
+    "kiwisolver==1.4.2",
+    "konoha==4.6.5",
+    "langdetect==1.0.9",
+    "leaderboard==0.0.1",
+    "lockfile==0.12.2",
+    "lxml==4.8.0",
+    "mailchecker==4.1.17",
+    "mako==1.2.0",
+    "markdown==3.3.5",
+    "markupsafe==2.1.1",
+    "matplotlib-inline==0.1.3",
+    "matplotlib==3.5.2",
+    "mistune==0.8.4",
+    "mlflow==1.19.0",
+    "more-itertools==8.8.0",
+    "mpld3==0.3",
+    "msgpack==1.0.3",
+    "multidict==6.0.2",
+    "multiprocess==0.70.12.2",
+    "mypy-extensions==0.4.3",
+    "mypy==0.950",
+    "nanotime==0.5.2",
+    "nbclient==0.6.3",
+    "nbconvert==6.5.0",
+    "nbformat==5.4.0",
+    "nest-asyncio==1.5.5",
+    "networkx==2.8.2",
+    "notebook==6.4.11",
+    "numpy==1.22.4",
+    "oauthlib==3.2.0",
+    "optuna==2.10.0",
+    "overrides==3.1.0",
+    "packaging==21.3",
+    "pandas==1.4.2",
+    "pandocfilters==1.5.0",
+    "parso==0.8.3",
+    "pastel==0.2.1",
+    "pathspec==0.9.0",
+    "pathtools==0.1.2",
+    "pbr==5.9.0",
+    "pexpect==4.8.0",
+    "phonenumbers==8.12.49",
+    "pickleshare==0.7.5",
+    "pillow==9.1.1",
+    "pip==21.2.4",
+    "pkginfo==1.8.2",
+    "platformdirs==2.5.2",
+    "pluggy==1.0.0",
+    "poethepoet==0.11.0",
+    "poetry-core==1.0.8",
+    "poetry==1.1.13",
+    "prettytable==3.3.0",
+    "prometheus-client==0.14.1",
+    "prometheus-flask-exporter==0.20.1",
+    "promise==2.3",
+    "prompt-toolkit==3.0.29",
+    "protobuf==3.20.0",
+    "psutil==5.9.1",
+    "ptyprocess==0.7.0",
+    "pure-eval==0.2.2",
+    "py==1.11.0",
+    "pyarrow==8.0.0",
+    "pyasn1-modules==0.2.8",
+    "pyasn1==0.4.8",
+    "pycparser==2.21",
+    "pydantic==1.9.1",
+    "pydeprecate==0.3.1",
+    "pydot==1.4.2",
+    "pyflakes==2.4.0",
+    "pygit2==1.9.2",
+    "pygments==2.12.0",
+    "pygtrie==2.4.2",
+    "pyjwt==2.4.0",
+    "pylev==1.4.0",
+    "pyparsing==3.0.9",
+    "pyperclip==1.8.2",
+    "pyrsistent==0.18.1",
+    "pysocks==1.7.1",
+    "pytest==6.2.5",
+    "python-benedict==0.25.1",
+    "python-dateutil==2.8.2",
+    "python-editor==1.0.4",
+    "python-fsutil==0.6.1",
+    "python-slugify==6.1.2",
+    "pytorch-lightning==1.5.4",
+    "pytz==2022.1",
+    "pyyaml==6.0",
+    "pyzmq==23.0.0",
+    "qtconsole==5.3.0",
+    "qtpy==2.1.0",
+    "querystring-parser==1.2.4",
+    "regex==2022.4.24",
+    "requests-oauthlib==1.3.1",
+    "requests-toolbelt==0.9.1",
+    "requests==2.27.1",
+    "responses==0.18.0",
+    "rich==12.4.4",
+    "rsa==4.8",
+    "ruamel.yaml.clib==0.2.6",
+    "ruamel.yaml==0.17.21",
+    "s3fs==2022.5.0",
+    "s3transfer==0.5.2",
+    "sacremoses==0.0.53",
+    "scikit-learn==1.1.1",
+    "scipy==1.8.1",
+    "scmrepo==0.0.16",
+    "secretstorage==3.3.2",
+    "segtok==1.5.11",
+    "send2trash==1.8.0",
+    "sentencepiece==0.1.95",
+    "sentry-sdk==1.5.12",
+    "seqeval==1.2.2",
+    "setproctitle==1.2.3",
+    "setuptools-scm==6.4.2",
+    "setuptools==61.2.0",
+    "shellingham==1.4.0",
+    "shortuuid==1.0.9",
+    "shtab==1.5.4",
+    "six==1.16.0",
+    "smart-open==6.0.0",
+    "smmap==5.0.0",
+    "soupsieve==2.3.2.post1",
+    "sqlalchemy==1.4.36",
+    "sqlitedict==2.0.0",
+    "sqlparse==0.4.2",
+    "srsly==2.4.3",
+    "stack-data==0.2.0",
+    "stevedore==3.5.0",
+    "tabulate==0.8.9",
+    "tensorboard-data-server==0.6.1",
+    "tensorboard-plugin-wit==1.8.1",
+    "tensorboard==2.9.0",
+    "terminado==0.15.0",
+    "text-unidecode==1.3",
+    "threadpoolctl==3.1.0",
+    "tinycss2==1.1.1",
+    "tokenizers==0.12.1",
+    "toml==0.10.2",
+    "tomli==1.2.3",
+    "tomlkit==0.10.2",
+    "torch==1.11.0+cu113",
+    "torchmetrics==0.7.3",
+    "tornado==6.1",
+    "tqdm==4.64.0",
+    "traitlets==5.2.1.post0",
+    "transformers==4.18.0",
+    "typer==0.4.1",
+    "types-pyyaml==6.0.7",
+    "types-requests==2.26.1",
+    "types-setuptools==57.4.17",
+    "typing-extensions==3.10.0.0",
+    "urllib3==1.26.9",
+    "virtualenv==20.14.1",
+    "voluptuous==0.13.1",
+    "wandb==0.12.14",
+    "wcwidth==0.2.5",
+    "webencodings==0.5.1",
+    "websocket-client==1.3.2",
+    "werkzeug==2.1.2",
+    "wheel==0.37.1",
+    "widgetsnbextension==3.6.0",
+    "wikipedia-api==0.5.4",
+    "wrapt==1.14.1",
+    "xmltodict==0.13.0",
+    "xxhash==3.0.0",
+    "yarl==1.7.2",
+    "zc.lockfile==2.0",
+    "zipp==3.8.0"
+  ],
+  "config": {
+    "wandb_version": 1,
+    "_wandb": {
+      "desc": null,
+      "value": {
+        "cli_version": "0.12.14",
+        "framework": "huggingface",
+        "huggingface_version": "4.18.0",
+        "is_jupyter_run": false,
+        "is_kaggle_kernel": false,
+        "m": [
+          {
+            "1": "trainer/global_step",
+            "6": [
+              3
+            ]
+          },
+          {
+            "1": "train/Loss",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/BaseLR",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/LambdaLR",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "epoch",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/precision_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/recall_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/f1_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/Loss",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/precision_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/recall_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/f1_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          }
+        ],
+        "python_version": "3.9.12",
+        "start_time": 1654051253,
+        "t": {
+          "1": [
+            1,
+            5,
+            9,
+            11,
+            44,
+            49,
+            51,
+            53,
+            55
+          ],
+          "2": [
+            1,
+            5,
+            9,
+            11,
+            44,
+            49,
+            51,
+            53,
+            55
+          ],
+          "3": [
+            2,
+            3,
+            7,
+            13
+          ],
+          "4": "3.9.12",
+          "5": "0.12.14",
+          "6": "4.18.0",
+          "8": [
+            5
+          ]
+        }
+      }
+    },
+    "accelerator": {
+      "desc": null,
+      "value": "auto"
+    },
+    "adam_epsilon": {
+      "desc": null,
+      "value": 0.0001
+    },
+    "config": {
+      "desc": null,
+      "value": "LightningAdvancedConfig(finetune_last_n_layers=4, task_model_kwargs={'adam_epsilon': 0.0001, 'eval_batch_size': 32, 'learning_rate': 0.0005, 'optimizer': 'Adam', 'train_batch_size': 32, 'use_scheduler': True, 'warmup_steps': 0, 'weight_decay': 0.0001}, datamodule_kwargs={'label_all_tokens': False, 'max_seq_length': 512}, task_train_kwargs={'max_epochs': 15, 'devices': 'auto', 'accelerator': 'auto'}, model_config_kwargs={'classifier_dropout': 0.3}, early_stopping_kwargs={'mode': 'min', 'monitor': 'val/Loss', 'patience': 3}, tokenizer_kwargs={}, batch_encoding_kwargs={}, dataloader_kwargs={})"
+    },
+    "config_kwargs/classifier_dropout": {
+      "desc": null,
+      "value": 0.3
+    },
+    "dataset_info": {
+      "desc": null,
+      "value": "DatasetInfo(description='KPWR-NER tagging dataset.', citation='', homepage='https://clarin-pl.eu/dspace/handle/11321/294', license='', features={'input_ids': Sequence(feature=Value(dtype='int32', id=None), length=-1, id=None), 'token_type_ids': Sequence(feature=Value(dtype='int8', id=None), length=-1, id=None), 'attention_mask': Sequence(feature=Value(dtype='int8', id=None), length=-1, id=None), 'labels': Sequence(feature=ClassLabel(num_classes=161, names=['B-nam_adj', 'B-nam_adj_city', 'B-nam_adj_country', 'B-nam_adj_person', 'B-nam_eve', 'B-nam_eve_human', 'B-nam_eve_human_cultural', 'B-nam_eve_human_holiday', 'B-nam_eve_human_sport', 'B-nam_fac_bridge', 'B-nam_fac_goe', 'B-nam_fac_goe_stop', 'B-nam_fac_park', 'B-nam_fac_road', 'B-nam_fac_square', 'B-nam_fac_system', 'B-nam_liv_animal', 'B-nam_liv_character', 'B-nam_liv_god', 'B-nam_liv_habitant', 'B-nam_liv_person', 'B-nam_loc', 'B-nam_loc_astronomical', 'B-nam_loc_country_region', 'B-nam_loc_gpe_admin1', 'B-nam_loc_gpe_admin2', 'B-nam_loc_gpe_admin3', 'B-nam_loc_gpe_city', 'B-nam_loc_gpe_conurbation', 'B-nam_loc_gpe_country', 'B-nam_loc_gpe_district', 'B-nam_loc_gpe_subdivision', 'B-nam_loc_historical_region', 'B-nam_loc_hydronym', 'B-nam_loc_hydronym_lake', 'B-nam_loc_hydronym_ocean', 'B-nam_loc_hydronym_river', 'B-nam_loc_hydronym_sea', 'B-nam_loc_land', 'B-nam_loc_land_continent', 'B-nam_loc_land_island', 'B-nam_loc_land_mountain', 'B-nam_loc_land_peak', 'B-nam_loc_land_region', 'B-nam_num_house', 'B-nam_num_phone', 'B-nam_org_company', 'B-nam_org_group', 'B-nam_org_group_band', 'B-nam_org_group_team', 'B-nam_org_institution', 'B-nam_org_nation', 'B-nam_org_organization', 'B-nam_org_organization_sub', 'B-nam_org_political_party', 'B-nam_oth', 'B-nam_oth_currency', 'B-nam_oth_data_format', 'B-nam_oth_license', 'B-nam_oth_position', 'B-nam_oth_tech', 'B-nam_oth_www', 'B-nam_pro', 'B-nam_pro_award', 'B-nam_pro_brand', 'B-nam_pro_media', 'B-nam_pro_media_periodic', 'B-nam_pro_media_radio', 'B-nam_pro_media_tv', 'B-nam_pro_media_web', 'B-nam_pro_model_car', 'B-nam_pro_software', 'B-nam_pro_software_game', 'B-nam_pro_title', 'B-nam_pro_title_album', 'B-nam_pro_title_article', 'B-nam_pro_title_book', 'B-nam_pro_title_document', 'B-nam_pro_title_song', 'B-nam_pro_title_treaty', 'B-nam_pro_title_tv', 'B-nam_pro_vehicle', 'I-nam_adj_country', 'I-nam_eve', 'I-nam_eve_human', 'I-nam_eve_human_cultural', 'I-nam_eve_human_holiday', 'I-nam_eve_human_sport', 'I-nam_fac_bridge', 'I-nam_fac_goe', 'I-nam_fac_goe_stop', 'I-nam_fac_park', 'I-nam_fac_road', 'I-nam_fac_square', 'I-nam_fac_system', 'I-nam_liv_animal', 'I-nam_liv_character', 'I-nam_liv_god', 'I-nam_liv_person', 'I-nam_loc', 'I-nam_loc_astronomical', 'I-nam_loc_country_region', 'I-nam_loc_gpe_admin1', 'I-nam_loc_gpe_admin2', 'I-nam_loc_gpe_admin3', 'I-nam_loc_gpe_city', 'I-nam_loc_gpe_conurbation', 'I-nam_loc_gpe_country', 'I-nam_loc_gpe_district', 'I-nam_loc_gpe_subdivision', 'I-nam_loc_historical_region', 'I-nam_loc_hydronym', 'I-nam_loc_hydronym_lake', 'I-nam_loc_hydronym_ocean', 'I-nam_loc_hydronym_river', 'I-nam_loc_hydronym_sea', 'I-nam_loc_land', 'I-nam_loc_land_continent', 'I-nam_loc_land_island', 'I-nam_loc_land_mountain', 'I-nam_loc_land_peak', 'I-nam_loc_land_region', 'I-nam_num_house', 'I-nam_num_phone', 'I-nam_org_company', 'I-nam_org_group', 'I-nam_org_group_band', 'I-nam_org_group_team', 'I-nam_org_institution', 'I-nam_org_nation', 'I-nam_org_organization', 'I-nam_org_organization_sub', 'I-nam_org_political_party', 'I-nam_oth', 'I-nam_oth_currency', 'I-nam_oth_data_format', 'I-nam_oth_license', 'I-nam_oth_position', 'I-nam_oth_tech', 'I-nam_oth_www', 'I-nam_pro', 'I-nam_pro_award', 'I-nam_pro_brand', 'I-nam_pro_media', 'I-nam_pro_media_periodic', 'I-nam_pro_media_radio', 'I-nam_pro_media_tv', 'I-nam_pro_media_web', 'I-nam_pro_model_car', 'I-nam_pro_software', 'I-nam_pro_software_game', 'I-nam_pro_title', 'I-nam_pro_title_album', 'I-nam_pro_title_article', 'I-nam_pro_title_book', 'I-nam_pro_title_document', 'I-nam_pro_title_song', 'I-nam_pro_title_treaty', 'I-nam_pro_title_tv', 'I-nam_pro_vehicle', 'O'], id=None), length=-1, id=None)}, post_processed=None, supervised_keys=None, task_templates=None, builder_name='kpwrner', config_name='default', version=0.0.0, splits={'train': SplitInfo(name='train', num_bytes=9914073, num_examples=13959, dataset_name='kpwrner'), 'test': SplitInfo(name='test', num_bytes=3298573, num_examples=4323, dataset_name='kpwrner')}, download_checksums={'https://huggingface.co/datasets/clarin-pl/kpwr-ner/resolve/main/data/kpwr-ner-n82-train-tune.iob': {'num_bytes': 6719818, 'checksum': '7ab673f299b3a9e875c2c46ef1051807d98f923f0356d0be78556c832481efea'}, 'https://huggingface.co/datasets/clarin-pl/kpwr-ner/resolve/main/data/kpwr-ner-n82-test.iob': {'num_bytes': 2247780, 'checksum': '7b86fd227605b7e5f807eedbcd87573271d8adb86cfddf56c763b1751e71a924'}}, download_size=8967598, post_processing_size=None, dataset_size=13212646, size_in_bytes=22180244)"
+    },
+    "dataset_name_or_path": {
+      "desc": null,
+      "value": "data/datasets/kpwr_ner/lightning/"
+    },
+    "dataset_version": {
+      "desc": null,
+      "value": "0.0.0"
+    },
+    "devices": {
+      "desc": null,
+      "value": "auto"
+    },
+    "downstream_model_type": {
+      "desc": null,
+      "value": "AutoModelForTokenClassification"
+    },
+    "embedding_name_or_path": {
+      "desc": null,
+      "value": "allegro/herbert-large-cased"
+    },
+    "eval_batch_size": {
+      "desc": null,
+      "value": 32
+    },
+    "evaluation_filename": {
+      "desc": null,
+      "value": "evaluation.json"
+    },
+    "evaluation_mode": {
+      "desc": null,
+      "value": "EvaluationMode.CONLL"
+    },
+    "finetune_last_n_layers": {
+      "desc": null,
+      "value": 4
+    },
+    "ignore_index": {
+      "desc": null,
+      "value": -100
+    },
+    "input_column_name": {
+      "desc": null,
+      "value": "tokens"
+    },
+    "label_all_tokens": {
+      "desc": null,
+      "value": false
+    },
+    "learning_rate": {
+      "desc": null,
+      "value": 0.0005
+    },
+    "load_dataset_kwargs": {
+      "desc": null,
+      "value": "None"
+    },
+    "logging_config": {
+      "desc": null,
+      "value": "LightningLoggingConfig(loggers_names=['wandb'], tracking_project_name='kpwr_ner', wandb_entity='embeddings', wandb_logger_kwargs={})"
+    },
+    "max_seq_length": {
+      "desc": null,
+      "value": 512
+    },
+    "metrics": {
+      "desc": null,
+      "value": "None"
+    },
+    "model_checkpoint_kwargs/filename": {
+      "desc": null,
+      "value": "last"
+    },
+    "model_checkpoint_kwargs/monitor": {
+      "desc": null,
+      "value": "None"
+    },
+    "model_checkpoint_kwargs/save_last": {
+      "desc": null,
+      "value": false
+    },
+    "model_name_or_path": {
+      "desc": null,
+      "value": "allegro/herbert-large-cased"
+    },
+    "num_classes": {
+      "desc": null,
+      "value": 161
+    },
+    "optimizer": {
+      "desc": null,
+      "value": "Adam"
+    },
+    "output_path": {
+      "desc": null,
+      "value": "/embeddings-internal/leaderboard/data/models/lightning/allegro__herbert-large-cased/kpwr_ner/run-4"
+    },
+    "predict_subset": {
+      "desc": null,
+      "value": "LightingDataModuleSubset.TEST"
+    },
+    "processing_batch_size": {
+      "desc": null,
+      "value": "None"
+    },
+    "seed": {
+      "desc": null,
+      "value": 441
+    },
+    "tagging_scheme": {
+      "desc": null,
+      "value": "None"
+    },
+    "target_column_name": {
+      "desc": null,
+      "value": "ner"
+    },
+    "target_field": {
+      "desc": null,
+      "value": "ner"
+    },
+    "task_model_kwargs/adam_epsilon": {
+      "desc": null,
+      "value": 0.0001
+    },
+    "task_model_kwargs/eval_batch_size": {
+      "desc": null,
+      "value": 32
+    },
+    "task_model_kwargs/learning_rate": {
+      "desc": null,
+      "value": 0.0005
+    },
+    "task_model_kwargs/optimizer": {
+      "desc": null,
+      "value": "Adam"
+    },
+    "task_model_kwargs/train_batch_size": {
+      "desc": null,
+      "value": 32
+    },
+    "task_model_kwargs/use_scheduler": {
+      "desc": null,
+      "value": true
+    },
+    "task_model_kwargs/warmup_steps": {
+      "desc": null,
+      "value": 0
+    },
+    "task_model_kwargs/weight_decay": {
+      "desc": null,
+      "value": 0.0001
+    },
+    "text_field": {
+      "desc": null,
+      "value": "tokens"
+    },
+    "tokenizer_name_or_path": {
+      "desc": null,
+      "value": "allegro/herbert-large-cased"
+    },
+    "train_batch_size": {
+      "desc": null,
+      "value": 32
+    },
+    "use_scheduler": {
+      "desc": null,
+      "value": true
+    },
+    "warmup_steps": {
+      "desc": null,
+      "value": 0
+    },
+    "weight_decay": {
+      "desc": null,
+      "value": 0.0001
+    }
+  },
+  "metrics": [
+    {
+      "accuracy": 0.9720460790530543,
+      "f1_macro": 0.5063131195528486,
+      "f1_micro": 0.75930359085963,
+      "f1_weighted": 0.7624313115803263,
+      "recall_macro": 0.5337720137505502,
+      "recall_micro": 0.7875846501128668,
+      "recall_weighted": 0.7875846501128668,
+      "precision_macro": 0.510546904090001,
+      "precision_micro": 0.7329831932773109,
+      "precision_weighted": 0.7488310471409181,
+      "classes": {
+        "nam_adj": {
+          "precision": 0.5178571428571429,
+          "recall": 0.5576923076923077,
+          "f1": 0.537037037037037,
+          "support": 52
+        },
+        "nam_adj_city": {
+          "precision": 0.8095238095238095,
+          "recall": 0.8095238095238095,
+          "f1": 0.8095238095238095,
+          "support": 42
+        },
+        "nam_adj_country": {
+          "precision": 0.7272727272727273,
+          "recall": 0.8192771084337349,
+          "f1": 0.7705382436260623,
+          "support": 166
+        },
+        "nam_adj_person": {
+          "precision": 1.0,
+          "recall": 0.6111111111111112,
+          "f1": 0.7586206896551725,
+          "support": 18
+        },
+        "nam_eve": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8
+        },
+        "nam_eve_human": {
+          "precision": 0.3125,
+          "recall": 0.38461538461538464,
+          "f1": 0.3448275862068966,
+          "support": 78
+        },
+        "nam_eve_human_cultural": {
+          "precision": 0.30434782608695654,
+          "recall": 0.3181818181818182,
+          "f1": 0.31111111111111117,
+          "support": 22
+        },
+        "nam_eve_human_holiday": {
+          "precision": 0.5,
+          "recall": 0.6666666666666666,
+          "f1": 0.5714285714285715,
+          "support": 9
+        },
+        "nam_eve_human_sport": {
+          "precision": 0.6153846153846154,
+          "recall": 0.7272727272727273,
+          "f1": 0.6666666666666667,
+          "support": 55
+        },
+        "nam_fac_bridge": {
+          "precision": 0.14285714285714285,
+          "recall": 0.25,
+          "f1": 0.18181818181818182,
+          "support": 4
+        },
+        "nam_fac_goe": {
+          "precision": 0.5063291139240507,
+          "recall": 0.625,
+          "f1": 0.5594405594405595,
+          "support": 64
+        },
+        "nam_fac_goe_stop": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "nam_fac_park": {
+          "precision": 0.7142857142857143,
+          "recall": 0.5,
+          "f1": 0.588235294117647,
+          "support": 10
+        },
+        "nam_fac_road": {
+          "precision": 0.8252427184466019,
+          "recall": 0.8947368421052632,
+          "f1": 0.8585858585858587,
+          "support": 95
+        },
+        "nam_fac_square": {
+          "precision": 0.16666666666666666,
+          "recall": 0.16666666666666666,
+          "f1": 0.16666666666666666,
+          "support": 6
+        },
+        "nam_fac_system": {
+          "precision": 0.5,
+          "recall": 0.11538461538461539,
+          "f1": 0.1875,
+          "support": 26
+        },
+        "nam_liv_animal": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 11
+        },
+        "nam_liv_character": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "nam_liv_god": {
+          "precision": 0.6976744186046512,
+          "recall": 0.8571428571428571,
+          "f1": 0.7692307692307693,
+          "support": 35
+        },
+        "nam_liv_habitant": {
+          "precision": 0.4,
+          "recall": 0.2857142857142857,
+          "f1": 0.3333333333333333,
+          "support": 7
+        },
+        "nam_liv_person": {
+          "precision": 0.9311408016443987,
+          "recall": 0.9546891464699684,
+          "f1": 0.9427679500520291,
+          "support": 949
+        },
+        "nam_loc": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "nam_loc_astronomical": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "nam_loc_country_region": {
+          "precision": 0.13333333333333333,
+          "recall": 0.5,
+          "f1": 0.2105263157894737,
+          "support": 4
+        },
+        "nam_loc_gpe_admin1": {
+          "precision": 0.7671232876712328,
+          "recall": 0.875,
+          "f1": 0.8175182481751825,
+          "support": 64
+        },
+        "nam_loc_gpe_admin2": {
+          "precision": 0.7777777777777778,
+          "recall": 0.7777777777777778,
+          "f1": 0.7777777777777778,
+          "support": 36
+        },
+        "nam_loc_gpe_admin3": {
+          "precision": 0.8333333333333334,
+          "recall": 0.7446808510638298,
+          "f1": 0.7865168539325842,
+          "support": 47
+        },
+        "nam_loc_gpe_city": {
+          "precision": 0.8780487804878049,
+          "recall": 0.9061784897025171,
+          "f1": 0.8918918918918918,
+          "support": 437
+        },
+        "nam_loc_gpe_country": {
+          "precision": 0.9349593495934959,
+          "recall": 0.9663865546218487,
+          "f1": 0.9504132231404958,
+          "support": 357
+        },
+        "nam_loc_gpe_district": {
+          "precision": 0.3103448275862069,
+          "recall": 0.5,
+          "f1": 0.3829787234042554,
+          "support": 18
+        },
+        "nam_loc_gpe_subdivision": {
+          "precision": 0.47368421052631576,
+          "recall": 0.34615384615384615,
+          "f1": 0.39999999999999997,
+          "support": 26
+        },
+        "nam_loc_historical_region": {
+          "precision": 0.7333333333333333,
+          "recall": 0.5,
+          "f1": 0.5945945945945945,
+          "support": 22
+        },
+        "nam_loc_hydronym": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1
+        },
+        "nam_loc_hydronym_lake": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "nam_loc_hydronym_ocean": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 1
+        },
+        "nam_loc_hydronym_river": {
+          "precision": 0.9375,
+          "recall": 0.8823529411764706,
+          "f1": 0.9090909090909091,
+          "support": 51
+        },
+        "nam_loc_hydronym_sea": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 3
+        },
+        "nam_loc_land": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "nam_loc_land_continent": {
+          "precision": 0.9285714285714286,
+          "recall": 0.8125,
+          "f1": 0.8666666666666666,
+          "support": 32
+        },
+        "nam_loc_land_island": {
+          "precision": 0.8,
+          "recall": 0.7272727272727273,
+          "f1": 0.761904761904762,
+          "support": 11
+        },
+        "nam_loc_land_mountain": {
+          "precision": 0.625,
+          "recall": 0.5555555555555556,
+          "f1": 0.5882352941176471,
+          "support": 9
+        },
+        "nam_loc_land_region": {
+          "precision": 0.42105263157894735,
+          "recall": 0.7272727272727273,
+          "f1": 0.5333333333333333,
+          "support": 11
+        },
+        "nam_num_house": {
+          "precision": 0.9166666666666666,
+          "recall": 1.0,
+          "f1": 0.9565217391304348,
+          "support": 11
+        },
+        "nam_num_phone": {
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "support": 2
+        },
+        "nam_org_company": {
+          "precision": 0.6588235294117647,
+          "recall": 0.7368421052631579,
+          "f1": 0.6956521739130435,
+          "support": 76
+        },
+        "nam_org_group": {
+          "precision": 0.5,
+          "recall": 0.1111111111111111,
+          "f1": 0.1818181818181818,
+          "support": 18
+        },
+        "nam_org_group_band": {
+          "precision": 0.7777777777777778,
+          "recall": 0.7368421052631579,
+          "f1": 0.7567567567567567,
+          "support": 19
+        },
+        "nam_org_group_team": {
+          "precision": 0.8679245283018868,
+          "recall": 0.9261744966442953,
+          "f1": 0.8961038961038962,
+          "support": 149
+        },
+        "nam_org_institution": {
+          "precision": 0.6141479099678456,
+          "recall": 0.7180451127819549,
+          "f1": 0.6620450606585789,
+          "support": 266
+        },
+        "nam_org_nation": {
+          "precision": 0.7972972972972973,
+          "recall": 0.7283950617283951,
+          "f1": 0.7612903225806451,
+          "support": 81
+        },
+        "nam_org_organization": {
+          "precision": 0.6203007518796992,
+          "recall": 0.6707317073170732,
+          "f1": 0.64453125,
+          "support": 246
+        },
+        "nam_org_organization_sub": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "nam_org_political_party": {
+          "precision": 0.8870967741935484,
+          "recall": 0.9482758620689655,
+          "f1": 0.9166666666666667,
+          "support": 58
+        },
+        "nam_oth": {
+          "precision": 0.4,
+          "recall": 0.45454545454545453,
+          "f1": 0.4255319148936171,
+          "support": 22
+        },
+        "nam_oth_currency": {
+          "precision": 0.9375,
+          "recall": 0.8823529411764706,
+          "f1": 0.9090909090909091,
+          "support": 51
+        },
+        "nam_oth_data_format": {
+          "precision": 0.5,
+          "recall": 0.1,
+          "f1": 0.16666666666666669,
+          "support": 10
+        },
+        "nam_oth_license": {
+          "precision": 0.625,
+          "recall": 0.9090909090909091,
+          "f1": 0.7407407407407406,
+          "support": 11
+        },
+        "nam_oth_position": {
+          "precision": 0.2727272727272727,
+          "recall": 0.3,
+          "f1": 0.28571428571428564,
+          "support": 10
+        },
+        "nam_oth_tech": {
+          "precision": 0.6285714285714286,
+          "recall": 0.7213114754098361,
+          "f1": 0.6717557251908397,
+          "support": 61
+        },
+        "nam_oth_www": {
+          "precision": 0.3333333333333333,
+          "recall": 0.05,
+          "f1": 0.08695652173913045,
+          "support": 20
+        },
+        "nam_pro": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "nam_pro_award": {
+          "precision": 0.48148148148148145,
+          "recall": 0.5652173913043478,
+          "f1": 0.52,
+          "support": 23
+        },
+        "nam_pro_brand": {
+          "precision": 0.4098360655737705,
+          "recall": 0.5434782608695652,
+          "f1": 0.4672897196261682,
+          "support": 46
+        },
+        "nam_pro_media": {
+          "precision": 0.5,
+          "recall": 0.25,
+          "f1": 0.3333333333333333,
+          "support": 8
+        },
+        "nam_pro_media_periodic": {
+          "precision": 0.6914893617021277,
+          "recall": 0.7738095238095238,
+          "f1": 0.7303370786516854,
+          "support": 84
+        },
+        "nam_pro_media_radio": {
+          "precision": 0.2,
+          "recall": 0.3333333333333333,
+          "f1": 0.25,
+          "support": 3
+        },
+        "nam_pro_media_tv": {
+          "precision": 0.5833333333333334,
+          "recall": 1.0,
+          "f1": 0.7368421052631579,
+          "support": 7
+        },
+        "nam_pro_media_web": {
+          "precision": 0.375,
+          "recall": 0.675,
+          "f1": 0.4821428571428572,
+          "support": 40
+        },
+        "nam_pro_model_car": {
+          "precision": 0.7333333333333333,
+          "recall": 0.8461538461538461,
+          "f1": 0.7857142857142856,
+          "support": 26
+        },
+        "nam_pro_software": {
+          "precision": 0.6785714285714286,
+          "recall": 0.5876288659793815,
+          "f1": 0.6298342541436465,
+          "support": 97
+        },
+        "nam_pro_software_game": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "nam_pro_title": {
+          "precision": 0.42592592592592593,
+          "recall": 0.6571428571428571,
+          "f1": 0.5168539325842697,
+          "support": 35
+        },
+        "nam_pro_title_album": {
+          "precision": 0.8333333333333334,
+          "recall": 0.7142857142857143,
+          "f1": 0.7692307692307692,
+          "support": 7
+        },
+        "nam_pro_title_article": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "nam_pro_title_book": {
+          "precision": 0.5,
+          "recall": 0.7272727272727273,
+          "f1": 0.5925925925925926,
+          "support": 11
+        },
+        "nam_pro_title_document": {
+          "precision": 0.30246913580246915,
+          "recall": 0.5568181818181818,
+          "f1": 0.392,
+          "support": 88
+        },
+        "nam_pro_title_song": {
+          "precision": 0.4,
+          "recall": 0.5714285714285714,
+          "f1": 0.47058823529411764,
+          "support": 7
+        },
+        "nam_pro_title_treaty": {
+          "precision": 0.125,
+          "recall": 0.5,
+          "f1": 0.2,
+          "support": 2
+        },
+        "nam_pro_title_tv": {
+          "precision": 0.5416666666666666,
+          "recall": 0.5416666666666666,
+          "f1": 0.5416666666666666,
+          "support": 24
+        },
+        "nam_pro_vehicle": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        }
+      }
+    },
+    {
+      "accuracy": 0.9731557810188121,
+      "f1_macro": 0.5336287791203292,
+      "f1_micro": 0.768630003254149,
+      "f1_weighted": 0.7749539483382935,
+      "recall_macro": 0.5671275682511305,
+      "recall_micro": 0.7997742663656885,
+      "recall_weighted": 0.7997742663656885,
+      "precision_macro": 0.5269021810520838,
+      "precision_micro": 0.7398204217999582,
+      "precision_weighted": 0.7601070043973398,
+      "classes": {
+        "nam_adj": {
+          "precision": 0.6041666666666666,
+          "recall": 0.5576923076923077,
+          "f1": 0.5799999999999998,
+          "support": 52
+        },
+        "nam_adj_city": {
+          "precision": 0.8181818181818182,
+          "recall": 0.8571428571428571,
+          "f1": 0.8372093023255814,
+          "support": 42
+        },
+        "nam_adj_country": {
+          "precision": 0.7061855670103093,
+          "recall": 0.8253012048192772,
+          "f1": 0.7611111111111112,
+          "support": 166
+        },
+        "nam_adj_person": {
+          "precision": 0.9230769230769231,
+          "recall": 0.6666666666666666,
+          "f1": 0.7741935483870968,
+          "support": 18
+        },
+        "nam_eve": {
+          "precision": 0.6666666666666666,
+          "recall": 0.75,
+          "f1": 0.7058823529411765,
+          "support": 8
+        },
+        "nam_eve_human": {
+          "precision": 0.3263157894736842,
+          "recall": 0.3974358974358974,
+          "f1": 0.3583815028901734,
+          "support": 78
+        },
+        "nam_eve_human_cultural": {
+          "precision": 0.25,
+          "recall": 0.3181818181818182,
+          "f1": 0.28,
+          "support": 22
+        },
+        "nam_eve_human_holiday": {
+          "precision": 0.6,
+          "recall": 0.6666666666666666,
+          "f1": 0.631578947368421,
+          "support": 9
+        },
+        "nam_eve_human_sport": {
+          "precision": 0.6349206349206349,
+          "recall": 0.7272727272727273,
+          "f1": 0.6779661016949152,
+          "support": 55
+        },
+        "nam_fac_bridge": {
+          "precision": 0.16666666666666666,
+          "recall": 0.25,
+          "f1": 0.2,
+          "support": 4
+        },
+        "nam_fac_goe": {
+          "precision": 0.47058823529411764,
+          "recall": 0.625,
+          "f1": 0.5369127516778524,
+          "support": 64
+        },
+        "nam_fac_goe_stop": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "nam_fac_park": {
+          "precision": 0.5,
+          "recall": 0.3,
+          "f1": 0.37499999999999994,
+          "support": 10
+        },
+        "nam_fac_road": {
+          "precision": 0.8415841584158416,
+          "recall": 0.8947368421052632,
+          "f1": 0.8673469387755102,
+          "support": 95
+        },
+        "nam_fac_square": {
+          "precision": 0.14285714285714285,
+          "recall": 0.16666666666666666,
+          "f1": 0.15384615384615383,
+          "support": 6
+        },
+        "nam_fac_system": {
+          "precision": 0.5454545454545454,
+          "recall": 0.23076923076923078,
+          "f1": 0.3243243243243243,
+          "support": 26
+        },
+        "nam_liv_animal": {
+          "precision": 0.16666666666666666,
+          "recall": 0.09090909090909091,
+          "f1": 0.11764705882352942,
+          "support": 11
+        },
+        "nam_liv_character": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "nam_liv_god": {
+          "precision": 0.7317073170731707,
+          "recall": 0.8571428571428571,
+          "f1": 0.7894736842105263,
+          "support": 35
+        },
+        "nam_liv_habitant": {
+          "precision": 0.5,
+          "recall": 0.42857142857142855,
+          "f1": 0.4615384615384615,
+          "support": 7
+        },
+        "nam_liv_person": {
+          "precision": 0.9395203336809176,
+          "recall": 0.9494204425711275,
+          "f1": 0.9444444444444444,
+          "support": 949
+        },
+        "nam_loc": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "nam_loc_astronomical": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "nam_loc_country_region": {
+          "precision": 0.15789473684210525,
+          "recall": 0.75,
+          "f1": 0.2608695652173913,
+          "support": 4
+        },
+        "nam_loc_gpe_admin1": {
+          "precision": 0.8181818181818182,
+          "recall": 0.84375,
+          "f1": 0.8307692307692308,
+          "support": 64
+        },
+        "nam_loc_gpe_admin2": {
+          "precision": 0.8108108108108109,
+          "recall": 0.8333333333333334,
+          "f1": 0.8219178082191781,
+          "support": 36
+        },
+        "nam_loc_gpe_admin3": {
+          "precision": 0.7083333333333334,
+          "recall": 0.723404255319149,
+          "f1": 0.7157894736842105,
+          "support": 47
+        },
+        "nam_loc_gpe_city": {
+          "precision": 0.8802660753880266,
+          "recall": 0.9084668192219679,
+          "f1": 0.8941441441441441,
+          "support": 437
+        },
+        "nam_loc_gpe_country": {
+          "precision": 0.9444444444444444,
+          "recall": 0.9523809523809523,
+          "f1": 0.9483960948396095,
+          "support": 357
+        },
+        "nam_loc_gpe_district": {
+          "precision": 0.37037037037037035,
+          "recall": 0.5555555555555556,
+          "f1": 0.4444444444444445,
+          "support": 18
+        },
+        "nam_loc_gpe_subdivision": {
+          "precision": 0.45,
+          "recall": 0.34615384615384615,
+          "f1": 0.3913043478260869,
+          "support": 26
+        },
+        "nam_loc_historical_region": {
+          "precision": 0.5909090909090909,
+          "recall": 0.5909090909090909,
+          "f1": 0.5909090909090909,
+          "support": 22
+        },
+        "nam_loc_hydronym": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1
+        },
+        "nam_loc_hydronym_lake": {
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "support": 2
+        },
+        "nam_loc_hydronym_ocean": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 1
+        },
+        "nam_loc_hydronym_river": {
+          "precision": 0.9583333333333334,
+          "recall": 0.9019607843137255,
+          "f1": 0.9292929292929293,
+          "support": 51
+        },
+        "nam_loc_hydronym_sea": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 3
+        },
+        "nam_loc_land": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "nam_loc_land_continent": {
+          "precision": 0.9354838709677419,
+          "recall": 0.90625,
+          "f1": 0.9206349206349206,
+          "support": 32
+        },
+        "nam_loc_land_island": {
+          "precision": 0.5,
+          "recall": 0.6363636363636364,
+          "f1": 0.56,
+          "support": 11
+        },
+        "nam_loc_land_mountain": {
+          "precision": 0.6666666666666666,
+          "recall": 0.6666666666666666,
+          "f1": 0.6666666666666666,
+          "support": 9
+        },
+        "nam_loc_land_region": {
+          "precision": 0.5333333333333333,
+          "recall": 0.7272727272727273,
+          "f1": 0.6153846153846153,
+          "support": 11
+        },
+        "nam_num_house": {
+          "precision": 0.9166666666666666,
+          "recall": 1.0,
+          "f1": 0.9565217391304348,
+          "support": 11
+        },
+        "nam_num_phone": {
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "support": 2
+        },
+        "nam_org_company": {
+          "precision": 0.6373626373626373,
+          "recall": 0.7631578947368421,
+          "f1": 0.6946107784431138,
+          "support": 76
+        },
+        "nam_org_group": {
+          "precision": 0.5714285714285714,
+          "recall": 0.2222222222222222,
+          "f1": 0.32,
+          "support": 18
+        },
+        "nam_org_group_band": {
+          "precision": 0.8235294117647058,
+          "recall": 0.7368421052631579,
+          "f1": 0.7777777777777778,
+          "support": 19
+        },
+        "nam_org_group_team": {
+          "precision": 0.9038461538461539,
+          "recall": 0.9463087248322147,
+          "f1": 0.9245901639344263,
+          "support": 149
+        },
+        "nam_org_institution": {
+          "precision": 0.6060606060606061,
+          "recall": 0.7518796992481203,
+          "f1": 0.6711409395973154,
+          "support": 266
+        },
+        "nam_org_nation": {
+          "precision": 0.8472222222222222,
+          "recall": 0.7530864197530864,
+          "f1": 0.7973856209150327,
+          "support": 81
+        },
+        "nam_org_organization": {
+          "precision": 0.663003663003663,
+          "recall": 0.7357723577235772,
+          "f1": 0.6974951830443159,
+          "support": 246
+        },
+        "nam_org_organization_sub": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "nam_org_political_party": {
+          "precision": 0.8870967741935484,
+          "recall": 0.9482758620689655,
+          "f1": 0.9166666666666667,
+          "support": 58
+        },
+        "nam_oth": {
+          "precision": 0.29411764705882354,
+          "recall": 0.45454545454545453,
+          "f1": 0.35714285714285715,
+          "support": 22
+        },
+        "nam_oth_currency": {
+          "precision": 0.9375,
+          "recall": 0.8823529411764706,
+          "f1": 0.9090909090909091,
+          "support": 51
+        },
+        "nam_oth_data_format": {
+          "precision": 0.5,
+          "recall": 0.3,
+          "f1": 0.37499999999999994,
+          "support": 10
+        },
+        "nam_oth_license": {
+          "precision": 0.5625,
+          "recall": 0.8181818181818182,
+          "f1": 0.6666666666666666,
+          "support": 11
+        },
+        "nam_oth_position": {
+          "precision": 0.4166666666666667,
+          "recall": 0.5,
+          "f1": 0.45454545454545453,
+          "support": 10
+        },
+        "nam_oth_tech": {
+          "precision": 0.6875,
+          "recall": 0.7213114754098361,
+          "f1": 0.7040000000000001,
+          "support": 61
+        },
+        "nam_oth_www": {
+          "precision": 0.5,
+          "recall": 0.1,
+          "f1": 0.16666666666666669,
+          "support": 20
+        },
+        "nam_pro": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "nam_pro_award": {
+          "precision": 0.6956521739130435,
+          "recall": 0.6956521739130435,
+          "f1": 0.6956521739130435,
+          "support": 23
+        },
+        "nam_pro_brand": {
+          "precision": 0.43548387096774194,
+          "recall": 0.5869565217391305,
+          "f1": 0.5,
+          "support": 46
+        },
+        "nam_pro_media": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 8
+        },
+        "nam_pro_media_periodic": {
+          "precision": 0.7717391304347826,
+          "recall": 0.8452380952380952,
+          "f1": 0.8068181818181818,
+          "support": 84
+        },
+        "nam_pro_media_radio": {
+          "precision": 0.4,
+          "recall": 0.6666666666666666,
+          "f1": 0.5,
+          "support": 3
+        },
+        "nam_pro_media_tv": {
+          "precision": 0.4666666666666667,
+          "recall": 1.0,
+          "f1": 0.6363636363636364,
+          "support": 7
+        },
+        "nam_pro_media_web": {
+          "precision": 0.323943661971831,
+          "recall": 0.575,
+          "f1": 0.41441441441441446,
+          "support": 40
+        },
+        "nam_pro_model_car": {
+          "precision": 0.88,
+          "recall": 0.8461538461538461,
+          "f1": 0.8627450980392156,
+          "support": 26
+        },
+        "nam_pro_software": {
+          "precision": 0.6555555555555556,
+          "recall": 0.6082474226804123,
+          "f1": 0.6310160427807486,
+          "support": 97
+        },
+        "nam_pro_software_game": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "nam_pro_title": {
+          "precision": 0.37735849056603776,
+          "recall": 0.5714285714285714,
+          "f1": 0.4545454545454546,
+          "support": 35
+        },
+        "nam_pro_title_album": {
+          "precision": 0.5555555555555556,
+          "recall": 0.7142857142857143,
+          "f1": 0.6250000000000001,
+          "support": 7
+        },
+        "nam_pro_title_book": {
+          "precision": 0.6153846153846154,
+          "recall": 0.7272727272727273,
+          "f1": 0.6666666666666667,
+          "support": 11
+        },
+        "nam_pro_title_document": {
+          "precision": 0.3443708609271523,
+          "recall": 0.5909090909090909,
+          "f1": 0.4351464435146443,
+          "support": 88
+        },
+        "nam_pro_title_song": {
+          "precision": 0.5,
+          "recall": 0.7142857142857143,
+          "f1": 0.588235294117647,
+          "support": 7
+        },
+        "nam_pro_title_treaty": {
+          "precision": 0.2,
+          "recall": 0.5,
+          "f1": 0.28571428571428575,
+          "support": 2
+        },
+        "nam_pro_title_tv": {
+          "precision": 0.7894736842105263,
+          "recall": 0.625,
+          "f1": 0.6976744186046512,
+          "support": 24
+        },
+        "nam_pro_vehicle": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        }
+      }
+    },
+    {
+      "accuracy": 0.9726537729866835,
+      "f1_macro": 0.5320634751335759,
+      "f1_micro": 0.7719260065288356,
+      "f1_weighted": 0.7750066232515692,
+      "recall_macro": 0.5547654028117207,
+      "recall_micro": 0.8006772009029345,
+      "recall_weighted": 0.8006772009029345,
+      "precision_macro": 0.5475305066919693,
+      "precision_micro": 0.7451680672268908,
+      "precision_weighted": 0.761564426552858,
+      "classes": {
+        "nam_adj": {
+          "precision": 0.5357142857142857,
+          "recall": 0.5769230769230769,
+          "f1": 0.5555555555555555,
+          "support": 52
+        },
+        "nam_adj_city": {
+          "precision": 0.813953488372093,
+          "recall": 0.8333333333333334,
+          "f1": 0.8235294117647058,
+          "support": 42
+        },
+        "nam_adj_country": {
+          "precision": 0.7428571428571429,
+          "recall": 0.7831325301204819,
+          "f1": 0.7624633431085045,
+          "support": 166
+        },
+        "nam_adj_person": {
+          "precision": 1.0,
+          "recall": 0.6111111111111112,
+          "f1": 0.7586206896551725,
+          "support": 18
+        },
+        "nam_eve": {
+          "precision": 0.8888888888888888,
+          "recall": 1.0,
+          "f1": 0.9411764705882353,
+          "support": 8
+        },
+        "nam_eve_human": {
+          "precision": 0.4266666666666667,
+          "recall": 0.41025641025641024,
+          "f1": 0.41830065359477125,
+          "support": 78
+        },
+        "nam_eve_human_cultural": {
+          "precision": 0.1875,
+          "recall": 0.2727272727272727,
+          "f1": 0.2222222222222222,
+          "support": 22
+        },
+        "nam_eve_human_holiday": {
+          "precision": 0.5454545454545454,
+          "recall": 0.6666666666666666,
+          "f1": 0.6,
+          "support": 9
+        },
+        "nam_eve_human_sport": {
+          "precision": 0.6212121212121212,
+          "recall": 0.7454545454545455,
+          "f1": 0.6776859504132231,
+          "support": 55
+        },
+        "nam_fac_bridge": {
+          "precision": 0.2,
+          "recall": 0.25,
+          "f1": 0.22222222222222224,
+          "support": 4
+        },
+        "nam_fac_goe": {
+          "precision": 0.5342465753424658,
+          "recall": 0.609375,
+          "f1": 0.5693430656934307,
+          "support": 64
+        },
+        "nam_fac_goe_stop": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "nam_fac_park": {
+          "precision": 0.5555555555555556,
+          "recall": 0.5,
+          "f1": 0.5263157894736842,
+          "support": 10
+        },
+        "nam_fac_road": {
+          "precision": 0.9081632653061225,
+          "recall": 0.9368421052631579,
+          "f1": 0.922279792746114,
+          "support": 95
+        },
+        "nam_fac_square": {
+          "precision": 0.4,
+          "recall": 0.3333333333333333,
+          "f1": 0.3636363636363636,
+          "support": 6
+        },
+        "nam_fac_system": {
+          "precision": 0.375,
+          "recall": 0.11538461538461539,
+          "f1": 0.1764705882352941,
+          "support": 26
+        },
+        "nam_liv_animal": {
+          "precision": 1.0,
+          "recall": 0.09090909090909091,
+          "f1": 0.16666666666666669,
+          "support": 11
+        },
+        "nam_liv_character": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "nam_liv_god": {
+          "precision": 0.6976744186046512,
+          "recall": 0.8571428571428571,
+          "f1": 0.7692307692307693,
+          "support": 35
+        },
+        "nam_liv_habitant": {
+          "precision": 0.4,
+          "recall": 0.2857142857142857,
+          "f1": 0.3333333333333333,
+          "support": 7
+        },
+        "nam_liv_person": {
+          "precision": 0.9380804953560371,
+          "recall": 0.9578503688092729,
+          "f1": 0.9478623566214808,
+          "support": 949
+        },
+        "nam_loc": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "nam_loc_astronomical": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "nam_loc_country_region": {
+          "precision": 0.0625,
+          "recall": 0.25,
+          "f1": 0.1,
+          "support": 4
+        },
+        "nam_loc_gpe_admin1": {
+          "precision": 0.76,
+          "recall": 0.890625,
+          "f1": 0.8201438848920863,
+          "support": 64
+        },
+        "nam_loc_gpe_admin2": {
+          "precision": 0.7692307692307693,
+          "recall": 0.8333333333333334,
+          "f1": 0.8,
+          "support": 36
+        },
+        "nam_loc_gpe_admin3": {
+          "precision": 0.7674418604651163,
+          "recall": 0.7021276595744681,
+          "f1": 0.7333333333333334,
+          "support": 47
+        },
+        "nam_loc_gpe_city": {
+          "precision": 0.8777292576419214,
+          "recall": 0.919908466819222,
+          "f1": 0.8983240223463688,
+          "support": 437
+        },
+        "nam_loc_gpe_country": {
+          "precision": 0.9295392953929539,
+          "recall": 0.9607843137254902,
+          "f1": 0.9449035812672176,
+          "support": 357
+        },
+        "nam_loc_gpe_district": {
+          "precision": 0.41379310344827586,
+          "recall": 0.6666666666666666,
+          "f1": 0.5106382978723404,
+          "support": 18
+        },
+        "nam_loc_gpe_subdivision": {
+          "precision": 0.36363636363636365,
+          "recall": 0.3076923076923077,
+          "f1": 0.33333333333333337,
+          "support": 26
+        },
+        "nam_loc_historical_region": {
+          "precision": 0.6666666666666666,
+          "recall": 0.5454545454545454,
+          "f1": 0.6,
+          "support": 22
+        },
+        "nam_loc_hydronym": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1
+        },
+        "nam_loc_hydronym_lake": {
+          "precision": 0.2,
+          "recall": 0.5,
+          "f1": 0.28571428571428575,
+          "support": 2
+        },
+        "nam_loc_hydronym_ocean": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 1
+        },
+        "nam_loc_hydronym_river": {
+          "precision": 0.9019607843137255,
+          "recall": 0.9019607843137255,
+          "f1": 0.9019607843137255,
+          "support": 51
+        },
+        "nam_loc_hydronym_sea": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571428571428571,
+          "support": 3
+        },
+        "nam_loc_land": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "nam_loc_land_continent": {
+          "precision": 0.8787878787878788,
+          "recall": 0.90625,
+          "f1": 0.8923076923076922,
+          "support": 32
+        },
+        "nam_loc_land_island": {
+          "precision": 0.75,
+          "recall": 0.5454545454545454,
+          "f1": 0.631578947368421,
+          "support": 11
+        },
+        "nam_loc_land_mountain": {
+          "precision": 0.8571428571428571,
+          "recall": 0.6666666666666666,
+          "f1": 0.75,
+          "support": 9
+        },
+        "nam_loc_land_region": {
+          "precision": 0.5,
+          "recall": 0.7272727272727273,
+          "f1": 0.5925925925925926,
+          "support": 11
+        },
+        "nam_num_house": {
+          "precision": 0.8461538461538461,
+          "recall": 1.0,
+          "f1": 0.9166666666666666,
+          "support": 11
+        },
+        "nam_num_phone": {
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.6666666666666666,
+          "support": 2
+        },
+        "nam_org_company": {
+          "precision": 0.6304347826086957,
+          "recall": 0.7631578947368421,
+          "f1": 0.6904761904761905,
+          "support": 76
+        },
+        "nam_org_group": {
+          "precision": 0.5,
+          "recall": 0.2222222222222222,
+          "f1": 0.30769230769230765,
+          "support": 18
+        },
+        "nam_org_group_band": {
+          "precision": 0.7222222222222222,
+          "recall": 0.6842105263157895,
+          "f1": 0.7027027027027027,
+          "support": 19
+        },
+        "nam_org_group_team": {
+          "precision": 0.9166666666666666,
+          "recall": 0.959731543624161,
+          "f1": 0.9377049180327869,
+          "support": 149
+        },
+        "nam_org_institution": {
+          "precision": 0.625,
+          "recall": 0.7894736842105263,
+          "f1": 0.6976744186046512,
+          "support": 266
+        },
+        "nam_org_nation": {
+          "precision": 0.8,
+          "recall": 0.7901234567901234,
+          "f1": 0.7950310559006211,
+          "support": 81
+        },
+        "nam_org_organization": {
+          "precision": 0.6342412451361867,
+          "recall": 0.6626016260162602,
+          "f1": 0.6481113320079523,
+          "support": 246
+        },
+        "nam_org_organization_sub": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "nam_org_political_party": {
+          "precision": 0.8870967741935484,
+          "recall": 0.9482758620689655,
+          "f1": 0.9166666666666667,
+          "support": 58
+        },
+        "nam_oth": {
+          "precision": 0.32142857142857145,
+          "recall": 0.4090909090909091,
+          "f1": 0.36000000000000004,
+          "support": 22
+        },
+        "nam_oth_currency": {
+          "precision": 0.94,
+          "recall": 0.9215686274509803,
+          "f1": 0.9306930693069307,
+          "support": 51
+        },
+        "nam_oth_data_format": {
+          "precision": 0.75,
+          "recall": 0.3,
+          "f1": 0.4285714285714285,
+          "support": 10
+        },
+        "nam_oth_license": {
+          "precision": 0.6923076923076923,
+          "recall": 0.8181818181818182,
+          "f1": 0.7500000000000001,
+          "support": 11
+        },
+        "nam_oth_position": {
+          "precision": 0.15384615384615385,
+          "recall": 0.2,
+          "f1": 0.17391304347826086,
+          "support": 10
+        },
+        "nam_oth_tech": {
+          "precision": 0.5733333333333334,
+          "recall": 0.7049180327868853,
+          "f1": 0.6323529411764707,
+          "support": 61
+        },
+        "nam_oth_www": {
+          "precision": 0.5,
+          "recall": 0.05,
+          "f1": 0.09090909090909091,
+          "support": 20
+        },
+        "nam_pro": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "nam_pro_award": {
+          "precision": 0.7272727272727273,
+          "recall": 0.6956521739130435,
+          "f1": 0.711111111111111,
+          "support": 23
+        },
+        "nam_pro_brand": {
+          "precision": 0.5087719298245614,
+          "recall": 0.6304347826086957,
+          "f1": 0.5631067961165049,
+          "support": 46
+        },
+        "nam_pro_media": {
+          "precision": 0.3333333333333333,
+          "recall": 0.25,
+          "f1": 0.28571428571428575,
+          "support": 8
+        },
+        "nam_pro_media_periodic": {
+          "precision": 0.6804123711340206,
+          "recall": 0.7857142857142857,
+          "f1": 0.729281767955801,
+          "support": 84
+        },
+        "nam_pro_media_radio": {
+          "precision": 0.2,
+          "recall": 0.3333333333333333,
+          "f1": 0.25,
+          "support": 3
+        },
+        "nam_pro_media_tv": {
+          "precision": 0.45454545454545453,
+          "recall": 0.7142857142857143,
+          "f1": 0.5555555555555556,
+          "support": 7
+        },
+        "nam_pro_media_web": {
+          "precision": 0.323943661971831,
+          "recall": 0.575,
+          "f1": 0.41441441441441446,
+          "support": 40
+        },
+        "nam_pro_model_car": {
+          "precision": 0.88,
+          "recall": 0.8461538461538461,
+          "f1": 0.8627450980392156,
+          "support": 26
+        },
+        "nam_pro_software": {
+          "precision": 0.6853932584269663,
+          "recall": 0.6288659793814433,
+          "f1": 0.6559139784946236,
+          "support": 97
+        },
+        "nam_pro_software_game": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "nam_pro_title": {
+          "precision": 0.44680851063829785,
+          "recall": 0.6,
+          "f1": 0.5121951219512195,
+          "support": 35
+        },
+        "nam_pro_title_album": {
+          "precision": 0.7142857142857143,
+          "recall": 0.7142857142857143,
+          "f1": 0.7142857142857143,
+          "support": 7
+        },
+        "nam_pro_title_book": {
+          "precision": 0.42105263157894735,
+          "recall": 0.7272727272727273,
+          "f1": 0.5333333333333333,
+          "support": 11
+        },
+        "nam_pro_title_document": {
+          "precision": 0.34415584415584416,
+          "recall": 0.6022727272727273,
+          "f1": 0.4380165289256199,
+          "support": 88
+        },
+        "nam_pro_title_song": {
+          "precision": 0.8333333333333334,
+          "recall": 0.7142857142857143,
+          "f1": 0.7692307692307692,
+          "support": 7
+        },
+        "nam_pro_title_treaty": {
+          "precision": 0.2,
+          "recall": 0.5,
+          "f1": 0.28571428571428575,
+          "support": 2
+        },
+        "nam_pro_title_tv": {
+          "precision": 0.7894736842105263,
+          "recall": 0.625,
+          "f1": 0.6976744186046512,
+          "support": 24
+        },
+        "nam_pro_vehicle": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        }
+      }
+    },
+    {
+      "accuracy": 0.9726273515113084,
+      "f1_macro": 0.5421334851906648,
+      "f1_micro": 0.771375667138656,
+      "f1_weighted": 0.7756365765802032,
+      "recall_macro": 0.5704860911752674,
+      "recall_micro": 0.7993227990970655,
+      "recall_weighted": 0.7993227990970655,
+      "precision_macro": 0.5503928102178329,
+      "precision_micro": 0.745316775415702,
+      "precision_weighted": 0.7623340671169129,
+      "classes": {
+        "nam_adj": {
+          "precision": 0.5535714285714286,
+          "recall": 0.5961538461538461,
+          "f1": 0.5740740740740741,
+          "support": 52
+        },
+        "nam_adj_city": {
+          "precision": 0.8222222222222222,
+          "recall": 0.8809523809523809,
+          "f1": 0.8505747126436781,
+          "support": 42
+        },
+        "nam_adj_country": {
+          "precision": 0.6903553299492385,
+          "recall": 0.8192771084337349,
+          "f1": 0.7493112947658402,
+          "support": 166
+        },
+        "nam_adj_person": {
+          "precision": 0.8571428571428571,
+          "recall": 0.6666666666666666,
+          "f1": 0.75,
+          "support": 18
+        },
+        "nam_eve": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 8
+        },
+        "nam_eve_human": {
+          "precision": 0.3563218390804598,
+          "recall": 0.3974358974358974,
+          "f1": 0.37575757575757573,
+          "support": 78
+        },
+        "nam_eve_human_cultural": {
+          "precision": 0.2692307692307692,
+          "recall": 0.3181818181818182,
+          "f1": 0.2916666666666667,
+          "support": 22
+        },
+        "nam_eve_human_holiday": {
+          "precision": 0.46153846153846156,
+          "recall": 0.6666666666666666,
+          "f1": 0.5454545454545455,
+          "support": 9
+        },
+        "nam_eve_human_sport": {
+          "precision": 0.6349206349206349,
+          "recall": 0.7272727272727273,
+          "f1": 0.6779661016949152,
+          "support": 55
+        },
+        "nam_fac_bridge": {
+          "precision": 0.125,
+          "recall": 0.25,
+          "f1": 0.16666666666666666,
+          "support": 4
+        },
+        "nam_fac_goe": {
+          "precision": 0.56,
+          "recall": 0.65625,
+          "f1": 0.60431654676259,
+          "support": 64
+        },
+        "nam_fac_goe_stop": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "nam_fac_park": {
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.6666666666666666,
+          "support": 10
+        },
+        "nam_fac_road": {
+          "precision": 0.8155339805825242,
+          "recall": 0.8842105263157894,
+          "f1": 0.8484848484848484,
+          "support": 95
+        },
+        "nam_fac_square": {
+          "precision": 0.5,
+          "recall": 0.3333333333333333,
+          "f1": 0.4,
+          "support": 6
+        },
+        "nam_fac_system": {
+          "precision": 0.6666666666666666,
+          "recall": 0.23076923076923078,
+          "f1": 0.3428571428571429,
+          "support": 26
+        },
+        "nam_liv_animal": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 11
+        },
+        "nam_liv_character": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "nam_liv_god": {
+          "precision": 0.6818181818181818,
+          "recall": 0.8571428571428571,
+          "f1": 0.759493670886076,
+          "support": 35
+        },
+        "nam_liv_habitant": {
+          "precision": 0.25,
+          "recall": 0.14285714285714285,
+          "f1": 0.18181818181818182,
+          "support": 7
+        },
+        "nam_liv_person": {
+          "precision": 0.9400206825232679,
+          "recall": 0.9578503688092729,
+          "f1": 0.9488517745302714,
+          "support": 949
+        },
+        "nam_loc": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "nam_loc_astronomical": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "nam_loc_country_region": {
+          "precision": 0.15789473684210525,
+          "recall": 0.75,
+          "f1": 0.2608695652173913,
+          "support": 4
+        },
+        "nam_loc_gpe_admin1": {
+          "precision": 0.7887323943661971,
+          "recall": 0.875,
+          "f1": 0.8296296296296297,
+          "support": 64
+        },
+        "nam_loc_gpe_admin2": {
+          "precision": 0.8108108108108109,
+          "recall": 0.8333333333333334,
+          "f1": 0.8219178082191781,
+          "support": 36
+        },
+        "nam_loc_gpe_admin3": {
+          "precision": 0.8095238095238095,
+          "recall": 0.723404255319149,
+          "f1": 0.7640449438202246,
+          "support": 47
+        },
+        "nam_loc_gpe_city": {
+          "precision": 0.8772321428571429,
+          "recall": 0.8993135011441648,
+          "f1": 0.888135593220339,
+          "support": 437
+        },
+        "nam_loc_gpe_country": {
+          "precision": 0.9478021978021978,
+          "recall": 0.9663865546218487,
+          "f1": 0.957004160887656,
+          "support": 357
+        },
+        "nam_loc_gpe_district": {
+          "precision": 0.44,
+          "recall": 0.6111111111111112,
+          "f1": 0.5116279069767442,
+          "support": 18
+        },
+        "nam_loc_gpe_subdivision": {
+          "precision": 0.5789473684210527,
+          "recall": 0.4230769230769231,
+          "f1": 0.4888888888888889,
+          "support": 26
+        },
+        "nam_loc_historical_region": {
+          "precision": 0.5238095238095238,
+          "recall": 0.5,
+          "f1": 0.5116279069767442,
+          "support": 22
+        },
+        "nam_loc_hydronym": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1
+        },
+        "nam_loc_hydronym_lake": {
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666,
+          "support": 2
+        },
+        "nam_loc_hydronym_ocean": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 1
+        },
+        "nam_loc_hydronym_river": {
+          "precision": 0.88,
+          "recall": 0.8627450980392157,
+          "f1": 0.8712871287128714,
+          "support": 51
+        },
+        "nam_loc_hydronym_sea": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571428571428571,
+          "support": 3
+        },
+        "nam_loc_land": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "nam_loc_land_continent": {
+          "precision": 0.967741935483871,
+          "recall": 0.9375,
+          "f1": 0.9523809523809523,
+          "support": 32
+        },
+        "nam_loc_land_island": {
+          "precision": 0.6666666666666666,
+          "recall": 0.5454545454545454,
+          "f1": 0.6,
+          "support": 11
+        },
+        "nam_loc_land_mountain": {
+          "precision": 0.75,
+          "recall": 0.6666666666666666,
+          "f1": 0.7058823529411765,
+          "support": 9
+        },
+        "nam_loc_land_region": {
+          "precision": 0.5333333333333333,
+          "recall": 0.7272727272727273,
+          "f1": 0.6153846153846153,
+          "support": 11
+        },
+        "nam_num_house": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 11
+        },
+        "nam_num_phone": {
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.6666666666666666,
+          "support": 2
+        },
+        "nam_org_company": {
+          "precision": 0.6276595744680851,
+          "recall": 0.7763157894736842,
+          "f1": 0.6941176470588235,
+          "support": 76
+        },
+        "nam_org_group": {
+          "precision": 0.5,
+          "recall": 0.2222222222222222,
+          "f1": 0.30769230769230765,
+          "support": 18
+        },
+        "nam_org_group_band": {
+          "precision": 0.7222222222222222,
+          "recall": 0.6842105263157895,
+          "f1": 0.7027027027027027,
+          "support": 19
+        },
+        "nam_org_group_team": {
+          "precision": 0.9032258064516129,
+          "recall": 0.9395973154362416,
+          "f1": 0.9210526315789472,
+          "support": 149
+        },
+        "nam_org_institution": {
+          "precision": 0.6253968253968254,
+          "recall": 0.7406015037593985,
+          "f1": 0.6781411359724613,
+          "support": 266
+        },
+        "nam_org_nation": {
+          "precision": 0.84,
+          "recall": 0.7777777777777778,
+          "f1": 0.8076923076923077,
+          "support": 81
+        },
+        "nam_org_organization": {
+          "precision": 0.6423357664233577,
+          "recall": 0.7154471544715447,
+          "f1": 0.676923076923077,
+          "support": 246
+        },
+        "nam_org_organization_sub": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "nam_org_political_party": {
+          "precision": 0.9016393442622951,
+          "recall": 0.9482758620689655,
+          "f1": 0.9243697478991596,
+          "support": 58
+        },
+        "nam_oth": {
+          "precision": 0.35714285714285715,
+          "recall": 0.45454545454545453,
+          "f1": 0.4,
+          "support": 22
+        },
+        "nam_oth_currency": {
+          "precision": 0.9361702127659575,
+          "recall": 0.8627450980392157,
+          "f1": 0.8979591836734694,
+          "support": 51
+        },
+        "nam_oth_data_format": {
+          "precision": 0.75,
+          "recall": 0.3,
+          "f1": 0.4285714285714285,
+          "support": 10
+        },
+        "nam_oth_license": {
+          "precision": 0.6666666666666666,
+          "recall": 0.9090909090909091,
+          "f1": 0.7692307692307692,
+          "support": 11
+        },
+        "nam_oth_position": {
+          "precision": 0.4444444444444444,
+          "recall": 0.4,
+          "f1": 0.4210526315789474,
+          "support": 10
+        },
+        "nam_oth_tech": {
+          "precision": 0.5857142857142857,
+          "recall": 0.6721311475409836,
+          "f1": 0.6259541984732824,
+          "support": 61
+        },
+        "nam_oth_www": {
+          "precision": 0.5,
+          "recall": 0.1,
+          "f1": 0.16666666666666669,
+          "support": 20
+        },
+        "nam_pro": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "nam_pro_award": {
+          "precision": 0.43333333333333335,
+          "recall": 0.5652173913043478,
+          "f1": 0.49056603773584906,
+          "support": 23
+        },
+        "nam_pro_brand": {
+          "precision": 0.48148148148148145,
+          "recall": 0.5652173913043478,
+          "f1": 0.52,
+          "support": 46
+        },
+        "nam_pro_media": {
+          "precision": 0.75,
+          "recall": 0.375,
+          "f1": 0.5,
+          "support": 8
+        },
+        "nam_pro_media_periodic": {
+          "precision": 0.7127659574468085,
+          "recall": 0.7976190476190477,
+          "f1": 0.7528089887640449,
+          "support": 84
+        },
+        "nam_pro_media_radio": {
+          "precision": 0.3333333333333333,
+          "recall": 0.6666666666666666,
+          "f1": 0.4444444444444444,
+          "support": 3
+        },
+        "nam_pro_media_tv": {
+          "precision": 0.5833333333333334,
+          "recall": 1.0,
+          "f1": 0.7368421052631579,
+          "support": 7
+        },
+        "nam_pro_media_web": {
+          "precision": 0.373134328358209,
+          "recall": 0.625,
+          "f1": 0.4672897196261683,
+          "support": 40
+        },
+        "nam_pro_model_car": {
+          "precision": 0.8461538461538461,
+          "recall": 0.8461538461538461,
+          "f1": 0.8461538461538461,
+          "support": 26
+        },
+        "nam_pro_software": {
+          "precision": 0.6781609195402298,
+          "recall": 0.6082474226804123,
+          "f1": 0.6413043478260869,
+          "support": 97
+        },
+        "nam_pro_software_game": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "nam_pro_title": {
+          "precision": 0.3958333333333333,
+          "recall": 0.5428571428571428,
+          "f1": 0.4578313253012048,
+          "support": 35
+        },
+        "nam_pro_title_album": {
+          "precision": 1.0,
+          "recall": 0.7142857142857143,
+          "f1": 0.8333333333333333,
+          "support": 7
+        },
+        "nam_pro_title_article": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "nam_pro_title_book": {
+          "precision": 0.5,
+          "recall": 0.7272727272727273,
+          "f1": 0.5925925925925926,
+          "support": 11
+        },
+        "nam_pro_title_document": {
+          "precision": 0.33793103448275863,
+          "recall": 0.5568181818181818,
+          "f1": 0.42060085836909866,
+          "support": 88
+        },
+        "nam_pro_title_song": {
+          "precision": 0.5555555555555556,
+          "recall": 0.7142857142857143,
+          "f1": 0.6250000000000001,
+          "support": 7
+        },
+        "nam_pro_title_treaty": {
+          "precision": 0.16666666666666666,
+          "recall": 0.5,
+          "f1": 0.25,
+          "support": 2
+        },
+        "nam_pro_title_tv": {
+          "precision": 0.7142857142857143,
+          "recall": 0.625,
+          "f1": 0.6666666666666666,
+          "support": 24
+        },
+        "nam_pro_vehicle": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        }
+      }
+    },
+    {
+      "accuracy": 0.9721649756922427,
+      "f1_macro": 0.5200532562545346,
+      "f1_micro": 0.7578878889732191,
+      "f1_weighted": 0.7627442394720547,
+      "recall_macro": 0.5496199640767399,
+      "recall_micro": 0.7889390519187359,
+      "recall_weighted": 0.7889390519187359,
+      "precision_macro": 0.5181927878911895,
+      "precision_micro": 0.7291883997496349,
+      "precision_weighted": 0.7470917673876304,
+      "classes": {
+        "nam_adj": {
+          "precision": 0.5094339622641509,
+          "recall": 0.5192307692307693,
+          "f1": 0.5142857142857143,
+          "support": 52
+        },
+        "nam_adj_city": {
+          "precision": 0.8181818181818182,
+          "recall": 0.8571428571428571,
+          "f1": 0.8372093023255814,
+          "support": 42
+        },
+        "nam_adj_country": {
+          "precision": 0.7142857142857143,
+          "recall": 0.8132530120481928,
+          "f1": 0.7605633802816901,
+          "support": 166
+        },
+        "nam_adj_person": {
+          "precision": 0.8461538461538461,
+          "recall": 0.6111111111111112,
+          "f1": 0.7096774193548387,
+          "support": 18
+        },
+        "nam_eve": {
+          "precision": 0.75,
+          "recall": 0.75,
+          "f1": 0.75,
+          "support": 8
+        },
+        "nam_eve_human": {
+          "precision": 0.38271604938271603,
+          "recall": 0.3974358974358974,
+          "f1": 0.38993710691823896,
+          "support": 78
+        },
+        "nam_eve_human_cultural": {
+          "precision": 0.18518518518518517,
+          "recall": 0.22727272727272727,
+          "f1": 0.20408163265306123,
+          "support": 22
+        },
+        "nam_eve_human_holiday": {
+          "precision": 0.4166666666666667,
+          "recall": 0.5555555555555556,
+          "f1": 0.4761904761904762,
+          "support": 9
+        },
+        "nam_eve_human_sport": {
+          "precision": 0.6451612903225806,
+          "recall": 0.7272727272727273,
+          "f1": 0.6837606837606838,
+          "support": 55
+        },
+        "nam_fac_bridge": {
+          "precision": 0.2,
+          "recall": 0.25,
+          "f1": 0.22222222222222224,
+          "support": 4
+        },
+        "nam_fac_goe": {
+          "precision": 0.5063291139240507,
+          "recall": 0.625,
+          "f1": 0.5594405594405595,
+          "support": 64
+        },
+        "nam_fac_goe_stop": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "nam_fac_park": {
+          "precision": 0.42857142857142855,
+          "recall": 0.3,
+          "f1": 0.3529411764705882,
+          "support": 10
+        },
+        "nam_fac_road": {
+          "precision": 0.8446601941747572,
+          "recall": 0.9157894736842105,
+          "f1": 0.8787878787878788,
+          "support": 95
+        },
+        "nam_fac_square": {
+          "precision": 0.2,
+          "recall": 0.16666666666666666,
+          "f1": 0.1818181818181818,
+          "support": 6
+        },
+        "nam_fac_system": {
+          "precision": 0.25,
+          "recall": 0.07692307692307693,
+          "f1": 0.11764705882352941,
+          "support": 26
+        },
+        "nam_liv_animal": {
+          "precision": 0.5,
+          "recall": 0.09090909090909091,
+          "f1": 0.15384615384615385,
+          "support": 11
+        },
+        "nam_liv_character": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "nam_liv_god": {
+          "precision": 0.6904761904761905,
+          "recall": 0.8285714285714286,
+          "f1": 0.7532467532467533,
+          "support": 35
+        },
+        "nam_liv_habitant": {
+          "precision": 0.25,
+          "recall": 0.14285714285714285,
+          "f1": 0.18181818181818182,
+          "support": 7
+        },
+        "nam_liv_person": {
+          "precision": 0.9272540983606558,
+          "recall": 0.9536354056902002,
+          "f1": 0.9402597402597402,
+          "support": 949
+        },
+        "nam_loc": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "nam_loc_country_region": {
+          "precision": 0.047619047619047616,
+          "recall": 0.25,
+          "f1": 0.08,
+          "support": 4
+        },
+        "nam_loc_gpe_admin1": {
+          "precision": 0.8333333333333334,
+          "recall": 0.859375,
+          "f1": 0.8461538461538461,
+          "support": 64
+        },
+        "nam_loc_gpe_admin2": {
+          "precision": 0.7692307692307693,
+          "recall": 0.8333333333333334,
+          "f1": 0.8,
+          "support": 36
+        },
+        "nam_loc_gpe_admin3": {
+          "precision": 0.6938775510204082,
+          "recall": 0.723404255319149,
+          "f1": 0.7083333333333333,
+          "support": 47
+        },
+        "nam_loc_gpe_city": {
+          "precision": 0.8878923766816144,
+          "recall": 0.9061784897025171,
+          "f1": 0.8969422423556058,
+          "support": 437
+        },
+        "nam_loc_gpe_country": {
+          "precision": 0.9368131868131868,
+          "recall": 0.9551820728291317,
+          "f1": 0.9459084604715673,
+          "support": 357
+        },
+        "nam_loc_gpe_district": {
+          "precision": 0.3793103448275862,
+          "recall": 0.6111111111111112,
+          "f1": 0.46808510638297873,
+          "support": 18
+        },
+        "nam_loc_gpe_subdivision": {
+          "precision": 0.42857142857142855,
+          "recall": 0.34615384615384615,
+          "f1": 0.3829787234042554,
+          "support": 26
+        },
+        "nam_loc_historical_region": {
+          "precision": 0.631578947368421,
+          "recall": 0.5454545454545454,
+          "f1": 0.5853658536585366,
+          "support": 22
+        },
+        "nam_loc_hydronym": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1
+        },
+        "nam_loc_hydronym_lake": {
+          "precision": 0.3333333333333333,
+          "recall": 0.5,
+          "f1": 0.4,
+          "support": 2
+        },
+        "nam_loc_hydronym_ocean": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 1
+        },
+        "nam_loc_hydronym_river": {
+          "precision": 0.9183673469387755,
+          "recall": 0.8823529411764706,
+          "f1": 0.9,
+          "support": 51
+        },
+        "nam_loc_hydronym_sea": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 3
+        },
+        "nam_loc_land": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "nam_loc_land_continent": {
+          "precision": 0.9375,
+          "recall": 0.9375,
+          "f1": 0.9375,
+          "support": 32
+        },
+        "nam_loc_land_island": {
+          "precision": 0.5454545454545454,
+          "recall": 0.5454545454545454,
+          "f1": 0.5454545454545454,
+          "support": 11
+        },
+        "nam_loc_land_mountain": {
+          "precision": 0.5454545454545454,
+          "recall": 0.6666666666666666,
+          "f1": 0.6,
+          "support": 9
+        },
+        "nam_loc_land_region": {
+          "precision": 0.4117647058823529,
+          "recall": 0.6363636363636364,
+          "f1": 0.5,
+          "support": 11
+        },
+        "nam_num_house": {
+          "precision": 0.9166666666666666,
+          "recall": 1.0,
+          "f1": 0.9565217391304348,
+          "support": 11
+        },
+        "nam_num_phone": {
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "support": 2
+        },
+        "nam_org_company": {
+          "precision": 0.6741573033707865,
+          "recall": 0.7894736842105263,
+          "f1": 0.7272727272727273,
+          "support": 76
+        },
+        "nam_org_group": {
+          "precision": 0.6666666666666666,
+          "recall": 0.2222222222222222,
+          "f1": 0.3333333333333333,
+          "support": 18
+        },
+        "nam_org_group_band": {
+          "precision": 0.65,
+          "recall": 0.6842105263157895,
+          "f1": 0.6666666666666667,
+          "support": 19
+        },
+        "nam_org_group_team": {
+          "precision": 0.89171974522293,
+          "recall": 0.9395973154362416,
+          "f1": 0.9150326797385622,
+          "support": 149
+        },
+        "nam_org_institution": {
+          "precision": 0.5749235474006116,
+          "recall": 0.706766917293233,
+          "f1": 0.6340640809443507,
+          "support": 266
+        },
+        "nam_org_nation": {
+          "precision": 0.8194444444444444,
+          "recall": 0.7283950617283951,
+          "f1": 0.7712418300653595,
+          "support": 81
+        },
+        "nam_org_organization": {
+          "precision": 0.6204379562043796,
+          "recall": 0.6910569105691057,
+          "f1": 0.6538461538461539,
+          "support": 246
+        },
+        "nam_org_organization_sub": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "nam_org_political_party": {
+          "precision": 0.873015873015873,
+          "recall": 0.9482758620689655,
+          "f1": 0.9090909090909091,
+          "support": 58
+        },
+        "nam_oth": {
+          "precision": 0.30303030303030304,
+          "recall": 0.45454545454545453,
+          "f1": 0.36363636363636365,
+          "support": 22
+        },
+        "nam_oth_currency": {
+          "precision": 0.9148936170212766,
+          "recall": 0.8431372549019608,
+          "f1": 0.8775510204081632,
+          "support": 51
+        },
+        "nam_oth_data_format": {
+          "precision": 0.5,
+          "recall": 0.3,
+          "f1": 0.37499999999999994,
+          "support": 10
+        },
+        "nam_oth_license": {
+          "precision": 0.6666666666666666,
+          "recall": 0.9090909090909091,
+          "f1": 0.7692307692307692,
+          "support": 11
+        },
+        "nam_oth_position": {
+          "precision": 0.23076923076923078,
+          "recall": 0.3,
+          "f1": 0.2608695652173913,
+          "support": 10
+        },
+        "nam_oth_tech": {
+          "precision": 0.6029411764705882,
+          "recall": 0.6721311475409836,
+          "f1": 0.6356589147286822,
+          "support": 61
+        },
+        "nam_oth_www": {
+          "precision": 0.5,
+          "recall": 0.1,
+          "f1": 0.16666666666666669,
+          "support": 20
+        },
+        "nam_pro": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "nam_pro_award": {
+          "precision": 0.4,
+          "recall": 0.5217391304347826,
+          "f1": 0.4528301886792453,
+          "support": 23
+        },
+        "nam_pro_brand": {
+          "precision": 0.48214285714285715,
+          "recall": 0.5869565217391305,
+          "f1": 0.5294117647058824,
+          "support": 46
+        },
+        "nam_pro_media": {
+          "precision": 0.5,
+          "recall": 0.375,
+          "f1": 0.42857142857142855,
+          "support": 8
+        },
+        "nam_pro_media_periodic": {
+          "precision": 0.7216494845360825,
+          "recall": 0.8333333333333334,
+          "f1": 0.7734806629834253,
+          "support": 84
+        },
+        "nam_pro_media_radio": {
+          "precision": 0.4,
+          "recall": 0.6666666666666666,
+          "f1": 0.5,
+          "support": 3
+        },
+        "nam_pro_media_tv": {
+          "precision": 0.5,
+          "recall": 0.8571428571428571,
+          "f1": 0.631578947368421,
+          "support": 7
+        },
+        "nam_pro_media_web": {
+          "precision": 0.352112676056338,
+          "recall": 0.625,
+          "f1": 0.45045045045045046,
+          "support": 40
+        },
+        "nam_pro_model_car": {
+          "precision": 0.8148148148148148,
+          "recall": 0.8461538461538461,
+          "f1": 0.830188679245283,
+          "support": 26
+        },
+        "nam_pro_software": {
+          "precision": 0.6705882352941176,
+          "recall": 0.5876288659793815,
+          "f1": 0.6263736263736264,
+          "support": 97
+        },
+        "nam_pro_software_game": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "nam_pro_title": {
+          "precision": 0.38181818181818183,
+          "recall": 0.6,
+          "f1": 0.4666666666666667,
+          "support": 35
+        },
+        "nam_pro_title_album": {
+          "precision": 0.7142857142857143,
+          "recall": 0.7142857142857143,
+          "f1": 0.7142857142857143,
+          "support": 7
+        },
+        "nam_pro_title_book": {
+          "precision": 0.47058823529411764,
+          "recall": 0.7272727272727273,
+          "f1": 0.5714285714285714,
+          "support": 11
+        },
+        "nam_pro_title_document": {
+          "precision": 0.3248407643312102,
+          "recall": 0.5795454545454546,
+          "f1": 0.4163265306122449,
+          "support": 88
+        },
+        "nam_pro_title_song": {
+          "precision": 0.3333333333333333,
+          "recall": 0.42857142857142855,
+          "f1": 0.375,
+          "support": 7
+        },
+        "nam_pro_title_treaty": {
+          "precision": 0.2,
+          "recall": 0.5,
+          "f1": 0.28571428571428575,
+          "support": 2
+        },
+        "nam_pro_title_tv": {
+          "precision": 0.8823529411764706,
+          "recall": 0.625,
+          "f1": 0.7317073170731708,
+          "support": 24
+        },
+        "nam_pro_vehicle": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        }
+      }
+    }
+  ],
+  "metrics_avg": {
+    "accuracy": 0.9725295920524202,
+    "f1_macro": 0.5268384230503906,
+    "f1_micro": 0.765824631350898,
+    "f1_weighted": 0.7701545398444893,
+    "recall_macro": 0.5551542080130817,
+    "recall_micro": 0.7952595936794582,
+    "recall_weighted": 0.7952595936794582,
+    "precision_macro": 0.5307130379886154,
+    "precision_micro": 0.7384953714938993,
+    "precision_weighted": 0.7559856625191318,
+    "classes": {
+      "nam_adj": {
+        "precision": 0.5441486972147349,
+        "recall": 0.5615384615384615,
+        "f1": 0.5521904761904761,
+        "support": 52
+      },
+      "nam_adj_city": {
+        "precision": 0.8164126312963522,
+        "recall": 0.8476190476190476,
+        "f1": 0.8316093077166713,
+        "support": 42
+      },
+      "nam_adj_country": {
+        "precision": 0.7161912962750264,
+        "recall": 0.8120481927710843,
+        "f1": 0.7607974745786417,
+        "support": 166
+      },
+      "nam_adj_person": {
+        "precision": 0.9252747252747253,
+        "recall": 0.6333333333333333,
+        "f1": 0.7502224694104561,
+        "support": 18
+      },
+      "nam_eve": {
+        "precision": 0.861111111111111,
+        "recall": 0.9,
+        "f1": 0.8794117647058823,
+        "support": 8
+      },
+      "nam_eve_human": {
+        "precision": 0.36090406892070537,
+        "recall": 0.3974358974358974,
+        "f1": 0.3774408850735312,
+        "support": 78
+      },
+      "nam_eve_human_cultural": {
+        "precision": 0.2392527561005822,
+        "recall": 0.2909090909090909,
+        "f1": 0.26181632653061226,
+        "support": 22
+      },
+      "nam_eve_human_holiday": {
+        "precision": 0.5047319347319348,
+        "recall": 0.6444444444444444,
+        "f1": 0.5649305080884028,
+        "support": 9
+      },
+      "nam_eve_human_sport": {
+        "precision": 0.6303198593521174,
+        "recall": 0.730909090909091,
+        "f1": 0.6768091008460808,
+        "support": 55
+      },
+      "nam_fac_bridge": {
+        "precision": 0.16690476190476192,
+        "recall": 0.25,
+        "f1": 0.1985858585858586,
+        "support": 4
+      },
+      "nam_fac_goe": {
+        "precision": 0.515498607696937,
+        "recall": 0.628125,
+        "f1": 0.5658906966029984,
+        "support": 64
+      },
+      "nam_fac_goe_stop": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 4
+      },
+      "nam_fac_park": {
+        "precision": 0.6396825396825396,
+        "recall": 0.42,
+        "f1": 0.5018317853457172,
+        "support": 10
+      },
+      "nam_fac_road": {
+        "precision": 0.8470368633851695,
+        "recall": 0.9052631578947369,
+        "f1": 0.875097063476042,
+        "support": 95
+      },
+      "nam_fac_square": {
+        "precision": 0.2819047619047619,
+        "recall": 0.2333333333333333,
+        "f1": 0.2531934731934732,
+        "support": 6
+      },
+      "nam_fac_system": {
+        "precision": 0.4674242424242424,
+        "recall": 0.15384615384615385,
+        "f1": 0.22975982284805815,
+        "support": 26
+      },
+      "nam_liv_animal": {
+        "precision": 0.3333333333333333,
+        "recall": 0.05454545454545455,
+        "f1": 0.08763197586726999,
+        "support": 11
+      },
+      "nam_liv_character": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      },
+      "nam_liv_god": {
+        "precision": 0.6998701053153691,
+        "recall": 0.8514285714285714,
+        "f1": 0.7681351293609788,
+        "support": 35
+      },
+      "nam_liv_habitant": {
+        "precision": 0.36,
+        "recall": 0.2571428571428571,
+        "f1": 0.29836829836829837,
+        "support": 7
+      },
+      "nam_liv_person": {
+        "precision": 0.9352032823130554,
+        "recall": 0.9546891464699684,
+        "f1": 0.9448372531815932,
+        "support": 949
+      },
+      "nam_loc": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 4
+      },
+      "nam_loc_astronomical": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      },
+      "nam_loc_country_region": {
+        "precision": 0.1118483709273183,
+        "recall": 0.5,
+        "f1": 0.18245308924485126,
+        "support": 4
+      },
+      "nam_loc_gpe_admin1": {
+        "precision": 0.7934741667105163,
+        "recall": 0.86875,
+        "f1": 0.8288429679239951,
+        "support": 64
+      },
+      "nam_loc_gpe_admin2": {
+        "precision": 0.7875721875721876,
+        "recall": 0.8222222222222223,
+        "f1": 0.8043226788432268,
+        "support": 36
+      },
+      "nam_loc_gpe_admin3": {
+        "precision": 0.7625019775352001,
+        "recall": 0.723404255319149,
+        "f1": 0.7416035876207372,
+        "support": 47
+      },
+      "nam_loc_gpe_city": {
+        "precision": 0.8802337266113021,
+        "recall": 0.9080091533180777,
+        "f1": 0.8938875787916699,
+        "support": 437
+      },
+      "nam_loc_gpe_country": {
+        "precision": 0.9387116948092558,
+        "recall": 0.9602240896358544,
+        "f1": 0.9493251041213092,
+        "support": 357
+      },
+      "nam_loc_gpe_district": {
+        "precision": 0.3827637292464879,
+        "recall": 0.5888888888888889,
+        "f1": 0.4635548958161526,
+        "support": 18
+      },
+      "nam_loc_gpe_subdivision": {
+        "precision": 0.45896787423103214,
+        "recall": 0.35384615384615387,
+        "f1": 0.3993010586905129,
+        "support": 26
+      },
+      "nam_loc_historical_region": {
+        "precision": 0.6292595124174072,
+        "recall": 0.5363636363636364,
+        "f1": 0.5764994892277933,
+        "support": 22
+      },
+      "nam_loc_hydronym": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 1
+      },
+      "nam_loc_hydronym_lake": {
+        "precision": 0.30666666666666664,
+        "recall": 0.5,
+        "f1": 0.37047619047619046,
+        "support": 2
+      },
+      "nam_loc_hydronym_ocean": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 1
+      },
+      "nam_loc_hydronym_river": {
+        "precision": 0.9192322929171669,
+        "recall": 0.8862745098039215,
+        "f1": 0.9023263502820871,
+        "support": 51
+      },
+      "nam_loc_hydronym_sea": {
+        "precision": 0.9,
+        "recall": 1.0,
+        "f1": 0.9428571428571428,
+        "support": 3
+      },
+      "nam_loc_land": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 2
+      },
+      "nam_loc_land_continent": {
+        "precision": 0.929617022762184,
+        "recall": 0.9,
+        "f1": 0.9138980463980464,
+        "support": 32
+      },
+      "nam_loc_land_island": {
+        "precision": 0.6524242424242425,
+        "recall": 0.6,
+        "f1": 0.6197876509455457,
+        "support": 11
+      },
+      "nam_loc_land_mountain": {
+        "precision": 0.6888528138528138,
+        "recall": 0.6444444444444444,
+        "f1": 0.662156862745098,
+        "support": 9
+      },
+      "nam_loc_land_region": {
+        "precision": 0.4798968008255934,
+        "recall": 0.7090909090909091,
+        "f1": 0.5713390313390313,
+        "support": 11
+      },
+      "nam_num_house": {
+        "precision": 0.9192307692307692,
+        "recall": 1.0,
+        "f1": 0.9572463768115942,
+        "support": 11
+      },
+      "nam_num_phone": {
+        "precision": 0.7,
+        "recall": 0.5,
+        "f1": 0.5666666666666667,
+        "support": 2
+      },
+      "nam_org_company": {
+        "precision": 0.6456875654443939,
+        "recall": 0.7657894736842106,
+        "f1": 0.7004259034327797,
+        "support": 76
+      },
+      "nam_org_group": {
+        "precision": 0.5476190476190476,
+        "recall": 0.19999999999999998,
+        "f1": 0.29010722610722606,
+        "support": 18
+      },
+      "nam_org_group_band": {
+        "precision": 0.7391503267973856,
+        "recall": 0.7052631578947368,
+        "f1": 0.7213213213213213,
+        "support": 19
+      },
+      "nam_org_group_team": {
+        "precision": 0.89667658009785,
+        "recall": 0.9422818791946308,
+        "f1": 0.9188968578777238,
+        "support": 149
+      },
+      "nam_org_institution": {
+        "precision": 0.6091057777651777,
+        "recall": 0.7413533834586467,
+        "f1": 0.6686131271554715,
+        "support": 266
+      },
+      "nam_org_nation": {
+        "precision": 0.8207927927927928,
+        "recall": 0.7555555555555555,
+        "f1": 0.7865282274307932,
+        "support": 81
+      },
+      "nam_org_organization": {
+        "precision": 0.6360638765294573,
+        "recall": 0.6951219512195121,
+        "f1": 0.6641813991642999,
+        "support": 246
+      },
+      "nam_org_organization_sub": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 3
+      },
+      "nam_org_political_party": {
+        "precision": 0.8871891079717626,
+        "recall": 0.9482758620689655,
+        "f1": 0.9166921313980138,
+        "support": 58
+      },
+      "nam_oth": {
+        "precision": 0.335143875732111,
+        "recall": 0.44545454545454544,
+        "f1": 0.3812622271345676,
+        "support": 22
+      },
+      "nam_oth_currency": {
+        "precision": 0.9332127659574468,
+        "recall": 0.8784313725490196,
+        "f1": 0.9048770183140763,
+        "support": 51
+      },
+      "nam_oth_data_format": {
+        "precision": 0.6,
+        "recall": 0.26,
+        "f1": 0.3547619047619047,
+        "support": 10
+      },
+      "nam_oth_license": {
+        "precision": 0.6426282051282051,
+        "recall": 0.8727272727272727,
+        "f1": 0.7391737891737892,
+        "support": 11
+      },
+      "nam_oth_position": {
+        "precision": 0.3036907536907537,
+        "recall": 0.34,
+        "f1": 0.31921899610686794,
+        "support": 10
+      },
+      "nam_oth_tech": {
+        "precision": 0.6156120448179272,
+        "recall": 0.6983606557377049,
+        "f1": 0.653944355913855,
+        "support": 61
+      },
+      "nam_oth_www": {
+        "precision": 0.4666666666666667,
+        "recall": 0.08,
+        "f1": 0.1355731225296443,
+        "support": 20
+      },
+      "nam_pro": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 2
+      },
+      "nam_pro_award": {
+        "precision": 0.5475479432001171,
+        "recall": 0.608695652173913,
+        "f1": 0.5740319022878497,
+        "support": 23
+      },
+      "nam_pro_brand": {
+        "precision": 0.4635432409980825,
+        "recall": 0.5826086956521739,
+        "f1": 0.5159616560897111,
+        "support": 46
+      },
+      "nam_pro_media": {
+        "precision": 0.4166666666666667,
+        "recall": 0.25,
+        "f1": 0.30952380952380953,
+        "support": 8
+      },
+      "nam_pro_media_periodic": {
+        "precision": 0.7156112610507643,
+        "recall": 0.8071428571428572,
+        "f1": 0.7585453360346277,
+        "support": 84
+      },
+      "nam_pro_media_radio": {
+        "precision": 0.3066666666666667,
+        "recall": 0.5333333333333333,
+        "f1": 0.3888888888888889,
+        "support": 3
+      },
+      "nam_pro_media_tv": {
+        "precision": 0.5175757575757576,
+        "recall": 0.9142857142857143,
+        "f1": 0.6594364699627857,
+        "support": 7
+      },
+      "nam_pro_media_web": {
+        "precision": 0.3496268656716418,
+        "recall": 0.615,
+        "f1": 0.445742371209661,
+        "support": 40
+      },
+      "nam_pro_model_car": {
+        "precision": 0.8308603988603989,
+        "recall": 0.8461538461538461,
+        "f1": 0.8375094014383692,
+        "support": 26
+      },
+      "nam_pro_software": {
+        "precision": 0.6736538794776595,
+        "recall": 0.6041237113402061,
+        "f1": 0.6368884499237464,
+        "support": 97
+      },
+      "nam_pro_software_game": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 3
+      },
+      "nam_pro_title": {
+        "precision": 0.40554888845635534,
+        "recall": 0.5942857142857143,
+        "f1": 0.48161850020976305,
+        "support": 35
+      },
+      "nam_pro_title_album": {
+        "precision": 0.7634920634920636,
+        "recall": 0.7142857142857143,
+        "f1": 0.7312271062271062,
+        "support": 7
+      },
+      "nam_pro_title_article": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      },
+      "nam_pro_title_book": {
+        "precision": 0.5014050964515361,
+        "recall": 0.7272727272727273,
+        "f1": 0.5913227513227514,
+        "support": 11
+      },
+      "nam_pro_title_document": {
+        "precision": 0.3307535279398869,
+        "recall": 0.5772727272727273,
+        "f1": 0.42041807228432154,
+        "support": 88
+      },
+      "nam_pro_title_song": {
+        "precision": 0.5244444444444445,
+        "recall": 0.6285714285714286,
+        "f1": 0.5656108597285068,
+        "support": 7
+      },
+      "nam_pro_title_treaty": {
+        "precision": 0.17833333333333334,
+        "recall": 0.5,
+        "f1": 0.26142857142857145,
+        "support": 2
+      },
+      "nam_pro_title_tv": {
+        "precision": 0.7434505381099809,
+        "recall": 0.6083333333333333,
+        "f1": 0.6670778975231613,
+        "support": 24
+      },
+      "nam_pro_vehicle": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 4
+      }
+    }
+  },
+  "metrics_median": {
+    "accuracy": 0.9726273515113084,
+    "f1_macro": 0.5320634751335759,
+    "f1_micro": 0.768630003254149,
+    "f1_weighted": 0.7749539483382935,
+    "recall_macro": 0.5547654028117207,
+    "recall_micro": 0.7993227990970655,
+    "recall_weighted": 0.7993227990970655,
+    "precision_macro": 0.5269021810520838,
+    "precision_micro": 0.7398204217999582,
+    "precision_weighted": 0.7601070043973398,
+    "classes": {
+      "nam_adj": {
+        "precision": 0.5357142857142857,
+        "recall": 0.5576923076923077,
+        "f1": 0.5555555555555555
+      },
+      "nam_adj_city": {
+        "precision": 0.8181818181818182,
+        "recall": 0.8571428571428571,
+        "f1": 0.8372093023255814
+      },
+      "nam_adj_country": {
+        "precision": 0.7142857142857143,
+        "recall": 0.8192771084337349,
+        "f1": 0.7611111111111112
+      },
+      "nam_adj_person": {
+        "precision": 0.9230769230769231,
+        "recall": 0.6111111111111112,
+        "f1": 0.7586206896551725
+      },
+      "nam_eve": {
+        "precision": 0.8888888888888888,
+        "recall": 1.0,
+        "f1": 0.9411764705882353
+      },
+      "nam_eve_human": {
+        "precision": 0.3563218390804598,
+        "recall": 0.3974358974358974,
+        "f1": 0.37575757575757573
+      },
+      "nam_eve_human_cultural": {
+        "precision": 0.25,
+        "recall": 0.3181818181818182,
+        "f1": 0.28
+      },
+      "nam_eve_human_holiday": {
+        "precision": 0.5,
+        "recall": 0.6666666666666666,
+        "f1": 0.5714285714285715
+      },
+      "nam_eve_human_sport": {
+        "precision": 0.6349206349206349,
+        "recall": 0.7272727272727273,
+        "f1": 0.6779661016949152
+      },
+      "nam_fac_bridge": {
+        "precision": 0.16666666666666666,
+        "recall": 0.25,
+        "f1": 0.2
+      },
+      "nam_fac_goe": {
+        "precision": 0.5063291139240507,
+        "recall": 0.625,
+        "f1": 0.5594405594405595
+      },
+      "nam_fac_goe_stop": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_fac_park": {
+        "precision": 0.5555555555555556,
+        "recall": 0.5,
+        "f1": 0.5263157894736842
+      },
+      "nam_fac_road": {
+        "precision": 0.8415841584158416,
+        "recall": 0.8947368421052632,
+        "f1": 0.8673469387755102
+      },
+      "nam_fac_square": {
+        "precision": 0.2,
+        "recall": 0.16666666666666666,
+        "f1": 0.1818181818181818
+      },
+      "nam_fac_system": {
+        "precision": 0.5,
+        "recall": 0.11538461538461539,
+        "f1": 0.1875
+      },
+      "nam_liv_animal": {
+        "precision": 0.16666666666666666,
+        "recall": 0.09090909090909091,
+        "f1": 0.11764705882352942
+      },
+      "nam_liv_character": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_liv_god": {
+        "precision": 0.6976744186046512,
+        "recall": 0.8571428571428571,
+        "f1": 0.7692307692307693
+      },
+      "nam_liv_habitant": {
+        "precision": 0.4,
+        "recall": 0.2857142857142857,
+        "f1": 0.3333333333333333
+      },
+      "nam_liv_person": {
+        "precision": 0.9380804953560371,
+        "recall": 0.9546891464699684,
+        "f1": 0.9444444444444444
+      },
+      "nam_loc": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_loc_astronomical": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_loc_country_region": {
+        "precision": 0.13333333333333333,
+        "recall": 0.5,
+        "f1": 0.2105263157894737
+      },
+      "nam_loc_gpe_admin1": {
+        "precision": 0.7887323943661971,
+        "recall": 0.875,
+        "f1": 0.8296296296296297
+      },
+      "nam_loc_gpe_admin2": {
+        "precision": 0.7777777777777778,
+        "recall": 0.8333333333333334,
+        "f1": 0.8
+      },
+      "nam_loc_gpe_admin3": {
+        "precision": 0.7674418604651163,
+        "recall": 0.723404255319149,
+        "f1": 0.7333333333333334
+      },
+      "nam_loc_gpe_city": {
+        "precision": 0.8780487804878049,
+        "recall": 0.9061784897025171,
+        "f1": 0.8941441441441441
+      },
+      "nam_loc_gpe_country": {
+        "precision": 0.9368131868131868,
+        "recall": 0.9607843137254902,
+        "f1": 0.9483960948396095
+      },
+      "nam_loc_gpe_district": {
+        "precision": 0.3793103448275862,
+        "recall": 0.6111111111111112,
+        "f1": 0.46808510638297873
+      },
+      "nam_loc_gpe_subdivision": {
+        "precision": 0.45,
+        "recall": 0.34615384615384615,
+        "f1": 0.3913043478260869
+      },
+      "nam_loc_historical_region": {
+        "precision": 0.631578947368421,
+        "recall": 0.5454545454545454,
+        "f1": 0.5909090909090909
+      },
+      "nam_loc_hydronym": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_loc_hydronym_lake": {
+        "precision": 0.3333333333333333,
+        "recall": 0.5,
+        "f1": 0.4
+      },
+      "nam_loc_hydronym_ocean": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "nam_loc_hydronym_river": {
+        "precision": 0.9183673469387755,
+        "recall": 0.8823529411764706,
+        "f1": 0.9019607843137255
+      },
+      "nam_loc_hydronym_sea": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "nam_loc_land": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_loc_land_continent": {
+        "precision": 0.9354838709677419,
+        "recall": 0.90625,
+        "f1": 0.9206349206349206
+      },
+      "nam_loc_land_island": {
+        "precision": 0.6666666666666666,
+        "recall": 0.5454545454545454,
+        "f1": 0.6
+      },
+      "nam_loc_land_mountain": {
+        "precision": 0.6666666666666666,
+        "recall": 0.6666666666666666,
+        "f1": 0.6666666666666666
+      },
+      "nam_loc_land_region": {
+        "precision": 0.5,
+        "recall": 0.7272727272727273,
+        "f1": 0.5925925925925926
+      },
+      "nam_num_house": {
+        "precision": 0.9166666666666666,
+        "recall": 1.0,
+        "f1": 0.9565217391304348
+      },
+      "nam_num_phone": {
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "nam_org_company": {
+        "precision": 0.6373626373626373,
+        "recall": 0.7631578947368421,
+        "f1": 0.6946107784431138
+      },
+      "nam_org_group": {
+        "precision": 0.5,
+        "recall": 0.2222222222222222,
+        "f1": 0.30769230769230765
+      },
+      "nam_org_group_band": {
+        "precision": 0.7222222222222222,
+        "recall": 0.6842105263157895,
+        "f1": 0.7027027027027027
+      },
+      "nam_org_group_team": {
+        "precision": 0.9032258064516129,
+        "recall": 0.9395973154362416,
+        "f1": 0.9210526315789472
+      },
+      "nam_org_institution": {
+        "precision": 0.6141479099678456,
+        "recall": 0.7406015037593985,
+        "f1": 0.6711409395973154
+      },
+      "nam_org_nation": {
+        "precision": 0.8194444444444444,
+        "recall": 0.7530864197530864,
+        "f1": 0.7950310559006211
+      },
+      "nam_org_organization": {
+        "precision": 0.6342412451361867,
+        "recall": 0.6910569105691057,
+        "f1": 0.6538461538461539
+      },
+      "nam_org_organization_sub": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_org_political_party": {
+        "precision": 0.8870967741935484,
+        "recall": 0.9482758620689655,
+        "f1": 0.9166666666666667
+      },
+      "nam_oth": {
+        "precision": 0.32142857142857145,
+        "recall": 0.45454545454545453,
+        "f1": 0.36363636363636365
+      },
+      "nam_oth_currency": {
+        "precision": 0.9375,
+        "recall": 0.8823529411764706,
+        "f1": 0.9090909090909091
+      },
+      "nam_oth_data_format": {
+        "precision": 0.5,
+        "recall": 0.3,
+        "f1": 0.37499999999999994
+      },
+      "nam_oth_license": {
+        "precision": 0.6666666666666666,
+        "recall": 0.9090909090909091,
+        "f1": 0.7500000000000001
+      },
+      "nam_oth_position": {
+        "precision": 0.2727272727272727,
+        "recall": 0.3,
+        "f1": 0.28571428571428564
+      },
+      "nam_oth_tech": {
+        "precision": 0.6029411764705882,
+        "recall": 0.7049180327868853,
+        "f1": 0.6356589147286822
+      },
+      "nam_oth_www": {
+        "precision": 0.5,
+        "recall": 0.1,
+        "f1": 0.16666666666666669
+      },
+      "nam_pro": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_pro_award": {
+        "precision": 0.48148148148148145,
+        "recall": 0.5652173913043478,
+        "f1": 0.52
+      },
+      "nam_pro_brand": {
+        "precision": 0.48148148148148145,
+        "recall": 0.5869565217391305,
+        "f1": 0.52
+      },
+      "nam_pro_media": {
+        "precision": 0.5,
+        "recall": 0.25,
+        "f1": 0.3333333333333333
+      },
+      "nam_pro_media_periodic": {
+        "precision": 0.7127659574468085,
+        "recall": 0.7976190476190477,
+        "f1": 0.7528089887640449
+      },
+      "nam_pro_media_radio": {
+        "precision": 0.3333333333333333,
+        "recall": 0.6666666666666666,
+        "f1": 0.4444444444444444
+      },
+      "nam_pro_media_tv": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6363636363636364
+      },
+      "nam_pro_media_web": {
+        "precision": 0.352112676056338,
+        "recall": 0.625,
+        "f1": 0.45045045045045046
+      },
+      "nam_pro_model_car": {
+        "precision": 0.8461538461538461,
+        "recall": 0.8461538461538461,
+        "f1": 0.8461538461538461
+      },
+      "nam_pro_software": {
+        "precision": 0.6781609195402298,
+        "recall": 0.6082474226804123,
+        "f1": 0.6310160427807486
+      },
+      "nam_pro_software_game": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_pro_title": {
+        "precision": 0.3958333333333333,
+        "recall": 0.6,
+        "f1": 0.4666666666666667
+      },
+      "nam_pro_title_album": {
+        "precision": 0.7142857142857143,
+        "recall": 0.7142857142857143,
+        "f1": 0.7142857142857143
+      },
+      "nam_pro_title_article": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_pro_title_book": {
+        "precision": 0.5,
+        "recall": 0.7272727272727273,
+        "f1": 0.5925925925925926
+      },
+      "nam_pro_title_document": {
+        "precision": 0.33793103448275863,
+        "recall": 0.5795454545454546,
+        "f1": 0.42060085836909866
+      },
+      "nam_pro_title_song": {
+        "precision": 0.5,
+        "recall": 0.7142857142857143,
+        "f1": 0.588235294117647
+      },
+      "nam_pro_title_treaty": {
+        "precision": 0.2,
+        "recall": 0.5,
+        "f1": 0.28571428571428575
+      },
+      "nam_pro_title_tv": {
+        "precision": 0.7894736842105263,
+        "recall": 0.625,
+        "f1": 0.6976744186046512
+      },
+      "nam_pro_vehicle": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    }
+  },
+  "metrics_std": {
+    "accuracy": 0.0004426681456047096,
+    "f1_macro": 0.013916497429464764,
+    "f1_micro": 0.0067347371432164,
+    "f1_weighted": 0.006913583883946288,
+    "recall_macro": 0.014717381336375537,
+    "recall_micro": 0.00642449186038721,
+    "recall_weighted": 0.00642449186038721,
+    "precision_macro": 0.01766403788840351,
+    "precision_micro": 0.007242513546121645,
+    "precision_weighted": 0.007394257903578175,
+    "classes": {
+      "nam_adj": {
+        "precision": 0.037611309715097165,
+        "recall": 0.028523840334983293,
+        "f1": 0.027064658335227625
+      },
+      "nam_adj_city": {
+        "precision": 0.004835148408610452,
+        "recall": 0.027147033930931833,
+        "f1": 0.015616180809551898
+      },
+      "nam_adj_country": {
+        "precision": 0.020031902703698857,
+        "recall": 0.016716189066881472,
+        "f1": 0.007578640945122455
+      },
+      "nam_adj_person": {
+        "precision": 0.07428766497211241,
+        "recall": 0.030429030972509184,
+        "f1": 0.02428797753268568
+      },
+      "nam_eve": {
+        "precision": 0.14958791130929178,
+        "recall": 0.13693063937629152,
+        "f1": 0.14120710451950355
+      },
+      "nam_eve_human": {
+        "precision": 0.04571865469222249,
+        "recall": 0.009065471553673673,
+        "f1": 0.0285280435993707
+      },
+      "nam_eve_human_cultural": {
+        "precision": 0.05208935267378557,
+        "recall": 0.040655781409087086,
+        "f1": 0.046240276131948685
+      },
+      "nam_eve_human_holiday": {
+        "precision": 0.07137558065650977,
+        "recall": 0.0496903994999953,
+        "f1": 0.05909360145213086
+      },
+      "nam_eve_human_sport": {
+        "precision": 0.011922822141908197,
+        "recall": 0.008131156281817419,
+        "f1": 0.0062177094495109555
+      },
+      "nam_fac_bridge": {
+        "precision": 0.0336338494327426,
+        "recall": 0.0,
+        "f1": 0.024593418656215282
+      },
+      "nam_fac_goe": {
+        "precision": 0.033604170087992186,
+        "recall": 0.01711632992203644,
+        "f1": 0.024552976620652856
+      },
+      "nam_fac_goe_stop": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_fac_park": {
+        "precision": 0.2272392838262843,
+        "recall": 0.10954451150103323,
+        "f1": 0.13554545923003053
+      },
+      "nam_fac_road": {
+        "precision": 0.03619127636012797,
+        "recall": 0.02105263157894738,
+        "f1": 0.028638812674305823
+      },
+      "nam_fac_square": {
+        "precision": 0.15877221665028599,
+        "recall": 0.09128709291752768,
+        "f1": 0.1185337490870313
+      },
+      "nam_fac_system": {
+        "precision": 0.16020533197437942,
+        "recall": 0.07195494974565272,
+        "f1": 0.09865135039962099
+      },
+      "nam_liv_animal": {
+        "precision": 0.42491829279939874,
+        "recall": 0.04979295977319692,
+        "f1": 0.08199151070209992
+      },
+      "nam_liv_character": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_liv_god": {
+        "precision": 0.01895631630043396,
+        "recall": 0.012777531299998753,
+        "f1": 0.013730197780875262
+      },
+      "nam_liv_habitant": {
+        "precision": 0.10839741694339401,
+        "recall": 0.11952286093343935,
+        "f1": 0.11857220250218999
+      },
+      "nam_liv_person": {
+        "precision": 0.005696839186889456,
+        "recall": 0.003494862792787565,
+        "f1": 0.003558706618167179
+      },
+      "nam_loc": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_loc_astronomical": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_loc_country_region": {
+        "precision": 0.053063186210694474,
+        "recall": 0.25,
+        "f1": 0.08715150727090504
+      },
+      "nam_loc_gpe_admin1": {
+        "precision": 0.03176709883340214,
+        "recall": 0.017815241017174032,
+        "f1": 0.011268530885412346
+      },
+      "nam_loc_gpe_admin2": {
+        "precision": 0.0214989123958866,
+        "recall": 0.024845199749997673,
+        "f1": 0.018447086713426923
+      },
+      "nam_loc_gpe_admin3": {
+        "precision": 0.06102476960276161,
+        "recall": 0.015044825131628652,
+        "f1": 0.03302457934450484
+      },
+      "nam_loc_gpe_city": {
+        "precision": 0.004435984297685748,
+        "recall": 0.007485321388465066,
+        "f1": 0.004066538174470464
+      },
+      "nam_loc_gpe_country": {
+        "precision": 0.007370871748409273,
+        "recall": 0.00638753739551339,
+        "f1": 0.0048020384277084075
+      },
+      "nam_loc_gpe_district": {
+        "precision": 0.049114232354232956,
+        "recall": 0.06334307917217433,
+        "f1": 0.05339970241301206
+      },
+      "nam_loc_gpe_subdivision": {
+        "precision": 0.07858771082248052,
+        "recall": 0.04213250442347431,
+        "f1": 0.05636615704758853
+      },
+      "nam_loc_historical_region": {
+        "precision": 0.07878212058396941,
+        "recall": 0.03803000120609435,
+        "f1": 0.03665473389405955
+      },
+      "nam_loc_hydronym": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_loc_hydronym_lake": {
+        "precision": 0.2126551721031544,
+        "recall": 0.3535533905932738,
+        "f1": 0.24990701218499056
+      },
+      "nam_loc_hydronym_ocean": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_loc_hydronym_river": {
+        "precision": 0.030417209077319797,
+        "recall": 0.01640509855949167,
+        "f1": 0.020868244171234562
+      },
+      "nam_loc_hydronym_sea": {
+        "precision": 0.13693063937629152,
+        "recall": 0.0,
+        "f1": 0.07824607964359519
+      },
+      "nam_loc_land": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_loc_land_continent": {
+        "precision": 0.03215107055918832,
+        "recall": 0.051348989766109326,
+        "f1": 0.034569923207457644
+      },
+      "nam_loc_land_island": {
+        "precision": 0.1286255661671077,
+        "recall": 0.0813115628181742,
+        "f1": 0.08635368088013336
+      },
+      "nam_loc_land_mountain": {
+        "precision": 0.11957527690517027,
+        "recall": 0.0496903994999953,
+        "f1": 0.0688776950139481
+      },
+      "nam_loc_land_region": {
+        "precision": 0.05962315667094039,
+        "recall": 0.0406557814090871,
+        "f1": 0.052118689754932675
+      },
+      "nam_num_house": {
+        "precision": 0.05450602992174696,
+        "recall": 0.0,
+        "f1": 0.02947948638667826
+      },
+      "nam_num_phone": {
+        "precision": 0.27386127875258304,
+        "recall": 0.0,
+        "f1": 0.09128709291752767
+      },
+      "nam_org_company": {
+        "precision": 0.020062650606230994,
+        "recall": 0.019516311808146496,
+        "f1": 0.01513396022910308
+      },
+      "nam_org_group": {
+        "precision": 0.07338588098772589,
+        "recall": 0.049690399499995326,
+        "f1": 0.061455393536023285
+      },
+      "nam_org_group_band": {
+        "precision": 0.06544618431631602,
+        "recall": 0.028827503026587657,
+        "f1": 0.04506506061814787
+      },
+      "nam_org_group_team": {
+        "precision": 0.018338139280260592,
+        "recall": 0.012191880620526794,
+        "f1": 0.015209003912296367
+      },
+      "nam_org_institution": {
+        "precision": 0.02074334576401734,
+        "recall": 0.03227394891930039,
+        "f1": 0.023337242446665053
+      },
+      "nam_org_nation": {
+        "precision": 0.022658487000664564,
+        "recall": 0.028152479632077464,
+        "f1": 0.019421155759981285
+      },
+      "nam_org_organization": {
+        "precision": 0.01775567633210734,
+        "recall": 0.03055548044384735,
+        "f1": 0.022490838495307062
+      },
+      "nam_org_organization_sub": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_org_political_party": {
+        "precision": 0.010120715075364859,
+        "recall": 0.0,
+        "f1": 0.005401997803089166
+      },
+      "nam_oth": {
+        "precision": 0.04356837901829746,
+        "recall": 0.020327890704543525,
+        "f1": 0.030229979994272873
+      },
+      "nam_oth_currency": {
+        "precision": 0.010333985276629761,
+        "recall": 0.029083131321943748,
+        "f1": 0.01934262674439901
+      },
+      "nam_oth_data_format": {
+        "precision": 0.13693063937629152,
+        "recall": 0.08944271909999157,
+        "f1": 0.1085065334459336
+      },
+      "nam_oth_license": {
+        "precision": 0.05087983290508827,
+        "recall": 0.04979295977319688,
+        "f1": 0.04237861811285557
+      },
+      "nam_oth_position": {
+        "precision": 0.12379907929250217,
+        "recall": 0.11401754250991379,
+        "f1": 0.11653795652052006
+      },
+      "nam_oth_tech": {
+        "precision": 0.04521542899393614,
+        "recall": 0.02486188670180839,
+        "f1": 0.03319189601260426
+      },
+      "nam_oth_www": {
+        "precision": 0.07453559924999299,
+        "recall": 0.027386127875258306,
+        "f1": 0.04259951600085635
+      },
+      "nam_pro": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_pro_award": {
+        "precision": 0.15282016488232222,
+        "recall": 0.08134037797334656,
+        "f1": 0.12057990333562638
+      },
+      "nam_pro_brand": {
+        "precision": 0.03995356499704711,
+        "recall": 0.03224434124824204,
+        "f1": 0.03550918802122888
+      },
+      "nam_pro_media": {
+        "precision": 0.27638539919628335,
+        "recall": 0.15309310892394862,
+        "f1": 0.19195851781663212
+      },
+      "nam_pro_media_periodic": {
+        "precision": 0.03541087931908618,
+        "recall": 0.030814712156059007,
+        "f1": 0.032551111779805006
+      },
+      "nam_pro_media_radio": {
+        "precision": 0.10110500592068734,
+        "recall": 0.18257418583505536,
+        "f1": 0.1288002568818848
+      },
+      "nam_pro_media_tv": {
+        "precision": 0.062292815457864706,
+        "recall": 0.12777531299998798,
+        "f1": 0.07759334112212897
+      },
+      "nam_pro_media_web": {
+        "precision": 0.025108912289493305,
+        "recall": 0.04183300132670381,
+        "f1": 0.030717793556920697
+      },
+      "nam_pro_model_car": {
+        "precision": 0.06089392335882144,
+        "recall": 0.0,
+        "f1": 0.031955962575857574
+      },
+      "nam_pro_software": {
+        "precision": 0.011393597109562843,
+        "recall": 0.017250722196578857,
+        "f1": 0.01200290849890591
+      },
+      "nam_pro_software_game": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_pro_title": {
+        "precision": 0.02987397303985059,
+        "recall": 0.042378277069118085,
+        "f1": 0.030408889776309973
+      },
+      "nam_pro_title_album": {
+        "precision": 0.16499539989159318,
+        "recall": 0.0,
+        "f1": 0.07701976959646951
+      },
+      "nam_pro_title_article": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "nam_pro_title_book": {
+        "precision": 0.07141686927993386,
+        "recall": 0.0,
+        "f1": 0.04857592398880773
+      },
+      "nam_pro_title_document": {
+        "precision": 0.01768854184130828,
+        "recall": 0.02032789070454358,
+        "f1": 0.018377918486718704
+      },
+      "nam_pro_title_song": {
+        "precision": 0.19299459469178643,
+        "recall": 0.127775312999988,
+        "f1": 0.15071645693168728
+      },
+      "nam_pro_title_treaty": {
+        "precision": 0.03312434485725299,
+        "recall": 0.0,
+        "f1": 0.03766121807561164
+      },
+      "nam_pro_title_tv": {
+        "precision": 0.12757101478684563,
+        "recall": 0.03726779962499651,
+        "f1": 0.07378584215774324
+      },
+      "nam_pro_vehicle": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    }
+  },
+  "averaged_over": 5
+}

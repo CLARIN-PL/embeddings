@@ -1,0 +1,7 @@
+main.container{
+    max-width: 100%;
+}
+
+.modal-backdrop.show {
+    z-index: -1;
+}
