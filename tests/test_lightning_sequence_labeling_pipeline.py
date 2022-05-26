@@ -87,6 +87,11 @@ def lightning_sequence_labeling_pipeline(
         output_path=tmp_path_module,
         embedding_name_or_path="allegro/herbert-base-cased",
         config=config,
+        model_checkpoint_kwargs={
+            "filename": "last",
+            "monitor": None,
+            "save_last": False,
+        },
         **dataset_kwargs,
     )
 

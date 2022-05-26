@@ -20,10 +20,17 @@ class TextClassificationTask(LightningTask):
         task_model_kwargs: Dict[str, Any],
         task_train_kwargs: Dict[str, Any],
         early_stopping_kwargs: Dict[str, Any],
+        model_checkpoint_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
         finetune_last_n_layers: int = -1,
     ) -> None:
-        super().__init__(output_path, task_train_kwargs, early_stopping_kwargs, logging_config)
+        super().__init__(
+            output_path,
+            task_train_kwargs,
+            early_stopping_kwargs,
+            model_checkpoint_kwargs,
+            logging_config,
+        )
         self.model_name_or_path = model_name_or_path
         self.num_classes = num_classes
         self.model_config_kwargs = model_config_kwargs

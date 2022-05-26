@@ -90,6 +90,11 @@ def lightning_classification_pipeline(
         config=config,
         devices="auto",
         accelerator="cpu",
+        model_checkpoint_kwargs={
+            "filename": "last",
+            "monitor": None,
+            "save_last": False,
+        },
         **dataset_kwargs,
     )
 
