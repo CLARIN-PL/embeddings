@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
 
+import pandas as pd
 from sklearn.base import ClassifierMixin as AnySklearnClassifier
 
 from embeddings.embedding.sklearn_embedding import SklearnEmbedding
@@ -36,8 +37,10 @@ class TextClassification(SklearnTask):
         predict_subset: str = "test",
     ) -> Predictions:
         predictions = self.classifier.predict(self.embedding.embed(data[predict_subset]["x"]))
-        model_result = Predictions(y_pred=predictions, y_true=data[predict_subset]["y"].values)
-        return model_result
+        y_true = data[predict_subset]["y"]
+        if isinstance(y_true, pd.Series):
+            y_true = y_true.values
+        return Predictions(y_pred=predictions, y_true=y_true)
 
     def fit_predict(
         self,
