@@ -4,6 +4,7 @@ from typing import Optional
 import typer
 
 from embeddings.config.lighting_config_space import LightingTextClassificationConfigSpace
+from embeddings.config.parameters import ConstantParameter
 from embeddings.defaults import RESULTS_PATH
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.pipeline.lightning_hps_pipeline import OptimizedLightingClassificationPipeline
@@ -49,6 +50,8 @@ def run(
     output_path = build_output_path(root, embedding_name_or_path, dataset_name)
     config_space = LightingTextClassificationConfigSpace(
         embedding_name_or_path=embedding_name_or_path,
+        finetune_last_n_layers=ConstantParameter("finetune_last_n_layers", 0),
+        max_epochs=ConstantParameter("max_epochs", 1),
     )
     pipeline = OptimizedLightingClassificationPipeline(
         config_space=config_space,
@@ -68,8 +71,8 @@ def run(
 
     for i in range(n_retrains):
         retrain_run_name = f"best-params-retrain-{run_name}-{i}"
-        assert isinstance(metadata["output_path"], Path)
         metadata["output_path"] = output_path / standardize_name(retrain_run_name)
+        assert isinstance(metadata["output_path"], Path)
         metadata["output_path"].mkdir()
         retrain_pipeline = LightningClassificationPipeline(
             logging_config=logging_config,
