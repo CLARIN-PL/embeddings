@@ -1,6 +1,5 @@
 import json
 import tempfile
-import zipfile
 from abc import ABC
 from dataclasses import asdict, dataclass
 from io import TextIOWrapper
@@ -18,7 +17,7 @@ from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.utils.json_dict_persister import CustomJsonEncoder
-from embeddings.utils.utils import standardize_name
+from embeddings.utils.utils import compress_and_remove, standardize_name
 
 
 @dataclass
@@ -29,29 +28,44 @@ class _BaseSubmission(ABC):
     embedding_name: str
     hparams: Dict[str, Any]
     packages: List[str]
+    predictions: Union[Predictions, List[Predictions]]
     config: Optional[Dict[str, Any]]  # any additional config
 
+    def __post_init__(self) -> None:
+        self.submission_name = standardize_name(self.submission_name)
+
     def save_json(
-        self, root: T_path = ".", filename: Optional[str] = None, compress: bool = True
+        self,
+        root: T_path = ".",
+        filename: Optional[str] = None,
+        pred_filename: Optional[str] = None,
+        compress: bool = True,
     ) -> None:
         root = Path(root)
         root.mkdir(parents=True, exist_ok=True)
-        filename = filename if filename else f"{standardize_name(self.submission_name)}.json"
-        file_path = root.joinpath(filename)
-        with open(file_path, "w") as f:
-            json.dump(self, f, cls=CustomJsonEncoder, indent=2)
+        filename = filename if filename else f"{self.submission_name}.json"
+        with open(root.joinpath(filename), "w") as f:
+            json.dump(self.without_predictions(), f, cls=CustomJsonEncoder, indent=2)
+
+        pred_filename = (
+            pred_filename if pred_filename else f"{self.submission_name}_predictions.json"
+        )
+        with open(root.joinpath(pred_filename), "w") as f:
+            json.dump(self.predictions, f, cls=CustomJsonEncoder, indent=2)
         if compress:
-            with zipfile.ZipFile(
-                root.joinpath(f"{filename}.zip"), mode="w", compression=zipfile.ZIP_DEFLATED
-            ) as arc:
-                arc.write(root.joinpath(filename), arcname=filename)
-            root.joinpath(filename).unlink()
+            compress_and_remove(root.joinpath(filename))
+            compress_and_remove(root.joinpath(pred_filename))
+
+    def without_predictions(self) -> Dict[str, Any]:
+        result = asdict(self)
+        result.pop("predictions")
+        return result
 
 
 @dataclass
 class Submission(_BaseSubmission):
-    metrics: Dict[str, Any]
     predictions: Predictions
+    metrics: Dict[str, Any]
 
     @staticmethod
     def _get_evaluator_kwargs(hparams: Dict[str, Any]) -> Dict[str, Any]:
@@ -218,13 +232,14 @@ class AveragedSubmission(_BaseSubmission):
     def from_wandb(
         cls,
         submission_name: str,
-        runs: Sequence[Run],
+        retrain_runs: Sequence[Run],
         hps_summary_run: Run,
         task: str,
         root: Optional[T_path] = None,
     ) -> "AveragedSubmission":
         submissions = [
-            Submission.from_wandb(submission_name, run, hps_summary_run, task, root) for run in runs
+            Submission.from_wandb(submission_name, run, hps_summary_run, task, root)
+            for run in retrain_runs
         ]
         return cls.from_submissions(submissions)
 

@@ -2,6 +2,7 @@ import copy
 import importlib
 import os.path
 import pprint
+import zipfile
 from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -142,3 +143,12 @@ def download_file(url: str, chunk_size: int = 1024) -> Tuple[Any, str]:
 
 def get_installed_packages() -> List[str]:
     return sorted([f"{p.key}=={p.version}" for p in pkg_resources.working_set])
+
+
+def compress_and_remove(filepath: T_path) -> None:
+    filepath = Path(filepath)
+    with zipfile.ZipFile(
+        filepath.with_name(filepath.name + ".zip"), mode="w", compression=zipfile.ZIP_DEFLATED
+    ) as arc:
+        arc.write(filepath, arcname=filepath.name)
+    filepath.unlink()
