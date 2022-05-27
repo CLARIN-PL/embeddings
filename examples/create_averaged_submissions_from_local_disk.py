@@ -38,7 +38,7 @@ def run(
         task=task,
         evaluation_file_paths=evaluation_file_paths_,
         packages_file_paths=packages_file_paths_,
-        wandb_config_file_paths=wandb_log_dirs_,
+        wandb_config_paths=wandb_log_dirs_,
         best_params_path=best_params_path,
     )
     submission.save_json(SUBMISSIONS_PATH / submission_name)
