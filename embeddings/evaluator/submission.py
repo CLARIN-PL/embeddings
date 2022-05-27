@@ -5,7 +5,8 @@ from abc import ABC
 from dataclasses import asdict, dataclass
 from io import TextIOWrapper
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Type, Union
+from statistics import mean, median, stdev
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
 
 import numpy as np
 import srsly
@@ -26,7 +27,6 @@ class _BaseSubmission(ABC):
     dataset_name: str
     dataset_version: str
     embedding_name: str
-    metrics: Dict[str, Any]
     hparams: Dict[str, Any]
     packages: List[str]
     config: Optional[Dict[str, Any]]  # any additional config
@@ -50,6 +50,7 @@ class _BaseSubmission(ABC):
 
 @dataclass
 class Submission(_BaseSubmission):
+    metrics: Dict[str, Any]
     predictions: Predictions
 
     @staticmethod
@@ -178,6 +179,10 @@ class Submission(_BaseSubmission):
 
 @dataclass
 class AveragedSubmission(_BaseSubmission):
+    metrics: List[Dict[str, Any]]
+    metrics_avg: Dict[str, Any]
+    metrics_median: Dict[str, Any]
+    metrics_std: Dict[str, Any]
     predictions: List[Predictions]
     averaged_over: int
 
@@ -226,28 +231,38 @@ class AveragedSubmission(_BaseSubmission):
     @classmethod
     def from_submissions(cls, submissions: Sequence[Submission]) -> "AveragedSubmission":
         cls._check_equal_submissions_dicts([asdict(submission) for submission in submissions])
-        metrics = cls._average_metrics_dicts([submission.metrics for submission in submissions])
+        metrics = [submission.metrics for submission in submissions]
+        metrics_avg, metrics_median, metrics_std = cls._aggregate_metrics_dicts(metrics)
         predictions = [submission.predictions for submission in submissions]
         return AveragedSubmission(
             predictions=predictions,
             metrics=metrics,
+            metrics_avg=metrics_avg,
+            metrics_median=metrics_median,
+            metrics_std=metrics_std,
             averaged_over=len(submissions),
             **cls._get_common_fields(submissions[0]),
         )
 
     @classmethod
-    def _average_metrics_dicts(cls, dicts: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
-        avg_dict = dict()
+    def _aggregate_metrics_dicts(
+        cls, dicts: Sequence[Dict[str, Any]]
+    ) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+        avg_dict, median_dict, std_dict = dict(), dict(), dict()
         for k in dicts[0].keys():
             if k in {"support"}:
                 if not all(d[k] == dicts[0][k] for d in dicts):
-                    raise ValueError(f"During averaging dict values of key '{k}' were not equal.")
+                    raise ValueError(f"During aggregating dict values of key '{k}' were not equal.")
                 avg_dict[k] = dicts[0][k]
             elif isinstance(dicts[0][k], (int, float)):
-                avg_dict[k] = sum(d[k] for d in dicts) / len(dicts)
+                avg_dict[k] = mean(d[k] for d in dicts)
+                median_dict[k] = median(d[k] for d in dicts)
+                std_dict[k] = stdev(d[k] for d in dicts)
             elif isinstance(dicts[0][k], dict):
-                avg_dict[k] = cls._average_metrics_dicts([d[k] for d in dicts])
-        return avg_dict
+                avg_dict[k], median_dict[k], std_dict[k] = cls._aggregate_metrics_dicts(
+                    [d[k] for d in dicts]
+                )
+        return avg_dict, median_dict, std_dict
 
     @classmethod
     def _check_equal_submissions_dicts(cls, dicts: Sequence[Dict[str, Any]]) -> None:
