@@ -21,8 +21,8 @@ def run(
     packages_file_paths: List[Path] = typer.Option(
         ..., dir_okay=False, file_okay=True, exists=True, help="Packages file path"
     ),
-    wandb_log_dirs: List[Path] = typer.Option(
-        ..., dir_okay=True, file_okay=False, exists=True, help="Wandb log dir"
+    wandb_config_file_paths: List[Path] = typer.Option(
+        ..., dir_okay=True, file_okay=False, exists=True, help="Wandb config file path"
     ),
     best_params_path: Path = typer.Option(..., help="Best parameters path"),
 ) -> None:
@@ -31,14 +31,14 @@ def run(
 
     evaluation_file_paths_: List[T_path] = list(evaluation_file_paths)
     packages_file_paths_: List[T_path] = list(packages_file_paths)
-    wandb_log_dirs_: List[T_path] = list(wandb_log_dirs)
+    wandb_log_dirs_: List[T_path] = list(wandb_config_file_paths)
 
     submission = AveragedSubmission.from_local_disk(
         submission_name=submission_name,
         task=task,
         evaluation_file_paths=evaluation_file_paths_,
         packages_file_paths=packages_file_paths_,
-        wandb_log_dirs=wandb_log_dirs_,
+        wandb_config_file_paths=wandb_log_dirs_,
         best_params_path=best_params_path,
     )
     submission.save_json(SUBMISSIONS_PATH / submission_name)

@@ -73,14 +73,16 @@ class Submission(_BaseSubmission):
         submission_name: str,
         evaluation_file_path: T_path,
         packages_file_path: T_path,
-        wandb_log_dir: T_path,
+        wandb_config_file_path: T_path,
         best_params_path: T_path,
         task: str,
     ) -> "Submission":
-        [wandb_run_dir] = list(Path(wandb_log_dir).glob("run*"))
-        wandb_config_path = Path(wandb_run_dir) / "files" / "config.yaml"
+        wandb_config_file_path = Path(wandb_config_file_path)
+        if wandb_config_file_path.is_dir():
+            [wandb_run_dir] = list(wandb_config_file_path.glob("run*"))
+            wandb_config_file_path = Path(wandb_run_dir) / "files" / "config.yaml"
 
-        with wandb_config_path.open() as f:
+        with wandb_config_file_path.open() as f:
             wandb_cfg = yaml.load(f, Loader=yaml.Loader)
         with Path(evaluation_file_path).open() as f:
             evaluation_json = f.read()
@@ -185,22 +187,24 @@ class AveragedSubmission(_BaseSubmission):
         submission_name: str,
         evaluation_file_paths: List[T_path],
         packages_file_paths: List[T_path],
-        wandb_log_dirs: List[T_path],
+        wandb_config_file_paths: List[T_path],
         best_params_path: T_path,
         task: str,
     ) -> "AveragedSubmission":
-        assert len(evaluation_file_paths) == len(packages_file_paths) == len(wandb_log_dirs)
+        assert (
+            len(evaluation_file_paths) == len(packages_file_paths) == len(wandb_config_file_paths)
+        )
         submissions = [
             Submission.from_local_disk(
                 submission_name,
                 evaluation_file_path,
                 packages_file_path,
-                wandb_log_dir,
+                wandb_config_file_path,
                 best_params_path,
                 task,
             )
-            for evaluation_file_path, packages_file_path, wandb_log_dir in zip(
-                evaluation_file_paths, packages_file_paths, wandb_log_dirs
+            for evaluation_file_path, packages_file_path, wandb_config_file_path in zip(
+                evaluation_file_paths, packages_file_paths, wandb_config_file_paths
             )
         ]
         return cls.from_submissions(submissions)
