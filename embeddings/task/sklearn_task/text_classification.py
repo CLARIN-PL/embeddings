@@ -40,8 +40,7 @@ class TextClassification(SklearnTask):
         y_true = data[predict_subset]["y"]
         if isinstance(y_true, pd.Series):
             y_true = y_true.values
-        model_result = Predictions(y_pred=predictions, y_true=y_true)
-        return model_result
+        return Predictions(y_pred=predictions, y_true=y_true)
 
     def fit_predict(
         self,
