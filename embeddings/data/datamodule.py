@@ -60,8 +60,6 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         dataloader_kwargs: Optional[Dict[str, Any]] = None,
         seed: int = 441,
     ) -> None:
-        self.num_classes: Optional[int] = None
-        self.target_names: Optional[List[str]] = None
         self.has_setup = False
         self.dataset_name_or_path = dataset_name_or_path
         self.tokenizer_name_or_path = tokenizer_name_or_path
@@ -233,7 +231,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         self.target_names = self.dataset["train"].features[self.target_field].names
 
     def _class_encode_column(self, column_name: str) -> None:
-        if self.num_classes is None and self.target_names is None:
+        if not hasattr(self, "num_classes") or not hasattr(self, "target_names"):
             self.dataset = self.dataset.class_encode_column(column_name)
         else:
             new_features = self.dataset["train"].features.copy()
