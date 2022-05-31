@@ -231,11 +231,14 @@ class TextClassificationDataModule(HuggingFaceDataModule):
         self.target_names = self.dataset["train"].features[self.target_field].names
 
     def _class_encode_column(self, column_name: str) -> None:
-        new_features = self.dataset["train"].features.copy()
-        new_features[column_name] = ClassLabel(
-            num_classes=self.num_classes, names=self.target_names
-        )
-        self.dataset = self.dataset.cast(new_features)
+        if not hasattr(self, "num_classes") or not hasattr(self, "target_names"):
+            self.dataset = self.dataset.class_encode_column(column_name)
+        else:
+            new_features = self.dataset["train"].features.copy()
+            new_features[column_name] = ClassLabel(
+                num_classes=self.num_classes, names=self.target_names
+            )
+            self.dataset = self.dataset.cast(new_features)
 
     def convert_to_features(
         self, example_batch: Dict[str, Any], indices: Optional[List[int]] = None
