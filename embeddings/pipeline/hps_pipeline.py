@@ -22,6 +22,7 @@ from embeddings.pipeline.pipelines_metadata import EvaluationMetadata, Metadata
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
 from embeddings.pipeline.standard_pipeline import LoaderResult, ModelResult, TransformationResult
 from embeddings.utils.hps_persister import HPSResultsPersister
+from embeddings.utils.loggers import LightningLoggingConfig
 from embeddings.utils.utils import standardize_name
 
 EvaluationResult = TypeVar("EvaluationResult", bound=EvaluationResults)
@@ -53,18 +54,32 @@ class OptimizedPipeline(ABC, Generic[Metadata]):
         pass
 
     def persisting(
-        self, best_params_path: T_path, log_path: T_path
+        self,
+        best_params_path: T_path,
+        log_path: T_path,
+        logging_config: LightningLoggingConfig = LightningLoggingConfig(),
+        logging_hps_summary_name: Optional[str] = None,
     ) -> "PersistingPipeline[Metadata]":
-        return PersistingPipeline(self, best_params_path, log_path)
+        return PersistingPipeline(
+            self, best_params_path, log_path, logging_config, logging_hps_summary_name
+        )
 
 
 class PersistingPipeline(OptimizedPipeline[Metadata]):
     def __init__(
-        self, base_pipeline: OptimizedPipeline[Metadata], best_params_path: T_path, log_path: T_path
+        self,
+        base_pipeline: OptimizedPipeline[Metadata],
+        best_params_path: T_path,
+        log_path: T_path,
+        logging_config: LightningLoggingConfig = LightningLoggingConfig(),
+        logging_hps_summary_name: Optional[str] = None,
     ):
         self.base_pipeline = base_pipeline
         self.persister: HPSResultsPersister[Metadata] = HPSResultsPersister(
-            best_params_path=best_params_path, log_path=log_path
+            best_params_path=best_params_path,
+            log_path=log_path,
+            logging_config=logging_config,
+            logging_hps_summary_name=logging_hps_summary_name,
         )
 
     def run(self, **kwargs: Any) -> Tuple[pd.DataFrame, Metadata]:
