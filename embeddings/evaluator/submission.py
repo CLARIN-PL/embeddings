@@ -273,7 +273,7 @@ class AveragedSubmission(_BaseSubmission):
                 std_dict[k] = stdev(d[k] for d in dicts)
             elif isinstance(dicts[0][k], dict):
                 avg_dict[k], median_dict[k], std_dict[k] = cls._aggregate_metrics_dicts(
-                    [d[k] for d in dicts]
+                    [d[k] for d in dicts if k in d]
                 )
         return avg_dict, median_dict, std_dict
 
