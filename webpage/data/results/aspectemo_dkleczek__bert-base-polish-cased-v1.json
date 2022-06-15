@@ -1,0 +1,1052 @@
+{
+  "submission_name": "aspectemo_dkleczek__bert-base-polish-cased-v1",
+  "dataset_name": {
+    "desc": null,
+    "value": "data/datasets/aspectemo/lightning/"
+  },
+  "dataset_version": {
+    "desc": null,
+    "value": "1.0.0"
+  },
+  "embedding_name": {
+    "desc": null,
+    "value": "dkleczek/bert-base-polish-cased-v1"
+  },
+  "hparams": {
+    "finetune_last_n_layers": 4,
+    "task_model_kwargs": {
+      "adam_epsilon": 1e-05,
+      "eval_batch_size": 16,
+      "learning_rate": 5e-05,
+      "optimizer": "Adam",
+      "train_batch_size": 16,
+      "use_scheduler": true,
+      "warmup_steps": 50,
+      "weight_decay": 0.0001
+    },
+    "datamodule_kwargs": {
+      "label_all_tokens": false,
+      "max_seq_length": 512
+    },
+    "task_train_kwargs": {
+      "max_epochs": 15
+    },
+    "model_config_kwargs": {
+      "classifier_dropout": 0.1
+    },
+    "early_stopping_kwargs": {
+      "mode": "min",
+      "monitor": "val/Loss",
+      "patience": 3
+    },
+    "tokenizer_kwargs": {},
+    "batch_encoding_kwargs": {},
+    "dataloader_kwargs": {}
+  },
+  "packages": [
+    "absl-py==1.0.0",
+    "aiobotocore==2.3.2",
+    "aiohttp-retry==2.4.6",
+    "aiohttp==3.8.1",
+    "aioitertools==0.8.0",
+    "aiosignal==1.2.0",
+    "alembic==1.4.1",
+    "appdirs==1.4.4",
+    "argon2-cffi-bindings==21.2.0",
+    "argon2-cffi==21.3.0",
+    "asttokens==2.0.5",
+    "async-timeout==4.0.2",
+    "asyncssh==2.10.1",
+    "atpublic==3.0.1",
+    "attrs==21.4.0",
+    "autopage==0.5.1",
+    "backcall==0.2.0",
+    "beautifulsoup4==4.11.1",
+    "black==21.10b0",
+    "bleach==5.0.0",
+    "boto3==1.21.21",
+    "botocore==1.24.21",
+    "bpemb==0.3.3",
+    "cachecontrol==0.12.11",
+    "cachetools==5.2.0",
+    "cachy==0.3.0",
+    "catalogue==2.0.7",
+    "certifi==2022.5.18.1",
+    "cffi==1.15.0",
+    "charset-normalizer==2.0.12",
+    "clarinpl-embeddings==0.0.1rc241317216295",
+    "cleo==0.8.1",
+    "click==8.0.4",
+    "cliff==3.10.1",
+    "clikit==0.6.2",
+    "cloudpickle==2.1.0",
+    "cmaes==0.8.2",
+    "cmd2==2.4.1",
+    "colorama==0.4.4",
+    "colorlog==6.6.0",
+    "commonmark==0.9.1",
+    "configobj==5.0.6",
+    "conllu==4.4.2",
+    "coverage==6.4",
+    "crashtest==0.3.1",
+    "cryptography==37.0.2",
+    "cycler==0.11.0",
+    "databricks-cli==0.16.6",
+    "datasets==2.2.2",
+    "debugpy==1.6.0",
+    "decorator==5.1.1",
+    "defusedxml==0.7.1",
+    "deprecated==1.2.13",
+    "dictdiffer==0.9.0",
+    "dill==0.3.4",
+    "diskcache==5.4.0",
+    "distlib==0.3.4",
+    "distro==1.7.0",
+    "docker-pycreds==0.4.0",
+    "docker==5.0.3",
+    "dpath==2.0.6",
+    "dulwich==0.20.42",
+    "dvc-render==0.0.4",
+    "dvc==2.10.1",
+    "entrypoints==0.4",
+    "executing==0.8.3",
+    "fastjsonschema==2.15.3",
+    "filelock==3.7.0",
+    "flair==0.10",
+    "flask==2.1.2",
+    "flatten-dict==0.4.2",
+    "flufl.lock==7.0",
+    "fonttools==4.33.3",
+    "frozenlist==1.3.0",
+    "fsspec==2022.5.0",
+    "ftfy==6.1.1",
+    "funcy==1.17",
+    "future==0.18.2",
+    "gdown==3.12.2",
+    "gensim==4.2.0",
+    "gitdb==4.0.9",
+    "gitpython==3.1.27",
+    "google-auth-oauthlib==0.4.6",
+    "google-auth==2.6.6",
+    "grandalf==0.6",
+    "greenlet==1.1.2",
+    "grpcio==1.46.3",
+    "gunicorn==20.1.0",
+    "html5lib==1.1",
+    "huggingface-hub==0.7.0",
+    "idna==3.3",
+    "importlib-metadata==3.10.1",
+    "iniconfig==1.1.1",
+    "ipykernel==6.13.0",
+    "ipython-genutils==0.2.0",
+    "ipython==8.4.0",
+    "ipywidgets==7.7.0",
+    "isort==5.10.1",
+    "itsdangerous==2.1.2",
+    "janome==0.4.2",
+    "jedi==0.18.1",
+    "jeepney==0.8.0",
+    "jinja2==3.1.2",
+    "jmespath==1.0.0",
+    "joblib==1.1.0",
+    "jsonschema==4.5.1",
+    "jupyter-client==7.3.1",
+    "jupyter-console==6.4.3",
+    "jupyter-core==4.10.0",
+    "jupyter==1.0.0",
+    "jupyterlab-pygments==0.2.2",
+    "jupyterlab-widgets==1.1.0",
+    "keyring==23.5.0",
+    "kiwisolver==1.4.2",
+    "konoha==4.6.5",
+    "langdetect==1.0.9",
+    "leaderboard==0.0.1",
+    "lockfile==0.12.2",
+    "lxml==4.8.0",
+    "mailchecker==4.1.17",
+    "mako==1.2.0",
+    "markdown==3.3.5",
+    "markupsafe==2.1.1",
+    "matplotlib-inline==0.1.3",
+    "matplotlib==3.5.2",
+    "mistune==0.8.4",
+    "mlflow==1.19.0",
+    "more-itertools==8.8.0",
+    "mpld3==0.3",
+    "msgpack==1.0.3",
+    "multidict==6.0.2",
+    "multiprocess==0.70.12.2",
+    "mypy-extensions==0.4.3",
+    "mypy==0.950",
+    "nanotime==0.5.2",
+    "nbclient==0.6.3",
+    "nbconvert==6.5.0",
+    "nbformat==5.4.0",
+    "nest-asyncio==1.5.5",
+    "networkx==2.8.2",
+    "notebook==6.4.11",
+    "numpy==1.22.4",
+    "oauthlib==3.2.0",
+    "optuna==2.10.0",
+    "overrides==3.1.0",
+    "packaging==21.3",
+    "pandas==1.4.2",
+    "pandocfilters==1.5.0",
+    "parso==0.8.3",
+    "pastel==0.2.1",
+    "pathspec==0.9.0",
+    "pathtools==0.1.2",
+    "pbr==5.9.0",
+    "pexpect==4.8.0",
+    "phonenumbers==8.12.49",
+    "pickleshare==0.7.5",
+    "pillow==9.1.1",
+    "pip==21.2.4",
+    "pkginfo==1.8.2",
+    "platformdirs==2.5.2",
+    "pluggy==1.0.0",
+    "poethepoet==0.11.0",
+    "poetry-core==1.0.8",
+    "poetry==1.1.13",
+    "prettytable==3.3.0",
+    "prometheus-client==0.14.1",
+    "prometheus-flask-exporter==0.20.1",
+    "promise==2.3",
+    "prompt-toolkit==3.0.29",
+    "protobuf==3.20.0",
+    "psutil==5.9.1",
+    "ptyprocess==0.7.0",
+    "pure-eval==0.2.2",
+    "py==1.11.0",
+    "pyarrow==8.0.0",
+    "pyasn1-modules==0.2.8",
+    "pyasn1==0.4.8",
+    "pycparser==2.21",
+    "pydantic==1.9.1",
+    "pydeprecate==0.3.1",
+    "pydot==1.4.2",
+    "pyflakes==2.4.0",
+    "pygit2==1.9.2",
+    "pygments==2.12.0",
+    "pygtrie==2.4.2",
+    "pyjwt==2.4.0",
+    "pylev==1.4.0",
+    "pyparsing==3.0.9",
+    "pyperclip==1.8.2",
+    "pyrsistent==0.18.1",
+    "pysocks==1.7.1",
+    "pytest==6.2.5",
+    "python-benedict==0.25.1",
+    "python-dateutil==2.8.2",
+    "python-editor==1.0.4",
+    "python-fsutil==0.6.1",
+    "python-slugify==6.1.2",
+    "pytorch-lightning==1.5.4",
+    "pytz==2022.1",
+    "pyyaml==6.0",
+    "pyzmq==23.0.0",
+    "qtconsole==5.3.0",
+    "qtpy==2.1.0",
+    "querystring-parser==1.2.4",
+    "regex==2022.4.24",
+    "requests-oauthlib==1.3.1",
+    "requests-toolbelt==0.9.1",
+    "requests==2.27.1",
+    "responses==0.18.0",
+    "rich==12.4.4",
+    "rsa==4.8",
+    "ruamel.yaml.clib==0.2.6",
+    "ruamel.yaml==0.17.21",
+    "s3fs==2022.5.0",
+    "s3transfer==0.5.2",
+    "sacremoses==0.0.53",
+    "scikit-learn==1.1.1",
+    "scipy==1.8.1",
+    "scmrepo==0.0.16",
+    "secretstorage==3.3.2",
+    "segtok==1.5.11",
+    "send2trash==1.8.0",
+    "sentencepiece==0.1.95",
+    "sentry-sdk==1.5.12",
+    "seqeval==1.2.2",
+    "setproctitle==1.2.3",
+    "setuptools-scm==6.4.2",
+    "setuptools==61.2.0",
+    "shellingham==1.4.0",
+    "shortuuid==1.0.9",
+    "shtab==1.5.4",
+    "six==1.16.0",
+    "smart-open==6.0.0",
+    "smmap==5.0.0",
+    "soupsieve==2.3.2.post1",
+    "sqlalchemy==1.4.36",
+    "sqlitedict==2.0.0",
+    "sqlparse==0.4.2",
+    "srsly==2.4.3",
+    "stack-data==0.2.0",
+    "stevedore==3.5.0",
+    "tabulate==0.8.9",
+    "tensorboard-data-server==0.6.1",
+    "tensorboard-plugin-wit==1.8.1",
+    "tensorboard==2.9.0",
+    "terminado==0.15.0",
+    "text-unidecode==1.3",
+    "threadpoolctl==3.1.0",
+    "tinycss2==1.1.1",
+    "tokenizers==0.12.1",
+    "toml==0.10.2",
+    "tomli==1.2.3",
+    "tomlkit==0.10.2",
+    "torch==1.11.0+cu113",
+    "torchmetrics==0.7.3",
+    "tornado==6.1",
+    "tqdm==4.64.0",
+    "traitlets==5.2.1.post0",
+    "transformers==4.18.0",
+    "typer==0.4.1",
+    "types-pyyaml==6.0.7",
+    "types-requests==2.26.1",
+    "types-setuptools==57.4.17",
+    "typing-extensions==3.10.0.0",
+    "urllib3==1.26.9",
+    "virtualenv==20.14.1",
+    "voluptuous==0.13.1",
+    "wandb==0.12.14",
+    "wcwidth==0.2.5",
+    "webencodings==0.5.1",
+    "websocket-client==1.3.2",
+    "werkzeug==2.1.2",
+    "wheel==0.37.1",
+    "widgetsnbextension==3.6.0",
+    "wikipedia-api==0.5.4",
+    "wrapt==1.14.1",
+    "xmltodict==0.13.0",
+    "xxhash==3.0.0",
+    "yarl==1.7.2",
+    "zc.lockfile==2.0",
+    "zipp==3.8.0"
+  ],
+  "config": {
+    "wandb_version": 1,
+    "_wandb": {
+      "desc": null,
+      "value": {
+        "cli_version": "0.12.14",
+        "framework": "huggingface",
+        "huggingface_version": "4.18.0",
+        "is_jupyter_run": false,
+        "is_kaggle_kernel": false,
+        "m": [
+          {
+            "1": "trainer/global_step",
+            "6": [
+              3
+            ]
+          },
+          {
+            "1": "train/Loss",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/BaseLR",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/LambdaLR",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "epoch",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/precision_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/recall_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "train/f1_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/Loss",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/precision_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/recall_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          },
+          {
+            "1": "test/f1_macro",
+            "5": 1,
+            "6": [
+              1
+            ]
+          }
+        ],
+        "python_version": "3.9.12",
+        "start_time": 1653994406,
+        "t": {
+          "1": [
+            1,
+            5,
+            9,
+            11,
+            44,
+            49,
+            51,
+            53,
+            55
+          ],
+          "2": [
+            1,
+            5,
+            9,
+            11,
+            44,
+            49,
+            51,
+            53,
+            55
+          ],
+          "3": [
+            2,
+            3,
+            7,
+            13
+          ],
+          "4": "3.9.12",
+          "5": "0.12.14",
+          "6": "4.18.0",
+          "8": [
+            5
+          ]
+        }
+      }
+    },
+    "accelerator": {
+      "desc": null,
+      "value": "auto"
+    },
+    "adam_epsilon": {
+      "desc": null,
+      "value": 1e-05
+    },
+    "config": {
+      "desc": null,
+      "value": "LightningAdvancedConfig(finetune_last_n_layers=4, task_model_kwargs={'adam_epsilon': 1e-05, 'eval_batch_size': 16, 'learning_rate': 5e-05, 'optimizer': 'Adam', 'train_batch_size': 16, 'use_scheduler': True, 'warmup_steps': 50, 'weight_decay': 0.0001}, datamodule_kwargs={'label_all_tokens': False, 'max_seq_length': 512}, task_train_kwargs={'max_epochs': 15, 'devices': 'auto', 'accelerator': 'auto'}, model_config_kwargs={'classifier_dropout': 0.1}, early_stopping_kwargs={'mode': 'min', 'monitor': 'val/Loss', 'patience': 3}, tokenizer_kwargs={}, batch_encoding_kwargs={}, dataloader_kwargs={})"
+    },
+    "config_kwargs/classifier_dropout": {
+      "desc": null,
+      "value": 0.1
+    },
+    "dataset_info": {
+      "desc": null,
+      "value": "DatasetInfo(description='AspectEmo dataset: Multi-Domain Corpus of Consumer Reviews for Aspect-Based \\n                Sentiment Analysis', citation=\"@misc{11321/849,\\t\\n title = {{AspectEmo} 1.0: Multi-Domain Corpus of Consumer Reviews for Aspect-Based Sentiment Analysis},\\t\\n author = {Koco{'n}, Jan and Radom, Jarema and Kaczmarz-Wawryk, Ewa and Wabnic, Kamil and Zaj{\\\\c a}czkowska, Ada and Za{'s}ko-Zieli{'n}ska, Monika},\\t\\n url = {http://hdl.handle.net/11321/849},\\t\\n note = {{CLARIN}-{PL} digital repository},\\t\\n copyright = {The {MIT} License},\\t\\n year = {2021}\\t\\n}\", homepage='https://clarin-pl.eu/dspace/handle/11321/849', license='The MIT License', features={'labels': Sequence(feature=ClassLabel(num_classes=7, names=['O', 'a_minus_m', 'a_minus_s', 'a_zero', 'a_plus_s', 'a_plus_m', 'a_amb'], id=None), length=-1, id=None), 'input_ids': Sequence(feature=Value(dtype='int32', id=None), length=-1, id=None), 'token_type_ids': Sequence(feature=Value(dtype='int8', id=None), length=-1, id=None), 'attention_mask': Sequence(feature=Value(dtype='int8', id=None), length=-1, id=None)}, post_processed=None, supervised_keys=SupervisedKeysData(input='tokens', output='labels'), task_templates=None, builder_name='aspect_emo', config_name='1.0', version=1.0.0, splits={'train': SplitInfo(name='train', num_bytes=2285783, num_examples=1173, dataset_name='aspect_emo'), 'test': SplitInfo(name='test', num_bytes=634292, num_examples=292, dataset_name='aspect_emo')}, download_checksums={'https://huggingface.co/datasets/clarin-pl/aspectemo/resolve/main/data/aspectemo1.zip': {'num_bytes': 694842, 'checksum': '4fc2289f47a5864d95018c6cec9cd7d038ca8c675d33f6dac384a786a7666a26'}}, download_size=694842, post_processing_size=None, dataset_size=2920075, size_in_bytes=3614917)"
+    },
+    "dataset_name_or_path": {
+      "desc": null,
+      "value": "data/datasets/aspectemo/lightning/"
+    },
+    "dataset_version": {
+      "desc": null,
+      "value": "1.0.0"
+    },
+    "devices": {
+      "desc": null,
+      "value": "auto"
+    },
+    "downstream_model_type": {
+      "desc": null,
+      "value": "AutoModelForTokenClassification"
+    },
+    "embedding_name_or_path": {
+      "desc": null,
+      "value": "dkleczek/bert-base-polish-cased-v1"
+    },
+    "eval_batch_size": {
+      "desc": null,
+      "value": 16
+    },
+    "evaluation_filename": {
+      "desc": null,
+      "value": "evaluation.json"
+    },
+    "evaluation_mode": {
+      "desc": null,
+      "value": "EvaluationMode.UNIT"
+    },
+    "finetune_last_n_layers": {
+      "desc": null,
+      "value": 4
+    },
+    "ignore_index": {
+      "desc": null,
+      "value": -100
+    },
+    "input_column_name": {
+      "desc": null,
+      "value": "tokens"
+    },
+    "label_all_tokens": {
+      "desc": null,
+      "value": false
+    },
+    "learning_rate": {
+      "desc": null,
+      "value": 5e-05
+    },
+    "load_dataset_kwargs": {
+      "desc": null,
+      "value": "None"
+    },
+    "logging_config": {
+      "desc": null,
+      "value": "LightningLoggingConfig(loggers_names=['wandb'], tracking_project_name='aspectemo', wandb_entity='embeddings', wandb_logger_kwargs={})"
+    },
+    "max_seq_length": {
+      "desc": null,
+      "value": 512
+    },
+    "metrics": {
+      "desc": null,
+      "value": "None"
+    },
+    "model_checkpoint_kwargs/filename": {
+      "desc": null,
+      "value": "last"
+    },
+    "model_checkpoint_kwargs/monitor": {
+      "desc": null,
+      "value": "None"
+    },
+    "model_checkpoint_kwargs/save_last": {
+      "desc": null,
+      "value": false
+    },
+    "model_name_or_path": {
+      "desc": null,
+      "value": "dkleczek/bert-base-polish-cased-v1"
+    },
+    "num_classes": {
+      "desc": null,
+      "value": 7
+    },
+    "optimizer": {
+      "desc": null,
+      "value": "Adam"
+    },
+    "output_path": {
+      "desc": null,
+      "value": "/embeddings-internal/leaderboard/data/models/lightning/dkleczek__bert-base-polish-cased-v1/aspectemo/run-4"
+    },
+    "predict_subset": {
+      "desc": null,
+      "value": "LightingDataModuleSubset.TEST"
+    },
+    "processing_batch_size": {
+      "desc": null,
+      "value": "None"
+    },
+    "seed": {
+      "desc": null,
+      "value": 441
+    },
+    "tagging_scheme": {
+      "desc": null,
+      "value": "None"
+    },
+    "target_column_name": {
+      "desc": null,
+      "value": "labels"
+    },
+    "target_field": {
+      "desc": null,
+      "value": "labels"
+    },
+    "task_model_kwargs/adam_epsilon": {
+      "desc": null,
+      "value": 1e-05
+    },
+    "task_model_kwargs/eval_batch_size": {
+      "desc": null,
+      "value": 16
+    },
+    "task_model_kwargs/learning_rate": {
+      "desc": null,
+      "value": 5e-05
+    },
+    "task_model_kwargs/optimizer": {
+      "desc": null,
+      "value": "Adam"
+    },
+    "task_model_kwargs/train_batch_size": {
+      "desc": null,
+      "value": 16
+    },
+    "task_model_kwargs/use_scheduler": {
+      "desc": null,
+      "value": true
+    },
+    "task_model_kwargs/warmup_steps": {
+      "desc": null,
+      "value": 50
+    },
+    "task_model_kwargs/weight_decay": {
+      "desc": null,
+      "value": 0.0001
+    },
+    "text_field": {
+      "desc": null,
+      "value": "tokens"
+    },
+    "tokenizer_name_or_path": {
+      "desc": null,
+      "value": "dkleczek/bert-base-polish-cased-v1"
+    },
+    "train_batch_size": {
+      "desc": null,
+      "value": 16
+    },
+    "use_scheduler": {
+      "desc": null,
+      "value": true
+    },
+    "warmup_steps": {
+      "desc": null,
+      "value": 50
+    },
+    "weight_decay": {
+      "desc": null,
+      "value": 0.0001
+    }
+  },
+  "metrics": [
+    {
+      "accuracy": 0.9453590004825996,
+      "f1_macro": 0.2993916838335498,
+      "f1_micro": 0.5136866627839255,
+      "f1_weighted": 0.5091440603021612,
+      "recall_macro": 0.281220902906255,
+      "recall_micro": 0.4812659148781375,
+      "recall_weighted": 0.4812659148781375,
+      "precision_macro": 0.4222427651520739,
+      "precision_micro": 0.5507910074937552,
+      "precision_weighted": 0.5624596342819308,
+      "classes": {
+        "a_amb": {
+          "precision": 0.6666666666666666,
+          "recall": 0.02197802197802198,
+          "f1": 0.0425531914893617,
+          "support": 91
+        },
+        "a_minus_m": {
+          "precision": 0.5549389567147613,
+          "recall": 0.4835589941972921,
+          "f1": 0.5167958656330749,
+          "support": 1034
+        },
+        "a_minus_s": {
+          "precision": 0.08333333333333333,
+          "recall": 0.05970149253731343,
+          "f1": 0.06956521739130435,
+          "support": 67
+        },
+        "a_plus_m": {
+          "precision": 0.7098265895953757,
+          "recall": 0.6049261083743842,
+          "f1": 0.6531914893617021,
+          "support": 1015
+        },
+        "a_plus_s": {
+          "precision": 0.16129032258064516,
+          "recall": 0.12195121951219512,
+          "f1": 0.1388888888888889,
+          "support": 41
+        },
+        "a_zero": {
+          "precision": 0.3574007220216607,
+          "recall": 0.39520958083832336,
+          "f1": 0.37535545023696687,
+          "support": 501
+        }
+      }
+    },
+    {
+      "accuracy": 0.9438039573167462,
+      "f1_macro": 0.30824608112048285,
+      "f1_micro": 0.5022386606969047,
+      "f1_weighted": 0.49838478474465514,
+      "recall_macro": 0.28315520546699496,
+      "recall_micro": 0.4692615496544198,
+      "recall_weighted": 0.4692615496544198,
+      "precision_macro": 0.4294580116552888,
+      "precision_micro": 0.5402010050251256,
+      "precision_weighted": 0.5514381415262987,
+      "classes": {
+        "a_amb": {
+          "precision": 0.6,
+          "recall": 0.03296703296703297,
+          "f1": 0.0625,
+          "support": 91
+        },
+        "a_minus_m": {
+          "precision": 0.5468036529680366,
+          "recall": 0.4632495164410058,
+          "f1": 0.5015706806282723,
+          "support": 1034
+        },
+        "a_minus_s": {
+          "precision": 0.16279069767441862,
+          "recall": 0.1044776119402985,
+          "f1": 0.12727272727272726,
+          "support": 67
+        },
+        "a_plus_m": {
+          "precision": 0.6997690531177829,
+          "recall": 0.5970443349753695,
+          "f1": 0.6443381180223285,
+          "support": 1015
+        },
+        "a_plus_s": {
+          "precision": 0.23809523809523808,
+          "recall": 0.12195121951219512,
+          "f1": 0.16129032258064516,
+          "support": 41
+        },
+        "a_zero": {
+          "precision": 0.3292894280762565,
+          "recall": 0.37924151696606784,
+          "f1": 0.35250463821892397,
+          "support": 501
+        }
+      }
+    },
+    {
+      "accuracy": 0.9465386884015229,
+      "f1_macro": 0.2918717497297488,
+      "f1_micro": 0.5085564727199517,
+      "f1_weighted": 0.5031502176505106,
+      "recall_macro": 0.2662109589776958,
+      "recall_micro": 0.45943979628955983,
+      "recall_weighted": 0.45943979628955983,
+      "precision_macro": 0.4025163163854937,
+      "precision_micro": 0.5694319206492335,
+      "precision_weighted": 0.5732520101009614,
+      "classes": {
+        "a_amb": {
+          "precision": 0.5,
+          "recall": 0.01098901098901099,
+          "f1": 0.021505376344086023,
+          "support": 91
+        },
+        "a_minus_m": {
+          "precision": 0.581453634085213,
+          "recall": 0.44874274661508706,
+          "f1": 0.5065502183406113,
+          "support": 1034
+        },
+        "a_minus_s": {
+          "precision": 0.0847457627118644,
+          "recall": 0.07462686567164178,
+          "f1": 0.07936507936507936,
+          "support": 67
+        },
+        "a_plus_m": {
+          "precision": 0.7170035671819263,
+          "recall": 0.594088669950739,
+          "f1": 0.6497844827586208,
+          "support": 1015
+        },
+        "a_plus_s": {
+          "precision": 0.15384615384615385,
+          "recall": 0.0975609756097561,
+          "f1": 0.11940298507462689,
+          "support": 41
+        },
+        "a_zero": {
+          "precision": 0.3780487804878049,
+          "recall": 0.3712574850299401,
+          "f1": 0.3746223564954683,
+          "support": 501
+        }
+      }
+    },
+    {
+      "accuracy": 0.9462169553327257,
+      "f1_macro": 0.2996569270013375,
+      "f1_micro": 0.5100218297281208,
+      "f1_weighted": 0.5054189626572821,
+      "recall_macro": 0.27451197985042197,
+      "recall_micro": 0.467442706438705,
+      "recall_weighted": 0.467442706438705,
+      "precision_macro": 0.4878440040026419,
+      "precision_micro": 0.5611353711790393,
+      "precision_weighted": 0.5832034873992897,
+      "classes": {
+        "a_amb": {
+          "precision": 1.0,
+          "recall": 0.02197802197802198,
+          "f1": 0.043010752688172046,
+          "support": 91
+        },
+        "a_minus_m": {
+          "precision": 0.5674418604651162,
+          "recall": 0.47195357833655704,
+          "f1": 0.515311510031679,
+          "support": 1034
+        },
+        "a_minus_s": {
+          "precision": 0.08163265306122448,
+          "recall": 0.05970149253731343,
+          "f1": 0.06896551724137931,
+          "support": 67
+        },
+        "a_plus_m": {
+          "precision": 0.7163636363636363,
+          "recall": 0.5822660098522168,
+          "f1": 0.6423913043478261,
+          "support": 1015
+        },
+        "a_plus_s": {
+          "precision": 0.19230769230769232,
+          "recall": 0.12195121951219512,
+          "f1": 0.1492537313432836,
+          "support": 41
+        },
+        "a_zero": {
+          "precision": 0.3693181818181818,
+          "recall": 0.38922155688622756,
+          "f1": 0.3790087463556851,
+          "support": 501
+        }
+      }
+    },
+    {
+      "accuracy": 0.9459488444420613,
+      "f1_macro": 0.3012236917788877,
+      "f1_micro": 0.5066132264529059,
+      "f1_weighted": 0.5028994616817802,
+      "recall_macro": 0.27206952029685855,
+      "recall_micro": 0.4598035649327028,
+      "recall_weighted": 0.4598035649327028,
+      "precision_macro": 0.4425020618851741,
+      "precision_micro": 0.5640339134315038,
+      "precision_weighted": 0.5775930001316872,
+      "classes": {
+        "a_amb": {
+          "precision": 0.6666666666666666,
+          "recall": 0.02197802197802198,
+          "f1": 0.0425531914893617,
+          "support": 91
+        },
+        "a_minus_m": {
+          "precision": 0.5808019441069259,
+          "recall": 0.4622823984526112,
+          "f1": 0.5148088314485729,
+          "support": 1034
+        },
+        "a_minus_s": {
+          "precision": 0.09259259259259259,
+          "recall": 0.07462686567164178,
+          "f1": 0.08264462809917354,
+          "support": 67
+        },
+        "a_plus_m": {
+          "precision": 0.7220172201722017,
+          "recall": 0.5783251231527093,
+          "f1": 0.6422319474835886,
+          "support": 1015
+        },
+        "a_plus_s": {
+          "precision": 0.23809523809523808,
+          "recall": 0.12195121951219512,
+          "f1": 0.16129032258064516,
+          "support": 41
+        },
+        "a_zero": {
+          "precision": 0.3548387096774194,
+          "recall": 0.37325349301397204,
+          "f1": 0.3638132295719844,
+          "support": 501
+        }
+      }
+    }
+  ],
+  "metrics_avg": {
+    "accuracy": 0.9455734891951311,
+    "f1_macro": 0.3000780266928013,
+    "f1_micro": 0.5082233704763617,
+    "f1_weighted": 0.5037994974072779,
+    "recall_macro": 0.27543371349964524,
+    "recall_micro": 0.467442706438705,
+    "recall_weighted": 0.467442706438705,
+    "precision_macro": 0.4369126318161345,
+    "precision_micro": 0.5571186435557315,
+    "precision_weighted": 0.5695892546880336,
+    "classes": {
+      "a_amb": {
+        "precision": 0.6866666666666666,
+        "recall": 0.02197802197802198,
+        "f1": 0.04242450240219629,
+        "support": 91
+      },
+      "a_minus_m": {
+        "precision": 0.5662880096680106,
+        "recall": 0.46595744680851064,
+        "f1": 0.511007421216442,
+        "support": 1034
+      },
+      "a_minus_s": {
+        "precision": 0.10101900787468668,
+        "recall": 0.07462686567164178,
+        "f1": 0.08556263387393276,
+        "support": 67
+      },
+      "a_plus_m": {
+        "precision": 0.7129960132861846,
+        "recall": 0.5913300492610838,
+        "f1": 0.6463874683948132,
+        "support": 1015
+      },
+      "a_plus_s": {
+        "precision": 0.1967269289849935,
+        "recall": 0.11707317073170731,
+        "f1": 0.14602525009361794,
+        "support": 41
+      },
+      "a_zero": {
+        "precision": 0.3577791644162647,
+        "recall": 0.38163672654690617,
+        "f1": 0.36906088417580574,
+        "support": 501
+      }
+    }
+  },
+  "metrics_median": {
+    "accuracy": 0.9459488444420613,
+    "f1_macro": 0.2996569270013375,
+    "f1_micro": 0.5085564727199517,
+    "f1_weighted": 0.5031502176505106,
+    "recall_macro": 0.27451197985042197,
+    "recall_micro": 0.467442706438705,
+    "recall_weighted": 0.467442706438705,
+    "precision_macro": 0.4294580116552888,
+    "precision_micro": 0.5611353711790393,
+    "precision_weighted": 0.5732520101009614,
+    "classes": {
+      "a_amb": {
+        "precision": 0.6666666666666666,
+        "recall": 0.02197802197802198,
+        "f1": 0.0425531914893617
+      },
+      "a_minus_m": {
+        "precision": 0.5674418604651162,
+        "recall": 0.4632495164410058,
+        "f1": 0.5148088314485729
+      },
+      "a_minus_s": {
+        "precision": 0.0847457627118644,
+        "recall": 0.07462686567164178,
+        "f1": 0.07936507936507936
+      },
+      "a_plus_m": {
+        "precision": 0.7163636363636363,
+        "recall": 0.594088669950739,
+        "f1": 0.6443381180223285
+      },
+      "a_plus_s": {
+        "precision": 0.19230769230769232,
+        "recall": 0.12195121951219512,
+        "f1": 0.1492537313432836
+      },
+      "a_zero": {
+        "precision": 0.3574007220216607,
+        "recall": 0.37924151696606784,
+        "f1": 0.3746223564954683
+      }
+    }
+  },
+  "metrics_std": {
+    "accuracy": 0.0010797914400559243,
+    "f1_macro": 0.0058314028048139606,
+    "f1_micro": 0.004230906833747561,
+    "f1_weighted": 0.003928669048221731,
+    "recall_macro": 0.006898180724432854,
+    "recall_micro": 0.008899330536722504,
+    "recall_weighted": 0.008899330536722504,
+    "precision_macro": 0.0319340306968333,
+    "precision_micro": 0.011638484895176805,
+    "precision_weighted": 0.012679880192683204,
+    "classes": {
+      "a_amb": {
+        "precision": 0.1879716290649558,
+        "recall": 0.007770404188863159,
+        "f1": 0.014500105603017586
+      },
+      "a_minus_m": {
+        "precision": 0.015414465507034587,
+        "recall": 0.012873935235817202,
+        "f1": 0.006621946833287958
+      },
+      "a_minus_s": {
+        "precision": 0.03478569562437288,
+        "recall": 0.018279774199874463,
+        "f1": 0.024073003269020836
+      },
+      "a_plus_m": {
+        "precision": 0.008570024342551882,
+        "recall": 0.010913303650087079,
+        "f1": 0.004880366942890655
+      },
+      "a_plus_s": {
+        "precision": 0.040424984848654935,
+        "recall": 0.010907648670730678,
+        "f1": 0.017579395703732178
+      },
+      "a_zero": {
+        "precision": 0.018469304451777562,
+        "recall": 0.01031378098424258,
+        "f1": 0.01085309468811016
+      }
+    }
+  },
+  "averaged_over": 5
+}
