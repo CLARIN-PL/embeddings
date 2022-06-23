@@ -37,7 +37,7 @@ jobs:
           restore-keys: |
             main-venv-${{ runner.os }}-${{matrix.python-version}}-
       - name: Install deps
-        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
+        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude onnx"
       - name: Run tests
         run: poetry run poe test
         env:
@@ -69,7 +69,7 @@ jobs:
           restore-keys: |
             main-venv-${{ runner.os }}-${{matrix.python-version}}-
       - name: Install deps
-        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
+        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude onnx"
       - name: Check
         run: poetry run poe check
   publish:
@@ -102,7 +102,7 @@ jobs:
           path: .venv
           key: main-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
       - name: Install deps
-        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
+        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude onnx"
       - name: Build and publish
         run: |
           poetry version "$(git describe --tags --abbrev=0)rc${GITHUB_RUN_ID}${GITHUB_RUN_NUMBER}"

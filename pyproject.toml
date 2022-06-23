@@ -37,13 +37,14 @@ seqeval = ">=1.2.2"
 srsly = ">=2.4.1"
 tensorboard = ">=2.4.1"
 torch = ">=1.9"
-transformers = ">=4.12.5"
+transformers = {extras = ["onnx"], version = "^4.20.1", optional=true}
 typer = ">=0.4.0"
 types-PyYAML = ">=5.4.10"
 types-setuptools = ">=57.4.11"
 typing-extensions = ">=4.0.1"
 intel-openmp = {version="^2022.0.3", platform="win32"}
 wandb = ">=0.12.10"
+sacremoses = { version = "^0.0.53", optional=true}
 
 [tool.poetry.dev-dependencies]
 black = "21.12b0"
@@ -78,6 +79,7 @@ fix_check = ["fix", "check"]
 [tool.poetry.extras]
 developer = ["black", "mypy", "typing-extensions"]
 pymagnitude = ["pymagnitude", "lz4", "annoy"]
+onnx = ["transformers[onnx]", "sacremoses"]
 
 [build-system]
 requires = ["poetry>=1.1.5"]
