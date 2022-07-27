@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 import datasets
 import pandas as pd
@@ -8,7 +8,11 @@ from sklearn.base import ClassifierMixin as AnySklearnClassifier
 from sklearn.feature_extraction.text import CountVectorizer
 from typing_extensions import Literal
 
-from embeddings.data.data_loader import HuggingFaceDataLoader
+from embeddings.data.data_loader import (
+    HuggingFaceDataLoader,
+    HuggingFaceLocalDataLoader,
+    get_hf_dataloader,
+)
 from embeddings.data.dataset import Dataset
 from embeddings.data.io import T_path
 from embeddings.embedding.sklearn_embedding import SklearnEmbedding
@@ -37,7 +41,7 @@ class SklearnClassificationPipeline(
 ):
     def __init__(
         self,
-        dataset_name: str,
+        dataset_name_or_path: T_path,
         input_column_name: str,
         target_column_name: str,
         output_path: T_path,
@@ -49,8 +53,12 @@ class SklearnClassificationPipeline(
         embedding_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
-        dataset = Dataset(dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {})
-        data_loader = HuggingFaceDataLoader()
+        dataset = Dataset(
+            str(dataset_name_or_path), **load_dataset_kwargs if load_dataset_kwargs else {}
+        )
+        data_loader: Union[HuggingFaceDataLoader, HuggingFaceLocalDataLoader] = get_hf_dataloader(
+            dataset
+        )
         transformation = ToPandasHuggingFaceCorpusTransformation().then(
             RenameInputColumnsTransformation(input_column_name, target_column_name)
         )
