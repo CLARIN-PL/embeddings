@@ -28,11 +28,10 @@ def dataset_kwargs(dataset_name: str) -> Dict[str, Any]:
 def dataset_path(dataset_name: str) -> "TemporaryDirectory[str]":
     path = TemporaryDirectory()
     pipeline = HuggingFacePreprocessingPipeline(
-        dataset_name="clarin-pl/polemo2-official",
+        dataset_name=dataset_name,
         persist_path=path.name,
         sample_missing_splits=None,
         ignore_test_subset=False,
-        # downsample_splits=(0.01, 0.01, 0.05),
         seed=441,
     )
     pipeline.run()
