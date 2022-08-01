@@ -1,8 +1,10 @@
 ---
-title: Embeddings
-type: docs
+title: Home
+url: "/"
+geekdocNav: false
+geekdocBreadcrumb: false
 ---
 
-# Results
+Strona główna
 
-{{< results >}}
+{{< button size="large" relref="embeddings/" >}}Embeddings{{< /button >}}
