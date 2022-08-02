@@ -12,7 +12,7 @@
       .homepage.title {
         font-size: 32px;
         font-weight: 300;
-        margin-top: 3em;
+        margin-top: 2em;
       }
       .homepage.container {
         display: flex;
@@ -20,9 +20,32 @@
         align-items: center;
         gap: 3em;
         color: #6e6e6e;
+        max-width: 90% !important;
       }
-      .homepage.title.tasks {
-        margin-top: 3em;
+      #tasks-container {
+        width: 100%;
+        display: flex;
+        gap: 2em;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .task {
+        cursor: pointer;
+        width: 10em;
+        height: 10em;
+        display: flex;
+        align-items: center;
+        border-radius: 5px;
+        border: 1px solid rgb(0 0 0 / 10%);
+        box-shadow: 0 4px 10px rgb(0 0 0 / 20%);
+        font-weight: 600;
+        justify-content: center;
+        text-align: center;
+        padding: 0.5em;
+        font-size: 20px;
+      }
+      .task:hover{
+        background-color: rgba(65, 105, 225, 0.1);
       }
     </style>
   </head>
@@ -39,7 +62,29 @@
         sed efficitur lorem faucibus lacinia. Sed sit amet consectetur sapien,
         at vestibulum
       </div>
-      <div class="homepage title tasks">Tasks</div>
+      <div class="homepage title">Tasks</div>
+      <div id="tasks-container"></div>
+      <script>
+        const taskTypes = [
+          "Punctuation Restoration",
+          "Paraphrase Classification",
+          "Sequence Tagging",
+          "Sentiment Analysis",
+          "Part-of-speach Tagging",
+          "Named Entity Recognition",
+          "Q&A Classification",
+          "Entailment Classification",
+          "Aspect-based Sentiment Analysis",
+          "Text Classification",
+        ];
+        const container = document.getElementById("tasks-container");
+        taskTypes.forEach((type) => {
+          const el = document.createElement("div");
+          el.classList.add("task");
+          el.innerHTML = type;
+          container.appendChild(el);
+        });
+      </script>
     </div>
   </body>
 </html>
