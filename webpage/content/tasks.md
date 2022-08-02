@@ -1,7 +1,7 @@
 ---
 title: Tasks
 type: docs
-url: "/embeddings"
+url: "/tasks"
 geekdocNav: false
 geekdocBreadcrumb: false
 ---

@@ -44,7 +44,7 @@
         padding: 0.5em;
         font-size: 20px;
       }
-      .task:hover{
+      .task:hover {
         background-color: rgba(65, 105, 225, 0.1);
       }
     </style>
@@ -82,6 +82,9 @@
           const el = document.createElement("div");
           el.classList.add("task");
           el.innerHTML = type;
+          el.onclick = () => {
+            location.href = "tasks";
+          };
           container.appendChild(el);
         });
       </script>
