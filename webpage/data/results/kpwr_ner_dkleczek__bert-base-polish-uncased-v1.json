@@ -1,9 +1,6 @@
 {
   "submission_name": "kpwr_ner_dkleczek__bert-base-polish-uncased-v1",
-  "dataset_name": {
-    "desc": null,
-    "value": "data/datasets/kpwr_ner/lightning/"
-  },
+  "dataset_name": "clarin-pl/kpwr-ner",
   "dataset_version": {
     "desc": null,
     "value": "0.0.0"
@@ -658,6 +655,12 @@
       "value": 0.0001
     }
   },
+  "dataset_key": "kpwr_ner",
+  "dataset_domains": [
+    "misc."
+  ],
+  "leaderboard_dataset_name": "KPWr NER",
+  "leaderboard_task_name": "Named Entity Recognition",
   "metrics": [
     {
       "accuracy": 0.9592977171845276,

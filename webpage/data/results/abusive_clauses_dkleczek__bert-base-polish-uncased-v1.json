@@ -1,9 +1,6 @@
 {
   "submission_name": "abusive_clauses_dkleczek__bert-base-polish-uncased-v1",
-  "dataset_name": {
-    "desc": null,
-    "value": "data/datasets/abusive_clauses/lightning/"
-  },
+  "dataset_name": "laugustyniak/abusive-clauses-pl",
   "dataset_version": {
     "desc": null,
     "value": "0.0.0"
@@ -678,6 +675,12 @@
       "value": 0
     }
   },
+  "dataset_key": "abusive_clauses",
+  "dataset_domains": [
+    "legal texts"
+  ],
+  "leaderboard_dataset_name": "Abusive Clauses",
+  "leaderboard_task_name": "Text Classification",
   "metrics": [
     {
       "accuracy": 0.879814653924124,

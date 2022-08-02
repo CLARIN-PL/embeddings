@@ -1,9 +1,6 @@
 {
   "submission_name": "cdsc_e_dkleczek__bert-base-polish-uncased-v1",
-  "dataset_name": {
-    "desc": null,
-    "value": "data/datasets/cdsc_e/lightning/"
-  },
+  "dataset_name": "allegro/klej-cdsc-e",
   "dataset_version": {
     "desc": null,
     "value": "0.0.0"
@@ -696,6 +693,12 @@
       "value": 0.0001
     }
   },
+  "dataset_key": "cdsc_e",
+  "dataset_domains": [
+    "image captions"
+  ],
+  "leaderboard_dataset_name": "CDSC-E",
+  "leaderboard_task_name": "Entailment Classification",
   "metrics": [
     {
       "accuracy": 0.933,

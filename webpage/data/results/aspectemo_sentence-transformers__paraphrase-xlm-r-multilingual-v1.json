@@ -1,9 +1,6 @@
 {
   "submission_name": "aspectemo_sentence-transformers__paraphrase-xlm-r-multilingual-v1",
-  "dataset_name": {
-    "desc": null,
-    "value": "data/datasets/aspectemo/lightning/"
-  },
+  "dataset_name": "clarin-pl/aspectemo",
   "dataset_version": {
     "desc": null,
     "value": "1.0.0"
@@ -644,6 +641,12 @@
       "value": 0
     }
   },
+  "dataset_key": "aspectemo",
+  "dataset_domains": [
+    "online reviews"
+  ],
+  "leaderboard_dataset_name": "AspectEmo",
+  "leaderboard_task_name": "Aspect-based Sentiment Analysis",
   "metrics": [
     {
       "accuracy": 0.9255290360989338,

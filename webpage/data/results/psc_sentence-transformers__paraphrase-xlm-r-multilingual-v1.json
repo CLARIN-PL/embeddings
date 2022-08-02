@@ -1,9 +1,6 @@
 {
   "submission_name": "psc_sentence-transformers__paraphrase-xlm-r-multilingual-v1",
-  "dataset_name": {
-    "desc": null,
-    "value": "data/datasets/psc/lightning/"
-  },
+  "dataset_name": "allegro/klej-psc",
   "dataset_version": {
     "desc": null,
     "value": "0.0.0"
@@ -661,6 +658,12 @@
       "value": 0
     }
   },
+  "dataset_key": "psc",
+  "dataset_domains": [
+    "news"
+  ],
+  "leaderboard_dataset_name": "PSC",
+  "leaderboard_task_name": "Paraphrase Classification",
   "metrics": [
     {
       "accuracy": 0.7365491651205937,

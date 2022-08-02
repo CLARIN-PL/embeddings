@@ -1,9 +1,6 @@
 {
   "submission_name": "dyk_dkleczek__bert-base-polish-uncased-v1",
-  "dataset_name": {
-    "desc": null,
-    "value": "data/datasets/dyk/lightning/"
-  },
+  "dataset_name": "allegro/klej-dyk",
   "dataset_version": {
     "desc": null,
     "value": "0.0.0"
@@ -647,6 +644,12 @@
       "value": 0.001
     }
   },
+  "dataset_key": "dyk",
+  "dataset_domains": [
+    "Wikipedia"
+  ],
+  "leaderboard_dataset_name": "DYK",
+  "leaderboard_task_name": "Q&A Classification",
   "metrics": [
     {
       "accuracy": 0.8736637512147716,

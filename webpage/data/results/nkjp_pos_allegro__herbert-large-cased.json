@@ -1,9 +1,6 @@
 {
   "submission_name": "nkjp_pos_allegro__herbert-large-cased",
-  "dataset_name": {
-    "desc": null,
-    "value": "data/datasets/nkjp_pos/lightning/"
-  },
+  "dataset_name": "clarin-pl/nkjp-pos",
   "dataset_version": {
     "desc": null,
     "value": "1.1.0"
@@ -658,6 +655,12 @@
       "value": 0
     }
   },
+  "dataset_key": "nkjp_pos",
+  "dataset_domains": [
+    "misc."
+  ],
+  "leaderboard_dataset_name": "NKJP POS",
+  "leaderboard_task_name": "Part-of-speach Tagging",
   "metrics": [
     {
       "accuracy": 0.9898202520430188,

@@ -1,9 +1,6 @@
 {
   "submission_name": "polemo2_out_dkleczek__bert-base-polish-uncased-v1",
-  "dataset_name": {
-    "desc": null,
-    "value": "data/datasets/polemo2_out/lightning/"
-  },
+  "dataset_name": "allegro/klej-polemo2-out",
   "dataset_version": {
     "desc": null,
     "value": "0.0.0"
@@ -692,6 +689,12 @@
       "value": 0.1
     }
   },
+  "dataset_key": "polemo2_out",
+  "dataset_domains": [
+    "online reviews"
+  ],
+  "leaderboard_dataset_name": "PolEmo 2.0 (Out-domain)",
+  "leaderboard_task_name": "Sentiment Analysis",
   "metrics": [
     {
       "accuracy": 0.6821862348178138,

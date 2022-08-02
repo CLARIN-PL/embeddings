@@ -1,9 +1,6 @@
 {
   "submission_name": "polemo2_out_allegro__herbert-base-cased",
-  "dataset_name": {
-    "desc": null,
-    "value": "data/datasets/polemo2_out/lightning/"
-  },
+  "dataset_name": "allegro/klej-polemo2-out",
   "dataset_version": {
     "desc": null,
     "value": "0.0.0"
@@ -678,6 +675,12 @@
       "value": 0.0001
     }
   },
+  "dataset_key": "polemo2_out",
+  "dataset_domains": [
+    "online reviews"
+  ],
+  "leaderboard_dataset_name": "PolEmo 2.0 (Out-domain)",
+  "leaderboard_task_name": "Sentiment Analysis",
   "metrics": [
     {
       "accuracy": 0.7267206477732794,

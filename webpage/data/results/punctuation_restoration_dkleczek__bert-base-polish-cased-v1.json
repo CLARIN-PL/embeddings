@@ -1,9 +1,6 @@
 {
   "submission_name": "punctuation_restoration_dkleczek__bert-base-polish-cased-v1",
-  "dataset_name": {
-    "desc": null,
-    "value": "data/datasets/punctuation_restoration/lightning/"
-  },
+  "dataset_name": "clarin-pl/2021-punctuation-restoration",
   "dataset_version": {
     "desc": null,
     "value": "1.0.0"
@@ -658,6 +655,13 @@
       "value": 0.0001
     }
   },
+  "dataset_key": "punctuation_restoration",
+  "dataset_domains": [
+    "Wikipedia Talk",
+    "Wikinews"
+  ],
+  "leaderboard_dataset_name": "Punctuation Restoration",
+  "leaderboard_task_name": "Punctuation Restoration",
   "metrics": [
     {
       "accuracy": 0.9214273460284783,

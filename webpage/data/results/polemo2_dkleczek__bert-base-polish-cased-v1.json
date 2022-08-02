@@ -1,9 +1,6 @@
 {
   "submission_name": "polemo2_dkleczek__bert-base-polish-cased-v1",
-  "dataset_name": {
-    "desc": null,
-    "value": "data/datasets/polemo2/lightning/"
-  },
+  "dataset_name": "clarin-pl/polemo2-official",
   "dataset_version": {
     "desc": null,
     "value": "0.0.0"
@@ -692,6 +689,12 @@
       "value": 0.0001
     }
   },
+  "dataset_key": "polemo2",
+  "dataset_domains": [
+    "online reviews"
+  ],
+  "leaderboard_dataset_name": "PolEmo 2.0",
+  "leaderboard_task_name": "Sentiment Analysis",
   "metrics": [
     {
       "accuracy": 0.8512195121951219,

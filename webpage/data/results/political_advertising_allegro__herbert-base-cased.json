@@ -1,9 +1,6 @@
 {
   "submission_name": "political_advertising_allegro__herbert-base-cased",
-  "dataset_name": {
-    "desc": null,
-    "value": "data/datasets/political_advertising/lightning/"
-  },
+  "dataset_name": "laugustyniak/political-advertising-pl",
   "dataset_version": {
     "desc": null,
     "value": "1.0.0"
@@ -672,6 +669,12 @@
       "value": 0.001
     }
   },
+  "dataset_key": "political_advertising",
+  "dataset_domains": [
+    "social media"
+  ],
+  "leaderboard_dataset_name": "Political Advertising",
+  "leaderboard_task_name": "Sequence Tagging",
   "metrics": [
     {
       "accuracy": 0.9646329837940896,
