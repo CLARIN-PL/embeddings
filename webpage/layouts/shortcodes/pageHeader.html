@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style scoped>
+      .header {
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50px;
+        width: 100%;
+        background: royalblue;
+        color: white;
+        display: flex;
+        padding: 1em 2em;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2em;
+      }
+      .menu-button {
+        cursor: pointer;
+        color: white !important; 
+        background-color: royalblue;
+        font-weight: 600;
+        text-decoration: none !important;
+      }
+      .menu-button:hover {
+        color: #f5e7bd !important;
+      }
+      .menu-items {
+        display: flex;
+        align-items: center;
+      }
+      .menu-gap {
+        margin: 0 0.5em;
+        font-size: 26px;
+        padding-bottom: 3px;
+      }
+      body {
+        font-family: Open Sans;
+      }
+      .gdoc-footer {
+        display: none;
+      }
+      .gdoc-header {
+        display: none;
+      }
+      .container {
+        padding: 0 !important;
+      }
+      .gdoc-page {
+        padding: 0 !important;
+      }
+      h1 {
+        margin: 0 !important;
+      }
+      p {
+        margin: 0 !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <a class="menu-button" href="/">Clarin Embedding</a>
+      <div class="menu-items">
+        <a class="menu-button" href="/embeddings/">Tasks</a>
+        <div class="menu-gap"></div>
+        <a class="menu-button" href="/about/">About</a>
+      </div>
+    </div>
+  </body>
+</html>

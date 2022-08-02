@@ -1,11 +1,10 @@
 ---
 title: Tasks
 type: docs
-aliases: [/embeddings]
+url: "/embeddings"
 geekdocNav: false
-geekdocAnchor: false
 geekdocBreadcrumb: false
 ---
 
-
+{{< pageHeader >}}
 {{< results >}}
