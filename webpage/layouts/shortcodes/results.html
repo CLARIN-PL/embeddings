@@ -14,6 +14,10 @@
 {{ $fields :=  $fields | uniq }}
 
 <style scoped>
+      #data-table{
+        max-width: 100vw;
+        overflow: auto; 
+      }
       .title {
         font-size: 32px;
         font-weight: 300;
@@ -21,8 +25,14 @@
         text-align: center;
       }
       .tabulator-cell{
+         min-width: 75px !important;
          padding: 0.5em 0.2em !important;
+         max-width: 400px !important;
 
+      }
+      .tabulator-col{
+         min-width: 75px !important;
+         max-width: 400px !important;
       }
       .tabulator-col-content{
          padding: 0.7em 0.5em !important;
@@ -79,16 +89,21 @@
    <thead>
       <tr>
          {{ range $field := $fields }}
-         <th>
+         <div>
+
+            <th>
             {{ $field  | humanize  }}
-         </th>
-         {{ end }}
-         {{ range $metric := $metrics }}
+            </th>
+            {{ end }}
+            {{ range $metric := $metrics }}
+            {{ if and (ne $metric "f1_weighted") (ne $metric "recall_weighted") (ne $metric "precision_weighted")}}       
             <th>
                {{ $metric  |  humanize  }}
             </th>
+            {{end}}
+         </div>
          {{ end }}
-         </tr>
+      </tr>
    </thead>
 <div>
    
@@ -126,26 +141,25 @@
 
    <script>
       var table = new Tabulator("#data-table", {
-         layout:"fitDataTable",
+         layout:"fitColumns",
          movableColumns: true
       });
       var formattedColumns = table.getColumnDefinitions().map(c => { c.formatter = "html"; return c})
-
+      
+      console.log(table.getColumnDefinitions())
       formattedColumns.forEach((col,i) => {
          col.headerFilter = true;
          if(i>2) {
             col.formatter = "money";
-            col.width ="6px";
+            col.widthGrow = 1;
+
             col.hozAlign = "center";
             col.formatterParams = {
                precision:3,
             };
             col.headerFilter = false;
-         }else if(i==1){
-            col.width ="10px";
-         }
-         else{
-            col.width ="15px";
+         }else{
+            col.widthGrow = 5;
          }
       })
       table.setColumns(formattedColumns)
