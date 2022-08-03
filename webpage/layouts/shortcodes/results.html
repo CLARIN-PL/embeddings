@@ -23,12 +23,50 @@
       .title-container {
         display: flex;
         flex-direction: column;
-        align-items: center;
+        justify-content: center;
         color: #6e6e6e;
         max-width: 90% !important;
       }
+      .tabulator-col-content{
+         display: flex;
+         align-items: center;
+         flex-direction: column;
+         height: 100%;
+      }
+      .tabulator-col-title-holder{
+         height: 100%;
+      }
+      .tabulator-col-title{
+         display: flex;
+         align-items: center;
+         height: 100%;
+         white-space: normal !important;
+      }
+      .tabulator-col-resize-handle.prev{
+         border-left: 1px solid rgb(222, 226, 230);
+      }
+      .button{
+         background: white;
+         height: 20px;
+         width: 20px;
+         margin: 0px;
+         padding: 0;
+         font-size: 14px;
+         font-weight: 600;
+         background: royalblue;
+         color: white;
+         border: none;
+         line-height: 15px;
+         align-items: center !important;
+         border-width: 1px;
+         border-radius: 50% !important;
+      }
+      .button:hover{
+         color: #f5e7bd;
+         box-shadow: 0 1px 4px rgb(0 0 0);
+      }
 </style>
-<div>
+<div style="margin: 0 2em;">
    <div class="container title-container">     
       <div class="title">{{ $type }}</div>
    </div>
@@ -36,9 +74,6 @@
    <table id="data-table">
    <thead>
       <tr>
-         <th>
-            Details
-         </th>
          {{ range $field := $fields }}
          <th>
             {{ $field  | humanize  }}
@@ -58,13 +93,13 @@
    {{if or (eq $type "Tasks") (eq (index $result $leaderboard) $type)}}
    <div>
       <tr>
-         <td>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{$file}}">
-               Details
-            </button>
-         </td>
          {{ range $field:= $fields }}
          <td>
+            {{if (eq $field "submission_name")}}
+            <button type="button" class="button" data-bs-toggle="modal" data-bs-target="#{{$file}}"> 
+               i
+            </button>
+            {{end}}
             {{if (in $fieldsValue $field)}}
                {{ index $result $field "value"}}
             {{else}}
@@ -87,11 +122,27 @@
 
    <script>
       var table = new Tabulator("#data-table", {
-         layout:"fitData",
+         layout:"fitDataTable",
          movableColumns: true
       });
       var formattedColumns = table.getColumnDefinitions().map(c => { c.formatter = "html"; return c})
-      formattedColumns.slice(1).forEach(c => c.headerFilter = true)
+
+      formattedColumns.forEach((col,i) => {
+         col.headerFilter = true
+         if(i>2) {
+            col.formatter = "money";
+            col.width ="6px";
+            col.formatterParams = {
+               precision:3,
+            }
+            col.headerFilter = false
+         }else if(i==1){
+            col.width ="10px";
+         }
+         else{
+            col.width ="15px";
+         }
+      })
       table.setColumns(formattedColumns)
    </script>
 
