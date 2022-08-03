@@ -76,7 +76,7 @@
           el.classList.add("task");
           el.innerHTML = type;
           el.onclick = () => {
-            location.href = "tasks";
+            location.href = "tasks/" + type.replace(/\s+/g, "");
           };
           container.appendChild(el);
         });
