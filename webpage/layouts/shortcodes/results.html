@@ -122,14 +122,15 @@
       var formattedColumns = table.getColumnDefinitions().map(c => { c.formatter = "html"; return c})
 
       formattedColumns.forEach((col,i) => {
-         col.headerFilter = true
+         col.headerFilter = true;
          if(i>2) {
             col.formatter = "money";
             col.width ="6px";
+            col.hozAlign = "center";
             col.formatterParams = {
                precision:3,
-            }
-            col.headerFilter = false
+            };
+            col.headerFilter = false;
          }else if(i==1){
             col.width ="10px";
          }
