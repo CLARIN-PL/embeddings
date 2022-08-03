@@ -6,4 +6,5 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
+{{< avarageResults >}}
 {{< results type="Named Entity Recognition" >}}
