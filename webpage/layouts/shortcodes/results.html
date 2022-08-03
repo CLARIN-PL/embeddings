@@ -1,5 +1,6 @@
 {{ $type := default "Tasks" (.Get "type") }}
 {{ $fields := slice "submission_name" "dataset_name" "embedding_name" }}
+{{ $leaderboard := slice "leaderboard_task_name"}}
 {{ $fieldsValue := slice  "embedding_name" }}
 {{ $metrics := slice }}
 {{ $metricsToIgnore := slice "classes" }}
@@ -50,7 +51,12 @@
          {{ end }}
          </tr>
    </thead>
+<div>
+   
+</div>
    {{ range $file, $result := $.Site.Data.results }}
+   {{if or (eq $type "Tasks") (eq (index $result $leaderboard) $type)}}
+   <div>
       <tr>
          <td>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{$file}}">
@@ -72,6 +78,7 @@
             </td>
          {{ end }}
          </tr>
+   {{end}} 
    {{end}}
    </table>
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
@@ -113,3 +120,4 @@
    </div>
 </div>
 {{end}}
+</div>
