@@ -6,5 +6,4 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-
-Sequence Tagging
+{{< results type="Sequence Tagging" >}}

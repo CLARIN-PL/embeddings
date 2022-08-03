@@ -6,5 +6,4 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-
-Text Classification
+{{< results type="Text Classification" >}}

@@ -6,5 +6,5 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
+{{< results type="Entailment Classification" >}}
 
-Entailment Classification

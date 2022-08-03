@@ -6,5 +6,4 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-
-Paraphrase Classification
+{{< results type="Paraphrase Classification" >}}

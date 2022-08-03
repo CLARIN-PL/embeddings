@@ -6,5 +6,4 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-
-Q&A Classification
+{{< results type="Q&A Classification" >}}

@@ -6,5 +6,5 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
+{{< results type="Aspect-based Sentiment Analysis" >}}
 
-Aspect-based Sentiment Analysis

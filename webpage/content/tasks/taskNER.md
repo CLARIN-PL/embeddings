@@ -6,5 +6,4 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-
-Named Entity Recognition
+{{< results type="Named Entity Recognition" >}}

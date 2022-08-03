@@ -6,5 +6,4 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-
-Sentiment Analysis
+{{< results type="Sentiment Analysis" >}}

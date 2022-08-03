@@ -1,3 +1,4 @@
+{{ $type := default "note" (.Get "type") }}
 {{ $fields := slice "submission_name" "dataset_name" "embedding_name" }}
 {{ $fieldsValue := slice  "embedding_name" }}
 {{ $metrics := slice }}
@@ -11,7 +12,27 @@
 {{ end }}
 {{ $fields :=  $fields | uniq }}
 
+<style scoped>
+      .title {
+        font-size: 32px;
+        font-weight: 300;
+        margin: 0.5em 0 1.5em 0;
+        
+      }
+      .title-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #6e6e6e;
+        max-width: 90% !important;
+      }
+</style>
 <div>
+   <div class="container title-container">
+      
+   <div class="title">{{ $type }}</div>
+   </div>
+
    <table id="data-table">
    <thead>
       <tr>

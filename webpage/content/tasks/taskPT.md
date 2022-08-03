@@ -6,5 +6,4 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-
-Part-of-speach Tagging
+{{< results type="Part-of-speach Tagging" >}}
