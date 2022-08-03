@@ -1,4 +1,4 @@
-{{ $type := default "note" (.Get "type") }}
+{{ $type := default "Tasks" (.Get "type") }}
 {{ $fields := slice "submission_name" "dataset_name" "embedding_name" }}
 {{ $fieldsValue := slice  "embedding_name" }}
 {{ $metrics := slice }}
@@ -28,9 +28,8 @@
       }
 </style>
 <div>
-   <div class="container title-container">
-      
-   <div class="title">{{ $type }}</div>
+   <div class="container title-container">     
+      <div class="title">{{ $type }}</div>
    </div>
 
    <table id="data-table">
@@ -68,7 +67,7 @@
          </td>
          {{ end }}
          {{ range $metric:= $metrics }}
-            <td>
+         <td>
                {{(index $result "metrics_avg"  $metric) }}
             </td>
          {{ end }}
