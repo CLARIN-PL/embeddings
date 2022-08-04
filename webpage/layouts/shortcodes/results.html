@@ -159,7 +159,7 @@
 
       const select = document.createElement("select");
       select.value = datasets[0];
-      select.style = "margin:0 0 2em; width:200px; padding: 3px; border-radius: 5px; ";
+      select.style = "margin:0 0 1em; width:200px; padding: 3px; border-radius: 5px; border: #4169e1 solid 2px !important; outline: 0 !important; background: #fff;";
       select.onchange = ()=>{
         datasets.forEach((d,i) => {
          const dataset = document.getElementById("data-table-"+i);
