@@ -159,6 +159,7 @@
 
       const select = document.createElement("select");
       select.value = datasets[0];
+      select.style = "margin:0 0 2em; width:200px; padding: 3px; border-radius: 5px; ";
       select.onchange = ()=>{
         datasets.forEach((d,i) => {
          const dataset = document.getElementById("data-table-"+i);
@@ -181,6 +182,10 @@
       })
       const main = document.getElementById("content");
       main.insertBefore(select, main.firstChild)
+
+      const datasetLabel = document.createElement("div");
+      datasetLabel.innerText = "Wybierz dataset:";
+      main.insertBefore(datasetLabel, select)
 
 
       datasets.forEach((d,i) => {
