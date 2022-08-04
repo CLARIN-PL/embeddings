@@ -144,7 +144,6 @@
       });
       var formattedColumns = table.getColumnDefinitions().map(c => { c.formatter = "html"; return c})
       
-      console.log(table.getColumnDefinitions())
       formattedColumns.forEach((col,i) => {
          col.headerFilter = true;
          if(i>2) {
