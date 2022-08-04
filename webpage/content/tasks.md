@@ -7,5 +7,4 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-{{< avarageResults >}}
 {{< results >}}

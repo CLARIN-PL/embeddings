@@ -6,5 +6,5 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-{{< avarageResults >}}
+{{< avarageResults tasktype="Part-of-speach Tagging" >}}
 {{< results type="Part-of-speach Tagging" >}}

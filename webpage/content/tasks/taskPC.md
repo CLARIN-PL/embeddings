@@ -6,5 +6,5 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-{{< avarageResults >}}
+{{< avarageResults tasktype="Paraphrase Classification" >}}
 {{< results type="Paraphrase Classification" >}}

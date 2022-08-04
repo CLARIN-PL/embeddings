@@ -5,5 +5,4 @@ geekdocNav: false
 geekdocBreadcrumb: false
 ---
 {{< pageHeader >}}
-{{< avarageResults >}}
 {{< about >}}
