@@ -1,0 +1,8 @@
+{{ $datasets := slice }}
+{{ range $file, $result := $.Site.Data.results }}
+    {{ $datasets = uniq ($datasets | append (index $result "dataset_name")) }}
+{{end}}
+
+{{ range $dataset := $datasets}}
+    <div> {{ $dataset }} </div>
+{{end}}

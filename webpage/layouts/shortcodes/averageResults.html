@@ -31,23 +31,17 @@
        <div class="title">{{ $tasktype }}</div>
 </div>
 
-<div>Modele: {{ $models }}</div>
-
-<div>Metryki: {{ $metrics }}</div>
-
 <table id="data-table" >
     <thead>
         <tr>
             <th>
                 Dataset
             </th>
-        </tr>
-       <tr>
-          {{ range $metric := $metrics }}
-             <th>
-                {{ $metric  |  humanize  }}
-             </th>
-          {{end}}
+            {{ range $metric := $metrics }}
+                <th>
+                    {{ $metric  |  humanize  }}
+                </th>
+            {{end}}
        </tr>
     </thead>
  {{ range $file, $result := $.Site.Data.results }}
