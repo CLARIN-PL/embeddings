@@ -6,5 +6,5 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-{{< avarageResults tasktype="Sentiment Analysis" >}}
+{{< averageResults tasktype="Sentiment Analysis" >}}
 {{< results type="Sentiment Analysis" >}}

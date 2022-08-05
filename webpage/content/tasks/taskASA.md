@@ -6,6 +6,6 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-{{< avarageResults tasktype="Aspect-based Sentiment Analysis" >}}
+{{< averageResults tasktype="Aspect-based Sentiment Analysis" >}}
 {{< results type="Aspect-based Sentiment Analysis" >}}
 

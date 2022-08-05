@@ -6,6 +6,6 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-{{< avarageResults tasktype="Entailment Classification" >}}
+{{< averageResults tasktype="Entailment Classification" >}}
 {{< results type="Entailment Classification" >}}
 

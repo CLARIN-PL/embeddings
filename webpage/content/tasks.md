@@ -7,5 +7,5 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-{{< avarageResults >}}
+{{< averageResults >}}
 {{< results >}}

@@ -6,5 +6,5 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-{{< avarageResults tasktype="Named Entity Recognition" >}}
+{{< averageResults tasktype="Named Entity Recognition" >}}
 {{< results type="Named Entity Recognition" >}}

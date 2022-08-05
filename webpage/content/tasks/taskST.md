@@ -6,5 +6,5 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-{{< avarageResults tasktype="Sequence Tagging" >}}
+{{< averageResults tasktype="Sequence Tagging" >}}
 {{< results type="Sequence Tagging" >}}

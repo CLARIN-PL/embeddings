@@ -6,5 +6,5 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-{{< avarageResults tasktype="Punctuation Restoration" >}}
+{{< averageResults tasktype="Punctuation Restoration" >}}
 {{< results type="Punctuation Restoration" >}}

@@ -6,5 +6,5 @@ geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-{{< avarageResults tasktype="Q&A Classification" >}}
+{{< averageResults tasktype="Q&A Classification" >}}
 {{< results type="Q&A Classification" >}}
