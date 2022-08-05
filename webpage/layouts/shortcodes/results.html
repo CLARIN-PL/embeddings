@@ -3,7 +3,7 @@
 {{ $leaderboard := slice "leaderboard_task_name"}}
 {{ $fieldsValue := slice  "embedding_name" }}
 {{ $metrics := slice }}
-{{ $metricsToIgnore := slice "classes" }}
+{{ $metricsToIgnore := slice "classes" "f1_weighted" "recall_weighted" "precision_weighted" }}
 {{ range $.Site.Data.results }}
    {{ range $k, $v := .metrics_avg }}
       {{if (not (in $metricsToIgnore $k)) }}
@@ -103,11 +103,9 @@
                {{end}}
 
                {{ range $metric := $metrics }}
-                  {{ if and (ne $metric "f1_weighted") (ne $metric "recall_weighted") (ne $metric "precision_weighted")}}       
-                     <th>
-                        {{ $metric  |  humanize  }}
-                     </th>
-                  {{end}} 
+                  <th>
+                     {{ $metric  |  humanize  }}
+                  </th>
                {{end}}
             </tr>
          </thead>
