@@ -1,5 +1,12 @@
 {{ $tasktype := default "Tasks" (.Get "tasktype") }}
-
+{{ $modelsTemp := slice }}
+{{ range $file, $result := $.Site.Data.results }}  
+    {{ $modelsTemp = uniq ($modelsTemp | append (index $result "embedding_name")) }}
+{{end}}
+{{ $models := slice }}
+{{ range $model := $modelsTemp }}  
+{{ $models = uniq ($models | append (index $model "value")) }}
+{{end}}
 
 <style scoped>
     .title {
@@ -9,8 +16,9 @@
       text-align: center;
     }
 </style>
-
 <div style="margin: 0 2em;">
     <div class="container title-container">     
        <div class="title">{{ $tasktype }}</div>
- </div>
+</div>
+
+{{ $models }}
