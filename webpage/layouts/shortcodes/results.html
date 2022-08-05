@@ -28,7 +28,7 @@
       .title {
         font-size: 32px;
         font-weight: 300;
-        margin: 0.5em 0 1.5em 0;
+        margin: 0.5em 0;
         text-align: center;
       }
       .tabulator-cell{
@@ -88,7 +88,7 @@
 <input type="hidden" id="datasets-list" value="{{$datasets}}">
 <div style="margin: 0 2em;">
    <div class="container title-container">     
-      <div class="title">{{ $type }}</div>
+      <div class="title">Details</div>
 </div>
 <div id="content">
    {{ range $index, $dataset := $datasets }}

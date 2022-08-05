@@ -1,0 +1,16 @@
+{{ $tasktype := default "Tasks" (.Get "tasktype") }}
+
+
+<style scoped>
+    .title {
+      font-size: 32px;
+      font-weight: 300;
+      margin: 0.5em 0;
+      text-align: center;
+    }
+</style>
+
+<div style="margin: 0 2em;">
+    <div class="container title-container">     
+       <div class="title">{{ $tasktype }}</div>
+ </div>
