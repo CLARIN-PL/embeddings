@@ -17,7 +17,7 @@
       {{end}}
    {{ end }}
 {{ end }}
-
+{{ $sum := slice }}
 <style scoped>
     .title {
       font-size: 32px;
@@ -25,10 +25,28 @@
       margin: 0.5em 0;
       text-align: center;
     }
+    #data-table{
+        max-width: 800px;
+        margin: auto;
+    }
 </style>
 <div style="margin: 0 2em;">
     <div class="container title-container">     
        <div class="title">{{ $tasktype }}</div>
+</div>
+
+<div id="data-tasktype" style="visibility: hidden; height: 0px; overflow: hidden;">{{ $tasktype }}</div>
+<div id="data-avarage" style="visibility: hidden; height: 0px; overflow: hidden;">
+{{ range $model := $models }}
+    {{ range $metric := $metrics }}
+        {{ range $file, $result := $.Site.Data.results }}
+            {{if eq ( index (index $result "embedding_name") "value") $model}}
+                {{ $sum := ($sum | append (index $result "metrics_avg" $metric))}}
+                <div> {{ $model }};;{{ $metric }};;{{(index $result "leaderboard_task_name")}};;{{(index $result "dataset_name")}};;{{index $result "metrics_avg" $metric}}</div>
+            {{end}}
+        {{end}}
+    {{end}}
+{{end}}
 </div>
 
 <table id="data-table" >
@@ -44,18 +62,9 @@
             {{end}}
        </tr>
     </thead>
- {{ range $file, $result := $.Site.Data.results }}
-    <tr>
-        <td>
-            {{index $result "dataset_name" }}
-        </td>
-        {{ range $metric:= $metrics }}
-            <td>
-                {{(index $result "metrics_avg"  $metric) }}
-            </td>
-        {{ end }}
+    <tr id="table-rows">
+
     </tr>
- {{end}}
  </table>
 
  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
@@ -82,5 +91,49 @@
             col.headerFilter = false;
         }
     })
-    table.setColumns(formattedColumns)
+    table.setColumns(formattedColumns);
+
+
+    const dataDiv = document.getElementById("data-avarage");
+    let array = [...dataDiv.children];
+    let dataArray = []
+    array.forEach((el)=>{
+        const temp = el.innerHTML.split(";;");
+        dataArray.push({model: temp[0], metric: temp[1], task: temp[2], dataset: temp[3], value: temp[4]})
+    })
+
+    const tasktype = document.getElementById("data-tasktype").innerHTML;
+    const uniqueModels = [...new Set(dataArray.map(item => item.model))];
+    const uniqueMetric = [...new Set(dataArray.map(item => item.metric))];
+ 
+    let values = new Array(0);
+    uniqueModels.forEach(model => {
+        let dataset = {dataset: model};
+        dataArray.forEach(el =>{
+            if( (tasktype == "Tasks" || el.task == tasktype) && el.model == model){
+                uniqueMetric.forEach( m =>{
+                    if(el.metric == m){
+                        if(dataset[m+"_sum"] == undefined){
+                            dataset[m+"_sum"] = +el.value;
+                            dataset[m+"_count"] = 1;
+                            dataset[m] = dataset[m+"_sum"] / dataset[m+"_count"];
+                        }else{
+                            dataset[m+"_sum"] += +el.value;
+                            dataset[m+"_count"] += 1;
+                            dataset[m] = dataset[m+"_sum"] / dataset[m+"_count"];
+                        }
+                    }
+                })
+            }
+        })
+        if(Object.keys(dataset).length>1){
+            const deleteKeys = Object.keys(dataset).filter( item => item.includes("_sum") || item.includes("_count"));
+            deleteKeys.forEach(d => {
+                delete dataset[d];
+            })
+            values.push(dataset);
+        }
+    })
+    table.replaceData(values);
+
  </script>
