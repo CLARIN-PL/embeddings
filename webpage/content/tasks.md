@@ -1,11 +1,10 @@
 ---
-title: Tasks
+title: By Dataset
 type: docs
-url: "/tasks"
+url: "/by-dataset"
 geekdocNav: false
 geekdocBreadcrumb: false
 ---
 
 {{< pageHeader >}}
-{{< averageResults >}}
 {{< results >}}

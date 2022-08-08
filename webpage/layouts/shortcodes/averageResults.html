@@ -22,7 +22,8 @@
     .title {
       font-size: 32px;
       font-weight: 300;
-      margin: 0.5em 0;
+      margin: 1em 0;
+      margin-top: 2em;
       text-align: center;
     }
     #data-table{
@@ -31,8 +32,13 @@
     }
 </style>
 <div style="margin: 0 2em;">
-    <div class="container title-container">     
+    <div class="container title-container">    
+        {{ if eq $tasktype "Tasks"}} 
+       <div class="title">Leaderboard</div>
+       {{else}}
        <div class="title">{{ $tasktype }}</div>
+       {{end}}
+       
 </div>
 
 <div id="data-tasktype" style="visibility: hidden; height: 0px; overflow: hidden;">{{ $tasktype }}</div>

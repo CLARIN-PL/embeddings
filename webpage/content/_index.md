@@ -7,3 +7,4 @@ geekdocBreadcrumb: false
 
 {{< pageHeader >}}
 {{< homepage >}}
+{{< averageResults >}}
