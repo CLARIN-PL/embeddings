@@ -53,7 +53,7 @@
     <thead>
         <tr>
             <th>
-                Dataset
+                Model
             </th>
             {{ range $metric := $metrics }}
                 <th>
@@ -108,30 +108,30 @@
  
     let values = new Array(0);
     uniqueModels.forEach(model => {
-        let dataset = {dataset: model};
+        let modelObj = {model: model};
         dataArray.forEach(el =>{
             if( (tasktype == "Tasks" || el.task == tasktype) && el.model == model){
                 uniqueMetric.forEach( m =>{
                     if(el.metric == m){
-                        if(dataset[m+"_sum"] == undefined){
-                            dataset[m+"_sum"] = +el.value;
-                            dataset[m+"_count"] = 1;
-                            dataset[m] = dataset[m+"_sum"] / dataset[m+"_count"];
+                        if(modelObj[m+"_sum"] == undefined){
+                            modelObj[m+"_sum"] = +el.value;
+                            modelObj[m+"_count"] = 1;
+                            modelObj[m] = modelObj[m+"_sum"] / modelObj[m+"_count"];
                         }else{
-                            dataset[m+"_sum"] += +el.value;
-                            dataset[m+"_count"] += 1;
-                            dataset[m] = dataset[m+"_sum"] / dataset[m+"_count"];
+                            modelObj[m+"_sum"] += +el.value;
+                            modelObj[m+"_count"] += 1;
+                            modelObj[m] = modelObj[m+"_sum"] / modelObj[m+"_count"];
                         }
                     }
                 })
             }
         })
-        if(Object.keys(dataset).length>1){
-            const deleteKeys = Object.keys(dataset).filter( item => item.includes("_sum") || item.includes("_count"));
+        if(Object.keys(modelObj).length>1){
+            const deleteKeys = Object.keys(modelObj).filter( item => item.includes("_sum") || item.includes("_count"));
             deleteKeys.forEach(d => {
-                delete dataset[d];
+                delete modelObj[d];
             })
-            values.push(dataset);
+            values.push(modelObj);
         }
     })
     table.replaceData(values);
