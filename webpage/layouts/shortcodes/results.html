@@ -25,6 +25,23 @@
         {{ $datasets = uniq ($datasets | append (index $result "dataset_name")) }}
     {{end}}
 {{end}}
+<style scoped>  
+     .tabulator-col-content{
+         padding:0.5em !important;
+         height: fit-content;
+      }
+      .tabulator-cell{
+         min-width: 60px !important;
+         /* padding: 0.5em !important; */
+      }
+      .tabulator-col{
+         min-width: 60px !important;
+         padding-top:0 !important;
+      }
+      .tabulator-col.tabulator-col-group{
+         min-height: 80px !important;
+      }
+</style>
 
 <input type="hidden" id="datasets-list" value="{{$datasets}}">
 <div style="margin: 2em 0;">
@@ -122,27 +139,40 @@
 
          let table = new Tabulator("#data-table-"+i, {
             layout:"fitColumns",
-            movableColumns: true
+            movableColumns: true,
+            columnHeaderVertAlign:"bottom",
          });
          let formattedColumns = table.getColumnDefinitions().map(c => { c.formatter = "html"; return c})
-         
-         formattedColumns.forEach((col,i) => {
-           
+         let resultColumns = [];
+         formattedColumns.forEach((col,i) => {          
             if(i==0) { 
                col.headerFilter = true;
                col.widthGrow = 3;
                col.minWidth= 180;
+               resultColumns.push(col);
             }else{
-               col.formatter = "money";
-               col.hozAlign = "center";
-               col.formatterParams = {
-                  precision:3,
-               };
-               col.headerFilter = false;
-               console.log(col);
+               if(i%2==1){
+                  const t = col.title;
+                  col.title = "Mean";
+                  formattedColumns[i+1].title = "Std";
+                  col.formatter = "money";
+                  formattedColumns[i+1].formatter = "money";
+                  col.hozAlign = "center";
+                  formattedColumns[i+1].hozAlign = "center";
+                  col.formatterParams = {
+                     precision:3,
+                  };
+                  formattedColumns[i+1].formatterParams = {
+                     precision:3,
+                  };
+                  col.headerFilter = false;
+                  formattedColumns[i+1].headerFilter = false;
+                  let obj = {title: t, columns: [col, formattedColumns[i+1]]};
+                  resultColumns.push(obj);
+               }
             }
          });
-         table.setColumns(formattedColumns)
+         table.setColumns(resultColumns);
       });
    </script>
 </div>
