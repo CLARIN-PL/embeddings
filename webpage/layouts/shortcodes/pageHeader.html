@@ -1,3 +1,6 @@
+{{ $asset := resources.Get "/clarin-logo.png" }}
+{{ $img := $asset.Fit "150x50" }}
+
 <!DOCTYPE html>
 <html>
   <link
@@ -69,7 +72,7 @@
       }
       #content{
          max-width: 800px;
-         margin: auto;      
+         margin: auto;  
       }
       .tabulator{
         max-width: 100vw;
@@ -84,13 +87,12 @@
       .tabulator-cell{
          min-width: 75px !important;
          padding: 0.5em !important;
-
       }
       .tabulator-col{
          min-width: 75px !important;
       }
       .tabulator-col-content{
-         padding: 0.7em 0.5em !important;
+         padding: 0.7em 0.5em 1.2em 0.5em !important;
          font-weight: 700;
          color: royalblue;
          font-size: 12px;
@@ -152,8 +154,9 @@
   </head>
   <body>
     <div class="header">
-      <a class="menu-button home-button" href="/">Clarin Embedding</a>
+      <a href="https://clarin-pl.eu/index.php/en/home/" target="_blank"> <img alt="Clarin Embedding" src="{{ $img.RelPermalink }}" /> </a>
       <div class="menu-items">
+        <a class="menu-button" href="/">Home</a>
         <a class="menu-button" href="/by-dataset/">By dataset</a>
         <a class="menu-button" href="/datasets/">Datasets</a>
         <a class="menu-button" target="_blank" href="https://huggingface.co/spaces/clarin-pl/abusive-clauses-dashboard">Spaces</a>

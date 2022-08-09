@@ -1,7 +1,5 @@
 {{ $type := default "Tasks" (.Get "type") }}
-{{ $fields := slice "embedding_name" }}
 {{ $leaderboard := slice "leaderboard_task_name"}}
-{{ $fieldsValue := slice  "embedding_name" }}
 {{ $metrics := slice }}
 {{ $metricsToIgnore := slice "classes" "f1_weighted" "recall_weighted" "precision_weighted" }}
 {{ range $.Site.Data.results }}
@@ -11,7 +9,6 @@
       {{end}}
    {{ end }}
 {{ end }}
-{{ $fields :=  $fields | uniq }}
 
 {{ $datasets := slice }}
 {{ range $file, $result := $.Site.Data.results }}
@@ -31,12 +28,9 @@
       <table id="data-table-{{$index}}" >
          <thead>
             <tr>
-               {{ range $field := $fields }}
-                  <th>
-                     {{ $field  | humanize  }}
-                  </th>  
-               {{end}}
-
+               <th>
+                  Model
+              </th>
                {{ range $metric := $metrics }}
                   <th>
                      {{ $metric  |  humanize  }}
@@ -47,31 +41,20 @@
       {{ range $file, $result := $.Site.Data.results }}
       {{if or (eq $type "Tasks") (eq (index $result $leaderboard) $type)}}
             {{if eq (index $result "dataset_name") $dataset }}
-               <div>
-                  <tr>
-                     {{ range $field:= $fields }}
-                     <td>
-                        {{if (eq $field "embedding_name")}}
-                           <button type="button" class="button" data-bs-toggle="modal" data-bs-target="#{{$file}}"> 
-                              i
-                           </button>
-                           {{end}}
-                           
-                           {{if (in $fieldsValue $field)}}
-                              {{ index $result $field "value"}}
-                           {{else}}
-                              {{ index $result $field }}
-                           {{end}}
-                     </td>
-                     {{ end }}
+               <tr>
+                  <td>
+                     <button type="button" class="button" data-bs-toggle="modal" data-bs-target="#{{$file}}"> 
+                        i
+                     </button>
+                     {{ index $result "embedding_name" "value"}}
+                  </td>
 
-                     {{ range $metric:= $metrics }}
-                     <td>
-                        {{(index $result "metrics_avg"  $metric) }}
-                     </td>
-                     {{ end }}
-                  </tr>
-               </div>
+                  {{ range $metric:= $metrics }}
+                  <td>
+                     {{(index $result "metrics_avg"  $metric) }}
+                  </td>
+                  {{ end }}
+               </tr>
             {{end}}    
       {{end}} 
       {{end}}
@@ -103,11 +86,10 @@
         })
       }
       datasets.forEach((d,i) => {
+         const dataset = document.getElementById("data-table-"+i);
          if(i!=0){
-            const dataset = document.getElementById("data-table-"+i);
-            dataset.setAttribute("style", "height: 0; overflow: hidden;");
+            dataset.setAttribute("style", "height: 0; width:0px; overflow: hidden;");
          }
-
          const e = document.createElement("option");
          e.value = d;
          e.innerText = d;
@@ -130,20 +112,21 @@
          let formattedColumns = table.getColumnDefinitions().map(c => { c.formatter = "html"; return c})
          
          formattedColumns.forEach((col,i) => {
-            col.headerFilter = true;
-            if(i==0) {
+           
+            if(i==0) { 
+               col.headerFilter = true;
                col.widthGrow = 3;
+               col.minWidth= 180;
             }else{
                col.formatter = "money";
-               col.widthGrow = 1;
-
                col.hozAlign = "center";
                col.formatterParams = {
                   precision:3,
                };
                col.headerFilter = false;
+               console.log(col);
             }
-         })
+         });
          table.setColumns(formattedColumns)
       });
    </script>
