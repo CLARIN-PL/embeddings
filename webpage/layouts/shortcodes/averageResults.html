@@ -27,7 +27,7 @@
       text-align: center;
     }
     #data-table{
-        max-width: 1300px;
+        max-width: 800px;
         margin: auto;
     }
 </style>
@@ -65,9 +65,6 @@
                 <th>
                     {{ $metric  |  humanize  }} 
                 </th>
-                <th>
-                    {{ $metric  |  humanize  }} Std
-                </th>
             {{end}}
        </tr>
     </thead>
@@ -91,10 +88,10 @@
         return c
     })       
     formattedColumns.forEach((col,i) => {
-        col.field = col.field.replace(" std", "_std");
         if(i==0){
             col.headerFilter = true;
-            col.minWidth = 180;
+            col.widthGrow = 3;
+            col.minWidth= 180;
         }else{
             col.formatter = "money";
             col.hozAlign = "center";
@@ -129,12 +126,10 @@
                         if(modelObj[m+"_sum"] == undefined){
                             modelObj[m+"_sum"] = +el.value;
                             modelObj[m+"_count"] = 1;
-                            modelObj[m+"_std"] = el.value + ";";
                             modelObj[m] = modelObj[m+"_sum"] / modelObj[m+"_count"];
                         }else{
                             modelObj[m+"_sum"] += +el.value;
                             modelObj[m+"_count"] += 1;
-                            modelObj[m+"_std"] += el.value + ";";
                             modelObj[m] = modelObj[m+"_sum"] / modelObj[m+"_count"];
                         }
                     }
@@ -146,27 +141,7 @@
             deleteKeys.forEach(d => {
                 delete modelObj[d];
             })
-            const std = Object.keys(modelObj).filter( item => item.includes("_std"));
-            std.forEach( s => {
-                const array = modelObj[s].split(";");
-                modelObj[s] = standardDeviation(array);
-            })
             values.push(modelObj);
-
-            function standardDeviation(arr){
-                arr.pop();
-                let mean = arr.reduce((acc, curr)=>{
-                    return +acc + +curr
-                 }, 0) / arr.length;
-
-                arr = arr.map((el)=>{
-                    return (el - mean) ** 2
-                })
-
-                let total = arr.reduce((acc, curr)=> acc + curr, 0);
-
-                return Math.sqrt(total / arr.length)
-            }
         }
     })
     table.replaceData(values);

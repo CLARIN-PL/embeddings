@@ -10,6 +10,15 @@
    {{ end }}
 {{ end }}
 
+{{ $metricsStd := slice }}
+{{ range $.Site.Data.results }}
+   {{ range $k, $v := .metrics_std }}
+      {{if (not (in $metricsToIgnore $k)) }}
+         {{ $metricsStd = uniq ($metricsStd | append $k) }}
+      {{end}}
+   {{ end }}
+{{ end }}
+
 {{ $datasets := slice }}
 {{ range $file, $result := $.Site.Data.results }}
     {{if or (eq $type "Tasks") (eq (index $result $leaderboard) $type)}}
@@ -35,6 +44,9 @@
                   <th>
                      {{ $metric  |  humanize  }}
                   </th>
+                  <th>
+                     {{ $metric  |  humanize  }} Std
+                  </th>
                {{end}}
             </tr>
          </thead>
@@ -52,6 +64,9 @@
                   {{ range $metric:= $metrics }}
                   <td>
                      {{(index $result "metrics_avg"  $metric) }}
+                  </td>
+                  <td>
+                     {{(index $result "metrics_std"  $metric) }}
                   </td>
                   {{ end }}
                </tr>
