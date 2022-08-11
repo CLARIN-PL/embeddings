@@ -25,6 +25,7 @@
         {{ $datasets = uniq ($datasets | append (index $result "dataset_name")) }}
     {{end}}
 {{end}}
+
 <style scoped>  
      .tabulator-col-content{
          padding:0.5em !important;
@@ -53,18 +54,22 @@
       .close-icon:hover{
          color: royalblue;
       }
-      .modal-dialog{
-         position: fixed !important;
-         top: 30% !important;
-         left: 50% !important;
-         transform: translate(-50%, -50%) !important;
-      }
 
       .modal.modal-xl.fade.show{
          padding: 0 !important;
       }
       .modal-open{
          padding: 0 !important;
+      }
+      .select-view{
+         margin:0 0 1em; 
+         width:200px; 
+         padding: 3px; 
+         border-radius: 5px; 
+         border: #4169e1 solid 2px !important; 
+         outline: 0 !important; 
+         background: #fff; 
+         color: #000 !important;
       }
 
 </style>
@@ -133,7 +138,7 @@
 
       const select = document.createElement("select");
       select.value = datasets[0];
-      select.style = "margin:0 0 1em; width:200px; padding: 3px; border-radius: 5px; border: #4169e1 solid 2px !important; outline: 0 !important; background: #fff; color: #000 !important;";
+      select.classList.add("select-view");
       select.onchange = ()=>{
         datasets.forEach((d,i) => {
          const dataset = document.getElementById("data-table-"+i);
@@ -202,21 +207,71 @@
       });
    </script>
 </div>
+{{ $allMetrics := slice}}
+{{ range $.Site.Data.results }}
+   {{ range $k, $v := .metrics_avg }}
+      {{if (not (eq "classes" $k)) }}
+         {{ $allMetrics = uniq ($allMetrics | append $k) }}
+      {{end}}
+   {{ end }}
+{{ end }}
+
+
 
 {{ range $file, $result := $.Site.Data.results }}
-<div class="modal modal-xl fade" id="{{$file}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
-      <div class="modal-content">
-         <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">{{$file | humanize}}</h5>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-               <span class="close-icon" aria-hidden="true">&times;</span>
-            </button>
-         </div>
-         <div class="modal-body">
-               TEST
+   {{ $classesNames := slice }}
+   {{ range $k, $v := .metrics_avg.classes }}
+         {{ $classesNames = uniq ( $classesNames | append $k) }}
+   {{ end }}
+   <div class="modal modal-xl fade" id="{{$file}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title" id="exampleModalLabel">{{$file | humanize}}</h5>
+               <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                  <span class="close-icon" aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <div class="modal-body">
+                  <div>Select an index:</div>
+                  <select name="classes" id="classes-{{$file}}" class="select-view">
+                     {{ range $i, $name := $classesNames }}
+                     <option value="{{ $i }}">{{ $name }} </option>
+                     {{end}}
+                  </select>
+
+                     <table>
+                        <thead>
+                           <th>
+                              Index
+                           </th>
+                           {{ range $m := $allMetrics }}
+                              {{if (not (eq "classes" $m)) }}
+                                 <th>
+                                    {{$m | humanize}}
+                                 </th>
+                              {{end}}
+                           {{end}}
+                        </thead>
+                           {{ range $i, $res := .metrics }}
+                              <tr>
+                                 <td> {{$i}} </td>                                  
+                                 {{ range $key, $result := $res}}                                  
+                                       {{if (not (eq "classes" $key)) }}
+                                          <td>
+                                             {{$result}}
+                                          </td>                                       
+                                       {{end}}
+                                 {{end}}
+                              </tr>
+                           {{end}}
+                     </table>
+                  
+                  <script>
+                     document.getElementById("classes-{{$file}}").onchange = (e) =>{ console.log(document.getElementById("classes-{{$file}}").value)};
+                  </script>
+            </div>
          </div>
       </div>
    </div>
-</div>
 {{end}}
