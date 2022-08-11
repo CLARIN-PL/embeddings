@@ -216,6 +216,14 @@
    {{ end }}
 {{ end }}
 
+{{ $classHeaderItems := slice}}
+{{ range $file, $result := $.Site.Data.results }}
+   {{ range $m := .metrics_avg.classes }}
+      {{ range $key, $result := $m}}                                  
+         {{ $classHeaderItems = uniq ($classHeaderItems | append $key) }}                           
+      {{end}}
+   {{end}}
+{{end}}
 
 
 {{ range $file, $result := $.Site.Data.results }}
@@ -233,12 +241,35 @@
                </button>
             </div>
             <div class="modal-body">
-                  <div>Select an index:</div>
+                  <div>Select a class:</div>
                   <select name="classes" id="classes-{{$file}}" class="select-view">
                      {{ range $i, $name := $classesNames }}
                      <option value="{{ $i }}">{{ $name }} </option>
                      {{end}}
                   </select>
+
+                  <table>
+                     <thead>
+                        <th>
+                           Class name
+                        </th>
+                        {{ range $c := $classHeaderItems }}                               
+                           <th>
+                              {{$c | humanize}}
+                           </th>                                       
+                        {{end}}
+                     </thead>
+                        {{ range $i, $m := .metrics_avg.classes }}
+                           <tr>
+                              <td> {{$i}} </td>                                  
+                              {{ range $key, $result := $m}}                                  
+                                 <td>
+                                    {{$result}}
+                                 </td>                                       
+                              {{end}}
+                           </tr>
+                        {{end}}
+                  </table>
 
                      <table>
                         <thead>
