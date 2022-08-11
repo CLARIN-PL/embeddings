@@ -71,6 +71,14 @@
          background: #fff; 
          color: #000 !important;
       }
+      .modal-table-1{
+         max-width: 600px !important;
+         margin: auto;
+      }
+      .tabulator-page{
+         padding-top: 0 !important;
+         padding-bottom: 0 !important;
+      }
 
 </style>
 
@@ -207,6 +215,9 @@
       });
    </script>
 </div>
+
+<!----------------------------------------------- MODAL --------------------------------------->
+
 {{ $allMetrics := slice}}
 {{ range $.Site.Data.results }}
    {{ range $k, $v := .metrics_avg }}
@@ -227,10 +238,6 @@
 
 
 {{ range $file, $result := $.Site.Data.results }}
-   {{ $classesNames := slice }}
-   {{ range $k, $v := .metrics_avg.classes }}
-         {{ $classesNames = uniq ( $classesNames | append $k) }}
-   {{ end }}
    <div class="modal modal-xl fade" id="{{$file}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
          <div class="modal-content">
@@ -241,68 +248,88 @@
                </button>
             </div>
             <div class="modal-body">
-                  <div>Select a class:</div>
-                  <select name="classes" id="classes-{{$file}}" class="select-view">
-                     {{ range $i, $name := $classesNames }}
-                     <option value="{{ $i }}">{{ $name }} </option>
-                     {{end}}
-                  </select>
 
-                  <table>
-                     <thead>
+               <table class="modal-table-1" id="modal-table-1-{{$file}}">
+                  <thead>
+                     <th>
+                        Class name
+                     </th>
+                     {{ range $c := $classHeaderItems }}                               
                         <th>
-                           Class name
-                        </th>
-                        {{ range $c := $classHeaderItems }}                               
-                           <th>
-                              {{$c | humanize}}
-                           </th>                                       
-                        {{end}}
-                     </thead>
-                        {{ range $i, $m := .metrics_avg.classes }}
-                           <tr>
-                              <td> {{$i}} </td>                                  
-                              {{ range $key, $result := $m}}                                  
-                                 <td>
-                                    {{$result}}
-                                 </td>                                       
-                              {{end}}
-                           </tr>
-                        {{end}}
-                  </table>
+                           {{$c | humanize}}
+                        </th>                                       
+                     {{end}}
+                  </thead>
+                     {{ range $i, $m := .metrics_avg.classes }}
+                        <tr>
+                           <td> {{$i}} </td>                                  
+                           {{ range $key, $result := $m}}                                  
+                              <td>
+                                 {{$result}}
+                              </td>                                       
+                           {{end}}
+                        </tr>
+                     {{end}}
+               </table>
 
-                     <table>
-                        <thead>
+               <!-- <table>
+                  <thead>
+                     <th>
+                        Index
+                     </th>
+                     {{ range $m := $allMetrics }}
+                        {{if (not (eq "classes" $m)) }}
                            <th>
-                              Index
+                              {{$m | humanize}}
                            </th>
-                           {{ range $m := $allMetrics }}
-                              {{if (not (eq "classes" $m)) }}
-                                 <th>
-                                    {{$m | humanize}}
-                                 </th>
-                              {{end}}
-                           {{end}}
-                        </thead>
-                           {{ range $i, $res := .metrics }}
-                              <tr>
-                                 <td> {{$i}} </td>                                  
-                                 {{ range $key, $result := $res}}                                  
-                                       {{if (not (eq "classes" $key)) }}
-                                          <td>
-                                             {{$result}}
-                                          </td>                                       
-                                       {{end}}
+                        {{end}}
+                     {{end}}
+                  </thead>
+                     {{ range $i, $res := .metrics }}
+                        <tr>
+                           <td> {{$i}} </td>                                  
+                           {{ range $key, $result := $res}}                                  
+                                 {{if (not (eq "classes" $key)) }}
+                                    <td>
+                                       {{$result}}
+                                    </td>                                       
                                  {{end}}
-                              </tr>
                            {{end}}
-                     </table>
-                  
-                  <script>
-                     document.getElementById("classes-{{$file}}").onchange = (e) =>{ console.log(document.getElementById("classes-{{$file}}").value)};
-                  </script>
+                        </tr>
+                     {{end}}
+               </table> -->
             </div>
          </div>
       </div>
    </div>
 {{end}}
+<script>
+   const classTables = document.getElementsByClassName("modal-table-1");
+   for(let i = 0; i < classTables.length; i++){
+      let table = new Tabulator("#" +classTables[i].id, {
+         layout:"fitColumns",
+         movableColumns: true,
+         pagination:"local",
+         paginationSize:5,
+         paginationCounter:"rows",
+         paginationSizeSelector:[5, 10, 25, 100],
+      });
+      let formattedColumns = table.getColumnDefinitions().map(c => { c.formatter = "html"; return c})
+      formattedColumns.forEach((col,i) => {   
+         if(i==0){
+               col.minWidth = 200;
+         }else{
+            col.hozAlign = "center";
+         }
+         if(i<4){
+            col.formatter = "money";
+            col.formatterParams = {
+               precision:3,
+            };
+            col.headerFilter = false;
+         }      
+
+      });
+      table.setColumns(formattedColumns);
+   }
+</script>
