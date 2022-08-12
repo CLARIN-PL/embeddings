@@ -271,9 +271,15 @@
 
                <textarea style="visibility: hidden; height: 0;" id="json-input{{$file}}" autocomplete="off">{{jsonify (dict "indent" " ") $result}}</textarea>
 
-               <div style="margin-top: 2em;">
+               <div style="margin-top: 1em; max-height: 500px; overflow: auto;">
                   <pre id="json-display{{$file}}"></pre>
                </div>
+               <style> 
+                  .json-dict{
+                     line-height: 0.8;
+                     font-size: 12px !important;
+                  }
+               </style>
                <script>
                // get JSON 
                function getJson() {
@@ -321,8 +327,6 @@
       </div>
    </div>
 {{end}}
-
-<div id="result-json"></div>
 
 <script>
    const classTables = document.getElementsByClassName("modal-table-1");
