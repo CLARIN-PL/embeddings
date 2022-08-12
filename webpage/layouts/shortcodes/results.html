@@ -268,11 +268,28 @@
                      {{end}}
                </table>
 
+
+               <textarea style="visibility: hidden; height: 0;" id="json-input{{$file}}" autocomplete="off">{{jsonify (dict "indent" " ") $result}}</textarea>
+
                <div style="margin-top: 2em;">
-                  <code>
-                     <pre>{{jsonify (dict "indent" " ") $result}}</pre>
-                  </code>
+                  <pre id="json-display{{$file}}"></pre>
                </div>
+               <script>
+               // get JSON 
+               function getJson() {
+               try {
+                  return JSON.parse($('#json-input{{$file}}').val());
+               } catch (ex) {
+                  alert('Wrong JSON Format: ' + ex);
+               }
+               }
+
+               // initialize
+               var editor = new JsonEditor('#json-display{{$file}}', getJson());
+               editor.load(getJson());
+               // enable translate butto
+
+               </script>
                <!-- <table>
                   <thead>
                      <th>
@@ -304,6 +321,9 @@
       </div>
    </div>
 {{end}}
+
+<div id="result-json"></div>
+
 <script>
    const classTables = document.getElementsByClassName("modal-table-1");
    for(let i = 0; i < classTables.length; i++){
