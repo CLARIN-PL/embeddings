@@ -79,6 +79,11 @@
          padding-top: 0 !important;
          padding-bottom: 0 !important;
       }
+      .json-dict{
+         line-height: 0.8;
+         font-size: 12px !important;
+      }
+
 
 </style>
 
@@ -271,17 +276,11 @@
 
                <textarea style="visibility: hidden; height: 0;" id="json-input{{$file}}" autocomplete="off">{{jsonify (dict "indent" " ") $result}}</textarea>
 
-               <div style="margin-top: 1em; max-height: 500px; overflow: auto;">
+               <div style="max-height: 500px; overflow: auto;">
                   <pre id="json-display{{$file}}"></pre>
                </div>
-               <style> 
-                  .json-dict{
-                     line-height: 0.8;
-                     font-size: 12px !important;
-                  }
-               </style>
                <script>
-               // get JSON 
+
                function getJson() {
                try {
                   return JSON.parse($('#json-input{{$file}}').val());
@@ -289,11 +288,9 @@
                   alert('Wrong JSON Format: ' + ex);
                }
                }
-
-               // initialize
                var editor = new JsonEditor('#json-display{{$file}}', getJson());
                editor.load(getJson());
-               // enable translate butto
+
 
                </script>
                <!-- <table>
