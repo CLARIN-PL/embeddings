@@ -19,11 +19,26 @@
    {{ end }}
 {{ end }}
 
+{{ $lastItem := "support"}}
+{{ $classHeaderItems := slice}}
 {{ $datasets := slice }}
 {{ range $file, $result := $.Site.Data.results }}
-    {{if or (eq $type "Tasks") (eq (index $result $leaderboard) $type)}}
+    
+   <div id="modal-data{{$file}}" style="display:none;">{"items":[{{ range $i, $m := .metrics_avg.classes }}{"class_name": "{{$i}}",{{ range $key, $result := $m}}"{{$key}}":"{{$result}}",{{end}}},{{end}}]}</div>
+
+
+   {{if or (eq $type "Tasks") (eq (index $result $leaderboard) $type)}}
         {{ $datasets = uniq ($datasets | append (index $result "dataset_name")) }}
     {{end}}
+
+    <textarea style="display:none;" id="json-input{{$file}}" autocomplete="off">{{jsonify (dict "indent" " ") $result}}</textarea>
+    
+    {{ range $m := .metrics_avg.classes }}
+       {{ range $key, $result := $m}}                                  
+          {{ $classHeaderItems = uniq ($classHeaderItems | append $key) }}                           
+       {{end}}
+    {{end}}
+
 {{end}}
 
 <style scoped>  
@@ -116,7 +131,7 @@
             {{if eq (index $result "dataset_name") $dataset }}
                <tr>
                   <td>
-                     <button type="button" class="button" data-bs-toggle="modal" data-bs-target="#{{$file}}"> 
+                     <button id="{{$file}}" type="button" class="button" data-bs-toggle="modal" data-bs-target="#modal"> 
                         i
                      </button>
                      {{ index $result "embedding_name" "value"}}
@@ -221,6 +236,97 @@
    </script>
 </div>
 
+
+<!----------------------------------------------- MODAL --------------------------------------->
+
+
+<div class="modal modal-xl fade" id="modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="modal-title">TYTUŁ</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+               <span class="close-icon" aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <div class="modal-body">
+            <table class="modal-table-1" id="modal-table">
+               <thead>
+                  <th>
+                     Class name
+                  </th>
+                  {{ range $c := $classHeaderItems }}                               
+                     <th>
+                        {{$c | humanize}}
+                     </th>                                       
+                  {{end}}
+               </thead>
+               <div id="modal-table-1-value"></div>
+            </table>
+
+            <div style="max-height: 500px; overflow: auto;">
+               <pre id="json-display"></pre>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<script>
+   let table = new Tabulator("#modal-table", {
+      layout:"fitColumns",
+      movableColumns: true,
+      pagination:"local",
+      paginationSize:5,
+      paginationCounter:"rows",
+      paginationSizeSelector:[5, 10, 25, 100],
+   });
+   let formattedColumns = table.getColumnDefinitions().map(c => { c.formatter = "html"; return c})
+   formattedColumns.forEach((col,i) => {   
+      if(i==0){
+            col.minWidth = 200;
+      }else{
+         col.hozAlign = "center";
+      }
+      if(i<4 && i!=0){
+         col.formatter = "money";
+         col.formatterParams = {
+            precision:3,
+         };
+         col.headerFilter = false;
+      }      
+
+   });
+   table.setColumns(formattedColumns);
+
+
+   const modalTitle = document.getElementById("modal-title");
+
+   document.addEventListener('click', function (event) {
+      if (!event.target.matches('.button')) return;
+      event.preventDefault();
+      modalTitle.innerText = event.target.id;
+      var editor = new JsonEditor('#json-display', getJson(event.target.id));
+      editor.load(getJson(event.target.id));
+
+      let jsonText = document.getElementById("modal-data"+event.target.id).innerHTML.toString();
+      jsonText = jsonText.split(",}").join("}");
+      jsonText = jsonText.split(",]").join("]");
+      jsonText = JSON.parse(jsonText);
+      table.replaceData(jsonText.items);
+
+   }, false);
+
+
+   function getJson(id) {
+      try {
+         return JSON.parse($(`#json-input${id}`).val());
+      } catch (ex) {
+         alert('Wrong JSON Format: ' + ex);
+      }
+   }
+</script>
+
 <!----------------------------------------------- MODAL --------------------------------------->
 
 {{ $allMetrics := slice}}
@@ -232,18 +338,9 @@
    {{ end }}
 {{ end }}
 
-{{ $classHeaderItems := slice}}
-{{ range $file, $result := $.Site.Data.results }}
-   {{ range $m := .metrics_avg.classes }}
-      {{ range $key, $result := $m}}                                  
-         {{ $classHeaderItems = uniq ($classHeaderItems | append $key) }}                           
-      {{end}}
-   {{end}}
-{{end}}
-
 
 {{ range $file, $result := $.Site.Data.results }}
-   <div class="modal modal-xl fade" id="{{$file}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+   <!-- <div class="modal modal-xl fade" id="{{$file}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
          <div class="modal-content">
             <div class="modal-header">
@@ -297,7 +394,7 @@
 
 
                </script>
-               <!-- <table>
+               <table>
                   <thead>
                      <th>
                         Index
@@ -322,13 +419,13 @@
                            {{end}}
                         </tr>
                      {{end}}
-               </table> -->
+               </table>
             </div>
          </div>
       </div>
-   </div>
+   </div> -->
 {{end}}
-
+<!-- 
 <script>
    const classTables = document.getElementsByClassName("modal-table-1");
    for(let i = 0; i < classTables.length; i++){
@@ -358,5 +455,5 @@
       });
       table.setColumns(formattedColumns);
    }
-</script>
+</script> -->
 
