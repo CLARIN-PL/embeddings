@@ -1,5 +1,4 @@
 {{ $datasets := slice }}
-{{ $datasetsToIgnore := slice "allegro/klej-cdsc-e" "allegro/klej-dyk" "allegro/klej-polemo2-official" "allegro/klej-polemo2-in" "allegro/klej-polemo2-out" "allegro/klej-psc" }}
 {{ range $file, $result := $.Site.Data.results }}
     {{ $datasets = uniq ($datasets | append (index $result "dataset_name")) }}
 {{end}}
@@ -22,9 +21,7 @@
         </h2>
         <div id="collapse{{$i}}" class="accordion-collapse collapse" aria-labelledby="heading{{$dataset}}" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-                {{ if not (in $datasetsToIgnore $dataset)}}
-                    <zero-md id="zeroMd" src="https://huggingface.co/datasets/{{$dataset}}/raw/main/README.md"></zero-md>
-                {{end}}
+                <zero-md id="zeroMd" src="https://huggingface.co/datasets/{{$dataset}}/raw/main/README.md"></zero-md>
             </div>
         </div>
         </div>
