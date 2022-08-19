@@ -83,8 +83,6 @@
          line-height: 0.8;
          font-size: 12px !important;
       }
-
-
 </style>
 
 <input type="hidden" id="datasets-list" value="{{$datasets}}">
@@ -92,7 +90,9 @@
    <div class="container title-container">     
       <div class="title">By dataset</div>
 </div>
-<div id="content">
+<div style="display: flex; justify-content: center; margin-top:2rem;"><div class="lds-ring" id="spinner"><div></div><div></div><div></div><div></div></div></div>
+
+<div id="content" style="display: none;">
    {{ range $index, $dataset := $datasets }}
    <div>
       <table id="data-table-{{$index}}" >
@@ -213,6 +213,10 @@
             }
          });
          table.setColumns(resultColumns);
+         const content = document.getElementById("content");
+         const spinner = document.getElementById("spinner");
+         content.style.display = "block";
+         spinner.style.display = "none";
       });
    </script>
 </div>
@@ -355,3 +359,4 @@
       table.setColumns(formattedColumns);
    }
 </script>
+

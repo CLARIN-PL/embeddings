@@ -42,7 +42,7 @@
 </div>
 
 <div id="data-tasktype" style="visibility: hidden; height: 0px; overflow: hidden;">{{ $tasktype }}</div>
-<div id="data-avarage" style="visibility: hidden; height: 0px; overflow: hidden;">
+<div id="data-average" style="visibility: hidden; height: 0px; overflow: hidden;">
 {{ range $model := $models }}
     {{ range $metric := $metrics }}
         {{ range $file, $result := $.Site.Data.results }}
@@ -54,8 +54,8 @@
     {{end}}
 {{end}}
 </div>
-
-<table id="data-table" >
+<div style="display: flex; justify-content: center; margin-top:2rem;"><div class="lds-ring" id="average-spinner"><div></div><div></div><div></div><div></div></div></div>
+<table id="data-table" style="display: none;">
     <thead>
         <tr>
             <th>
@@ -100,7 +100,7 @@
     table.setColumns(formattedColumns);
 
 
-    const dataDiv = document.getElementById("data-avarage");
+    const dataDiv = document.getElementById("data-average");
     let array = [...dataDiv.children];
     let dataArray = []
     array.forEach((el)=>{
@@ -141,5 +141,9 @@
         }
     })
     table.replaceData(values);
+    const content = document.getElementById("data-table");
+    const spinner = document.getElementById("average-spinner");
+    content.style.display = "block";
+    spinner.style.display = "none";
 
  </script>
