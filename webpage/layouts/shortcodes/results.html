@@ -273,7 +273,7 @@
 </div>
 
 <script>
-   let table = new Tabulator("#modal-table", {
+   let tableModal = new Tabulator("#modal-table", {
       layout:"fitColumns",
       movableColumns: true,
       pagination:"local",
@@ -281,8 +281,8 @@
       paginationCounter:"rows",
       paginationSizeSelector:[5, 10, 25, 100],
    });
-   let formattedColumns = table.getColumnDefinitions().map(c => { c.formatter = "html"; return c})
-   formattedColumns.forEach((col,i) => {   
+   let formattedColumnsModal = tableModal.getColumnDefinitions().map(c => { c.formatter = "html"; return c})
+   formattedColumnsModal.forEach((col,i) => {   
       if(i==0){
             col.minWidth = 200;
       }else{
@@ -297,7 +297,7 @@
       }      
 
    });
-   table.setColumns(formattedColumns);
+   tableModal.setColumns(formattedColumnsModal);
 
 
    const modalTitle = document.getElementById("modal-title");
@@ -313,7 +313,7 @@
       jsonText = jsonText.split(",}").join("}");
       jsonText = jsonText.split(",]").join("]");
       jsonText = JSON.parse(jsonText);
-      table.replaceData(jsonText.items);
+      tableModal.replaceData(jsonText.items);
 
    }, false);
 
