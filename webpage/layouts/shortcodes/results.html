@@ -81,7 +81,7 @@
          width:200px; 
          padding: 3px; 
          border-radius: 5px; 
-         border: #4169e1 solid 2px !important; 
+         border: #c6c6c6 solid 2px !important; 
          outline: 0 !important; 
          background: #fff; 
          color: #000 !important;
@@ -97,6 +97,26 @@
       .json-dict{
          line-height: 0.8;
          font-size: 12px !important;
+      }
+      .button{
+         background: white;
+         height: 20px;
+         width: 20px;
+         margin: 0px;
+         padding: 0;
+         font-size: 14px;
+         font-weight: 600;
+         background: rgba(0, 0, 0, 0.3);
+         color: white;
+         border: none;
+         line-height: 15px;
+         align-items: center !important;
+         border-width: 1px;
+         border-radius: 50% !important;
+      }
+      .button:hover{
+         color: #f5e7bd;
+         box-shadow: 0 1px 3px rgb(0 0 0);
       }
 </style>
 
@@ -130,11 +150,11 @@
       {{if or (eq $type "Tasks") (eq (index $result $leaderboard) $type)}}
             {{if eq (index $result "dataset_name") $dataset }}
                <tr>
-                  <td>
+                  <td >
                      <button id="{{$file}}" type="button" class="button" data-bs-toggle="modal" data-bs-target="#modal"> 
                         i
                      </button>
-                     {{ index $result "embedding_name" "value"}}
+                     <span style="color: black !important; font-weight: 600;">{{ index $result "embedding_name" "value"}}</span>
                   </td>
 
                   {{ range $metric:= $metrics }}
@@ -166,16 +186,16 @@
       select.onchange = ()=>{
         datasets.forEach((d,i) => {
          const dataset = document.getElementById("data-table-"+i);
-         dataset.setAttribute("style", "height: 0; overflow: hidden;");
+         dataset.setAttribute("style", "display:none;");
          if( d == select.value){
-            dataset.setAttribute("style", "heigh:auto;");
+            dataset.setAttribute("style", "display:block;");
          }
         })
       }
       datasets.forEach((d,i) => {
          const dataset = document.getElementById("data-table-"+i);
          if(i!=0){
-            dataset.setAttribute("style", "height: 0; width:0px; overflow: hidden;");
+            dataset.setAttribute("style", "display:none;");
          }
          const e = document.createElement("option");
          e.value = d;
