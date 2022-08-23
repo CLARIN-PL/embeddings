@@ -6,6 +6,7 @@ class LeaderboardDataset(str, Enum):
     abusive_clauses = "Abusive Clauses"
     aspectemo = "AspectEmo"
     cdsc_e = "CDSC-E"
+    dialogue_acts = "Dialogue Acts"
     dyk = "DYK"
     kpwr_ner = "KPWr NER"
     nkjp_pos = "NKJP POS"
@@ -20,6 +21,7 @@ class LeaderboardDataset(str, Enum):
 class LeaderboardTask(str, Enum):
     abusive_clauses_detection = "Abusive Clauses Detection"
     aspect_based_sentiment_analysis = "Aspect-based Sentiment Analysis"
+    dialogue_acts_classification = "Dialogue Acts Classification"
     entailment_classification = "Entailment Classification"
     ner = "Named Entity Recognition"
     paraphrase_classification = "Paraphrase Classification"
@@ -47,6 +49,7 @@ HUGGINGFACE_DATASET_LEADERBOARD_DATASET_MAPPING: Final[Dict[str, str]] = {
     "clarin-pl/aspectemo": "aspectemo",
     "allegro/klej-cdsc-e": "cdsc_e",
     "allegro/klej-dyk": "dyk",
+    "clarin-pl/dialogue-acts": "dialogue_acts",
     "clarin-pl/kpwr-ner": "kpwr_ner",
     "clarin-pl/nkjp-pos": "nkjp_pos",
     "clarin-pl/polemo2-official": "polemo2",
@@ -61,6 +64,7 @@ LEADERBOARD_DATASET_TASK_MAPPING: Final[Dict[str, LeaderboardTask]] = {
     "abusive_clauses": LeaderboardTask.abusive_clauses_detection,
     "aspectemo": LeaderboardTask.aspect_based_sentiment_analysis,
     "cdsc_e": LeaderboardTask.entailment_classification,
+    "dialogue_acts": LeaderboardTask.dialogue_acts_classification,
     "dyk": LeaderboardTask.qa_classification,
     "kpwr_ner": LeaderboardTask.ner,
     "nkjp_pos": LeaderboardTask.pos,
