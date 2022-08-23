@@ -121,11 +121,11 @@
 </style>
 
 <input type="hidden" id="datasets-list" value="{{$datasets}}">
-<div style="margin: 2em 0;">
+<div style="margin-top: 2em;">
    <div class="container title-container">     
-      <div class="title">By dataset</div>
+      <div class="title">Dataset model's ranking</div>
 </div>
-<div style="display: flex; justify-content: center; margin-top:2rem;"><div class="lds-ring" id="spinner"><div></div><div></div><div></div><div></div></div></div>
+<div style="display: flex; justify-content: center;"><div class="lds-ring" id="spinner"><div></div><div></div><div></div><div></div></div></div>
 
 <div id="content" style="display: none;">
    {{ range $index, $dataset := $datasets }}
