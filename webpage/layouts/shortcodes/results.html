@@ -106,7 +106,7 @@
          padding: 0;
          font-size: 14px;
          font-weight: 600;
-         background: rgba(0, 0, 0, 0.3);
+         background: #e1b941;
          color: white;
          border: none;
          line-height: 15px;
@@ -152,9 +152,9 @@
                <tr>
                   <td >
                      <button id="{{$file}}" type="button" class="button" data-bs-toggle="modal" data-bs-target="#modal"> 
-                        i
+                        <span style="font-weight:900;">i</span>
                      </button>
-                     <span style="color: black !important; font-weight: 600;">{{ index $result "embedding_name" "value"}}</span>
+                     <span style="color: royalblue !important; font-weight: 600;">{{ index $result "embedding_name" "value"}}</span>
                   </td>
 
                   {{ range $metric:= $metrics }}
