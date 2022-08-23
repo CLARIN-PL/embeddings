@@ -1,7 +1,7 @@
 import json
 import tempfile
 from abc import ABC
-from dataclasses import asdict, dataclass, field, fields
+from dataclasses import asdict, dataclass, field
 from io import TextIOWrapper
 from pathlib import Path
 from statistics import mean, median, stdev
@@ -16,10 +16,7 @@ from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.evaluator.leaderboard import (
     HUGGINGFACE_DATASET_LEADERBOARD_DATASET_MAPPING,
-    LEADERBOARD_DATASET_DOMAIN_MAPPING,
     LEADERBOARD_DATASET_TASK_MAPPING,
-    LeaderboardDataset,
-    LeaderboardDomain,
     LeaderboardTask,
 )
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
@@ -39,15 +36,11 @@ class _BaseSubmission(ABC):
     predictions: Union[Predictions, List[Predictions]]
     config: Optional[Dict[str, Any]]  # any additional config
     dataset_key: str = field(init=False)
-    dataset_domains: List[LeaderboardDomain] = field(init=False)
-    leaderboard_dataset_name: LeaderboardDataset = field(init=False)
     leaderboard_task_name: LeaderboardTask = field(init=False)
 
     def __post_init__(self) -> None:
         self.submission_name = standardize_name(self.submission_name)
         self.dataset_key = HUGGINGFACE_DATASET_LEADERBOARD_DATASET_MAPPING[self.dataset_name]
-        self.leaderboard_dataset_name = LeaderboardDataset[self.dataset_key]
-        self.dataset_domains = LEADERBOARD_DATASET_DOMAIN_MAPPING[self.dataset_key]
         self.leaderboard_task_name = LEADERBOARD_DATASET_TASK_MAPPING[self.dataset_key]
 
     def save_json(
@@ -74,7 +67,9 @@ class _BaseSubmission(ABC):
 
     def without_predictions(self) -> Dict[str, Any]:
         result = asdict(self)
-        result.pop("predictions", "dataset_key")
+        for k in ("predictions", "dataset_key"):
+            result.pop(k)
+
         return result
 
 
@@ -108,6 +103,7 @@ class Submission(_BaseSubmission):
         best_params_path: T_path,
         task: str,
         dataset_name: Optional[str] = None,
+        additional_config: Optional[Dict[str, Any]] = None,
     ) -> "Submission":
         wandb_config_path = Path(wandb_config_path)
         if wandb_config_path.is_dir():
@@ -130,13 +126,13 @@ class Submission(_BaseSubmission):
         return cls(
             submission_name=submission_name,
             dataset_name=dataset_name,
-            dataset_version=wandb_cfg["dataset_version"],
-            embedding_name=wandb_cfg["embedding_name_or_path"],
+            dataset_version=wandb_cfg["dataset_version"]["value"],
+            embedding_name=wandb_cfg["embedding_name_or_path"]["value"],
             metrics=metrics,
             predictions=predictions,
             hparams=hparams["config"],
             packages=packages,
-            config=wandb_cfg,
+            config=additional_config,
         )
 
     @staticmethod
@@ -146,6 +142,7 @@ class Submission(_BaseSubmission):
         hps_summary_run: Run,
         task: str,
         root: Optional[T_path] = None,
+        additional_config: Optional[Dict[str, Any]] = None,
     ) -> "Submission":
         assert retrain_run.state == "finished"
 
@@ -187,14 +184,14 @@ class Submission(_BaseSubmission):
 
         return Submission(
             submission_name=submission_name,
-            dataset_name=config["dataset_name_or_path"],
-            dataset_version=config["dataset_version"],
-            embedding_name=config["embedding_name_or_path"],
+            dataset_name=config["dataset_name_or_path"]["value"],
+            dataset_version=config["dataset_version"]["value"],
+            embedding_name=config["embedding_name_or_path"]["value"],
             metrics=metrics,
             predictions=predictions,
             hparams=hparams["config"],
             packages=packages,
-            config=config,
+            config=additional_config,
         )
 
     @staticmethod
@@ -312,9 +309,8 @@ class AveragedSubmission(_BaseSubmission):
 
     @staticmethod
     def _get_common_fields(submission: Submission) -> Dict[str, Any]:
-        submission_initiable_fields = {it.name for it in fields(Submission) if it.init}
-        result = {k: v for k, v in asdict(submission).items() if k in submission_initiable_fields}
+        result = asdict(submission)
+        for k in ("predictions", "metrics", "dataset_key", "leaderboard_task_name"):
+            result.pop(k)
 
-        result.pop("predictions")
-        result.pop("metrics")
         return result
