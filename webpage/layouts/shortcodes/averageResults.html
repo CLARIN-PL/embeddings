@@ -30,8 +30,10 @@
     <div class="container title-container">    
         {{ if eq $tasktype "Tasks"}} 
        <div class="title">Model ranking</div>
+       <p style="text-align: center;">Average model performance across all tasks.</p>
        {{else}}
        <div class="title">Model's task ranking</div>
+       <p style="text-align: center;">Average model performance across task datasets.</p>
        {{end}}
        
 </div>
