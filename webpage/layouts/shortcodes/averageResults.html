@@ -1,12 +1,9 @@
 {{ $tasktype := default "Tasks" (.Get "tasktype") }}
-{{ $modelsTemp := slice }}
-{{ range $file, $result := $.Site.Data.results }}  
-    {{ $modelsTemp = uniq ($modelsTemp | append (index $result "embedding_name")) }}
-{{end}}
 {{ $models := slice }}
-{{ range $model := $modelsTemp }}  
-{{ $models = uniq ($models | append (index $model "value")) }}
+{{ range $file, $result := $.Site.Data.results }}  
+    {{ $models = uniq ($models | append (index $result "embedding_name")) }}
 {{end}}
+
 
 {{ $metrics := slice }}
 {{ $metricsToIgnore := slice "classes" "f1_weighted" "recall_weighted" "precision_weighted" }}
@@ -44,7 +41,7 @@
 {{ range $model := $models }}
     {{ range $metric := $metrics }}
         {{ range $file, $result := $.Site.Data.results }}
-            {{if eq ( index (index $result "embedding_name") "value") $model}}
+            {{if eq (index $result "embedding_name") $model}}
                 {{ $sum := ($sum | append (index $result "metrics_avg" $metric))}}
                 <div> {{ $model }};;{{ $metric }};;{{(index $result "leaderboard_task_name")}};;{{(index $result "dataset_name")}};;{{index $result "metrics_avg" $metric}}</div>
             {{end}}
