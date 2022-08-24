@@ -1,0 +1,2920 @@
+{
+  "submission_name": "dialogue_acts_dkleczek__bert-base-polish-uncased-v1",
+  "dataset_name": "clarin-pl/dialogue-acts",
+  "dataset_version": "0.0.0",
+  "embedding_name": "dkleczek/bert-base-polish-uncased-v1",
+  "hparams": {
+    "finetune_last_n_layers": 4,
+    "task_model_kwargs": {
+      "adam_epsilon": 0.0001,
+      "eval_batch_size": 32,
+      "learning_rate": 5e-05,
+      "optimizer": "AdamW",
+      "train_batch_size": 32,
+      "use_scheduler": false,
+      "warmup_steps": 200,
+      "weight_decay": 0.0001
+    },
+    "datamodule_kwargs": {
+      "max_seq_length": 512
+    },
+    "task_train_kwargs": {
+      "max_epochs": 20
+    },
+    "model_config_kwargs": {
+      "classifier_dropout": 0.0
+    },
+    "early_stopping_kwargs": {
+      "mode": "min",
+      "monitor": "val/Loss",
+      "patience": 3
+    },
+    "tokenizer_kwargs": {},
+    "batch_encoding_kwargs": {},
+    "dataloader_kwargs": {}
+  },
+  "packages": [
+    "absl-py==1.1.0",
+    "aiobotocore==2.3.2",
+    "aiohttp-retry==2.4.6",
+    "aiohttp==3.8.1",
+    "aioitertools==0.8.0",
+    "aiosignal==1.2.0",
+    "alembic==1.4.1",
+    "appdirs==1.4.4",
+    "argon2-cffi-bindings==21.2.0",
+    "argon2-cffi==21.3.0",
+    "asttokens==2.0.5",
+    "async-timeout==4.0.2",
+    "asyncssh==2.11.0",
+    "atpublic==3.0.1",
+    "attrs==21.4.0",
+    "autopage==0.5.1",
+    "backcall==0.2.0",
+    "beautifulsoup4==4.11.1",
+    "black==21.10b0",
+    "bleach==5.0.0",
+    "boto3==1.21.21",
+    "botocore==1.24.21",
+    "bpemb==0.3.3",
+    "cachecontrol==0.12.11",
+    "cachetools==5.2.0",
+    "cachy==0.3.0",
+    "catalogue==2.0.7",
+    "certifi==2022.5.18.1",
+    "cffi==1.15.0",
+    "charset-normalizer==2.0.12",
+    "clarinpl-embeddings==0.0.1a2447203364941",
+    "cleo==0.8.1",
+    "click==8.0.4",
+    "cliff==3.10.1",
+    "clikit==0.6.2",
+    "cloudpickle==2.1.0",
+    "cmaes==0.8.2",
+    "cmd2==2.4.1",
+    "colorama==0.4.4",
+    "colorlog==6.6.0",
+    "commonmark==0.9.1",
+    "configobj==5.0.6",
+    "conllu==4.4.2",
+    "coverage==6.4.1",
+    "crashtest==0.3.1",
+    "cryptography==37.0.2",
+    "cycler==0.11.0",
+    "databricks-cli==0.16.6",
+    "datasets==2.2.2",
+    "debugpy==1.6.0",
+    "decorator==5.1.1",
+    "defusedxml==0.7.1",
+    "deprecated==1.2.13",
+    "dictdiffer==0.9.0",
+    "dill==0.3.4",
+    "diskcache==5.4.0",
+    "distlib==0.3.4",
+    "distro==1.7.0",
+    "docker-pycreds==0.4.0",
+    "docker==5.0.3",
+    "dpath==2.0.6",
+    "dulwich==0.20.42",
+    "dvc-render==0.0.4",
+    "dvc==2.10.1",
+    "entrypoints==0.4",
+    "executing==0.8.3",
+    "fastjsonschema==2.15.3",
+    "filelock==3.7.1",
+    "flair==0.10",
+    "flask==2.1.2",
+    "flatten-dict==0.4.2",
+    "flufl.lock==7.0",
+    "fonttools==4.33.3",
+    "frozenlist==1.3.0",
+    "fsspec==2022.5.0",
+    "ftfy==6.1.1",
+    "funcy==1.17",
+    "future==0.18.2",
+    "gdown==3.12.2",
+    "gensim==4.2.0",
+    "gitdb==4.0.9",
+    "gitpython==3.1.27",
+    "google-auth-oauthlib==0.4.6",
+    "google-auth==2.6.6",
+    "grandalf==0.6",
+    "greenlet==1.1.2",
+    "grpcio==1.46.3",
+    "gunicorn==20.1.0",
+    "html5lib==1.1",
+    "huggingface-hub==0.7.0",
+    "idna==3.3",
+    "importlib-metadata==3.10.1",
+    "iniconfig==1.1.1",
+    "ipykernel==6.13.0",
+    "ipython-genutils==0.2.0",
+    "ipython==8.4.0",
+    "ipywidgets==7.7.0",
+    "isort==5.10.1",
+    "itsdangerous==2.1.2",
+    "janome==0.4.2",
+    "jedi==0.18.1",
+    "jeepney==0.8.0",
+    "jinja2==3.1.2",
+    "jmespath==1.0.0",
+    "joblib==1.1.0",
+    "jsonschema==4.6.0",
+    "jupyter-client==7.3.2",
+    "jupyter-console==6.4.3",
+    "jupyter-core==4.10.0",
+    "jupyter==1.0.0",
+    "jupyterlab-pygments==0.2.2",
+    "jupyterlab-widgets==1.1.0",
+    "keyring==23.5.0",
+    "kiwisolver==1.4.2",
+    "konoha==4.6.5",
+    "langdetect==1.0.9",
+    "leaderboard==0.0.1",
+    "lockfile==0.12.2",
+    "lxml==4.9.0",
+    "mailchecker==4.1.17",
+    "mako==1.2.0",
+    "markdown==3.3.5",
+    "markupsafe==2.1.1",
+    "matplotlib-inline==0.1.3",
+    "matplotlib==3.5.2",
+    "mistune==0.8.4",
+    "mlflow==1.19.0",
+    "more-itertools==8.8.0",
+    "mpld3==0.3",
+    "msgpack==1.0.3",
+    "multidict==6.0.2",
+    "multiprocess==0.70.12.2",
+    "mypy-extensions==0.4.3",
+    "mypy==0.950",
+    "nanotime==0.5.2",
+    "nbclient==0.6.4",
+    "nbconvert==6.5.0",
+    "nbformat==5.4.0",
+    "nest-asyncio==1.5.5",
+    "networkx==2.8.3",
+    "notebook==6.4.11",
+    "numpy==1.22.4",
+    "oauthlib==3.2.0",
+    "optuna==2.10.0",
+    "overrides==3.1.0",
+    "packaging==21.3",
+    "pandas==1.4.2",
+    "pandocfilters==1.5.0",
+    "parso==0.8.3",
+    "pastel==0.2.1",
+    "pathspec==0.9.0",
+    "pathtools==0.1.2",
+    "pbr==5.9.0",
+    "pexpect==4.8.0",
+    "phonenumbers==8.12.49",
+    "pickleshare==0.7.5",
+    "pillow==9.1.1",
+    "pip==21.2.4",
+    "pkginfo==1.8.2",
+    "platformdirs==2.5.2",
+    "pluggy==1.0.0",
+    "poethepoet==0.11.0",
+    "poetry-core==1.0.8",
+    "poetry==1.1.13",
+    "prettytable==3.3.0",
+    "prometheus-client==0.14.1",
+    "prometheus-flask-exporter==0.20.2",
+    "promise==2.3",
+    "prompt-toolkit==3.0.29",
+    "protobuf==3.20.0",
+    "psutil==5.9.1",
+    "ptyprocess==0.7.0",
+    "pure-eval==0.2.2",
+    "py==1.11.0",
+    "pyarrow==8.0.0",
+    "pyasn1-modules==0.2.8",
+    "pyasn1==0.4.8",
+    "pycparser==2.21",
+    "pydantic==1.9.1",
+    "pydeprecate==0.3.1",
+    "pydot==1.4.2",
+    "pyflakes==2.4.0",
+    "pygit2==1.9.2",
+    "pygments==2.12.0",
+    "pygtrie==2.4.2",
+    "pyjwt==2.4.0",
+    "pylev==1.4.0",
+    "pyparsing==3.0.9",
+    "pyperclip==1.8.2",
+    "pyrsistent==0.18.1",
+    "pysocks==1.7.1",
+    "pytest==6.2.5",
+    "python-benedict==0.25.1",
+    "python-dateutil==2.8.2",
+    "python-editor==1.0.4",
+    "python-fsutil==0.6.1",
+    "python-slugify==6.1.2",
+    "pytorch-lightning==1.5.4",
+    "pytz==2022.1",
+    "pyyaml==6.0",
+    "pyzmq==23.1.0",
+    "qtconsole==5.3.1",
+    "qtpy==2.1.0",
+    "querystring-parser==1.2.4",
+    "regex==2022.6.2",
+    "requests-oauthlib==1.3.1",
+    "requests-toolbelt==0.9.1",
+    "requests==2.27.1",
+    "responses==0.18.0",
+    "rich==12.4.4",
+    "rsa==4.8",
+    "ruamel.yaml.clib==0.2.6",
+    "ruamel.yaml==0.17.21",
+    "s3fs==2022.5.0",
+    "s3transfer==0.5.2",
+    "sacremoses==0.0.53",
+    "scikit-learn==1.1.1",
+    "scipy==1.8.1",
+    "scmrepo==0.0.16",
+    "secretstorage==3.3.2",
+    "segtok==1.5.11",
+    "send2trash==1.8.0",
+    "sentencepiece==0.1.95",
+    "sentry-sdk==1.5.12",
+    "seqeval==1.2.2",
+    "setproctitle==1.2.3",
+    "setuptools-scm==6.4.2",
+    "setuptools==61.2.0",
+    "shellingham==1.4.0",
+    "shortuuid==1.0.9",
+    "shtab==1.5.4",
+    "six==1.16.0",
+    "smart-open==6.0.0",
+    "smmap==5.0.0",
+    "soupsieve==2.3.2.post1",
+    "sqlalchemy==1.4.37",
+    "sqlitedict==2.0.0",
+    "sqlparse==0.4.2",
+    "srsly==2.4.3",
+    "stack-data==0.2.0",
+    "stevedore==3.5.0",
+    "tabulate==0.8.9",
+    "tensorboard-data-server==0.6.1",
+    "tensorboard-plugin-wit==1.8.1",
+    "tensorboard==2.9.0",
+    "terminado==0.15.0",
+    "text-unidecode==1.3",
+    "threadpoolctl==3.1.0",
+    "tinycss2==1.1.1",
+    "tokenizers==0.12.1",
+    "toml==0.10.2",
+    "tomli==1.2.3",
+    "tomlkit==0.10.2",
+    "torch==1.11.0+cu113",
+    "torchmetrics==0.7.3",
+    "tornado==6.1",
+    "tqdm==4.64.0",
+    "traitlets==5.2.2.post1",
+    "transformers==4.18.0",
+    "typer==0.4.1",
+    "types-pyyaml==6.0.8",
+    "types-requests==2.26.1",
+    "types-setuptools==57.4.17",
+    "typing-extensions==3.10.0.0",
+    "urllib3==1.26.9",
+    "virtualenv==20.14.1",
+    "voluptuous==0.13.1",
+    "wandb==0.12.14",
+    "wcwidth==0.2.5",
+    "webencodings==0.5.1",
+    "websocket-client==1.3.2",
+    "werkzeug==2.1.2",
+    "wheel==0.37.1",
+    "widgetsnbextension==3.6.0",
+    "wikipedia-api==0.5.4",
+    "wrapt==1.14.1",
+    "xmltodict==0.13.0",
+    "xxhash==3.0.0",
+    "yarl==1.7.2",
+    "zc.lockfile==2.0",
+    "zipp==3.8.0"
+  ],
+  "config": null,
+  "leaderboard_task_name": "Dialogue Acts Classification",
+  "metrics": [
+    {
+      "accuracy": 0.7606449415237879,
+      "f1_macro": 0.4951182822293291,
+      "f1_micro": 0.7606449415237879,
+      "f1_weighted": 0.7533794620923774,
+      "recall_macro": 0.49780892034760593,
+      "recall_micro": 0.7606449415237879,
+      "recall_weighted": 0.7606449415237879,
+      "precision_macro": 0.5281093583159947,
+      "precision_micro": 0.7606449415237879,
+      "precision_weighted": 0.7558743693000699,
+      "classes": {
+        "0": {
+          "precision": 0.36923076923076925,
+          "recall": 0.5274725274725275,
+          "f1": 0.4343891402714932,
+          "support": 91
+        },
+        "1": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "2": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "3": {
+          "precision": 0.19047619047619047,
+          "recall": 0.17391304347826086,
+          "f1": 0.1818181818181818,
+          "support": 23
+        },
+        "4": {
+          "precision": 0.3333333333333333,
+          "recall": 0.11904761904761904,
+          "f1": 0.1754385964912281,
+          "support": 42
+        },
+        "5": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 13
+        },
+        "6": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "7": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1
+        },
+        "8": {
+          "precision": 0.5,
+          "recall": 0.4107142857142857,
+          "f1": 0.45098039215686275,
+          "support": 56
+        },
+        "9": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 30
+        },
+        "10": {
+          "precision": 0.627831715210356,
+          "recall": 0.6339869281045751,
+          "f1": 0.6308943089430894,
+          "support": 612
+        },
+        "11": {
+          "precision": 0.6842105263157895,
+          "recall": 0.6842105263157895,
+          "f1": 0.6842105263157895,
+          "support": 19
+        },
+        "12": {
+          "precision": 0.4,
+          "recall": 0.4,
+          "f1": 0.4000000000000001,
+          "support": 5
+        },
+        "13": {
+          "precision": 0.7096045197740113,
+          "recall": 0.8155844155844156,
+          "f1": 0.7589123867069486,
+          "support": 770
+        },
+        "14": {
+          "precision": 0.8682170542635659,
+          "recall": 0.8296296296296296,
+          "f1": 0.8484848484848484,
+          "support": 135
+        },
+        "15": {
+          "precision": 0.7777777777777778,
+          "recall": 0.84,
+          "f1": 0.8076923076923077,
+          "support": 50
+        },
+        "16": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "17": {
+          "precision": 0.36428571428571427,
+          "recall": 0.4811320754716981,
+          "f1": 0.4146341463414634,
+          "support": 106
+        },
+        "18": {
+          "precision": 1.0,
+          "recall": 0.125,
+          "f1": 0.2222222222222222,
+          "support": 8
+        },
+        "19": {
+          "precision": 0.610062893081761,
+          "recall": 0.8981481481481481,
+          "f1": 0.7265917602996256,
+          "support": 216
+        },
+        "20": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 5
+        },
+        "21": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "22": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "23": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 6
+        },
+        "24": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "25": {
+          "precision": 1.0,
+          "recall": 0.6666666666666666,
+          "f1": 0.8,
+          "support": 24
+        },
+        "26": {
+          "precision": 0.12318840579710146,
+          "recall": 0.0913978494623656,
+          "f1": 0.10493827160493827,
+          "support": 186
+        },
+        "27": {
+          "precision": 0.7920656634746922,
+          "recall": 0.7986206896551724,
+          "f1": 0.7953296703296702,
+          "support": 1450
+        },
+        "28": {
+          "precision": 0.8421052631578947,
+          "recall": 0.6,
+          "f1": 0.7007299270072991,
+          "support": 80
+        },
+        "29": {
+          "precision": 0.41509433962264153,
+          "recall": 0.5569620253164557,
+          "f1": 0.4756756756756757,
+          "support": 79
+        },
+        "30": {
+          "precision": 0.7204301075268817,
+          "recall": 0.8375,
+          "f1": 0.7745664739884393,
+          "support": 80
+        },
+        "31": {
+          "precision": 0.5517241379310345,
+          "recall": 0.6575342465753424,
+          "f1": 0.6,
+          "support": 73
+        },
+        "32": {
+          "precision": 0.8164481525625745,
+          "recall": 0.7083764219234746,
+          "f1": 0.7585825027685492,
+          "support": 967
+        },
+        "33": {
+          "precision": 0.6744186046511628,
+          "recall": 0.6041666666666666,
+          "f1": 0.6373626373626373,
+          "support": 48
+        },
+        "34": {
+          "precision": 0.4,
+          "recall": 0.15789473684210525,
+          "f1": 0.22641509433962267,
+          "support": 76
+        },
+        "35": {
+          "precision": 0.9512195121951219,
+          "recall": 0.9285714285714286,
+          "f1": 0.9397590361445782,
+          "support": 42
+        },
+        "36": {
+          "precision": 1.0,
+          "recall": 0.25,
+          "f1": 0.4,
+          "support": 8
+        },
+        "37": {
+          "precision": 0.9666666666666667,
+          "recall": 0.9666666666666667,
+          "f1": 0.9666666666666667,
+          "support": 30
+        },
+        "38": {
+          "precision": 0.425,
+          "recall": 0.6071428571428571,
+          "f1": 0.5,
+          "support": 28
+        },
+        "39": {
+          "precision": 0.8802083333333334,
+          "recall": 0.7071129707112971,
+          "f1": 0.7842227378190255,
+          "support": 239
+        },
+        "40": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571428571428571,
+          "support": 3
+        },
+        "41": {
+          "precision": 0.7129629629629629,
+          "recall": 0.7333333333333333,
+          "f1": 0.7230046948356808,
+          "support": 105
+        },
+        "42": {
+          "precision": 0.7272727272727273,
+          "recall": 0.8,
+          "f1": 0.761904761904762,
+          "support": 10
+        },
+        "43": {
+          "precision": 0.7043478260869566,
+          "recall": 0.9101123595505618,
+          "f1": 0.7941176470588236,
+          "support": 89
+        },
+        "44": {
+          "precision": 0.5294117647058824,
+          "recall": 0.6818181818181818,
+          "f1": 0.5960264900662252,
+          "support": 66
+        },
+        "45": {
+          "precision": 0.6923076923076923,
+          "recall": 0.36,
+          "f1": 0.47368421052631576,
+          "support": 25
+        },
+        "46": {
+          "precision": 0.6402439024390244,
+          "recall": 0.42338709677419356,
+          "f1": 0.5097087378640776,
+          "support": 248
+        },
+        "47": {
+          "precision": 0.7272727272727273,
+          "recall": 0.6153846153846154,
+          "f1": 0.6666666666666667,
+          "support": 26
+        },
+        "48": {
+          "precision": 0.8076923076923077,
+          "recall": 0.8502024291497976,
+          "f1": 0.8284023668639053,
+          "support": 247
+        },
+        "49": {
+          "precision": 0.9396636993076162,
+          "recall": 0.9669211195928753,
+          "f1": 0.9530975670930524,
+          "support": 1965
+        },
+        "50": {
+          "precision": 0.7424242424242424,
+          "recall": 0.6901408450704225,
+          "f1": 0.7153284671532847,
+          "support": 71
+        },
+        "51": {
+          "precision": 0.9285714285714286,
+          "recall": 1.0,
+          "f1": 0.962962962962963,
+          "support": 13
+        },
+        "52": {
+          "precision": 0.8,
+          "recall": 0.8484848484848485,
+          "f1": 0.823529411764706,
+          "support": 99
+        },
+        "53": {
+          "precision": 0.8221343873517787,
+          "recall": 0.9244444444444444,
+          "f1": 0.8702928870292888,
+          "support": 225
+        }
+      }
+    },
+    {
+      "accuracy": 0.7633700465538776,
+      "f1_macro": 0.48919379501910004,
+      "f1_micro": 0.7633700465538776,
+      "f1_weighted": 0.7538816710054237,
+      "recall_macro": 0.49985539938330764,
+      "recall_micro": 0.7633700465538776,
+      "recall_weighted": 0.7633700465538776,
+      "precision_macro": 0.49962211254766165,
+      "precision_micro": 0.7633700465538776,
+      "precision_weighted": 0.7528271305418806,
+      "classes": {
+        "0": {
+          "precision": 0.46,
+          "recall": 0.25274725274725274,
+          "f1": 0.3262411347517731,
+          "support": 91
+        },
+        "1": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "2": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "3": {
+          "precision": 0.19047619047619047,
+          "recall": 0.17391304347826086,
+          "f1": 0.1818181818181818,
+          "support": 23
+        },
+        "4": {
+          "precision": 0.3125,
+          "recall": 0.11904761904761904,
+          "f1": 0.17241379310344826,
+          "support": 42
+        },
+        "5": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 13
+        },
+        "6": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "7": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1
+        },
+        "8": {
+          "precision": 0.425,
+          "recall": 0.30357142857142855,
+          "f1": 0.35416666666666663,
+          "support": 56
+        },
+        "9": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 30
+        },
+        "10": {
+          "precision": 0.6252158894645942,
+          "recall": 0.5915032679738562,
+          "f1": 0.6078925272879933,
+          "support": 612
+        },
+        "11": {
+          "precision": 0.7222222222222222,
+          "recall": 0.6842105263157895,
+          "f1": 0.7027027027027027,
+          "support": 19
+        },
+        "12": {
+          "precision": 0.3333333333333333,
+          "recall": 0.4,
+          "f1": 0.3636363636363636,
+          "support": 5
+        },
+        "13": {
+          "precision": 0.8090225563909774,
+          "recall": 0.6987012987012987,
+          "f1": 0.7498257839721255,
+          "support": 770
+        },
+        "14": {
+          "precision": 0.8671875,
+          "recall": 0.8222222222222222,
+          "f1": 0.844106463878327,
+          "support": 135
+        },
+        "15": {
+          "precision": 0.86,
+          "recall": 0.86,
+          "f1": 0.8599999999999999,
+          "support": 50
+        },
+        "16": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "17": {
+          "precision": 0.37662337662337664,
+          "recall": 0.27358490566037735,
+          "f1": 0.3169398907103825,
+          "support": 106
+        },
+        "18": {
+          "precision": 0.5,
+          "recall": 0.25,
+          "f1": 0.3333333333333333,
+          "support": 8
+        },
+        "19": {
+          "precision": 0.6153846153846154,
+          "recall": 0.8148148148148148,
+          "f1": 0.701195219123506,
+          "support": 216
+        },
+        "20": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 5
+        },
+        "21": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "22": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "23": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 6
+        },
+        "24": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "25": {
+          "precision": 0.47058823529411764,
+          "recall": 1.0,
+          "f1": 0.6399999999999999,
+          "support": 24
+        },
+        "26": {
+          "precision": 0.18285714285714286,
+          "recall": 0.17204301075268819,
+          "f1": 0.17728531855955676,
+          "support": 186
+        },
+        "27": {
+          "precision": 0.7813121272365805,
+          "recall": 0.8131034482758621,
+          "f1": 0.7968908415005068,
+          "support": 1450
+        },
+        "28": {
+          "precision": 0.8545454545454545,
+          "recall": 0.5875,
+          "f1": 0.6962962962962964,
+          "support": 80
+        },
+        "29": {
+          "precision": 0.41509433962264153,
+          "recall": 0.5569620253164557,
+          "f1": 0.4756756756756757,
+          "support": 79
+        },
+        "30": {
+          "precision": 0.7922077922077922,
+          "recall": 0.7625,
+          "f1": 0.7770700636942675,
+          "support": 80
+        },
+        "31": {
+          "precision": 0.5760869565217391,
+          "recall": 0.726027397260274,
+          "f1": 0.6424242424242426,
+          "support": 73
+        },
+        "32": {
+          "precision": 0.7473118279569892,
+          "recall": 0.8624612202688728,
+          "f1": 0.800768122899664,
+          "support": 967
+        },
+        "33": {
+          "precision": 0.5967741935483871,
+          "recall": 0.7708333333333334,
+          "f1": 0.6727272727272728,
+          "support": 48
+        },
+        "34": {
+          "precision": 0.22727272727272727,
+          "recall": 0.06578947368421052,
+          "f1": 0.1020408163265306,
+          "support": 76
+        },
+        "35": {
+          "precision": 0.95,
+          "recall": 0.9047619047619048,
+          "f1": 0.9268292682926829,
+          "support": 42
+        },
+        "36": {
+          "precision": 0.6666666666666666,
+          "recall": 0.25,
+          "f1": 0.36363636363636365,
+          "support": 8
+        },
+        "37": {
+          "precision": 0.967741935483871,
+          "recall": 1.0,
+          "f1": 0.9836065573770492,
+          "support": 30
+        },
+        "38": {
+          "precision": 0.40816326530612246,
+          "recall": 0.7142857142857143,
+          "f1": 0.5194805194805194,
+          "support": 28
+        },
+        "39": {
+          "precision": 0.8421052631578947,
+          "recall": 0.803347280334728,
+          "f1": 0.822269807280514,
+          "support": 239
+        },
+        "40": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571428571428571,
+          "support": 3
+        },
+        "41": {
+          "precision": 0.7333333333333333,
+          "recall": 0.7333333333333333,
+          "f1": 0.7333333333333333,
+          "support": 105
+        },
+        "42": {
+          "precision": 0.7,
+          "recall": 0.7,
+          "f1": 0.7,
+          "support": 10
+        },
+        "43": {
+          "precision": 0.7043478260869566,
+          "recall": 0.9101123595505618,
+          "f1": 0.7941176470588236,
+          "support": 89
+        },
+        "44": {
+          "precision": 0.5294117647058824,
+          "recall": 0.6818181818181818,
+          "f1": 0.5960264900662252,
+          "support": 66
+        },
+        "45": {
+          "precision": 0.5769230769230769,
+          "recall": 0.6,
+          "f1": 0.5882352941176471,
+          "support": 25
+        },
+        "46": {
+          "precision": 0.6042780748663101,
+          "recall": 0.45564516129032256,
+          "f1": 0.5195402298850575,
+          "support": 248
+        },
+        "47": {
+          "precision": 0.7272727272727273,
+          "recall": 0.6153846153846154,
+          "f1": 0.6666666666666667,
+          "support": 26
+        },
+        "48": {
+          "precision": 0.8785046728971962,
+          "recall": 0.7611336032388664,
+          "f1": 0.8156182212581344,
+          "support": 247
+        },
+        "49": {
+          "precision": 0.9317521781219749,
+          "recall": 0.9796437659033079,
+          "f1": 0.9550979905730589,
+          "support": 1965
+        },
+        "50": {
+          "precision": 0.7288135593220338,
+          "recall": 0.6056338028169014,
+          "f1": 0.6615384615384615,
+          "support": 71
+        },
+        "51": {
+          "precision": 0.9285714285714286,
+          "recall": 1.0,
+          "f1": 0.962962962962963,
+          "support": 13
+        },
+        "52": {
+          "precision": 0.7333333333333333,
+          "recall": 0.8888888888888888,
+          "f1": 0.8036529680365296,
+          "support": 99
+        },
+        "53": {
+          "precision": 0.8773584905660378,
+          "recall": 0.8266666666666667,
+          "f1": 0.8512585812356981,
+          "support": 225
+        }
+      }
+    },
+    {
+      "accuracy": 0.7584875667083002,
+      "f1_macro": 0.4740374981377799,
+      "f1_micro": 0.7584875667083002,
+      "f1_weighted": 0.7499512016796889,
+      "recall_macro": 0.4846716219080942,
+      "recall_micro": 0.7584875667083002,
+      "recall_weighted": 0.7584875667083002,
+      "precision_macro": 0.503425148235601,
+      "precision_micro": 0.7584875667083002,
+      "precision_weighted": 0.7521228831997067,
+      "classes": {
+        "0": {
+          "precision": 0.3125,
+          "recall": 0.43956043956043955,
+          "f1": 0.36529680365296807,
+          "support": 91
+        },
+        "1": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "2": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "3": {
+          "precision": 0.25,
+          "recall": 0.043478260869565216,
+          "f1": 0.07407407407407408,
+          "support": 23
+        },
+        "4": {
+          "precision": 0.5,
+          "recall": 0.047619047619047616,
+          "f1": 0.08695652173913042,
+          "support": 42
+        },
+        "5": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 13
+        },
+        "6": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "7": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1
+        },
+        "8": {
+          "precision": 0.65,
+          "recall": 0.23214285714285715,
+          "f1": 0.3421052631578948,
+          "support": 56
+        },
+        "9": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 30
+        },
+        "10": {
+          "precision": 0.588495575221239,
+          "recall": 0.6519607843137255,
+          "f1": 0.6186046511627907,
+          "support": 612
+        },
+        "11": {
+          "precision": 0.6666666666666666,
+          "recall": 0.631578947368421,
+          "f1": 0.6486486486486486,
+          "support": 19
+        },
+        "12": {
+          "precision": 0.5,
+          "recall": 0.2,
+          "f1": 0.28571428571428575,
+          "support": 5
+        },
+        "13": {
+          "precision": 0.6953210010881393,
+          "recall": 0.8298701298701299,
+          "f1": 0.7566607460035525,
+          "support": 770
+        },
+        "14": {
+          "precision": 0.855072463768116,
+          "recall": 0.8740740740740741,
+          "f1": 0.8644688644688645,
+          "support": 135
+        },
+        "15": {
+          "precision": 0.9090909090909091,
+          "recall": 0.8,
+          "f1": 0.8510638297872342,
+          "support": 50
+        },
+        "16": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "17": {
+          "precision": 0.4166666666666667,
+          "recall": 0.37735849056603776,
+          "f1": 0.3960396039603961,
+          "support": 106
+        },
+        "18": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 8
+        },
+        "19": {
+          "precision": 0.6218181818181818,
+          "recall": 0.7916666666666666,
+          "f1": 0.6965376782077393,
+          "support": 216
+        },
+        "20": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 5
+        },
+        "21": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "22": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "23": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 6
+        },
+        "24": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "25": {
+          "precision": 0.47058823529411764,
+          "recall": 1.0,
+          "f1": 0.6399999999999999,
+          "support": 24
+        },
+        "26": {
+          "precision": 0.16111111111111112,
+          "recall": 0.15591397849462366,
+          "f1": 0.15846994535519127,
+          "support": 186
+        },
+        "27": {
+          "precision": 0.8006993006993007,
+          "recall": 0.7896551724137931,
+          "f1": 0.7951388888888888,
+          "support": 1450
+        },
+        "28": {
+          "precision": 0.8627450980392157,
+          "recall": 0.55,
+          "f1": 0.6717557251908397,
+          "support": 80
+        },
+        "29": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 79
+        },
+        "30": {
+          "precision": 0.8356164383561644,
+          "recall": 0.7625,
+          "f1": 0.7973856209150326,
+          "support": 80
+        },
+        "31": {
+          "precision": 0.53125,
+          "recall": 0.6986301369863014,
+          "f1": 0.6035502958579881,
+          "support": 73
+        },
+        "32": {
+          "precision": 0.833939393939394,
+          "recall": 0.7114788004136504,
+          "f1": 0.7678571428571427,
+          "support": 967
+        },
+        "33": {
+          "precision": 0.7333333333333333,
+          "recall": 0.6875,
+          "f1": 0.7096774193548386,
+          "support": 48
+        },
+        "34": {
+          "precision": 0.38461538461538464,
+          "recall": 0.7236842105263158,
+          "f1": 0.5022831050228311,
+          "support": 76
+        },
+        "35": {
+          "precision": 0.9285714285714286,
+          "recall": 0.9285714285714286,
+          "f1": 0.9285714285714286,
+          "support": 42
+        },
+        "36": {
+          "precision": 1.0,
+          "recall": 0.125,
+          "f1": 0.2222222222222222,
+          "support": 8
+        },
+        "37": {
+          "precision": 0.9655172413793104,
+          "recall": 0.9333333333333333,
+          "f1": 0.9491525423728815,
+          "support": 30
+        },
+        "38": {
+          "precision": 0.5555555555555556,
+          "recall": 0.35714285714285715,
+          "f1": 0.43478260869565216,
+          "support": 28
+        },
+        "39": {
+          "precision": 0.8319327731092437,
+          "recall": 0.8284518828451883,
+          "f1": 0.8301886792452831,
+          "support": 239
+        },
+        "40": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571428571428571,
+          "support": 3
+        },
+        "41": {
+          "precision": 0.6956521739130435,
+          "recall": 0.7619047619047619,
+          "f1": 0.7272727272727272,
+          "support": 105
+        },
+        "42": {
+          "precision": 0.7,
+          "recall": 0.7,
+          "f1": 0.7,
+          "support": 10
+        },
+        "43": {
+          "precision": 0.6974789915966386,
+          "recall": 0.9325842696629213,
+          "f1": 0.798076923076923,
+          "support": 89
+        },
+        "44": {
+          "precision": 0.5176470588235295,
+          "recall": 0.6666666666666666,
+          "f1": 0.5827814569536424,
+          "support": 66
+        },
+        "45": {
+          "precision": 0.68,
+          "recall": 0.68,
+          "f1": 0.68,
+          "support": 25
+        },
+        "46": {
+          "precision": 0.5756097560975609,
+          "recall": 0.47580645161290325,
+          "f1": 0.5209713024282561,
+          "support": 248
+        },
+        "47": {
+          "precision": 0.7272727272727273,
+          "recall": 0.6153846153846154,
+          "f1": 0.6666666666666667,
+          "support": 26
+        },
+        "48": {
+          "precision": 0.8062015503875969,
+          "recall": 0.8421052631578947,
+          "f1": 0.8237623762376236,
+          "support": 247
+        },
+        "49": {
+          "precision": 0.9488866396761133,
+          "recall": 0.9541984732824428,
+          "f1": 0.9515351433646282,
+          "support": 1965
+        },
+        "50": {
+          "precision": 0.676923076923077,
+          "recall": 0.6197183098591549,
+          "f1": 0.6470588235294118,
+          "support": 71
+        },
+        "51": {
+          "precision": 0.9285714285714286,
+          "recall": 1.0,
+          "f1": 0.962962962962963,
+          "support": 13
+        },
+        "52": {
+          "precision": 0.803921568627451,
+          "recall": 0.8282828282828283,
+          "f1": 0.8159203980099502,
+          "support": 99
+        },
+        "53": {
+          "precision": 0.8156862745098039,
+          "recall": 0.9244444444444444,
+          "f1": 0.8666666666666666,
+          "support": 225
+        }
+      }
+    },
+    {
+      "accuracy": 0.7610991256954696,
+      "f1_macro": 0.4880366210137242,
+      "f1_micro": 0.7610991256954696,
+      "f1_weighted": 0.7497550044364727,
+      "recall_macro": 0.49109187735158066,
+      "recall_micro": 0.7610991256954696,
+      "recall_weighted": 0.7610991256954696,
+      "precision_macro": 0.508122713252923,
+      "precision_micro": 0.7610991256954696,
+      "precision_weighted": 0.7484615124124931,
+      "classes": {
+        "0": {
+          "precision": 0.45054945054945056,
+          "recall": 0.45054945054945056,
+          "f1": 0.45054945054945056,
+          "support": 91
+        },
+        "1": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "2": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "3": {
+          "precision": 0.18181818181818182,
+          "recall": 0.08695652173913043,
+          "f1": 0.1176470588235294,
+          "support": 23
+        },
+        "4": {
+          "precision": 0.4166666666666667,
+          "recall": 0.11904761904761904,
+          "f1": 0.18518518518518517,
+          "support": 42
+        },
+        "5": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 13
+        },
+        "6": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "7": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1
+        },
+        "8": {
+          "precision": 0.47058823529411764,
+          "recall": 0.2857142857142857,
+          "f1": 0.35555555555555557,
+          "support": 56
+        },
+        "9": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 30
+        },
+        "10": {
+          "precision": 0.5971107544141252,
+          "recall": 0.6078431372549019,
+          "f1": 0.6024291497975708,
+          "support": 612
+        },
+        "11": {
+          "precision": 0.6842105263157895,
+          "recall": 0.6842105263157895,
+          "f1": 0.6842105263157895,
+          "support": 19
+        },
+        "12": {
+          "precision": 0.4,
+          "recall": 0.4,
+          "f1": 0.4000000000000001,
+          "support": 5
+        },
+        "13": {
+          "precision": 0.7059483726150393,
+          "recall": 0.8168831168831169,
+          "f1": 0.7573750752558699,
+          "support": 770
+        },
+        "14": {
+          "precision": 0.8394160583941606,
+          "recall": 0.8518518518518519,
+          "f1": 0.8455882352941176,
+          "support": 135
+        },
+        "15": {
+          "precision": 0.8837209302325582,
+          "recall": 0.76,
+          "f1": 0.8172043010752689,
+          "support": 50
+        },
+        "16": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "17": {
+          "precision": 0.36585365853658536,
+          "recall": 0.14150943396226415,
+          "f1": 0.20408163265306123,
+          "support": 106
+        },
+        "18": {
+          "precision": 0.5,
+          "recall": 0.125,
+          "f1": 0.2,
+          "support": 8
+        },
+        "19": {
+          "precision": 0.6042944785276073,
+          "recall": 0.9120370370370371,
+          "f1": 0.7269372693726938,
+          "support": 216
+        },
+        "20": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 5
+        },
+        "21": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "22": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "23": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 6
+        },
+        "24": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "25": {
+          "precision": 1.0,
+          "recall": 0.6666666666666666,
+          "f1": 0.8,
+          "support": 24
+        },
+        "26": {
+          "precision": 0.14772727272727273,
+          "recall": 0.13978494623655913,
+          "f1": 0.14364640883977903,
+          "support": 186
+        },
+        "27": {
+          "precision": 0.7771883289124668,
+          "recall": 0.8082758620689655,
+          "f1": 0.7924273157538877,
+          "support": 1450
+        },
+        "28": {
+          "precision": 0.8392857142857143,
+          "recall": 0.5875,
+          "f1": 0.6911764705882354,
+          "support": 80
+        },
+        "29": {
+          "precision": 0.4260869565217391,
+          "recall": 0.620253164556962,
+          "f1": 0.5051546391752577,
+          "support": 79
+        },
+        "30": {
+          "precision": 0.7840909090909091,
+          "recall": 0.8625,
+          "f1": 0.8214285714285715,
+          "support": 80
+        },
+        "31": {
+          "precision": 0.5454545454545454,
+          "recall": 0.5753424657534246,
+          "f1": 0.5599999999999999,
+          "support": 73
+        },
+        "32": {
+          "precision": 0.8210900473933649,
+          "recall": 0.7166494312306101,
+          "f1": 0.7653230259525123,
+          "support": 967
+        },
+        "33": {
+          "precision": 0.8048780487804879,
+          "recall": 0.6875,
+          "f1": 0.7415730337078651,
+          "support": 48
+        },
+        "34": {
+          "precision": 0.2,
+          "recall": 0.02631578947368421,
+          "f1": 0.046511627906976744,
+          "support": 76
+        },
+        "35": {
+          "precision": 0.9090909090909091,
+          "recall": 0.9523809523809523,
+          "f1": 0.9302325581395349,
+          "support": 42
+        },
+        "36": {
+          "precision": 0.6,
+          "recall": 0.375,
+          "f1": 0.4615384615384615,
+          "support": 8
+        },
+        "37": {
+          "precision": 0.9655172413793104,
+          "recall": 0.9333333333333333,
+          "f1": 0.9491525423728815,
+          "support": 30
+        },
+        "38": {
+          "precision": 0.4,
+          "recall": 0.42857142857142855,
+          "f1": 0.4137931034482759,
+          "support": 28
+        },
+        "39": {
+          "precision": 0.8369098712446352,
+          "recall": 0.8158995815899581,
+          "f1": 0.826271186440678,
+          "support": 239
+        },
+        "40": {
+          "precision": 0.6,
+          "recall": 1.0,
+          "f1": 0.7499999999999999,
+          "support": 3
+        },
+        "41": {
+          "precision": 0.6492537313432836,
+          "recall": 0.8285714285714286,
+          "f1": 0.7280334728033472,
+          "support": 105
+        },
+        "42": {
+          "precision": 0.6666666666666666,
+          "recall": 0.8,
+          "f1": 0.7272727272727272,
+          "support": 10
+        },
+        "43": {
+          "precision": 0.7079646017699115,
+          "recall": 0.898876404494382,
+          "f1": 0.7920792079207921,
+          "support": 89
+        },
+        "44": {
+          "precision": 0.5238095238095238,
+          "recall": 0.6666666666666666,
+          "f1": 0.5866666666666667,
+          "support": 66
+        },
+        "45": {
+          "precision": 0.7142857142857143,
+          "recall": 0.6,
+          "f1": 0.6521739130434783,
+          "support": 25
+        },
+        "46": {
+          "precision": 0.6453488372093024,
+          "recall": 0.4475806451612903,
+          "f1": 0.5285714285714286,
+          "support": 248
+        },
+        "47": {
+          "precision": 0.7619047619047619,
+          "recall": 0.6153846153846154,
+          "f1": 0.6808510638297872,
+          "support": 26
+        },
+        "48": {
+          "precision": 0.8380566801619433,
+          "recall": 0.8380566801619433,
+          "f1": 0.8380566801619433,
+          "support": 247
+        },
+        "49": {
+          "precision": 0.9312530472940029,
+          "recall": 0.9720101781170484,
+          "f1": 0.9511952191235059,
+          "support": 1965
+        },
+        "50": {
+          "precision": 0.6575342465753424,
+          "recall": 0.676056338028169,
+          "f1": 0.6666666666666666,
+          "support": 71
+        },
+        "51": {
+          "precision": 0.9285714285714286,
+          "recall": 1.0,
+          "f1": 0.962962962962963,
+          "support": 13
+        },
+        "52": {
+          "precision": 0.8350515463917526,
+          "recall": 0.8181818181818182,
+          "f1": 0.826530612244898,
+          "support": 99
+        },
+        "53": {
+          "precision": 0.8214285714285714,
+          "recall": 0.92,
+          "f1": 0.8679245283018867,
+          "support": 225
+        }
+      }
+    },
+    {
+      "accuracy": 0.7646190530260021,
+      "f1_macro": 0.49704494581254616,
+      "f1_micro": 0.7646190530260021,
+      "f1_weighted": 0.7537623641165447,
+      "recall_macro": 0.5055344563936599,
+      "recall_micro": 0.7646190530260021,
+      "recall_weighted": 0.7646190530260021,
+      "precision_macro": 0.5080383288389483,
+      "precision_micro": 0.7646190530260021,
+      "precision_weighted": 0.7506442121421418,
+      "classes": {
+        "0": {
+          "precision": 0.42857142857142855,
+          "recall": 0.3626373626373626,
+          "f1": 0.39285714285714285,
+          "support": 91
+        },
+        "1": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "2": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "3": {
+          "precision": 0.3684210526315789,
+          "recall": 0.30434782608695654,
+          "f1": 0.3333333333333333,
+          "support": 23
+        },
+        "4": {
+          "precision": 0.3076923076923077,
+          "recall": 0.19047619047619047,
+          "f1": 0.23529411764705882,
+          "support": 42
+        },
+        "5": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 13
+        },
+        "6": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "7": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 1
+        },
+        "8": {
+          "precision": 0.5641025641025641,
+          "recall": 0.39285714285714285,
+          "f1": 0.4631578947368421,
+          "support": 56
+        },
+        "9": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 30
+        },
+        "10": {
+          "precision": 0.6113821138211382,
+          "recall": 0.6143790849673203,
+          "f1": 0.6128769356153219,
+          "support": 612
+        },
+        "11": {
+          "precision": 0.6875,
+          "recall": 0.5789473684210527,
+          "f1": 0.6285714285714286,
+          "support": 19
+        },
+        "12": {
+          "precision": 0.4,
+          "recall": 0.4,
+          "f1": 0.4000000000000001,
+          "support": 5
+        },
+        "13": {
+          "precision": 0.711340206185567,
+          "recall": 0.8064935064935065,
+          "f1": 0.7559342665855143,
+          "support": 770
+        },
+        "14": {
+          "precision": 0.8382352941176471,
+          "recall": 0.8444444444444444,
+          "f1": 0.8413284132841329,
+          "support": 135
+        },
+        "15": {
+          "precision": 0.8536585365853658,
+          "recall": 0.7,
+          "f1": 0.7692307692307692,
+          "support": 50
+        },
+        "16": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "17": {
+          "precision": 0.3448275862068966,
+          "recall": 0.18867924528301888,
+          "f1": 0.2439024390243903,
+          "support": 106
+        },
+        "18": {
+          "precision": 0.38461538461538464,
+          "recall": 0.625,
+          "f1": 0.4761904761904762,
+          "support": 8
+        },
+        "19": {
+          "precision": 0.601823708206687,
+          "recall": 0.9166666666666666,
+          "f1": 0.7266055045871559,
+          "support": 216
+        },
+        "20": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 5
+        },
+        "21": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        "22": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 3
+        },
+        "23": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 6
+        },
+        "24": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "25": {
+          "precision": 0.9411764705882353,
+          "recall": 0.6666666666666666,
+          "f1": 0.7804878048780487,
+          "support": 24
+        },
+        "26": {
+          "precision": 0.145985401459854,
+          "recall": 0.10752688172043011,
+          "f1": 0.1238390092879257,
+          "support": 186
+        },
+        "27": {
+          "precision": 0.7879767291531997,
+          "recall": 0.8406896551724138,
+          "f1": 0.8134801468134801,
+          "support": 1450
+        },
+        "28": {
+          "precision": 0.8421052631578947,
+          "recall": 0.6,
+          "f1": 0.7007299270072991,
+          "support": 80
+        },
+        "29": {
+          "precision": 0.41509433962264153,
+          "recall": 0.5569620253164557,
+          "f1": 0.4756756756756757,
+          "support": 79
+        },
+        "30": {
+          "precision": 0.7444444444444445,
+          "recall": 0.8375,
+          "f1": 0.788235294117647,
+          "support": 80
+        },
+        "31": {
+          "precision": 0.6493506493506493,
+          "recall": 0.684931506849315,
+          "f1": 0.6666666666666666,
+          "support": 73
+        },
+        "32": {
+          "precision": 0.8298397040690506,
+          "recall": 0.6959669079627715,
+          "f1": 0.7570303712035996,
+          "support": 967
+        },
+        "33": {
+          "precision": 0.6981132075471698,
+          "recall": 0.7708333333333334,
+          "f1": 0.7326732673267327,
+          "support": 48
+        },
+        "34": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 76
+        },
+        "35": {
+          "precision": 0.9302325581395349,
+          "recall": 0.9523809523809523,
+          "f1": 0.9411764705882352,
+          "support": 42
+        },
+        "36": {
+          "precision": 1.0,
+          "recall": 0.25,
+          "f1": 0.4,
+          "support": 8
+        },
+        "37": {
+          "precision": 0.9666666666666667,
+          "recall": 0.9666666666666667,
+          "f1": 0.9666666666666667,
+          "support": 30
+        },
+        "38": {
+          "precision": 0.5416666666666666,
+          "recall": 0.4642857142857143,
+          "f1": 0.5,
+          "support": 28
+        },
+        "39": {
+          "precision": 0.8014981273408239,
+          "recall": 0.895397489539749,
+          "f1": 0.8458498023715415,
+          "support": 239
+        },
+        "40": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571428571428571,
+          "support": 3
+        },
+        "41": {
+          "precision": 0.7264957264957265,
+          "recall": 0.8095238095238095,
+          "f1": 0.7657657657657657,
+          "support": 105
+        },
+        "42": {
+          "precision": 0.5,
+          "recall": 0.7,
+          "f1": 0.5833333333333334,
+          "support": 10
+        },
+        "43": {
+          "precision": 0.7079646017699115,
+          "recall": 0.898876404494382,
+          "f1": 0.7920792079207921,
+          "support": 89
+        },
+        "44": {
+          "precision": 0.4787234042553192,
+          "recall": 0.6818181818181818,
+          "f1": 0.5625,
+          "support": 66
+        },
+        "45": {
+          "precision": 0.68,
+          "recall": 0.68,
+          "f1": 0.68,
+          "support": 25
+        },
+        "46": {
+          "precision": 0.5526315789473685,
+          "recall": 0.5080645161290323,
+          "f1": 0.5294117647058824,
+          "support": 248
+        },
+        "47": {
+          "precision": 0.7272727272727273,
+          "recall": 0.6153846153846154,
+          "f1": 0.6666666666666667,
+          "support": 26
+        },
+        "48": {
+          "precision": 0.8932038834951457,
+          "recall": 0.7449392712550608,
+          "f1": 0.8123620309050774,
+          "support": 247
+        },
+        "49": {
+          "precision": 0.9445,
+          "recall": 0.961323155216285,
+          "f1": 0.9528373266078184,
+          "support": 1965
+        },
+        "50": {
+          "precision": 0.5949367088607594,
+          "recall": 0.6619718309859155,
+          "f1": 0.6266666666666666,
+          "support": 71
+        },
+        "51": {
+          "precision": 0.9285714285714286,
+          "recall": 1.0,
+          "f1": 0.962962962962963,
+          "support": 13
+        },
+        "52": {
+          "precision": 0.7394957983193278,
+          "recall": 0.8888888888888888,
+          "f1": 0.8073394495412844,
+          "support": 99
+        },
+        "53": {
+          "precision": 0.813953488372093,
+          "recall": 0.9333333333333333,
+          "f1": 0.8695652173913044,
+          "support": 225
+        }
+      }
+    }
+  ],
+  "metrics_avg": {
+    "accuracy": 0.7616441467014875,
+    "f1_macro": 0.4886862284424959,
+    "f1_micro": 0.7616441467014875,
+    "f1_weighted": 0.7521459406661015,
+    "recall_macro": 0.49579245507684966,
+    "recall_micro": 0.7616441467014875,
+    "recall_weighted": 0.7616441467014875,
+    "precision_macro": 0.5094635322382257,
+    "precision_micro": 0.7616441467014875,
+    "precision_weighted": 0.7519860215192584,
+    "classes": {
+      "0": {
+        "precision": 0.4041703296703297,
+        "recall": 0.4065934065934066,
+        "f1": 0.39386673441656556,
+        "support": 91
+      },
+      "1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 2
+      },
+      "2": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 2
+      },
+      "3": {
+        "precision": 0.23623832308042833,
+        "recall": 0.1565217391304348,
+        "f1": 0.17773816597346007,
+        "support": 23
+      },
+      "4": {
+        "precision": 0.37403846153846154,
+        "recall": 0.11904761904761904,
+        "f1": 0.17105764283321015,
+        "support": 42
+      },
+      "5": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 13
+      },
+      "6": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 2
+      },
+      "7": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 1
+      },
+      "8": {
+        "precision": 0.5219381598793363,
+        "recall": 0.325,
+        "f1": 0.3931931544547644,
+        "support": 56
+      },
+      "9": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 30
+      },
+      "10": {
+        "precision": 0.6100072096262905,
+        "recall": 0.6199346405228758,
+        "f1": 0.6145395145613533,
+        "support": 612
+      },
+      "11": {
+        "precision": 0.6889619883040936,
+        "recall": 0.6526315789473685,
+        "f1": 0.6696687665108718,
+        "support": 19
+      },
+      "12": {
+        "precision": 0.4066666666666667,
+        "recall": 0.36000000000000004,
+        "f1": 0.3698701298701299,
+        "support": 5
+      },
+      "13": {
+        "precision": 0.7262473312107469,
+        "recall": 0.7935064935064935,
+        "f1": 0.7557416517048021,
+        "support": 770
+      },
+      "14": {
+        "precision": 0.8536256741086979,
+        "recall": 0.8444444444444444,
+        "f1": 0.8487953650820581,
+        "support": 135
+      },
+      "15": {
+        "precision": 0.8568496307373221,
+        "recall": 0.792,
+        "f1": 0.8210382415571159,
+        "support": 50
+      },
+      "16": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 2
+      },
+      "17": {
+        "precision": 0.3736514004638479,
+        "recall": 0.29245283018867924,
+        "f1": 0.3151195425379387,
+        "support": 106
+      },
+      "18": {
+        "precision": 0.47692307692307695,
+        "recall": 0.225,
+        "f1": 0.24634920634920635,
+        "support": 8
+      },
+      "19": {
+        "precision": 0.6106767754037705,
+        "recall": 0.8666666666666667,
+        "f1": 0.7155734863181441,
+        "support": 216
+      },
+      "20": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 5
+      },
+      "21": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 2
+      },
+      "22": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 3
+      },
+      "23": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 6
+      },
+      "24": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 4
+      },
+      "25": {
+        "precision": 0.7764705882352941,
+        "recall": 0.7999999999999999,
+        "f1": 0.7320975609756097,
+        "support": 24
+      },
+      "26": {
+        "precision": 0.15217386679049644,
+        "recall": 0.13333333333333333,
+        "f1": 0.1416357907294782,
+        "support": 186
+      },
+      "27": {
+        "precision": 0.787848429895248,
+        "recall": 0.8100689655172414,
+        "f1": 0.7986533726572868,
+        "support": 1450
+      },
+      "28": {
+        "precision": 0.8481573586372347,
+        "recall": 0.585,
+        "f1": 0.6921376692179939,
+        "support": 80
+      },
+      "29": {
+        "precision": 0.33427399507793276,
+        "recall": 0.4582278481012658,
+        "f1": 0.38643633324045695,
+        "support": 79
+      },
+      "30": {
+        "precision": 0.7753579383252384,
+        "recall": 0.8125,
+        "f1": 0.7917372048287916,
+        "support": 80
+      },
+      "31": {
+        "precision": 0.5707732578515937,
+        "recall": 0.6684931506849315,
+        "f1": 0.6145282409897794,
+        "support": 73
+      },
+      "32": {
+        "precision": 0.8097258251842746,
+        "recall": 0.7389865563598759,
+        "f1": 0.7699122331362935,
+        "support": 967
+      },
+      "33": {
+        "precision": 0.7015034775721082,
+        "recall": 0.7041666666666667,
+        "f1": 0.6988027260958694,
+        "support": 48
+      },
+      "34": {
+        "precision": 0.2423776223776224,
+        "recall": 0.19473684210526315,
+        "f1": 0.17545012871919224,
+        "support": 76
+      },
+      "35": {
+        "precision": 0.9338228815993989,
+        "recall": 0.9333333333333333,
+        "f1": 0.933313752347292,
+        "support": 42
+      },
+      "36": {
+        "precision": 0.8533333333333333,
+        "recall": 0.25,
+        "f1": 0.3694794094794095,
+        "support": 8
+      },
+      "37": {
+        "precision": 0.966421950315165,
+        "recall": 0.96,
+        "f1": 0.9630489950912291,
+        "support": 30
+      },
+      "38": {
+        "precision": 0.46607709750566895,
+        "recall": 0.5142857142857142,
+        "f1": 0.4736112463248895,
+        "support": 28
+      },
+      "39": {
+        "precision": 0.8385308736371861,
+        "recall": 0.8100418410041841,
+        "f1": 0.8217604426314085,
+        "support": 239
+      },
+      "40": {
+        "precision": 0.72,
+        "recall": 1.0,
+        "f1": 0.8357142857142856,
+        "support": 3
+      },
+      "41": {
+        "precision": 0.7035395856096699,
+        "recall": 0.7733333333333333,
+        "f1": 0.7354819988021708,
+        "support": 105
+      },
+      "42": {
+        "precision": 0.6587878787878788,
+        "recall": 0.74,
+        "f1": 0.6945021645021645,
+        "support": 10
+      },
+      "43": {
+        "precision": 0.704420769462075,
+        "recall": 0.9101123595505618,
+        "f1": 0.7940941266072309,
+        "support": 89
+      },
+      "44": {
+        "precision": 0.5158007032600275,
+        "recall": 0.6757575757575757,
+        "f1": 0.5848002207505519,
+        "support": 66
+      },
+      "45": {
+        "precision": 0.6687032967032968,
+        "recall": 0.584,
+        "f1": 0.6148186835374883,
+        "support": 25
+      },
+      "46": {
+        "precision": 0.6036224299119133,
+        "recall": 0.4620967741935484,
+        "f1": 0.5216406926909404,
+        "support": 248
+      },
+      "47": {
+        "precision": 0.7341991341991342,
+        "recall": 0.6153846153846154,
+        "f1": 0.6695035460992909,
+        "support": 26
+      },
+      "48": {
+        "precision": 0.844731818926838,
+        "recall": 0.8072874493927126,
+        "f1": 0.8236403350853368,
+        "support": 247
+      },
+      "49": {
+        "precision": 0.9392111128799414,
+        "recall": 0.9668193384223919,
+        "f1": 0.9527526493524128,
+        "support": 1965
+      },
+      "50": {
+        "precision": 0.6801263668210911,
+        "recall": 0.6507042253521127,
+        "f1": 0.6634518171108983,
+        "support": 71
+      },
+      "51": {
+        "precision": 0.9285714285714286,
+        "recall": 1.0,
+        "f1": 0.962962962962963,
+        "support": 13
+      },
+      "52": {
+        "precision": 0.782360449334373,
+        "recall": 0.8545454545454545,
+        "f1": 0.8153945679194736,
+        "support": 99
+      },
+      "53": {
+        "precision": 0.830112242445657,
+        "recall": 0.9057777777777778,
+        "f1": 0.8651415761249689,
+        "support": 225
+      }
+    }
+  },
+  "metrics_median": {
+    "accuracy": 0.7610991256954696,
+    "f1_macro": 0.48919379501910004,
+    "f1_micro": 0.7610991256954696,
+    "f1_weighted": 0.7533794620923774,
+    "recall_macro": 0.49780892034760593,
+    "recall_micro": 0.7610991256954696,
+    "recall_weighted": 0.7610991256954696,
+    "precision_macro": 0.5080383288389483,
+    "precision_micro": 0.7610991256954696,
+    "precision_weighted": 0.7521228831997067,
+    "classes": {
+      "0": {
+        "precision": 0.42857142857142855,
+        "recall": 0.43956043956043955,
+        "f1": 0.39285714285714285
+      },
+      "1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "2": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "3": {
+        "precision": 0.19047619047619047,
+        "recall": 0.17391304347826086,
+        "f1": 0.1818181818181818
+      },
+      "4": {
+        "precision": 0.3333333333333333,
+        "recall": 0.11904761904761904,
+        "f1": 0.1754385964912281
+      },
+      "5": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "6": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "7": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "8": {
+        "precision": 0.5,
+        "recall": 0.30357142857142855,
+        "f1": 0.35555555555555557
+      },
+      "9": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "10": {
+        "precision": 0.6113821138211382,
+        "recall": 0.6143790849673203,
+        "f1": 0.6128769356153219
+      },
+      "11": {
+        "precision": 0.6842105263157895,
+        "recall": 0.6842105263157895,
+        "f1": 0.6842105263157895
+      },
+      "12": {
+        "precision": 0.4,
+        "recall": 0.4,
+        "f1": 0.4000000000000001
+      },
+      "13": {
+        "precision": 0.7096045197740113,
+        "recall": 0.8155844155844156,
+        "f1": 0.7566607460035525
+      },
+      "14": {
+        "precision": 0.855072463768116,
+        "recall": 0.8444444444444444,
+        "f1": 0.8455882352941176
+      },
+      "15": {
+        "precision": 0.86,
+        "recall": 0.8,
+        "f1": 0.8172043010752689
+      },
+      "16": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "17": {
+        "precision": 0.36585365853658536,
+        "recall": 0.27358490566037735,
+        "f1": 0.3169398907103825
+      },
+      "18": {
+        "precision": 0.5,
+        "recall": 0.125,
+        "f1": 0.2222222222222222
+      },
+      "19": {
+        "precision": 0.610062893081761,
+        "recall": 0.8981481481481481,
+        "f1": 0.7265917602996256
+      },
+      "20": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "21": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "22": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "23": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "24": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "25": {
+        "precision": 0.9411764705882353,
+        "recall": 0.6666666666666666,
+        "f1": 0.7804878048780487
+      },
+      "26": {
+        "precision": 0.14772727272727273,
+        "recall": 0.13978494623655913,
+        "f1": 0.14364640883977903
+      },
+      "27": {
+        "precision": 0.7879767291531997,
+        "recall": 0.8082758620689655,
+        "f1": 0.7953296703296702
+      },
+      "28": {
+        "precision": 0.8421052631578947,
+        "recall": 0.5875,
+        "f1": 0.6962962962962964
+      },
+      "29": {
+        "precision": 0.41509433962264153,
+        "recall": 0.5569620253164557,
+        "f1": 0.4756756756756757
+      },
+      "30": {
+        "precision": 0.7840909090909091,
+        "recall": 0.8375,
+        "f1": 0.788235294117647
+      },
+      "31": {
+        "precision": 0.5517241379310345,
+        "recall": 0.684931506849315,
+        "f1": 0.6035502958579881
+      },
+      "32": {
+        "precision": 0.8210900473933649,
+        "recall": 0.7114788004136504,
+        "f1": 0.7653230259525123
+      },
+      "33": {
+        "precision": 0.6981132075471698,
+        "recall": 0.6875,
+        "f1": 0.7096774193548386
+      },
+      "34": {
+        "precision": 0.22727272727272727,
+        "recall": 0.06578947368421052,
+        "f1": 0.1020408163265306
+      },
+      "35": {
+        "precision": 0.9302325581395349,
+        "recall": 0.9285714285714286,
+        "f1": 0.9302325581395349
+      },
+      "36": {
+        "precision": 1.0,
+        "recall": 0.25,
+        "f1": 0.4
+      },
+      "37": {
+        "precision": 0.9666666666666667,
+        "recall": 0.9666666666666667,
+        "f1": 0.9666666666666667
+      },
+      "38": {
+        "precision": 0.425,
+        "recall": 0.4642857142857143,
+        "f1": 0.5
+      },
+      "39": {
+        "precision": 0.8369098712446352,
+        "recall": 0.8158995815899581,
+        "f1": 0.826271186440678
+      },
+      "40": {
+        "precision": 0.75,
+        "recall": 1.0,
+        "f1": 0.8571428571428571
+      },
+      "41": {
+        "precision": 0.7129629629629629,
+        "recall": 0.7619047619047619,
+        "f1": 0.7280334728033472
+      },
+      "42": {
+        "precision": 0.7,
+        "recall": 0.7,
+        "f1": 0.7
+      },
+      "43": {
+        "precision": 0.7043478260869566,
+        "recall": 0.9101123595505618,
+        "f1": 0.7941176470588236
+      },
+      "44": {
+        "precision": 0.5238095238095238,
+        "recall": 0.6818181818181818,
+        "f1": 0.5866666666666667
+      },
+      "45": {
+        "precision": 0.68,
+        "recall": 0.6,
+        "f1": 0.6521739130434783
+      },
+      "46": {
+        "precision": 0.6042780748663101,
+        "recall": 0.45564516129032256,
+        "f1": 0.5209713024282561
+      },
+      "47": {
+        "precision": 0.7272727272727273,
+        "recall": 0.6153846153846154,
+        "f1": 0.6666666666666667
+      },
+      "48": {
+        "precision": 0.8380566801619433,
+        "recall": 0.8380566801619433,
+        "f1": 0.8237623762376236
+      },
+      "49": {
+        "precision": 0.9396636993076162,
+        "recall": 0.9669211195928753,
+        "f1": 0.9528373266078184
+      },
+      "50": {
+        "precision": 0.676923076923077,
+        "recall": 0.6619718309859155,
+        "f1": 0.6615384615384615
+      },
+      "51": {
+        "precision": 0.9285714285714286,
+        "recall": 1.0,
+        "f1": 0.962962962962963
+      },
+      "52": {
+        "precision": 0.8,
+        "recall": 0.8484848484848485,
+        "f1": 0.8159203980099502
+      },
+      "53": {
+        "precision": 0.8214285714285714,
+        "recall": 0.9244444444444444,
+        "f1": 0.8679245283018867
+      }
+    }
+  },
+  "metrics_std": {
+    "accuracy": 0.0024025119186827123,
+    "f1_macro": 0.009034716171117398,
+    "f1_micro": 0.0024025119186827123,
+    "f1_weighted": 0.0021024161673952172,
+    "recall_macro": 0.008081593277331897,
+    "recall_micro": 0.0024025119186827123,
+    "recall_weighted": 0.0024025119186827123,
+    "precision_macro": 0.011009217198466544,
+    "precision_micro": 0.0024025119186827123,
+    "precision_weighted": 0.002741717564786826,
+    "classes": {
+      "0": {
+        "precision": 0.062224614895950964,
+        "recall": 0.10396092268365112,
+        "f1": 0.05060997340803759
+      },
+      "1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "2": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "3": {
+        "precision": 0.0787584203104815,
+        "recall": 0.10009447333235946,
+        "f1": 0.0982348388711486
+      },
+      "4": {
+        "precision": 0.08295959089361536,
+        "recall": 0.050507627227610534,
+        "f1": 0.05343206578733245
+      },
+      "5": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "6": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "7": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "8": {
+        "precision": 0.08759676982226702,
+        "recall": 0.07512744274272368,
+        "f1": 0.058702763906630574
+      },
+      "9": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "10": {
+        "precision": 0.01717539137182467,
+        "recall": 0.023497618316663464,
+        "f1": 0.01092717001484231
+      },
+      "11": {
+        "precision": 0.020313878993553004,
+        "recall": 0.04707511531578505,
+        "f1": 0.030186930273813677
+      },
+      "12": {
+        "precision": 0.05962847939999439,
+        "recall": 0.0894427190999916,
+        "f1": 0.049609709657406034
+      },
+      "13": {
+        "precision": 0.046688941591119054,
+        "recall": 0.053649097573337266,
+        "f1": 0.003485719395039249
+      },
+      "14": {
+        "precision": 0.014471538201520166,
+        "recall": 0.020286020648339516,
+        "f1": 0.009134848776976937
+      },
+      "15": {
+        "precision": 0.0493043703423269,
+        "recall": 0.06418722614352486,
+        "f1": 0.03638812240523554
+      },
+      "16": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "17": {
+        "precision": 0.026638688471201398,
+        "recall": 0.1384897948670113,
+        "f1": 0.09199975494901784
+      },
+      "18": {
+        "precision": 0.35729920499980283,
+        "recall": 0.24044230077089182,
+        "f1": 0.1759343197265581
+      },
+      "19": {
+        "precision": 0.008151411808594302,
+        "recall": 0.05887097910745125,
+        "f1": 0.015340631602595701
+      },
+      "20": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "21": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "22": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "23": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "24": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "25": {
+        "precision": 0.2802618646958022,
+        "recall": 0.18257418583505539,
+        "f1": 0.08444971822210534
+      },
+      "26": {
+        "precision": 0.021906414683487564,
+        "recall": 0.033445873150528584,
+        "f1": 0.02838024630455924
+      },
+      "27": {
+        "precision": 0.009210149368962943,
+        "recall": 0.019350942545722356,
+        "f1": 0.008442483725816166
+      },
+      "28": {
+        "precision": 0.010069405432728933,
+        "recall": 0.020539595906443702,
+        "f1": 0.012055035380952208
+      },
+      "29": {
+        "precision": 0.18692545837272942,
+        "recall": 0.2576190390863837,
+        "f1": 0.21640128033769182
+      },
+      "30": {
+        "precision": 0.04462056667156235,
+        "recall": 0.046770717334674305,
+        "f1": 0.01894534415183938
+      },
+      "31": {
+        "precision": 0.04682049745236808,
+        "recall": 0.05763201087113051,
+        "f1": 0.04123565344186101
+      },
+      "32": {
+        "precision": 0.035569324274353796,
+        "recall": 0.06944293862968066,
+        "f1": 0.017830278382425624
+      },
+      "33": {
+        "precision": 0.07650612539921844,
+        "recall": 0.06972166887783966,
+        "f1": 0.0434441753918126
+      },
+      "34": {
+        "precision": 0.16267093125208107,
+        "recall": 0.30168616629916606,
+        "f1": 0.20137901698379157
+      },
+      "35": {
+        "precision": 0.0174390406949697,
+        "recall": 0.019920476822239862,
+        "f1": 0.00665950349800074
+      },
+      "36": {
+        "precision": 0.2022100118413747,
+        "recall": 0.08838834764831845,
+        "f1": 0.08952192795774204
+      },
+      "37": {
+        "precision": 0.0009352980204483959,
+        "recall": 0.027888667551135844,
+        "f1": 0.014448280682293747
+      },
+      "38": {
+        "precision": 0.07603897049413497,
+        "recall": 0.1441902088441882,
+        "f1": 0.04632115115750765
+      },
+      "39": {
+        "precision": 0.02813971297274524,
+        "recall": 0.0676350482084023,
+        "f1": 0.022809087935235478
+      },
+      "40": {
+        "precision": 0.0670820393249937,
+        "recall": 0.0,
+        "f1": 0.047915742374995525
+      },
+      "41": {
+        "precision": 0.033588007849706364,
+        "recall": 0.04385091212655753,
+        "f1": 0.01732252217254874
+      },
+      "42": {
+        "precision": 0.09132732078900434,
+        "recall": 0.05477225575051666,
+        "f1": 0.06714905311075248
+      },
+      "43": {
+        "precision": 0.004281250292179297,
+        "recall": 0.013761178330242561,
+        "f1": 0.0024486510964303707
+      },
+      "44": {
+        "precision": 0.02128848470600437,
+        "recall": 0.008298826628866145,
+        "f1": 0.013756063378060745
+      },
+      "45": {
+        "precision": 0.053183089507285244,
+        "recall": 0.1314534138012399,
+        "f1": 0.08734734865496163
+      },
+      "46": {
+        "precision": 0.04021017272602018,
+        "recall": 0.03182675364624373,
+        "f1": 0.00799462684275304
+      },
+      "47": {
+        "precision": 0.015487916727271242,
+        "recall": 0.0,
+        "f1": 0.006343455255318512
+      },
+      "48": {
+        "precision": 0.039972525478592355,
+        "recall": 0.050045464422226536,
+        "f1": 0.0102722599936649
+      },
+      "49": {
+        "precision": 0.0077582133223503425,
+        "recall": 0.009758526823648065,
+        "f1": 0.0015439133455975567
+      },
+      "50": {
+        "precision": 0.05922290689643864,
+        "recall": 0.036456842550830384,
+        "f1": 0.03289019815461912
+      },
+      "51": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "52": {
+        "precision": 0.04414018501316795,
+        "recall": 0.033195306515464575,
+        "f1": 0.009914809186085888
+      },
+      "53": {
+        "precision": 0.026648049458546947,
+        "recall": 0.04448886668886115,
+        "f1": 0.007888486501875663
+      }
+    }
+  },
+  "averaged_over": 5
+}
