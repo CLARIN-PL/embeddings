@@ -86,3 +86,22 @@ LEADERBOARD_DATASET_DOMAIN_MAPPING: Final[Dict[str, List[LeaderboardDomain]]] = 
     "psc": [LeaderboardDomain.news],
     "punctuation_restoration": [LeaderboardDomain.wikipedia_talk, LeaderboardDomain.wikinews],
 }
+
+DATASET_TASK_MAPPING: Dict[str, str] = {
+    "abusive_clauses": "text_classification",
+    "aspectemo": "sequence_labeling",
+    "cdsc_e": "text_classification",
+    "dyk": "text_classification",
+    "kpwr_ner": "sequence_labeling",
+    "polemo2": "text_classification",
+    "polemo2_in": "text_classification",
+    "polemo2_out": "text_classification",
+    "political_advertising": "sequence_labeling",
+    "psc": "text_classification",
+    "punctuation_restoration": "sequence_labeling",
+    "nkjp_pos": "sequence_labeling",
+}
+
+
+def get_dataset_task(dataset_name: str) -> str:
+    return DATASET_TASK_MAPPING[HUGGINGFACE_DATASET_LEADERBOARD_DATASET_MAPPING[dataset_name]]

@@ -195,6 +195,35 @@ class Submission(_BaseSubmission):
         )
 
     @staticmethod
+    def from_predictions(
+        submission_name: str,
+        dataset_name: str,
+        dataset_version: str,
+        embedding_name: str,
+        predictions: Predictions,
+        hparams: Dict[str, Any],
+        packages: List[str],
+        task: str,
+        evaluator_kwargs: Optional[Dict[str, Any]] = None,
+        config: Optional[Dict[str, Any]] = None,  # any additional config
+    ) -> "Submission":
+        evaluator = Submission._get_evaluator_cls(task)(
+            return_input_data=False, **(evaluator_kwargs or {})
+        )
+        metrics = evaluator.evaluate(data=predictions).metrics
+        return Submission(
+            submission_name=submission_name,
+            dataset_name=dataset_name,
+            dataset_version=dataset_version,
+            embedding_name=embedding_name,
+            metrics=metrics,
+            predictions=predictions,
+            hparams=hparams,
+            packages=packages,
+            config=config,
+        )
+
+    @staticmethod
     def _get_evaluator_cls(
         task: str,
     ) -> Union[Type[TextClassificationEvaluator], Type[SequenceLabelingEvaluator]]:
@@ -273,6 +302,37 @@ class AveragedSubmission(_BaseSubmission):
             averaged_over=len(submissions),
             **cls._get_common_fields(submissions[0]),
         )
+
+    @classmethod
+    def from_predictions(
+        cls,
+        submission_name: str,
+        dataset_name: str,
+        dataset_version: str,
+        embedding_name: str,
+        predictions: Sequence[Predictions],
+        hparams: Dict[str, Any],
+        packages: List[str],
+        task: str,
+        evaluator_kwargs: Optional[Dict[str, Any]] = None,
+        config: Optional[Dict[str, Any]] = None,  # any additional config
+    ) -> "AveragedSubmission":
+        submissions = [
+            Submission.from_predictions(
+                submission_name=submission_name,
+                dataset_name=dataset_name,
+                dataset_version=dataset_version,
+                embedding_name=embedding_name,
+                predictions=predictions_,
+                hparams=hparams,
+                packages=packages,
+                task=task,
+                evaluator_kwargs=evaluator_kwargs,
+                config=config,
+            )
+            for predictions_ in predictions
+        ]
+        return AveragedSubmission.from_submissions(submissions)
 
     @classmethod
     def _aggregate_metrics_dicts(
