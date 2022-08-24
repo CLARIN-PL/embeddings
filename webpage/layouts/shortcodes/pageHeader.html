@@ -28,6 +28,10 @@
         background-color: white !important;
         color: black !important;
       }
+      article > *:not(.header) {
+        width: 80%;
+        margin: auto !important;
+      }
       .wrapper {
         font-family: Open Sans !important;
         background-color:rgba(139, 196, 250, 0.1) !important;
@@ -88,7 +92,7 @@
         margin: 0 !important;
       }
       p {
-        margin: 0 !important;
+        margin: 0;
       }
       #content{
          max-width: 1100px;
@@ -160,7 +164,7 @@
       }
     </style>
   </head>
-  <body>
+
     <div class="header">
       <a href="https://clarin-pl.eu/index.php/en/home/" target="_blank"> <img alt="Clarin Embedding" src="{{ $img.RelPermalink }}" /> </a>
       <div class="menu-items">
@@ -177,7 +181,6 @@
         </a>
       </div>
     </div>
-  </body>
 </html>
 <!-- spinner -->
 <style> 

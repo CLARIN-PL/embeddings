@@ -5,4 +5,3 @@ geekdocNav: false
 geekdocBreadcrumb: false
 ---
 {{< pageHeader >}}
-{{< about >}}
