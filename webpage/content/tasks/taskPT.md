@@ -1,5 +1,5 @@
 ---
-url: "/tasks/Part-of-speachTagging"
+url: "/tasks/Part-of-speechTagging"
 type: docs
 geekdocNav: false
 geekdocBreadcrumb: false
