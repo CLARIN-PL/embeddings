@@ -7,7 +7,7 @@ import yaml
 
 from embeddings.data.io import T_path
 from embeddings.pipeline.pipelines_metadata import Metadata
-from embeddings.utils.loggers import LightningLoggingConfig, WandbWrapper
+from embeddings.utils.loggers import LightningLoggingConfig, LoggingConfig, WandbWrapper
 from embeddings.utils.results_persister import ResultsPersister
 from embeddings.utils.utils import standardize_name
 
@@ -16,7 +16,7 @@ from embeddings.utils.utils import standardize_name
 class HPSResultsPersister(ResultsPersister[Tuple[pd.DataFrame, Metadata]], Generic[Metadata]):
     best_params_path: T_path
     log_path: T_path
-    logging_config: LightningLoggingConfig = LightningLoggingConfig()
+    logging_config: Optional[LoggingConfig] = LightningLoggingConfig()
     logging_hps_summary_name: Optional[str] = None
 
     def persist(self, result: Tuple[pd.DataFrame, Metadata], **kwargs: Any) -> None:
@@ -24,7 +24,10 @@ class HPSResultsPersister(ResultsPersister[Tuple[pd.DataFrame, Metadata]], Gener
         log.to_pickle(self.log_path)
         with open(self.best_params_path, "w") as f:
             yaml.dump(data=metadata, stream=f)
-        if self.logging_config.use_wandb():
+        if (
+            isinstance(self.logging_config, LightningLoggingConfig)
+            and self.logging_config.use_wandb()
+        ):
             general_metadata = deepcopy(metadata)
             del general_metadata["config"]
             logger = WandbWrapper()

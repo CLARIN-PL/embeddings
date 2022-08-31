@@ -30,7 +30,12 @@ def get_logger(name: str, log_level: Union[str, int] = DEFAULT_LOG_LEVEL) -> log
 
 
 @dataclass
-class LightningLoggingConfig:
+class LoggingConfig(abc.ABC):
+    pass
+
+
+@dataclass
+class LightningLoggingConfig(LoggingConfig):
     loggers_names: List[Literal["wandb", "csv", "tensorboard"]] = field(default_factory=list)
     tracking_project_name: Optional[str] = None
     wandb_entity: Optional[str] = None
