@@ -62,7 +62,7 @@ def sklearn_classification_pipeline(
     return (
         SklearnClassificationPipeline(
             **dataset_kwargs,
-            embedding_kwargs=embedding_kwargs,
+            vectorizer_kwargs=embedding_kwargs,
             output_path=Path(result_path.name),
             classifier=AdaBoostClassifier
         ),
@@ -79,7 +79,7 @@ def sklearn_local_classification_pipeline(
     return (
         SklearnClassificationPipeline(
             **local_dataset_kwargs,
-            embedding_kwargs=embedding_kwargs,
+            vectorizer_kwargs=embedding_kwargs,
             output_path=Path(result_path.name),
             classifier=AdaBoostClassifier
         ),
