@@ -1,0 +1,19 @@
+version: "3.0"
+
+services:
+  embeddings:
+    build:
+      context: .
+      dockerfile: ./docker/embeddings-gpu/Dockerfile
+    container_name: embeddings
+    volumes:
+      - .:/app
+      # pass cache to the container, models and datasets are stored there
+      # hence there is no need to redownload them everything docker is cleaned
+      - L:/cache:/root/.cache
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
