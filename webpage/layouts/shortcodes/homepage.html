@@ -1,0 +1,139 @@
+{{ $image := resources.Get "/cardcover.jpg" }}
+<!DOCTYPE html>
+<html>
+  <head>
+    <style scoped>
+       .homepage.container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1em;
+        color: #6e6e6e;
+      }
+      .title {
+        font-size: 32px;
+        font-weight: 300;
+        margin-top: 4rem;
+        text-align: center;
+      }
+
+      ._card.title {
+        margin-top: 7rem;
+        margin-bottom: 5rem;
+      }
+
+      .homepage ._card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        height: 25rem;
+        padding: 2rem;
+        padding-left: 7rem;
+        border-radius: 1rem;
+        background: url("{{$image.RelPermalink}}");
+        background-repeat: no-repeat;
+        background-size: cover;
+        -webkit-box-shadow: 0px 24px 24px -8px rgba(66, 68, 90, 0.51);
+        -moz-box-shadow: 0px 24px 24px -8px rgba(66, 68, 90, 0.51);
+        box-shadow: 0px 24px 24px -8px rgba(66, 68, 90, 0.51);
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+
+      ._card h1 {
+        font-size: 2.5rem;
+        color: #4169e1;
+        font-weight: bold;
+        margin-top: 0;
+        margin-bottom: 1rem;
+      }
+
+      ._card p {
+        width: 60%;
+        max-width: 70%;
+        overflow: hidden;
+        line-height: 1.5;
+        margin-top: 1em !important;
+        text-overflow: ellipsis;
+        /* white-space: nowrap; */
+      }
+
+      #tasks-container {
+        display: flex;
+        gap: 2em;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .task {
+        cursor: pointer;
+        width: 9em;
+        height: 7em;
+        display: flex;
+        align-items: center;
+        border-radius: 5px;
+        background-color: #fff;
+        border: 1px solid rgb(0 0 0 / 10%);
+        -webkit-box-shadow: 8px 8px 14px 0px rgba(66, 68, 90, 0.21);
+        -moz-box-shadow: 8px 8px 14px 0px rgba(66, 68, 90, 0.21);
+        box-shadow: 8px 8px 14px 0px rgba(66, 68, 90, 0.21);
+        font-weight: 600;
+        justify-content: center;
+        text-align: center;
+        padding: 0.5em;
+        font-size: 20px;
+        transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.3s;
+      }
+
+      .task:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 17px 10px -10px rgba(17, 55, 80, 0.5);
+        background: -webkit-radial-gradient(top left, rgba(0, 64, 255, 0.1), white);
+        background: -moz-radial-gradient(top left, rgba(0, 64, 255, 0.1), white);
+        background: radial-gradient(to bottom right, rgba(0, 64, 255, 0.1), white);
+      }
+      
+    </style>
+  </head>
+  <body>
+    <div class="homepage container">
+      <div class="_card">
+          <h1 class="title">LEPISZCZE</h1> 
+        <p>
+          A new, comprehensive open-source benchmark for Polish NLP with a continuous-submission leaderboard.
+        </p>
+        <p>
+          In the first batch of experiments, we tested 13 experiments (task and dataset pairs) based on the five recent LMs for Polish, used five already benchmarked datasets, and added eight datasets that were not previously added to the benchmark.
+        </p>
+      </div>
+      <div class="homepage title">Tasks</div>
+      <div id="tasks-container"></div>
+      <script>
+        const taskTypes = [
+          "Punctuation Restoration",
+          "Paraphrase Classification",
+          "Political Advertising Detection",
+          "Sentiment Analysis",
+          "Part-of-speech Tagging",
+          "Named Entity Recognition",
+          "Q&A Classification",
+          "Entailment Classification",
+          "Aspect-based Sentiment Analysis",
+          "Abusive Clauses Detection",
+          "Dialogue Acts Classification"
+        ];
+        const container = document.getElementById("tasks-container");
+        taskTypes.forEach((type) => {
+          const el = document.createElement("div");
+          el.classList.add("task");
+          el.innerHTML = type;
+          el.onclick = () => {
+            location.href = "tasks/" + type.replace(/\s+/g, "");
+          };
+          container.appendChild(el);
+        });
+      </script>
+    </div>
+  </body>
+</html>

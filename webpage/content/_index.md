@@ -1,8 +1,10 @@
 ---
-title: Embeddings
+url: "/"
 type: docs
+geekdocNav: false
+geekdocBreadcrumb: false
 ---
 
-# Results
-
-{{< results >}}
+{{< pageHeader >}}
+{{< homepage >}}
+{{< averageResults >}}

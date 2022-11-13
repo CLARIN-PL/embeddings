@@ -1,7 +1,7 @@
-{{ $fields := slice "submission_name" "dataset_name" "embedding_name" }}
-{{ $fieldsValue := slice  "dataset_name" "embedding_name" }}
+{{ $type := default "Tasks" (.Get "type") }}
+{{ $leaderboard := slice "leaderboard_task_name"}}
 {{ $metrics := slice }}
-{{ $metricsToIgnore := slice "classes" }}
+{{ $metricsToIgnore := slice "classes" "f1_weighted" "recall_weighted" "precision_weighted" }}
 {{ range $.Site.Data.results }}
    {{ range $k, $v := .metrics_avg }}
       {{if (not (in $metricsToIgnore $k)) }}
@@ -9,87 +9,346 @@
       {{end}}
    {{ end }}
 {{ end }}
-{{ $fields :=  $fields | uniq }}
 
-<div>
-   <table id="data-table">
-   <thead>
-      <tr>
-         <th>
-            Details
-         </th>
-         {{ range $field := $fields }}
-         <th>
-            {{ $field  | humanize  }}
-         </th>
-         {{ end }}
-         {{ range $metric := $metrics }}
-            <th>
-               {{ $metric  |  humanize  }}
-            </th>
-         {{ end }}
-         </tr>
-   </thead>
-   {{ range $file, $result := $.Site.Data.results }}
-      <tr>
-         <td>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{$file}}">
-               Details
-            </button>
-         </td>
-         {{ range $field:= $fields }}
-         <td>
-            {{if (in $fieldsValue $field)}}
-               {{ index $result $field "value"}}
-            {{else}}
-               {{ index $result $field }}
-            {{end}}
-         </td>
-         {{ end }}
-         {{ range $metric:= $metrics }}
-            <td>
-               {{(index $result "metrics_avg"  $metric) }}
-            </td>
-         {{ end }}
-         </tr>
+{{ $metricsStd := slice }}
+{{ range $.Site.Data.results }}
+   {{ range $k, $v := .metrics_std }}
+      {{if (not (in $metricsToIgnore $k)) }}
+         {{ $metricsStd = uniq ($metricsStd | append $k) }}
+      {{end}}
+   {{ end }}
+{{ end }}
+
+{{ $lastItem := "support"}}
+{{ $classHeaderItems := slice}}
+{{ $datasets := slice }}
+{{ range $file, $result := $.Site.Data.results }}
+    
+   <div id="modal-data{{$file}}" style="display:none;">{"items":[{{ range $i, $m := .metrics_avg.classes }}{"class_name": "{{$i}}",{{ range $key, $result := $m}}"{{$key}}":"{{$result}}",{{end}}},{{end}}]}</div>
+
+
+   {{if or (eq $type "Tasks") (eq (index $result $leaderboard) $type)}}
+        {{ $datasets = uniq ($datasets | append (index $result "dataset_name")) }}
+    {{end}}
+
+    <textarea style="display:none;" id="json-input{{$file}}" autocomplete="off">{{jsonify (dict "indent" " ") $result}}</textarea>
+    
+    {{ range $m := .metrics_avg.classes }}
+       {{ range $key, $result := $m}}                                  
+          {{ $classHeaderItems = uniq ($classHeaderItems | append $key) }}                           
+       {{end}}
+    {{end}}
+
+{{end}}
+
+<style scoped>  
+     .tabulator-col-content{
+         padding:0.5em !important;
+         height: fit-content;
+      }
+      .tabulator-cell{
+         min-width: 60px !important;
+         /* padding: 0.5em !important; */
+      }
+      .tabulator-col{
+         min-width: 60px !important;
+         padding-top:0 !important;
+      }
+      .tabulator-col.tabulator-col-group{
+         min-height: 80px !important;
+      }
+      .close{
+         background: none;
+         border: none;
+         height: 30px;
+      }
+      .close-icon{
+         font-size: 36px;
+         font-weight: 500;
+      }
+      .close-icon:hover{
+         color: royalblue;
+      }
+
+      .modal.modal-xl.fade.show{
+         padding: 0 !important;
+      }
+      .modal-open{
+         padding: 0 !important;
+      }
+      .select-view{
+         margin:0 0 1em; 
+         width:200px; 
+         padding: 3px; 
+         border-radius: 5px; 
+         border: #c6c6c6 solid 2px !important; 
+         outline: 0 !important; 
+         background: #fff; 
+         color: #000 !important;
+      }
+      .modal-table-1{
+         max-width: 600px !important;
+         margin: auto;
+      }
+      .tabulator-page{
+         padding-top: 0 !important;
+         padding-bottom: 0 !important;
+      }
+      .json-dict{
+         line-height: 0.8;
+         font-size: 12px !important;
+      }
+      .button{
+         background: white;
+         height: 20px;
+         width: 20px;
+         margin: 0px;
+         padding: 0;
+         font-size: 14px;
+         font-weight: 600;
+         background: #e1b941;
+         color: white;
+         border: none;
+         line-height: 15px;
+         align-items: center !important;
+         border-width: 1px;
+         border-radius: 50% !important;
+      }
+      .button:hover{
+         color: #f5e7bd;
+         box-shadow: 0 1px 3px rgb(0 0 0);
+      }
+</style>
+
+<input type="hidden" id="datasets-list" value="{{$datasets}}">
+<div style="margin-top: 2em;">
+   <div class="container title-container">     
+      <div class="title">Dataset model's ranking</div>
+      <p style="text-align: center;">Detailed model performance within specific dataset.</p>
+</div>
+<div style="display: flex; justify-content: center;"><div class="lds-ring" id="spinner"><div></div><div></div><div></div><div></div></div></div>
+
+<div id="content" style="display: none;">
+   {{ range $index, $dataset := $datasets }}
+   <div>
+      <table id="data-table-{{$index}}" >
+         <thead>
+            <tr>
+               <th>
+                  Model
+              </th>
+               {{ range $metric := $metrics }}
+                  <th>
+                     {{ $metric  |  humanize  }}
+                  </th>
+                  <th>
+                     {{ $metric  |  humanize  }} Std
+                  </th>
+               {{end}}
+            </tr>
+         </thead>
+      {{ range $file, $result := $.Site.Data.results }}
+      {{if or (eq $type "Tasks") (eq (index $result $leaderboard) $type)}}
+            {{if eq (index $result "dataset_name") $dataset }}
+               <tr>
+                  <td >
+                     <button id="{{$file}}" type="button" class="button" data-bs-toggle="modal" data-bs-target="#modal"> 
+                        <span style="font-weight:900;">i</span>
+                     </button>
+                     <span style="color: royalblue !important; font-weight: 600;">{{ index $result "embedding_name"}}</span>
+                  </td>
+
+                  {{ range $metric:= $metrics }}
+                  <td>
+                     {{(index $result "metrics_avg"  $metric) }}
+                  </td>
+                  <td>
+                     {{(index $result "metrics_std"  $metric) }}
+                  </td>
+                  {{ end }}
+               </tr>
+            {{end}}    
+      {{end}} 
+      {{end}}
+      </table>
+   </div>
    {{end}}
-   </table>
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script> <script src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.9.3/js/tabulator.min.js" integrity="sha512-N/WbW5rCM/O+/QpzuqYXkInRdSfFu6txbJcbQioBywGXDiF1XCJY2LXVKIGjNFUMS4P79mtf9pDu5ViXaa+BnA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.9.3/css/bootstrap/tabulator_bootstrap4.min.css" integrity="sha512-pXZ8FsuOBAyDmJ3OWob4V2UgZWQ8zs8f99MrNv0sBG8VLzuucajpzJ3BIiVNzTpfIYgzWGUq0QPJ3Y/9Gr4h7Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
    <script>
-      var table = new Tabulator("#data-table", {
-         layout:"fitData",
-         movableColumns: true
+      const datasetsInput = document.getElementById("datasets-list");
+      let datasets = datasetsInput.value;
+      datasets = datasets.replace("[", "");
+      datasets = datasets.replace("]", "");
+      datasets = datasets.replace("/", "-");
+      datasets = datasets.split(" ");
+
+      const select = document.createElement("select");
+      select.value = datasets[0];
+      select.classList.add("select-view");
+      select.onchange = ()=>{
+        datasets.forEach((d,i) => {
+         const dataset = document.getElementById("data-table-"+i);
+         dataset.setAttribute("style", "display:none;");
+         if( d == select.value){
+            dataset.setAttribute("style", "display:block;");
+         }
+        })
+      }
+      datasets.forEach((d,i) => {
+         const dataset = document.getElementById("data-table-"+i);
+         if(i!=0){
+            dataset.setAttribute("style", "display:none;");
+         }
+         const e = document.createElement("option");
+         e.value = d;
+         e.innerText = d;
+         select.appendChild(e);
+      })
+      const main = document.getElementById("content");
+      main.insertBefore(select, main.firstChild)
+
+      const datasetLabel = document.createElement("div");
+      datasetLabel.innerText = "Select a dataset:";
+      main.insertBefore(datasetLabel, select)
+
+
+      datasets.forEach((d,i) => {
+
+         let table = new Tabulator("#data-table-"+i, {
+            layout:"fitColumns",
+            movableColumns: true,
+            columnHeaderVertAlign:"bottom",
+         });
+         let formattedColumns = table.getColumnDefinitions().map(c => { c.formatter = "html"; return c})
+         let resultColumns = [];
+         formattedColumns.forEach((col,i) => {          
+            if(i==0) { 
+               col.headerFilter = true;
+               col.widthGrow = 3;
+               col.minWidth= 180;
+               resultColumns.push(col);
+            }else{
+               if(i%2==1){
+                  const t = col.title;
+                  col.title = "Mean";
+                  formattedColumns[i+1].title = "Std";
+                  col.formatter = "money";
+                  formattedColumns[i+1].formatter = "money";
+                  col.hozAlign = "center";
+                  formattedColumns[i+1].hozAlign = "center";
+                  col.formatterParams = {
+                     precision:3,
+                  };
+                  formattedColumns[i+1].formatterParams = {
+                     precision:3,
+                  };
+                  col.headerFilter = false;
+                  formattedColumns[i+1].headerFilter = false;
+                  let obj = {title: t, columns: [col, formattedColumns[i+1]]};
+                  resultColumns.push(obj);
+               }
+            }
+         });
+         table.setColumns(resultColumns);
+         table.setSort("f1_macro", "desc")
+         const content = document.getElementById("content");
+         const spinner = document.getElementById("spinner");
+         content.style.display = "block";
+         spinner.style.display = "none";
       });
-      var formattedColumns = table.getColumnDefinitions().map(c => { c.formatter = "html"; return c})
-      formattedColumns.slice(1).forEach(c => c.headerFilter = true)
-      table.setColumns(formattedColumns)
    </script>
-
-
 </div>
 
-{{ range $file, $result := $.Site.Data.results }}
-<div class="modal modal-xl fade" id="{{$file}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+<!----------------------------------------------- MODAL --------------------------------------->
+
+
+<div class="modal modal-xl fade" id="modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">{{$file | humanize}}</h5>
+            <h5 class="modal-title" id="modal-title">TYTUŁ</h5>
             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
+               <span class="close-icon" aria-hidden="true">&times;</span>
             </button>
          </div>
          <div class="modal-body">
-                  {{ range $k, $v := $result}}
-                  <p>
-                     <strong>{{$k}}</strong>
-               <pre>{{jsonify (dict "indent" " ") $v}}</pre>
-                  </p>
+            <div class="title">Mean class-level metrics </div>
+            <table class="modal-table-1" id="modal-table">
+               <thead>
+                  <th>
+                     Class name
+                  </th>
+                  {{ range $c := $classHeaderItems }}                               
+                     <th>
+                        {{$c | humanize}}
+                     </th>                                       
                   {{end}}
+               </thead>
+               <div id="modal-table-1-value"></div>
+            </table>
+            <div class="title" style="margin-top: 3rem;">Submission JSON </div>
+            <div style="max-height: 500px; overflow: auto;">
+               <pre id="json-display"></pre>
+            </div>
          </div>
       </div>
    </div>
 </div>
-{{end}}
+
+<script>
+   let tableModal = new Tabulator("#modal-table", {
+      layout:"fitColumns",
+      movableColumns: true,
+      pagination:"local",
+      paginationSize:5,
+      paginationCounter:"rows",
+      paginationSizeSelector:[5, 10, 25, 100],
+   });
+   let formattedColumnsModal = tableModal.getColumnDefinitions().map(c => { c.formatter = "html"; return c})
+   formattedColumnsModal.forEach((col,i) => {   
+      if(i==0){
+            col.minWidth = 200;
+      }else{
+         col.hozAlign = "center";
+      }
+      if(i<4 && i!=0){
+         col.formatter = "money";
+         col.formatterParams = {
+            precision:3,
+         };
+         col.headerFilter = false;
+      }      
+
+   });
+   tableModal.setColumns(formattedColumnsModal);
+
+
+   tableModal.setSort("f1", "desc")
+   const modalTitle = document.getElementById("modal-title");
+
+   document.addEventListener('click', function (event) {
+      if (!event.target.matches('.button')) return;
+      event.preventDefault();
+      modalTitle.innerText = event.target.id;
+      var editor = new JsonEditor('#json-display', getJson(event.target.id));
+      editor.load(getJson(event.target.id));
+
+      let jsonText = document.getElementById("modal-data"+event.target.id).innerHTML.toString();
+      jsonText = jsonText.split(",}").join("}");
+      jsonText = jsonText.split(",]").join("]");
+      jsonText = JSON.parse(jsonText);
+      tableModal.replaceData(jsonText.items);
+
+   }, false);
+
+
+   function getJson(id) {
+      try {
+         return JSON.parse($(`#json-input${id}`).val());
+      } catch (ex) {
+         alert('Wrong JSON Format: ' + ex);
+      }
+   }
+</script>
+
+<!----------------------------------------------- MODAL --------------------------------------->

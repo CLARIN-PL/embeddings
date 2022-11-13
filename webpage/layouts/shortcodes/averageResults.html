@@ -1,0 +1,147 @@
+{{ $tasktype := default "Tasks" (.Get "tasktype") }}
+{{ $models := slice }}
+{{ range $file, $result := $.Site.Data.results }}  
+    {{ $models = uniq ($models | append (index $result "embedding_name")) }}
+{{end}}
+
+
+{{ $metrics := slice }}
+{{ $metricsToIgnore := slice "classes" "f1_weighted" "recall_weighted" "precision_weighted" }}
+{{ range $.Site.Data.results }}
+   {{ range $k, $v := .metrics_avg }}
+      {{if (not (in $metricsToIgnore $k)) }}
+         {{ $metrics = uniq ($metrics | append $k) }}
+      {{end}}
+   {{ end }}
+{{ end }}
+{{ $sum := slice }}
+<style scoped>
+    #data-table{
+        max-width: 800px;
+        margin: auto;
+    }
+    .tabulator-cell[tabulator-field="model"]{
+        color: royalblue !important;
+        font-weight: 500;
+    }
+    
+</style>
+<div style="margin: 0 2em;">
+    <div class="container title-container">    
+        {{ if eq $tasktype "Tasks"}} 
+       <div class="title">Model ranking</div>
+       <p style="text-align: center;">Average model performance across all tasks.</p>
+       {{else}}
+       <div class="title">Model's task ranking</div>
+       <p style="text-align: center;">Average model performance across task datasets.</p>
+       {{end}}
+       
+</div>
+
+<div id="data-tasktype" style="visibility: hidden; height: 0px; overflow: hidden;">{{ $tasktype }}</div>
+<div id="data-average" style="visibility: hidden; height: 0px; overflow: hidden;">
+{{ range $model := $models }}
+    {{ range $metric := $metrics }}
+        {{ range $file, $result := $.Site.Data.results }}
+            {{if eq (index $result "embedding_name") $model}}
+                {{ $sum := ($sum | append (index $result "metrics_avg" $metric))}}
+                <div> {{ $model }};;{{ $metric }};;{{(index $result "leaderboard_task_name")}};;{{(index $result "dataset_name")}};;{{index $result "metrics_avg" $metric}}</div>
+            {{end}}
+        {{end}}
+    {{end}}
+{{end}}
+</div>
+<div style="display: flex; justify-content: center;"><div class="lds-ring" id="average-spinner"><div></div><div></div><div></div><div></div></div></div>
+<table id="data-table" style="display: none;">
+    <thead>
+        <tr>
+            <th>
+                Model
+            </th>
+            {{ range $metric := $metrics }}
+                <th>
+                    {{ $metric  |  humanize  }} 
+                </th>
+            {{end}}
+       </tr>
+    </thead>
+    <tr id="table-rows">
+
+    </tr>
+ </table>
+
+ <script>
+    let table = new Tabulator("#data-table", {
+        layout:"fitColumns",
+        movableColumns: true
+    });
+         
+    let formattedColumns = table.getColumnDefinitions().map(c => { 
+        c.formatter = "html"; 
+        return c
+    })       
+    formattedColumns.forEach((col,i) => {
+        if(i==0){
+            col.headerFilter = true;
+            col.widthGrow = 3;
+            col.minWidth= 180;
+        }else{
+            col.formatter = "money";
+            col.hozAlign = "center";
+            col.formatterParams = {
+                precision:3,
+            };
+            col.headerFilter = false;
+        }
+    })
+    table.setColumns(formattedColumns);
+
+
+    table.setSort("f1_macro", "desc")
+    const dataDiv = document.getElementById("data-average");
+    let array = [...dataDiv.children];
+    let dataArray = []
+    array.forEach((el)=>{
+        const temp = el.innerHTML.split(";;");
+        dataArray.push({model: temp[0], metric: temp[1], task: temp[2], dataset: temp[3], value: temp[4]})
+    })
+
+    const tasktype = document.getElementById("data-tasktype").innerHTML;
+    const uniqueModels = [...new Set(dataArray.map(item => item.model))];
+    const uniqueMetric = [...new Set(dataArray.map(item => item.metric))];
+ 
+    let values = new Array(0);
+    uniqueModels.forEach(model => {
+        let modelObj = {model: model};
+        dataArray.forEach(el =>{
+            if( (tasktype == "Tasks" || el.task == tasktype) && el.model == model){
+                uniqueMetric.forEach( m =>{
+                    if(el.metric == m){
+                        if(modelObj[m+"_sum"] == undefined){
+                            modelObj[m+"_sum"] = +el.value;
+                            modelObj[m+"_count"] = 1;
+                            modelObj[m] = modelObj[m+"_sum"] / modelObj[m+"_count"];
+                        }else{
+                            modelObj[m+"_sum"] += +el.value;
+                            modelObj[m+"_count"] += 1;
+                            modelObj[m] = modelObj[m+"_sum"] / modelObj[m+"_count"];
+                        }
+                    }
+                })
+            }
+        })
+        if(Object.keys(modelObj).length>1){
+            const deleteKeys = Object.keys(modelObj).filter( item => item.includes("_sum") || item.includes("_count"));
+            deleteKeys.forEach(d => {
+                delete modelObj[d];
+            })
+            values.push(modelObj);
+        }
+    })
+    table.replaceData(values);
+    const content = document.getElementById("data-table");
+    const spinner = document.getElementById("average-spinner");
+    content.style.display = "block";
+    spinner.style.display = "none";
+
+ </script>
