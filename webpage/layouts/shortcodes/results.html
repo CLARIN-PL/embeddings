@@ -249,6 +249,7 @@
             }
          });
          table.setColumns(resultColumns);
+         table.setSort("f1_macro", "desc")
          const content = document.getElementById("content");
          const spinner = document.getElementById("spinner");
          content.style.display = "block";
@@ -322,6 +323,7 @@
    tableModal.setColumns(formattedColumnsModal);
 
 
+   tableModal.setSort("f1", "desc")
    const modalTitle = document.getElementById("modal-title");
 
    document.addEventListener('click', function (event) {
