@@ -56,6 +56,7 @@ types-requests = "2.26.1"
 coverage = {extras = ["toml"], version = "6.2"}
 pytest-env = "0.6.2"
 nbdev = "^2.3.9"
+jupyterlab = "^3.5.0"
 
 [tool.poe.tasks]
 black = "black --check ./"
