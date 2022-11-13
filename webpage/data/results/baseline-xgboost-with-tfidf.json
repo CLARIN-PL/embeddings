@@ -2,7 +2,7 @@
   "submission_name": "baseline_xgboost_tfidf",
   "dataset_name": "clarin-pl/polemo2-official",
   "dataset_version": "0.0.0",
-  "embedding_name": "TfidfVectorizer",
+  "embedding_name": "XGBoost+Tfidf",
   "hparams": {
     "max_features": 10000,
     "n_estimators": 200,
