@@ -44,6 +44,7 @@ types-setuptools = ">=57.4.11"
 typing-extensions = ">=4.0.1"
 intel-openmp = {version="^2022.0.3", platform="win32"}
 wandb = ">=0.12.10"
+sacremoses = "^0.0.53"
 
 [tool.poetry.dev-dependencies]
 black = "21.12b0"
@@ -76,6 +77,7 @@ check_local = ["black", "isort", "pyflakes", "mypy_local", "mypy_examples_local"
 fix = ["black_fix", "isort_fix"]
 all = ["check", "test"]
 fix_check = ["fix", "check"]
+force-torch-cuda = "python -m pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113"
 
 [tool.poetry.extras]
 developer = ["black", "mypy", "typing-extensions"]
