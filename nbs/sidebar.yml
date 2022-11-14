@@ -2,4 +2,14 @@ website:
   sidebar:
     contents:
       - index.qmd
-      - 00_lepiszcze.ipynb
+      - section: lepiszcze
+        contents:
+          - lepiszcze/00_lepiszcze.ipynb
+          - lepiszcze/01_submission.ipynb
+      - section: tutorials
+        contents:
+          - tutorials/baseline_sklearn_models_tutorial.ipynb
+          - tutorials/how_to_use_polsih_static_embeddings.ipynb
+          - tutorials/tutorial_how_to_use_config_space.ipynb
+          - tutorials/validate_flair_models_inference.ipynb
+          - tutorials/validate_lightning_models_inference.ipynb
