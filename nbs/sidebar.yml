@@ -1,7 +1,7 @@
 website:
   sidebar:
     contents:
-      - index.qmd
+      - index.ipynb
       - section: lepiszcze
         contents:
           - lepiszcze/00_lepiszcze.ipynb
