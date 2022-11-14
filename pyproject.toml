@@ -45,6 +45,7 @@ typing-extensions = ">=4.0.1"
 intel-openmp = {version="^2022.0.3", platform="win32"}
 wandb = ">=0.12.10"
 sacremoses = "^0.0.53"
+setuptools = "^65.5.1"
 
 [tool.poetry.dev-dependencies]
 black = "21.12b0"
@@ -84,7 +85,7 @@ developer = ["black", "mypy", "typing-extensions"]
 pymagnitude = ["pymagnitude", "lz4", "annoy"]
 
 [build-system]
-requires = ["poetry>=1.1.5"]
+requires = ["setuptools", "poetry>=1.2"]
 build-backend = "poetry.masonry.api"
 
 [tool.pytest.ini_options]
