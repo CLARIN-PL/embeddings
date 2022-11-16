@@ -364,8 +364,7 @@ class SequenceLabelingDataModule(HuggingFaceDataModule):
     @property
     def collate_fn(self) -> Optional[Callable[[Any], Any]]:
         if self.processing_batch_size and self.processing_batch_size > 0:
-            # ignoring type to avoid unexpected tokenizer argument defined in parent dataclass
-            data_collator = CustomDataCollatorForTokenClassification(tokenizer=self.tokenizer)  # type: ignore
+            data_collator = CustomDataCollatorForTokenClassification(tokenizer=self.tokenizer)
             assert callable(data_collator)
             return data_collator
         return None

@@ -39,7 +39,7 @@ class TorchGarbageCollectorOptunaCallback(OptunaCallback):
     def _cleanup() -> None:
         gc.collect()
         if torch.cuda.is_available():
-            torch.cuda.empty_cache()  # type: ignore
+            torch.cuda.empty_cache()
 
     def __call__(self, study: Study, trial: optuna.trial.FrozenTrial) -> None:
         TorchGarbageCollectorOptunaCallback._cleanup()
@@ -117,7 +117,7 @@ class OptunaPipeline(
         dataset_path: T_path,
         metric_name: str,
     ):
-        self.config_space = config_space
+        self.config_space: ConfigSpace = config_space
         self.preprocessing_pipeline = preprocessing_pipeline
         self.evaluation_pipeline = evaluation_pipeline
         self.pruner = pruner
@@ -218,8 +218,7 @@ class _HuggingFaceOptimizedPipelineDefaultsBase(ABC):
     ignore_preprocessing_pipeline: bool = False
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
+@dataclass
 class AbstractHuggingFaceOptimizedPipeline(
     _HuggingFaceOptimizedPipelineDefaultsBase,
     _HuggingFaceOptimizedPipelineBase[ConfigSpace],
