@@ -18,7 +18,7 @@ from embeddings.utils.utils import read_yaml
 class FlairTextClassificationConfigSpaceMapping:
     LOAD_MODEL_KEYS_MAPPING: ClassVar[Mapping[str, Set[str]]] = MappingProxyType(
         {
-            "FlairDocumentCNNEmbeddings": {
+            "FlairDocumentRNNEmbeddings": {
                 "hidden_size",
                 "rnn_type",
                 "rnn_layers",
@@ -27,8 +27,8 @@ class FlairTextClassificationConfigSpaceMapping:
                 "word_dropout",
                 "reproject_words",
             },
-            "FlairDocumentRNNEmbeddings": {
-                "cnn_pool_kernels",
+            "FlairDocumentCNNEmbeddings": {
+                "kernels",
                 "dropout",
                 "word_dropout",
                 "reproject_words",
@@ -38,7 +38,7 @@ class FlairTextClassificationConfigSpaceMapping:
         }
     )
     LOAD_MODEL_KEYS: ClassVar[Set[str]] = {
-        "cnn_pool_kernels",
+        "kernels",
         "fine_tune_mode",
         "reproject_words",
         "pooling",
@@ -247,12 +247,13 @@ class FlairTextClassificationConfigSpace(
     dynamic_fine_tune: Parameter = SearchableParameter(
         name="fine_tune", type="categorical", choices=[False, True]
     )
-    # Choices to Optuna can only take primitives;
-    # This parameter results in Optuna warning but the library works properly
-    cnn_pool_kernels: Parameter = SearchableParameter(
+    # CNN pooling kernels
+    kernels: Parameter = SearchableParameter(
         name="kernels",
         type="categorical",
         choices=[((100, 3), (100, 4), (100, 5)), ((200, 4), (200, 5), (200, 6))],
+        # Choices to Optuna can only take primitives;
+        # This parameter results in Optuna warning but the library works properly
     )
     hidden_size: Parameter = SearchableParameter(
         name="hidden_size", type="int_uniform", low=128, high=2048, step=128

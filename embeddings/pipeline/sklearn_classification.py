@@ -50,7 +50,7 @@ class SklearnClassificationPipeline(
         evaluation_filename: str = "evaluation.json",
         predict_subset: Literal["dev", "validation", "test"] = "test",
         classifier_kwargs: Optional[Dict[str, Any]] = None,
-        embedding_kwargs: Optional[Dict[str, Any]] = None,
+        vectorizer_kwargs: Optional[Dict[str, Any]] = None,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
     ):
         dataset = Dataset(
@@ -63,7 +63,7 @@ class SklearnClassificationPipeline(
             RenameInputColumnsTransformation(input_column_name, target_column_name)
         )
         classifier_kwargs = classifier_kwargs if classifier_kwargs else {}
-        embedding = SklearnEmbedding(embedding_kwargs=embedding_kwargs, vectorizer=vectorizer)
+        embedding = SklearnEmbedding(vectorizer_kwargs=vectorizer_kwargs, vectorizer=vectorizer)
         task = TextClassification(classifier=classifier, classifier_kwargs=classifier_kwargs)
         model = SklearnModel(embedding, task, predict_subset=predict_subset)
         output_path = Path(output_path)

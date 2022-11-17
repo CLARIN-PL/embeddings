@@ -22,7 +22,7 @@ from embeddings.pipeline.pipelines_metadata import EvaluationMetadata, Metadata
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
 from embeddings.pipeline.standard_pipeline import LoaderResult, ModelResult, TransformationResult
 from embeddings.utils.hps_persister import HPSResultsPersister
-from embeddings.utils.loggers import LightningLoggingConfig
+from embeddings.utils.loggers import LightningLoggingConfig, LoggingConfig
 from embeddings.utils.utils import standardize_name
 
 EvaluationResult = TypeVar("EvaluationResult", bound=EvaluationResults)
@@ -57,7 +57,7 @@ class OptimizedPipeline(ABC, Generic[Metadata]):
         self,
         best_params_path: T_path,
         log_path: T_path,
-        logging_config: LightningLoggingConfig = LightningLoggingConfig(),
+        logging_config: Optional[LoggingConfig] = LightningLoggingConfig(),
         logging_hps_summary_name: Optional[str] = None,
     ) -> "PersistingPipeline[Metadata]":
         return PersistingPipeline(
@@ -71,7 +71,7 @@ class PersistingPipeline(OptimizedPipeline[Metadata]):
         base_pipeline: OptimizedPipeline[Metadata],
         best_params_path: T_path,
         log_path: T_path,
-        logging_config: LightningLoggingConfig = LightningLoggingConfig(),
+        logging_config: Optional[LoggingConfig] = LightningLoggingConfig(),
         logging_hps_summary_name: Optional[str] = None,
     ):
         self.base_pipeline = base_pipeline
