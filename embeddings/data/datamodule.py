@@ -1,5 +1,17 @@
 import abc
-from typing import Any, Callable, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 import datasets
 import pytorch_lightning as pl
@@ -76,10 +88,24 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
         self.dataloader_kwargs = dataloader_kwargs if dataloader_kwargs else {}
         self.seed = seed
         self.setup()
+        dataset_info, dataset_version = self._parse_dataset_info()
         super().__init__(
-            dataset_info=self.dataset["train"].info,
-            dataset_version=self.dataset["train"].info.version.version_str,
+            dataset_info=dataset_info,
+            dataset_version=dataset_version,
         )
+
+    def _parse_dataset_info(self) -> Tuple[str, str]:
+        assert isinstance(self.dataset, datasets.DatasetDict)
+        keys = list(self.dataset.keys())
+        dataset_info = self.dataset[keys[0]].info
+        dataset_version = self.dataset[keys[0]].info.version.version_str
+
+        if not dataset_info:
+            dataset_info = ""
+        if not dataset_version:
+            dataset_version = ""
+
+        return dataset_info, dataset_version
 
     @abc.abstractmethod
     def prepare_labels(self) -> None:
