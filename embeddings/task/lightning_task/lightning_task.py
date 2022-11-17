@@ -93,7 +93,7 @@ class LightningTask(Task[HuggingFaceDataModule, Predictions]):
             self.trainer.fit(self.model, data)
         except Exception as e:
             del self.trainer
-            torch.cuda.empty_cache()  # type: ignore
+            torch.cuda.empty_cache()
             raise e
 
     @abc.abstractmethod

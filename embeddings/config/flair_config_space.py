@@ -56,8 +56,7 @@ class FlairTextClassificationConfigSpaceMapping:
         return cls.LOAD_MODEL_KEYS_MAPPING[document_embedding_cls]
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
+@dataclass
 class AbstractFlairModelTrainerConfigSpace(BaseConfigSpace, ABC):
     embedding_name: InitVar[Union[str, List[str]]]
     param_embedding_name: Parameter = field(init=False)
