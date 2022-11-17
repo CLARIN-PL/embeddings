@@ -66,10 +66,8 @@ class _OptimizedLightingPipelineBase(
     logging_config: LightningLoggingConfig = field(default_factory=LightningLoggingConfig)
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods
-# https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
-class OptimizedLightingPipeline(
+@dataclass
+class OptimizedLightingPipeline(  # type: ignore
     OptunaPipeline[
         ConfigSpace,
         LightningMetadata,

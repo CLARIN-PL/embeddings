@@ -60,7 +60,7 @@ class MagnitudeFlairConnector(Embedding[List[Sentence], List[Sentence]]):
     def embed(self, data: List[Sentence]) -> List[Sentence]:
         sentences_plain_text = [sentence.to_plain_string() for sentence in data]
 
-        embeddings = super().embed(sentences_plain_text)
+        embeddings = self.to_wrap.embed(sentences_plain_text)
         for sentence, embedding in zip(data, embeddings):
             sentence.set_embedding(self.__class__.__name__, embedding)
 

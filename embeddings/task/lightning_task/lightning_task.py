@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Type
 
 import pytorch_lightning as pl
-import torch
 from pytorch_lightning.callbacks import Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from torch.utils.data import DataLoader
@@ -18,6 +17,7 @@ from embeddings.model.lightning_module.lightning_module import LightningModule
 from embeddings.task.task import Task
 from embeddings.utils.lightning_callbacks.best_epoch_callback import BestEpochCallback
 from embeddings.utils.loggers import LightningLoggingConfig, get_logger
+from embeddings.utils.torch_utils import cleanup_torch_model_artifacts
 
 _logger = get_logger(__name__)
 
@@ -93,7 +93,7 @@ class LightningTask(Task[HuggingFaceDataModule, Predictions]):
             self.trainer.fit(self.model, data)
         except Exception as e:
             del self.trainer
-            torch.cuda.empty_cache()  # type: ignore
+            cleanup_torch_model_artifacts()
             raise e
 
     @abc.abstractmethod

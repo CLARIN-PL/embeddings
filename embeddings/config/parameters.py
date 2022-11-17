@@ -30,8 +30,7 @@ class ConstantParameter:
     value: ParameterValues
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
+@dataclass
 class AbstractSearchableParameter(ABC, Generic[Distribution]):
     name: str
     type: ParameterTypes
