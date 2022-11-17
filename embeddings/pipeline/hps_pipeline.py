@@ -1,5 +1,4 @@
 import abc
-import gc
 import logging
 import os
 from abc import ABC
@@ -9,7 +8,6 @@ from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar, Union
 
 import optuna
 import pandas as pd
-import torch
 from optuna import Study
 
 from embeddings.config.config_space import ConfigSpace, SampledParameters
@@ -23,6 +21,7 @@ from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
 from embeddings.pipeline.standard_pipeline import LoaderResult, ModelResult, TransformationResult
 from embeddings.utils.hps_persister import HPSResultsPersister
 from embeddings.utils.loggers import LightningLoggingConfig
+from embeddings.utils.torch_utils import cleanup_torch_model_artifacts
 from embeddings.utils.utils import standardize_name
 
 EvaluationResult = TypeVar("EvaluationResult", bound=EvaluationResults)
@@ -35,14 +34,8 @@ class OptunaCallback(ABC):
 
 
 class TorchGarbageCollectorOptunaCallback(OptunaCallback):
-    @staticmethod
-    def _cleanup() -> None:
-        gc.collect()
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-
     def __call__(self, study: Study, trial: optuna.trial.FrozenTrial) -> None:
-        TorchGarbageCollectorOptunaCallback._cleanup()
+        cleanup_torch_model_artifacts()
 
 
 class OptimizedPipeline(ABC, Generic[Metadata]):
