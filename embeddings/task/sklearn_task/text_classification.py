@@ -1,21 +1,24 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, TypeVar
 
 import pandas as pd
-from sklearn.base import ClassifierMixin as AnySklearnClassifier
+from sklearn.base import ClassifierMixin
 
 from embeddings.embedding.sklearn_embedding import SklearnEmbedding
 from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.task.sklearn_task.sklearn_task import SklearnTask
 from embeddings.utils.array_like import ArrayLike
 
+SklearnClassifier = TypeVar("SklearnClassifier", bound=ClassifierMixin)
+
 
 class TextClassification(SklearnTask):
     def __init__(
         self,
-        classifier: AnySklearnClassifier,
+        classifier: SklearnClassifier,
         classifier_kwargs: Optional[Dict[str, Any]] = None,
     ):
         super().__init__()
+        assert callable(classifier)
         self.classifier_kwargs = classifier_kwargs if classifier_kwargs else {}
         self.classifier = classifier(**self.classifier_kwargs)
 

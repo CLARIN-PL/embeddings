@@ -1,19 +1,27 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, TypeVar, Union
 
 import pandas as pd
 import scipy
-from sklearn.base import BaseEstimator as AnySklearnVectorizer
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.feature_extraction.text import _VectorizerMixin
 
 from embeddings.embedding.embedding import Embedding
+from embeddings.embedding.vectorizer.vectorizer import Vectorizer
 from embeddings.utils.array_like import ArrayLike
+
+SklearnVectorizer = TypeVar(
+    "SklearnVectorizer", bound=Union[Vectorizer, _VectorizerMixin, BaseEstimator]
+)
 
 
 class SklearnEmbedding(Embedding[ArrayLike, pd.DataFrame]):
     def __init__(
-        self, vectorizer: AnySklearnVectorizer, vectorizer_kwargs: Optional[Dict[str, Any]] = None
+        self, vectorizer: SklearnVectorizer, vectorizer_kwargs: Optional[Dict[str, Any]] = None
     ):
         super().__init__()
-        self.vectorizer = vectorizer(**vectorizer_kwargs if vectorizer_kwargs else {})
+        assert callable(vectorizer)
+        self.vectorizer_kwargs = vectorizer_kwargs if vectorizer_kwargs else {}
+        self.vectorizer = vectorizer(**self.vectorizer_kwargs)
 
     def fit(self, data: ArrayLike) -> None:
         self.vectorizer.fit(data)
