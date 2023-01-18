@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple
 
 import datasets
 from flair.data import Corpus
@@ -15,6 +15,7 @@ from embeddings.embedding.flair_loader import FlairDocumentPoolEmbeddingLoader
 from embeddings.evaluator.evaluation_results import Predictions, TextClassificationEvaluationResults
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.flair_model import FlairModel
+from embeddings.pipeline import FLAIR_DATASET_TRANSFORMATIONS_TYPE
 from embeddings.pipeline.standard_pipeline import StandardPipeline
 from embeddings.task.flair_task.text_pair_classification import TextPairClassification
 from embeddings.transformation.flair_transformation.pair_classification_corpus_transformation import (
@@ -23,7 +24,10 @@ from embeddings.transformation.flair_transformation.pair_classification_corpus_t
 from embeddings.transformation.flair_transformation.split_sample_corpus_transformation import (
     SampleSplitsFlairCorpusTransformation,
 )
-from embeddings.transformation.transformation import Transformation
+from embeddings.transformation.hf_transformation.class_encode_column_transformation import (
+    ClassEncodeColumnTransformation,
+)
+from embeddings.transformation.transformation import DummyTransformation
 from embeddings.utils.json_dict_persister import JsonPersister
 
 
@@ -49,15 +53,18 @@ class FlairPairClassificationPipeline(
         sample_missing_splits: Optional[Tuple[Optional[float], Optional[float]]] = None,
         seed: int = 441,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
+        encode_classes: bool = False,
     ):
         output_path = Path(output_path)
         dataset = Dataset(dataset_name, **load_dataset_kwargs if load_dataset_kwargs else {})
         data_loader = HuggingFaceDataLoader()
-        transformation: Union[
-            Transformation[datasets.DatasetDict, Corpus], Transformation[Corpus, Corpus]
-        ]
-        transformation = PairClassificationCorpusTransformation(
-            input_columns_names_pair, target_column_name
+        transformation: FLAIR_DATASET_TRANSFORMATIONS_TYPE = DummyTransformation()
+        if encode_classes:
+            transformation = transformation.then(
+                ClassEncodeColumnTransformation(column=target_column_name)
+            )
+        transformation = transformation.then(
+            PairClassificationCorpusTransformation(input_columns_names_pair, target_column_name)
         )
         if sample_missing_splits:
             transformation = transformation.then(

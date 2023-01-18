@@ -18,7 +18,7 @@ from embeddings.utils.utils import read_yaml
 class FlairTextClassificationConfigSpaceMapping:
     LOAD_MODEL_KEYS_MAPPING: ClassVar[Mapping[str, Set[str]]] = MappingProxyType(
         {
-            "FlairDocumentCNNEmbeddings": {
+            "FlairDocumentRNNEmbeddings": {
                 "hidden_size",
                 "rnn_type",
                 "rnn_layers",
@@ -27,7 +27,7 @@ class FlairTextClassificationConfigSpaceMapping:
                 "word_dropout",
                 "reproject_words",
             },
-            "FlairDocumentRNNEmbeddings": {
+            "FlairDocumentCNNEmbeddings": {
                 "cnn_pool_kernels",
                 "dropout",
                 "word_dropout",
