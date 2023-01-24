@@ -6,7 +6,7 @@ from urllib.request import urlopen
 
 import requests
 import srsly
-from huggingface_hub import cached_download, hf_hub_url
+from huggingface_hub import cached_download, hf_hub_url  # type: ignore
 
 from embeddings.utils.loggers import get_logger
 

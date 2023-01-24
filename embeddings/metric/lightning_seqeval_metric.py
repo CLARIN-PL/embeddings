@@ -47,6 +47,6 @@ class SeqevalTorchMetric(Metric):
         self, preds: List[torch.Tensor], targets: List[torch.Tensor]
     ) -> Dict[str, List[List[str]]]:
         return {
-            "y_true": [self.class_label.int2str(x) for x in preds],
-            "y_pred": [self.class_label.int2str(x) for x in targets],
+            "y_true": [list(self.class_label.int2str(x)) for x in preds],
+            "y_pred": [list(self.class_label.int2str(x)) for x in targets],
         }

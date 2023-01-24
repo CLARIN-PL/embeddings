@@ -67,7 +67,8 @@ class ColumnCorpusTransformation(CorpusTransformation):
             ):
                 assert len(tokens) == len(tags)
                 for token, tag in zip(tokens, tags):
-                    f.write(f"{token}\t{tag}\n")
+                    str_tag = dataset.features[self.target_column_name].feature.int2str(tag)
+                    f.write(f"{token}\t{str_tag}\n")
                 f.write("\n")
 
         column_format = {0: "text", 1: "tag"}

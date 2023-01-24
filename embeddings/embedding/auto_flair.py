@@ -89,7 +89,7 @@ class AutoFlairWordEmbedding(AutoFlairEmbedding):
     ) -> FlairEmbedding:
         try:
             return FlairTransformerWordEmbedding(str(file_path), **kwargs)
-        except EnvironmentError:
+        except ValueError:
             AutoFlairWordEmbedding._log_info_static_local_file(file_path)
             return LocalFileAutoStaticWordEmbedding.from_file(
                 file_path, model_type_reference, **kwargs
@@ -117,7 +117,7 @@ class AutoFlairDocumentEmbedding(AutoFlairEmbedding):
         """
         try:
             return FlairTransformerDocumentEmbedding(str(file_path), **kwargs)
-        except EnvironmentError:
+        except ValueError:
             AutoFlairDocumentEmbedding._log_info_static_local_file(file_path)
             return LocalFileAutoStaticDocumentEmbedding.from_file(
                 file_path=file_path, model_type_reference=model_type_reference, **kwargs

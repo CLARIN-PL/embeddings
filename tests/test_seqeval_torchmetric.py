@@ -28,7 +28,9 @@ def get_predictions(
 ) -> Predictions:
     y_true = [dataset.features[target_label].feature.int2str(x) for x in dataset[target_label]]
     y_predictions = [dataset.features[target_label].feature.int2str(x) for x in y_predictions]
-    return Predictions(y_pred=np.array(y_predictions), y_true=np.array(y_true))
+    return Predictions(
+        y_pred=np.array(y_predictions, dtype="object"), y_true=np.array(y_true, dtype="object")
+    )
 
 
 @pytest.fixture(scope="module")

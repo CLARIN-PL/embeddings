@@ -148,7 +148,7 @@ def test_downsampling(
     for sentence_transformed, sentence_loaded in zip(transformed_data.train, loaded_data.train):
         for token_transformed, token_loaded in zip(sentence_transformed, sentence_loaded):
             assert token_transformed.text == token_loaded.text
-            assert token_transformed.get_tag("tag") == token_loaded.get_tag("tag")
+            assert token_transformed.tag== token_loaded.tag
 
     path.cleanup()
 
@@ -185,7 +185,7 @@ def test_split_sampling(
     for sentence_transformed, sentence_loaded in zip(transformed_data.train, loaded_data.train):
         for token_transformed, token_loaded in zip(sentence_transformed, sentence_loaded):
             assert token_transformed.text == token_loaded.text
-            assert token_transformed.get_tag("tag") == token_loaded.get_tag("tag")
+            assert token_transformed.tag == token_loaded.tag
 
     path.cleanup()
 
@@ -236,7 +236,7 @@ def test_combined_sampling(
     for sentence_transformed, sentence_loaded in zip(transformed_data.train, loaded_data.train):
         for token_transformed, token_loaded in zip(sentence_transformed, sentence_loaded):
             assert token_transformed.text == token_loaded.text
-            assert token_transformed.get_tag("tag") == token_loaded.get_tag("tag")
+            assert token_transformed.tag == token_loaded.tag
 
     path.cleanup()
     path_other.cleanup()
