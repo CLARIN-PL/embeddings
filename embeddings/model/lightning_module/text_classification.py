@@ -41,11 +41,12 @@ class TextClassificationModule(HuggingFaceLightningModule):
         return loss, logits, preds
 
     def training_step(self, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
+        assert isinstance(self.hparams, dict)
         batch, batch_idx = args
         loss, logits, _ = self.shared_step(**batch)
         self.train_metrics(logits, batch["labels"])
         self.log("train/Loss", loss)
-        if self.hparams.use_scheduler:
+        if self.hparams["use_scheduler"]:
             assert self.trainer is not None
             last_lr = self.trainer.lr_schedulers[0]["scheduler"].get_last_lr()
             self.log("train/BaseLR", last_lr[0], prog_bar=True)

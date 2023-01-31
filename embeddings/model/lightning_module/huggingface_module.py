@@ -1,4 +1,5 @@
 import abc
+import inspect
 import sys
 from collections import ChainMap
 from typing import Any, Dict, List, Optional, Type
@@ -22,6 +23,7 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
         task_model_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(metrics=metrics, **task_model_kwargs if task_model_kwargs else {})
+        assert inspect.ismethod(self.save_hyperparameters)
         self.save_hyperparameters({"downstream_model_type": downstream_model_type.__name__})
         self.downstream_model_type = downstream_model_type
         self.config_kwargs = config_kwargs if config_kwargs else {}
@@ -43,16 +45,17 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
             self._init_metrics()
 
     def _init_model(self) -> None:
+        assert isinstance(self.hparams, dict)
         self.config = AutoConfig.from_pretrained(
-            self.hparams.model_name_or_path,
-            num_labels=self.hparams.num_classes,
+            self.hparams["model_name_or_path"],
+            num_labels=self.hparams["num_classes"],
             **self.config_kwargs,
         )
         self.model: AutoModel = self.downstream_model_type.from_pretrained(
-            self.hparams.model_name_or_path, config=self.config
+            self.hparams["model_name_or_path"], config=self.config
         )
-        if self.hparams.finetune_last_n_layers > -1:
-            self.freeze_transformer(finetune_last_n_layers=self.hparams.finetune_last_n_layers)
+        if self.hparams["finetune_last_n_layers"] > -1:
+            self.freeze_transformer(finetune_last_n_layers=self.hparams["finetune_last_n_layers"])
 
     def freeze_transformer(self, finetune_last_n_layers: int) -> None:
         if finetune_last_n_layers == 0:

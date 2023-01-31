@@ -43,8 +43,7 @@ from embeddings.transformation.transformation import DummyTransformation
 from embeddings.utils.flair_corpus_persister import FlairConllPersister, FlairPicklePersister
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
+@dataclass
 class FlairPreprocessingPipeline(
     PreprocessingPipeline[str, Union[datasets.DatasetDict, Corpus], Corpus],
     abc.ABC,

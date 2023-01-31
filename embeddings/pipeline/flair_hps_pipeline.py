@@ -74,8 +74,7 @@ class _OptimizedFlairPipelineDefaultsBase(_HuggingFaceOptimizedPipelineDefaultsB
     )
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
+@dataclass
 class AbstractOptimizedFlairClassificationPipeline(
     AbstractHuggingFaceOptimizedPipeline[FlairTextClassificationConfigSpace],
     _OptimizedFlairPipelineDefaultsBase,
@@ -105,8 +104,11 @@ class AbstractOptimizedFlairClassificationPipeline(
         return embedding_name, document_embedding, task_train_kwargs, load_model_kwargs
 
 
+# ignoring due to the error: definition of "config_space" in base class "OptunaPipeline" is
+# incompatible with definition in base class "_HuggingFaceOptimizedPipelineBase" which is
+# most likely due to dataclass/class mismatch between the inherited abstract classes
 @dataclass
-class OptimizedFlairClassificationPipeline(
+class OptimizedFlairClassificationPipeline(  # type: ignore
     OptunaPipeline[
         FlairTextClassificationConfigSpace,
         FlairClassificationPipelineMetadata,
@@ -202,8 +204,11 @@ class OptimizedFlairClassificationPipeline(
         self.tmp_model_output_dir.cleanup()
 
 
+# ignoring due to the error: definition of "config_space" in base class "OptunaPipeline" is
+# incompatible with definition in base class "_HuggingFaceOptimizedPipelineBase" which is
+# most likely due to dataclass/class mismatch between the inherited abstract classes
 @dataclass
-class OptimizedFlairPairClassificationPipeline(
+class OptimizedFlairPairClassificationPipeline(  # type: ignore
     OptunaPipeline[
         FlairTextClassificationConfigSpace,
         FlairPairClassificationPipelineMetadata,
@@ -300,8 +305,11 @@ class OptimizedFlairPairClassificationPipeline(
         self.tmp_model_output_dir.cleanup()
 
 
+# ignoring due to the error: definition of "config_space" in base class "OptunaPipeline" is
+# incompatible with definition in base class "_HuggingFaceOptimizedPipelineBase" which is
+# most likely due to dataclass/class mismatch between the inherited abstract classes
 @dataclass
-class OptimizedFlairSequenceLabelingPipeline(
+class OptimizedFlairSequenceLabelingPipeline(  # type: ignore
     OptunaPipeline[
         FlairSequenceLabelingConfigSpace,
         FlairSequenceLabelingPipelineMetadata,
