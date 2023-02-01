@@ -1,0 +1,2 @@
+class LightningQuestionAnsweringPipeline:
+    pass
