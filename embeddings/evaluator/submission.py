@@ -139,11 +139,11 @@ class Submission(_BaseSubmission):
 
         files = {
             file.name: file.download(root=Path(root).joinpath(retrain_run.name))
-            for file in retrain_run.files(["evaluation.json", "packages.json"])
+            for file in retrain_run.files(["evaluation.json", "packages.json"])  # type: ignore
         }
         [hps_output_artifact] = [
             artifact
-            for artifact in hps_summary_run.logged_artifacts()
+            for artifact in hps_summary_run.logged_artifacts()  # type: ignore
             if artifact.name.split(":")[0] == "hps_result"
         ]
         files["best_params.yaml"] = hps_output_artifact.download(

@@ -261,9 +261,7 @@ class TextClassificationDataModule(HuggingFaceDataModule):
             self.dataset = self.dataset.class_encode_column(column_name)
         else:
             new_features = self.dataset["train"].features.copy()
-            new_features[column_name] = ClassLabel(
-                num_classes=self.num_classes, names=self.target_names
-            )
+            new_features[column_name] = ClassLabel(names=self.target_names)
             self.dataset = self.dataset.cast(new_features)
 
     def convert_to_features(
@@ -382,9 +380,7 @@ class SequenceLabelingDataModule(HuggingFaceDataModule):
 
     def _class_encode_column(self, column_name: str) -> None:
         new_features = self.dataset["train"].features.copy()
-        new_features[column_name] = HFSequence(
-            feature=ClassLabel(num_classes=self.num_classes, names=self.target_names)
-        )
+        new_features[column_name] = HFSequence(feature=ClassLabel(names=self.target_names))
         self.dataset = self.dataset.cast(new_features)
 
     @property

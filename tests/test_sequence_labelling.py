@@ -161,7 +161,7 @@ def test_pos_tagging_pipeline(
     pipeline, path = pos_tagging_pipeline
     result = pipeline.run()
 
-    np.testing.assert_almost_equal(result.f1_micro, 0.0618556)
+    np.testing.assert_almost_equal(result.f1_micro, 0.04123711)
 
     task_from_ckpt = SequenceLabeling.from_checkpoint(
         checkpoint_path=(Path(path.name) / "final-model.pt"), output_path=path.name
@@ -192,7 +192,7 @@ def test_ner_tagging_pipeline(
     pipeline, path = ner_tagging_pipeline
     result = pipeline.run()
 
-    np.testing.assert_almost_equal(result.f1_micro, 0.0)
+    np.testing.assert_almost_equal(result.f1_micro, 0.026845637)
 
     task_from_ckpt = SequenceLabeling.from_checkpoint(
         checkpoint_path=(Path(path.name) / "final-model.pt"), output_path=path.name
@@ -238,5 +238,5 @@ def test_ner_tagging_pipeline_local_embedding(
     flair.device = torch.device("cpu")
     pipeline, path = ner_tagging_pipeline_local_embedding
     result = pipeline.run()
-    np.testing.assert_almost_equal(result.f1_micro, 0.0107816)
+    np.testing.assert_almost_equal(result.f1_micro, 0.01677148)
     path.cleanup()

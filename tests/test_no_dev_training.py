@@ -107,5 +107,5 @@ def test_no_dev_pipeline(
 
     result = sequence_labeling_evaluation_pipeline.run()
 
-    np.testing.assert_almost_equal(result.accuracy, 0.8935483)
-    np.testing.assert_almost_equal(result.f1_micro, 0)
+    np.testing.assert_almost_equal(result.accuracy, 0.00322580)
+    np.testing.assert_almost_equal(result.f1_micro, 0.014084507)

@@ -63,9 +63,9 @@ def test_text_pair_classification_pipeline(
     pipeline, path = text_pair_classification_pipeline
     result = pipeline.run()
     path.cleanup()
-    np.testing.assert_almost_equal(result.accuracy, 0.1538461)
-    np.testing.assert_almost_equal(result.f1_macro, 0.0222222)
-    np.testing.assert_almost_equal(result.precision_macro, 0.0128205)
+    np.testing.assert_almost_equal(result.accuracy, 0.0769230)
+    np.testing.assert_almost_equal(result.f1_macro, 0.0119047)
+    np.testing.assert_almost_equal(result.precision_macro, 0.0064102)
     np.testing.assert_almost_equal(result.recall_macro, 0.0833333)
 
 
@@ -107,7 +107,7 @@ def test_text_pair_classification_pipeline_local_embedding(
     pipeline, path = text_pair_classification_pipeline_local_embedding
     result = pipeline.run()
     path.cleanup()
-    np.testing.assert_almost_equal(result.accuracy, 0.1025641)
-    np.testing.assert_almost_equal(result.f1_macro, 0.062160)
-    np.testing.assert_almost_equal(result.precision_macro, 0.051282)
-    np.testing.assert_almost_equal(result.recall_macro, 0.08205128)
+    np.testing.assert_almost_equal(result.accuracy, 0.1538461)
+    np.testing.assert_almost_equal(result.f1_macro, 0.09051845)
+    np.testing.assert_almost_equal(result.precision_macro, 0.0858974)
+    np.testing.assert_almost_equal(result.recall_macro, 0.098901)

@@ -111,7 +111,7 @@ def test_sequence_labeling_preprocessing_pipeline(
     evaluation_pipeline, _ = sequence_labeling_evaluation_pipeline
     result = evaluation_pipeline.run()
 
-    np.testing.assert_almost_equal(result.accuracy, 0.0024630)
-    np.testing.assert_almost_equal(result.f1_micro, 0)
+    np.testing.assert_almost_equal(result.accuracy, 0.0049261)
+    np.testing.assert_almost_equal(result.f1_micro, 0.0079051)
 
     path.cleanup()

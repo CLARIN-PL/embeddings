@@ -79,7 +79,7 @@ class AutoFlairWordEmbedding(AutoFlairEmbedding):
     def from_hub(repo_id: str, *args: Any, **kwargs: Any) -> FlairEmbedding:
         try:
             return FlairTransformerWordEmbedding(repo_id, **kwargs)
-        except EnvironmentError:
+        except (ValueError, TypeError, EnvironmentError):
             AutoFlairWordEmbedding._log_info_static(repo_id)
             return AutoStaticWordEmbedding.from_default_config(repo_id, **kwargs)
 
@@ -89,7 +89,7 @@ class AutoFlairWordEmbedding(AutoFlairEmbedding):
     ) -> FlairEmbedding:
         try:
             return FlairTransformerWordEmbedding(str(file_path), **kwargs)
-        except EnvironmentError:
+        except (ValueError, TypeError, EnvironmentError):
             AutoFlairWordEmbedding._log_info_static_local_file(file_path)
             return LocalFileAutoStaticWordEmbedding.from_file(
                 file_path, model_type_reference, **kwargs
@@ -104,7 +104,7 @@ class AutoFlairDocumentEmbedding(AutoFlairEmbedding):
         """
         try:
             return FlairTransformerDocumentEmbedding(repo_id, **kwargs)
-        except EnvironmentError:
+        except (ValueError, TypeError, EnvironmentError):
             AutoFlairDocumentEmbedding._log_info_static(repo_id)
             return AutoStaticDocumentEmbedding.from_default_config(repo_id, **kwargs)
 
@@ -117,7 +117,7 @@ class AutoFlairDocumentEmbedding(AutoFlairEmbedding):
         """
         try:
             return FlairTransformerDocumentEmbedding(str(file_path), **kwargs)
-        except EnvironmentError:
+        except (ValueError, TypeError, EnvironmentError):
             AutoFlairDocumentEmbedding._log_info_static_local_file(file_path)
             return LocalFileAutoStaticDocumentEmbedding.from_file(
                 file_path=file_path, model_type_reference=model_type_reference, **kwargs
