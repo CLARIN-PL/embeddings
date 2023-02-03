@@ -17,6 +17,7 @@ class QAEvaluator(abc.ABC):
     Refactor pt 2:
     Rewrite it as evaluator
     """
+
     @abc.abstractmethod
     def evaluate(self, scores: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         pass
@@ -28,6 +29,7 @@ class QASquadV2Evaluator(QAEvaluator):
     embeddings/evaluator/qa_evaluator.py
     Refactor pt 2:
     Rewrite it as evaluator"""
+
     def __init__(self, no_answer_threshold: float = 1.0):
         self.metric = SQUADv2Metric(no_answer_threshold=no_answer_threshold)
         self.postprocessor = QAPredictionPostProcessor()
