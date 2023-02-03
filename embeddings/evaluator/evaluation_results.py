@@ -70,3 +70,7 @@ class TextClassificationEvaluationResults(EvaluationResults):
 @dataclass
 class SequenceLabelingEvaluationResults(EvaluationResults):
     pass
+
+@dataclass
+class QuestionAnsweringEvaluationResults(EvaluationResults):
+    pass
