@@ -1,6 +1,6 @@
 import sys
 from collections import ChainMap
-from typing import Dict, Optional, Union, Sequence, List, Any
+from typing import Dict, Optional, Union, Sequence, List, Any, Type
 
 import pytorch_lightning as pl
 import torch
@@ -9,10 +9,12 @@ from torch.utils.data import DataLoader
 from transformers import AutoModelForQuestionAnswering, AutoConfig, AutoModel
 from transformers.modeling_outputs import QuestionAnsweringModelOutput
 
+from embeddings.data.dataset import Dataset
 from embeddings.data.io import T_path
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
+from embeddings.model.lightning_module.lightning_module import LightningModule
 
-from embeddings.task.lightning_task.question_answering import HuggingFaceDataset
+HuggingFaceDataset = Type[Dataset]  # to refactor
 
 
 class PretrainedQAModel(pl.LightningModule):  # type: ignore
@@ -51,8 +53,7 @@ class PretrainedQAModel(pl.LightningModule):  # type: ignore
             return_predictions=True,
         )
 
-
-class QuestionAnsweringModule(HuggingFaceLightningModule[AutoModelForQuestionAnswering]):
+class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
     """
     TODO:
     Refactor

@@ -19,9 +19,6 @@ SQUAD_V2_PREDICTED_ANSWER_TYPE = Dict[str, Union[str, int, float]]
 SQUAD_V2_GOLD_ANSWER_TYPE = Dict[str, Union[Dict[str, Union[List[str], List[Any]]], str, int]]
 
 
-HuggingFaceDataset = Type[Dataset]  # to refactor
-
-
 class QuestionAnsweringTask(LightningTask):
     """
     TODO:
