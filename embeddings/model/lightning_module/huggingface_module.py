@@ -1,7 +1,6 @@
 import abc
 import inspect
 import sys
-from collections import ChainMap
 from typing import Any, Dict, List, Optional, Type
 
 from torchmetrics import MetricCollection
