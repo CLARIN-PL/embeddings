@@ -77,11 +77,7 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
                 param.requires_grad = False
 
     def forward(self, *args: Any, **kwargs: Any) -> Any:
-        assert (not (args and kwargs)) and (args or kwargs)
-        inputs = kwargs if kwargs else args
-        if isinstance(inputs, tuple):
-            inputs = dict(ChainMap(*inputs))
-        return self.model(**inputs)
+        return self.model(*args, **kwargs)
 
     def on_save_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
         assert self.trainer is not None
