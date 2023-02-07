@@ -13,7 +13,7 @@ class QAEvaluator(abc.ABC):
     """
     TODO:
     Refactor:
-    embeddings/evaluator/qa_evaluator.py
+    embeddings/evaluator/question_answering_evaluator.py
     Refactor pt 2:
     Rewrite it as evaluator
     """
@@ -26,7 +26,7 @@ class QAEvaluator(abc.ABC):
 class QASquadV2Evaluator(QAEvaluator):
     """TODO:
     Refactor:
-    embeddings/evaluator/qa_evaluator.py
+    embeddings/evaluator/question_answering_evaluator.py
     Refactor pt 2:
     Rewrite it as evaluator"""
 
