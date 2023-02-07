@@ -38,7 +38,7 @@ jobs:
         with:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install deps
-        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
+        run: poetry install -vv --no-interaction --no-root --extras "developer"
       - name: Run tests
         run: poetry run poe test
         env:
@@ -71,7 +71,7 @@ jobs:
             main-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
             main-venv-${{ runner.os }}-${{matrix.python-version}}-
       - name: Install deps
-        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
+        run: poetry install -vv --no-interaction --no-root --extras "developer"
       - name: Check
         run: poetry run poe check
   publish:
@@ -104,7 +104,7 @@ jobs:
           path: .venv
           key: ${{github.event.pull_request.head.ref}}-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
       - name: Install deps
-        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
+        run: poetry install -vv --no-interaction --no-root --extras "developer"
       - name: Build and publish
         run: |
           poetry version "$(git describe --tags --abbrev=0)a${GITHUB_RUN_ID}${GITHUB_RUN_NUMBER}"

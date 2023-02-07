@@ -32,7 +32,7 @@ jobs:
             main-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
             main-venv-${{ runner.os }}-${{matrix.python-version}}-
       - name: Install deps
-        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
+        run: poetry install -vv --no-interaction --no-root --extras "developer"
       - name: Build and publish
         run: |
           poetry version "$(git describe --tags --abbrev=0)"
