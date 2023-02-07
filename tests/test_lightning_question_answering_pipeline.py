@@ -58,7 +58,10 @@ def config() -> LightningAdvancedConfig:
 
 
 @pytest.fixture(scope="module")
-def lightning_question_answering_pipeline():
+def lightning_question_answering_pipeline(
+        config: LightningAdvancedConfig,
+        tmp_path_module: Path,
+        dataset_kwargs: Dict[str, Any]):
     return LightningQuestionAnsweringPipeline(
         embedding_name_or_path="xlm-roberta-base",
         output_path=tmp_path_module,
