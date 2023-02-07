@@ -5,7 +5,8 @@ from wandb.apis.public import Run
 
 def filter_hps_summary_runs(runs: Iterable[Run]) -> Iterable[Run]:
     for run in runs:
-        for artifact in run.logged_artifacts():  # type:ignore
+        # type ignore due to untyped logged_artifacts() function
+        for artifact in run.logged_artifacts():  # type: ignore[no-untyped-call]
             if artifact.name.split(":")[0] == "hps_result":
                 yield run
 

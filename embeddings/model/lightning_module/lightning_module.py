@@ -132,16 +132,16 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         # Accuracy, Precision etc. no longer inherits from Metric subclass as it is helper class
         return MetricCollection(
             [
-                Accuracy(num_classes=self.hparams["num_classes"], task=task),  # type:ignore
+                Accuracy(num_classes=self.hparams["num_classes"], task=task),  # type: ignore[list-item]
                 Precision(
                     num_classes=self.hparams["num_classes"], average="macro", task=task
-                ),  # type:ignore
+                ),  # type: ignore[list-item]
                 Recall(
                     num_classes=self.hparams["num_classes"], average="macro", task=task
-                ),  # type:ignore
+                ),  # type: ignore[list-item]
                 F1Score(
                     num_classes=self.hparams["num_classes"], average="macro", task=task
-                ),  # type:ignore
+                ),  # type: ignore[list-item]
             ]
         )
 

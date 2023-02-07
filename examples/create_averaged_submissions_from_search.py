@@ -27,7 +27,6 @@ def main(
 ) -> None:
     typer.echo(pprint.pformat(locals()))
     api = wandb.Api()
-    # Call to untyped function "runs" in typed context
     runs = api.runs(entity + "/" + project)
 
     embeddings = {run.config["embedding_name_or_path"] for run in runs}

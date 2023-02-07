@@ -3166,4 +3166,4 @@ developer = ["typing-extensions"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">= 3.8.0, <4.0"
-content-hash = "d35984f992a1898ff42f692c8d6cb1c283c2fdabe700d536ead9853f3813ac9c"
+content-hash = "47850d683bb6d0381cfc4cfde42a2f9e5407d4e46e26313982aecaf3dd33d55e"
