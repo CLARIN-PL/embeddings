@@ -11,11 +11,12 @@ from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.data.qa_datamodule import QAHuggingFaceDataModule
 from embeddings.evaluator.evaluation_results import Predictions, QuestionAnsweringEvaluationResults
-from embeddings.evaluator.qa_evaluator import QASquadV2Evaluator
+from embeddings.evaluator.question_answering_evaluator import QASquadV2Evaluator
 from embeddings.model.lightning_model import LightningModel
-from embeddings.pipeline.lightning_pipeline import LightningPipeline
+from embeddings.pipeline.lightning_pipeline import LightningPipeline, EvaluationResult
 from embeddings.task.lightning_task import question_answering
 from embeddings.utils.loggers import LightningLoggingConfig
+from embeddings.utils.utils import standardize_name
 
 
 class LightningQuestionAnsweringPipeline(
