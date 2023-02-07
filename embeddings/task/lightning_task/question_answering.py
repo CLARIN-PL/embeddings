@@ -2,6 +2,7 @@
 import os
 import warnings
 from typing import Any, Dict, List, Optional, Type, Union
+from tqdm import tqdm
 
 import pytorch_lightning as pl
 import torch
@@ -10,6 +11,7 @@ from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.loggers import MLFlowLogger
 
 from embeddings.data.datamodule import HuggingFaceDataModule
+from embeddings.data.qa_datamodule import QAHuggingFaceDataModule
 from embeddings.data.io import T_path
 from embeddings.model.lightning_module.question_answering import QuestionAnsweringModule
 from embeddings.task.lightning_task.lightning_task import LightningTask
