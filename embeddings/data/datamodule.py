@@ -193,7 +193,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
     ) -> Union[LightingDataLoaders, None]:
         if subset == "train":
             return self.train_dataloader()
-        elif subset == "dev":
+        elif subset == "dev" or subset == "validation":
             return self.val_dataloader()
         elif subset == "test":
             return self.test_dataloader()

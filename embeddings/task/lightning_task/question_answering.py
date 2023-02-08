@@ -11,6 +11,7 @@ from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.loggers import MLFlowLogger
 
 from embeddings.data.datamodule import HuggingFaceDataModule
+from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.qa_datamodule import QAHuggingFaceDataModule
 from embeddings.data.io import T_path
 from embeddings.model.lightning_module.question_answering import QuestionAnsweringModule
@@ -98,6 +99,22 @@ class QuestionAnsweringTask(LightningTask):
         assert self.model is not None
         assert self.trainer is not None
         return self.trainer.predict(model=self.model, dataloaders=dataloader)
+
+    def postprocess(
+        self,
+        data: HuggingFaceDataModule,
+        predict_subset: LightingDataModuleSubset = None
+    ) -> Dict[str, Any]:
+        data_loader = data.get_subset(predict_subset)
+        scores = {}
+        model_outputs = self.predict(data_loader)
+        scores[predict_subset] = {
+            "examples": data.dataset_raw[predict_subset].to_pandas(),
+            "outputs": model_outputs,
+            "overflow_to_sample_mapping": data.overflow_to_sample_mapping[predict_subset],
+            "offset_mapping": data.offset_mapping[predict_subset],
+        }
+        return scores
 
     @classmethod
     def from_checkpoint(
