@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [ 3.9, 3.8 ]
-        poetry-version: [ 1.1.12 ]
+        poetry-version: [ 1.3.2 ]
         os: [ ubuntu-20.04, macos-latest, windows-2022 ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -37,7 +37,7 @@ jobs:
           restore-keys: |
             main-venv-${{ runner.os }}-${{matrix.python-version}}-
       - name: Install deps
-        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
+        run: poetry install -vv --no-interaction --no-root --extras "developer"
       - name: Run tests
         run: poetry run poe test
         env:
@@ -48,7 +48,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [ 3.9]
-        poetry-version: [ 1.1.12 ]
+        poetry-version: [ 1.3.2 ]
         os: [ ubuntu-20.04 ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -69,7 +69,7 @@ jobs:
           restore-keys: |
             main-venv-${{ runner.os }}-${{matrix.python-version}}-
       - name: Install deps
-        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
+        run: poetry install -vv --no-interaction --no-root --extras "developer"
       - name: Check
         run: poetry run poe check
   publish:
@@ -81,7 +81,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [ 3.9 ]
-        poetry-version: [ 1.1.12 ]
+        poetry-version: [ 1.3.2 ]
         os: [ ubuntu-20.04 ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -102,7 +102,7 @@ jobs:
           path: .venv
           key: main-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
       - name: Install deps
-        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
+        run: poetry install -vv --no-interaction --no-root --extras "developer"
       - name: Build and publish
         run: |
           poetry version "$(git describe --tags --abbrev=0)rc${GITHUB_RUN_ID}${GITHUB_RUN_NUMBER}"

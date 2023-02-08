@@ -4,7 +4,7 @@ import os
 from abc import ABC
 from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar
 
 import optuna
 import pandas as pd
@@ -14,7 +14,6 @@ from embeddings.config.config_space import ConfigSpace, SampledParameters
 from embeddings.data.dataset import Data
 from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import EvaluationResults
-from embeddings.pipeline.evaluation_pipeline import ModelEvaluationPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.pipeline.pipelines_metadata import EvaluationMetadata, Metadata
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
@@ -100,9 +99,8 @@ class OptunaPipeline(
         preprocessing_pipeline: Optional[
             PreprocessingPipeline[Data, LoaderResult, TransformationResult]
         ],
-        evaluation_pipeline: Union[
-            Type[ModelEvaluationPipeline[Data, LoaderResult, ModelResult, EvaluationResult]],
-            Type[LightningPipeline[TransformationResult, ModelResult, EvaluationResult]],
+        evaluation_pipeline: Type[
+            LightningPipeline[TransformationResult, ModelResult, EvaluationResult]
         ],
         pruner: optuna.pruners.BasePruner,
         sampler: optuna.samplers.BaseSampler,
@@ -176,10 +174,7 @@ class OptunaPipeline(
 
     def _get_evaluation_pipeline(
         self, **kwargs: Any
-    ) -> Union[
-        ModelEvaluationPipeline[Data, LoaderResult, ModelResult, EvaluationResult],
-        LightningPipeline[TransformationResult, ModelResult, EvaluationResult],
-    ]:
+    ) -> LightningPipeline[TransformationResult, ModelResult, EvaluationResult]:
         return self.evaluation_pipeline(**kwargs)
 
     def _pre_run_hook(self) -> None:
