@@ -71,3 +71,14 @@ class LightningQuestionAnsweringPipeline(
         model = LightningModel(task, predict_subset)
         evaluator = QASquadV2Evaluator()
         super().__init__(datamodule, model, evaluator, output_path, logging_config)
+
+    def run(self, run_name: Optional[str] = None) -> EvaluationResult:
+        if run_name:
+            run_name = standardize_name(run_name)
+        self._save_artifacts()
+        self.model.task.build_task_model()
+        self.model.task.fit(self.datamodule)
+        model_result = self.model.task.postprocess(data=self.datamodule, predict_subset=self.model.predict_subset)
+        result = self.evaluator.evaluate(model_result)
+        self._finish_logging()
+        return result
