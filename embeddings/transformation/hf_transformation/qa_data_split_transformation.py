@@ -15,8 +15,7 @@ def split_train_dev_test(
     stratify_column: Optional[str] = None,
 ) -> DatasetDict:
     """
-    TODO: Move to embeddings/transformation/hf_transformation/qa_data_split_transformation.py
-    Refactor pt 2
+    TODO:
     Q&A require separate split_train pipeline refactor it as a transformation and improve parametrization"
     """
     dataset = DatasetDict()

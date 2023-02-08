@@ -12,9 +12,6 @@ from embeddings.task.lightning_task.question_answering import SQUAD_V2_GOLD_ANSW
 class QAEvaluator(abc.ABC):
     """
     TODO:
-    Refactor:
-    embeddings/evaluator/question_answering_evaluator.py
-    Refactor pt 2:
     Rewrite it as evaluator
     """
 
@@ -24,10 +21,8 @@ class QAEvaluator(abc.ABC):
 
 
 class QASquadV2Evaluator(QAEvaluator):
-    """TODO:
-    Refactor:
-    embeddings/evaluator/question_answering_evaluator.py
-    Refactor pt 2:
+    """
+    TODO:
     Rewrite it as evaluator"""
 
     def __init__(self, no_answer_threshold: float = 1.0):

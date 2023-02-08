@@ -9,9 +9,6 @@ from embeddings.task.lightning_task.question_answering import SQUAD_V2_PREDICTED
 class QAMetric(abc.ABC):
     """
     TODO:
-    Refactor:
-    embeddings/metric/question_answering.py
-
     Refactor pt 2:
     - Decide whether we need additional seperate base QA metric class
     """

@@ -20,10 +20,6 @@ HuggingFaceDataset = Type[Dataset]  # to refactor
 class PretrainedQAModel(pl.LightningModule):  # type: ignore
     """
     TODO:
-    Refactor:
-    - Move module to appropiate path
-    embeddings/model/lightning_module/question_answering.py
-
     Refactor pt. 2
     Refactor in separate PR (create seperate task for inference)
     https://github.com/CLARIN-PL/embeddings/issues/279
@@ -56,10 +52,6 @@ class PretrainedQAModel(pl.LightningModule):  # type: ignore
 class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
     """
     TODO:
-    Refactor
-    - Move module to appropiate path
-      embeddings/model/lightning_module/question_answering.py
-
     Refactor pt. 2:
     - Refactor functions `setup`, `forward` `freeze_transformer`
     """

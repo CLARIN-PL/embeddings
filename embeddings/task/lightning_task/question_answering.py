@@ -24,9 +24,6 @@ SQUAD_V2_GOLD_ANSWER_TYPE = Dict[str, Union[Dict[str, Union[List[str], List[Any]
 class QuestionAnsweringTask(LightningTask):
     """
     TODO:
-    Refactor
-     embeddings/task/lightning_task/question_answering.py
-
      Refactor pt 2:
      - Drop MlFlow logger as required parameter
      - Add postprocess directly to task
