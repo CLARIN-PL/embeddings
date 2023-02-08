@@ -1,7 +1,7 @@
 import abc
 import inspect
 from inspect import signature
-from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar
+from typing import Any, Dict, Generic, List, Literal, Optional, Tuple, TypeVar
 
 import numpy as np
 import pytorch_lightning as pl
@@ -124,12 +124,24 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
 
     def get_default_metrics(self) -> MetricCollection:
         assert isinstance(self.hparams, dict)
+
+        task: Literal["multiclass", "binary"] = (
+            "multiclass" if self.hparams["num_classes"] > 2 else "binary"
+        )
+
+        # Accuracy, Precision etc. no longer inherits from Metric subclass as it is helper class
         return MetricCollection(
             [
-                Accuracy(num_classes=self.hparams["num_classes"]),
-                Precision(num_classes=self.hparams["num_classes"], average="macro"),
-                Recall(num_classes=self.hparams["num_classes"], average="macro"),
-                F1Score(num_classes=self.hparams["num_classes"], average="macro"),
+                Accuracy(num_classes=self.hparams["num_classes"], task=task),  # type: ignore[list-item]
+                Precision(
+                    num_classes=self.hparams["num_classes"], average="macro", task=task
+                ),  # type: ignore[list-item]
+                Recall(
+                    num_classes=self.hparams["num_classes"], average="macro", task=task
+                ),  # type: ignore[list-item]
+                F1Score(
+                    num_classes=self.hparams["num_classes"], average="macro", task=task
+                ),  # type: ignore[list-item]
             ]
         )
 

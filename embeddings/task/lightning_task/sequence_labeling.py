@@ -83,7 +83,7 @@ class SequenceLabelingTask(LightningTask):
         assert self.model is not None
         assert isinstance(self.model.class_label, ClassLabel)
         return [
-            self.model.class_label.int2str(x.item())
+            str(self.model.class_label.int2str(x.item()))
             for x in data[ground_truth_data != self.model.ignore_index]
         ]
 

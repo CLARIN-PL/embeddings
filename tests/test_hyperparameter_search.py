@@ -1,73 +1,19 @@
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict
 
 import optuna
 import pytest
 
-from embeddings.config.flair_config import (
-    FlairSequenceLabelingAdvancedConfig,
-    FlairTextClassificationAdvancedConfig,
-)
 from embeddings.config.lightning_config import LightningBasicConfig
 from embeddings.config.parameters import SearchableParameter
 from embeddings.data.dataset import LightingDataModuleSubset
-from embeddings.pipeline.flair_classification import FlairClassificationPipeline
-from embeddings.pipeline.flair_pair_classification import FlairPairClassificationPipeline
-from embeddings.pipeline.flair_sequence_labeling import FlairSequenceLabelingPipeline
-from embeddings.pipeline.pipelines_metadata import (
-    FlairClassificationPipelineMetadata,
-    FlairPairClassificationPipelineMetadata,
-    FlairSequenceLabelingPipelineMetadata,
-    LightningPipelineMetadata,
-)
+from embeddings.pipeline.pipelines_metadata import LightningPipelineMetadata
 from embeddings.utils.utils import PrimitiveTypes
 
 
 @pytest.fixture(scope="module")
 def output_path() -> "TemporaryDirectory[str]":
     return TemporaryDirectory()
-
-
-@pytest.fixture(scope="module")
-def flair_text_classification_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
-    return {
-        "dataset_name": "clarin-pl/polemo2-official",
-        "input_column_name": "text",
-        "target_column_name": "target",
-        "load_dataset_kwargs": None,
-    }
-
-
-@pytest.fixture(scope="module")
-def flair_text_pair_classification_dataset_kwargs() -> Dict[
-    str, Union[PrimitiveTypes, Tuple[str, str]]
-]:
-    return {
-        "dataset_name": "clarin-pl/cst-wikinews",
-        "input_columns_names_pair": ("sentence_1", "sentence_2"),
-        "target_column_name": "label",
-        "load_dataset_kwargs": None,
-    }
-
-
-@pytest.fixture(scope="module")
-def flair_sequence_labeling_dataset_kwargs() -> Dict[str, PrimitiveTypes]:
-    return {
-        "dataset_name": "clarin-pl/kpwr-ner",
-        "input_column_name": "tokens",
-        "target_column_name": "ner",
-        "load_dataset_kwargs": None,
-    }
-
-
-@pytest.fixture(scope="module")
-def flair_pipeline_kwargs(output_path: "TemporaryDirectory[str]") -> Dict[str, PrimitiveTypes]:
-    return {"output_path": output_path.name, "embedding_name": "clarin-pl/roberta-polish-kgr10"}
-
-
-@pytest.fixture(scope="module")
-def flair_sequence_labeling_pipeline_kwargs() -> Dict[str, PrimitiveTypes]:
-    return {"evaluation_mode": "conll", "tagging_scheme": None}
 
 
 @pytest.fixture(scope="module")
@@ -92,88 +38,11 @@ def lightning_classification_kwargs(output_path: "TemporaryDirectory[str]") -> D
 
 
 @pytest.fixture(scope="module")
-def flair_classification_pipeline_metadata(
-    flair_pipeline_kwargs: Dict[str, PrimitiveTypes],
-    flair_text_classification_dataset_kwargs: Dict[str, PrimitiveTypes],
-) -> Dict[str, Any]:
-    return {
-        **flair_pipeline_kwargs,
-        **flair_text_classification_dataset_kwargs,
-        **{
-            "config": FlairTextClassificationAdvancedConfig(
-                document_embedding_cls="FlairDocumentPoolEmbedding",
-                load_model_kwargs={},
-                task_model_kwargs={},
-                task_train_kwargs={},
-            )
-        },
-    }
-
-
-@pytest.fixture(scope="module")
-def flair_pair_classification_pipeline_metadata(
-    flair_pipeline_kwargs: Dict[str, Any],
-    flair_text_pair_classification_dataset_kwargs: Dict[str, Any],
-) -> Dict[str, Any]:
-    return {
-        **flair_pipeline_kwargs,
-        **flair_text_pair_classification_dataset_kwargs,
-        **{
-            "config": FlairTextClassificationAdvancedConfig(
-                document_embedding_cls="FlairDocumentPoolEmbedding",
-                load_model_kwargs={},
-                task_model_kwargs={},
-                task_train_kwargs={},
-            )
-        },
-    }
-
-
-@pytest.fixture(scope="module")
-def flair_sequence_labeling_pipeline_metadata(
-    flair_pipeline_kwargs: Dict[str, PrimitiveTypes],
-    flair_sequence_labeling_pipeline_kwargs: Dict[str, PrimitiveTypes],
-    flair_sequence_labeling_dataset_kwargs: Dict[str, PrimitiveTypes],
-) -> Dict[str, Any]:
-    return {
-        **flair_pipeline_kwargs,
-        **flair_sequence_labeling_pipeline_kwargs,
-        **flair_sequence_labeling_dataset_kwargs,
-        **{
-            "config": FlairSequenceLabelingAdvancedConfig(
-                hidden_size=16, load_model_kwargs={}, task_model_kwargs={}, task_train_kwargs={}
-            )
-        },
-    }
-
-
-@pytest.fixture(scope="module")
 def lightning_classification_pipeline_metadata(
     lightning_text_classification_dataset_kwargs: Dict[str, PrimitiveTypes],
     lightning_classification_kwargs: Dict[str, PrimitiveTypes],
 ) -> Dict[str, Any]:
     return {**lightning_text_classification_dataset_kwargs, **lightning_classification_kwargs}
-
-
-def test_flair_classification_pipeline_metadata(flair_classification_pipeline_metadata) -> None:
-    metadata = FlairClassificationPipelineMetadata(**flair_classification_pipeline_metadata)
-    FlairClassificationPipeline(**metadata)
-
-
-def test_flair_pair_classification_pipeline_metadata(
-    flair_pair_classification_pipeline_metadata,
-) -> None:
-    metadata = FlairPairClassificationPipelineMetadata(
-        **flair_pair_classification_pipeline_metadata
-    )
-    FlairPairClassificationPipeline(**metadata)
-
-
-def test_flair_sequence_labeling_pipeline_metadata(
-    flair_sequence_labeling_pipeline_metadata,
-) -> None:
-    metadata = FlairSequenceLabelingPipelineMetadata(**flair_sequence_labeling_pipeline_metadata)
-    FlairSequenceLabelingPipeline(**metadata)
 
 
 def test_lightning_classification_pipeline_metadata(
