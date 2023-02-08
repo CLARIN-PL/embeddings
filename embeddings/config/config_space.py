@@ -8,9 +8,6 @@ import optuna
 
 from embeddings.config.base_config import Config
 from embeddings.config.parameters import ConstantParameter, ParameterValues, SearchableParameter
-from embeddings.embedding.auto_flair import AutoFlairWordEmbedding
-from embeddings.embedding.flair_embedding import FlairTransformerEmbedding
-from embeddings.embedding.static.embedding import StaticEmbedding
 
 Parameter = Union[SearchableParameter, ConstantParameter]
 ParsedParameters = TypeVar("ParsedParameters")
@@ -90,17 +87,6 @@ class BaseConfigSpace(Config, ABC):
     @abc.abstractmethod
     def parse_parameters(cls, parameters: Dict[str, ParameterValues]) -> SampledParameters:
         pass
-
-    @staticmethod
-    def _retrieve_embedding_type(embedding_name: str) -> str:
-        embedding = AutoFlairWordEmbedding.from_hub(repo_id=embedding_name)
-        if isinstance(embedding, FlairTransformerEmbedding):
-            embedding_type = "dynamic"
-        elif isinstance(embedding, StaticEmbedding):
-            embedding_type = "static"
-        else:
-            raise TypeError("Embedding type not recognized")
-        return embedding_type
 
     @staticmethod
     def _parse_config_params(parameters: Dict[str, Any]) -> Dict[str, Parameter]:
