@@ -67,7 +67,7 @@ def lightning_question_answering_pipeline(
         output_path=tmp_path_module,
         config=config,
         evaluation_filename="evaluation.json",
-        predict_subset="dev",
+        predict_subset="validation",
         model_checkpoint_kwargs={
             "filename": "last",
             "monitor": None,
@@ -99,4 +99,13 @@ def test_lightning_question_answering_pipeline(
         lightning_question_answering_pipeline: LightningQuestionAnsweringPipeline
 ):
     pipeline = lightning_question_answering_pipeline
-    assert isinstance(pipeline, LightningQuestionAnsweringPipeline)
+    results = pipeline.run()
+    assert isinstance(results, tuple)
+
+    metrics = results[0]["validation"]
+    assert 0 <= metrics["f1"] <= 100
+    assert 0 <= metrics["total"] <= 100
+    assert 0 <= metrics["HasAns_f1"] <= 100
+    assert 0 <= metrics["HasAns_total"] <= 100
+    assert 0 <= metrics["best_f1"] <= 100
+    assert 0 <= metrics["HasAns_f1"] <= 100
