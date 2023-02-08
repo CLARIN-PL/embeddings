@@ -1,0 +1,19 @@
+name: CI GitLab
+
+on:
+  - push
+  - delete
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    name:  repository sync
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - uses: wangchucheng/git-repo-sync@v0.1.0
+      with:
+        target-url: ${{ secrets.CLARIN_REPO_URL }}
+        target-username: ${{ secrets.CLARIN_REPO_USERNAME }}
+        target-token: ${{ secrets.CLARIN_REPO_TOKEN }}
