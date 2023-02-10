@@ -28,8 +28,16 @@ class CharToTokenMapper:
 
     @staticmethod
     def _get_answer_start_and_end_char(answers: Dict[str, Any]) -> Tuple[int, int]:
-        [start_char] = answers["answer_start"]
-        end_char = start_char + len(answers["text"][0])
+        start_char = (
+            answers["answer_start"][0]
+            if isinstance(answers["answer_start"], list)
+            else answers["answer_start"]
+        )
+        end_char = start_char + len(
+            answers["text"][0]
+            if isinstance(answers["text"], list)
+            else answers["text"]
+        )
         return start_char, end_char
 
     @staticmethod
