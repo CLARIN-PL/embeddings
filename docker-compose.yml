@@ -12,6 +12,7 @@ services:
       # hence there is no need to redownload them everything docker is cleaned
       - L:/cache:/root/.cache
     tty: true
+    shm_size: "16gb"
     deploy:
       resources:
         reservations:
