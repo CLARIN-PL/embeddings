@@ -45,7 +45,6 @@ types-PyYAML = ">=5.4.10"
 types-setuptools = ">=57.4.11"
 typing-extensions = ">=4.0.1.0"
 wandb = ">=0.12.10"
-sacremoses = "^0.0.53"
 setuptools = "^65.5.1"
 
 [tool.poetry.dev-dependencies]
@@ -60,6 +59,9 @@ coverage = {extras = ["toml"], version = "6.2"}
 pytest-env = "0.6.2"
 nbdev = "^2.3.9"
 jupyterlab = "^3.5.0"
+
+[tool.poetry.group.dev.dependencies]
+nbdev = "^2.3.11"
 
 [tool.poe.tasks]
 black = "black --check ./"
