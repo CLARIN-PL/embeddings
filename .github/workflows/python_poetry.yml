@@ -7,15 +7,15 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [ 3.9, 3.8]
-        poetry-version: [ 1.1.12 ]
+        poetry-version: [ 1.3.2 ]
         os: [ ubuntu-20.04, macos-latest, windows-2022 ]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         name: Load cached venv
         id: cached-poetry-dependencies
         with:
@@ -24,7 +24,7 @@ jobs:
           restore-keys: |
             main-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
             main-venv-${{ runner.os }}-${{matrix.python-version}}-
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         name: Load cached HF
         id: cached-huggingface-data
         with:
@@ -34,11 +34,11 @@ jobs:
             main-hf-${{ hashFiles('**/poetry.lock') }}
             main-hf-
       - name: Install poetry
-        uses: abatilo/actions-poetry@v2.0.0
+        uses: abatilo/actions-poetry@v2.2.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install deps
-        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
+        run: poetry install -vv --no-interaction --no-root --extras "developer"
       - name: Run tests
         run: poetry run poe test
         env:
@@ -49,19 +49,19 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [ 3.9]
-        poetry-version: [ 1.1.12 ]
+        poetry-version: [ 1.3.2 ]
         os: [ ubuntu-20.04 ]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install poetry
-        uses: abatilo/actions-poetry@v2.0.0
+        uses: abatilo/actions-poetry@v2.2.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         name: Load cached venv
         id: cached-poetry-dependencies
         with:
@@ -71,7 +71,7 @@ jobs:
             main-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
             main-venv-${{ runner.os }}-${{matrix.python-version}}-
       - name: Install deps
-        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
+        run: poetry install -vv --no-interaction --no-root --extras "developer"
       - name: Check
         run: poetry run poe check
   publish:
@@ -83,28 +83,28 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [ 3.9 ]
-        poetry-version: [ 1.1.12 ]
+        poetry-version: [ 1.3.2 ]
         os: [ ubuntu-20.04 ]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install poetry
-        uses: abatilo/actions-poetry@v2.0.0
+        uses: abatilo/actions-poetry@v2.2.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         name: Load cached venv
         id: cached-poetry-dependencies
         with:
           path: .venv
           key: ${{github.event.pull_request.head.ref}}-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
       - name: Install deps
-        run: poetry install -vv --no-interaction --no-root --extras "developer pymagnitude"
+        run: poetry install -vv --no-interaction --no-root --extras "developer"
       - name: Build and publish
         run: |
           poetry version "$(git describe --tags --abbrev=0)a${GITHUB_RUN_ID}${GITHUB_RUN_NUMBER}"

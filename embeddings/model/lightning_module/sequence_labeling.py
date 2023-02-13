@@ -100,8 +100,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         metrics: MetricCollection,
         prog_bar: bool = False,
     ) -> Dict[str, float]:
-        metric_values = metrics.compute()[metrics.prefix + next(iter(metrics))]
-        metric_values = {metrics.prefix + k: v for k, v in metric_values.items()}
+        metric_values = metrics.compute()
         assert isinstance(metric_values, dict)
         metrics.reset()
         self.log_dict(metric_values, prog_bar=prog_bar)

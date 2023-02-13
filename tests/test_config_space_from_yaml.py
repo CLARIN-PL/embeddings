@@ -7,10 +7,6 @@ import yaml
 from _pytest.tmpdir import TempdirFactory
 
 from embeddings.config.config_space import BaseConfigSpace
-from embeddings.config.flair_config_space import (
-    FlairModelTrainerConfigSpace,
-    FlairSequenceLabelingConfigSpace,
-)
 from embeddings.config.lighting_config_space import LightingTextClassificationConfigSpace
 
 
@@ -49,80 +45,6 @@ def base_config_dict() -> Dict[str, Any]:
             },
         }
     }
-    return config
-
-
-@pytest.fixture()
-def flair_trainer_config_dict(base_config_dict: Dict[str, Any]) -> Dict[str, Any]:
-    config = deepcopy(base_config_dict)
-    config["embedding_name"] = "allegro/herbert-base-case"
-    return config
-
-
-@pytest.fixture()
-def flair_sequence_labeling_config_dict(base_config_dict: Dict[str, Any]) -> Dict[str, Any]:
-    config = deepcopy(base_config_dict)
-    config["embedding_name"] = "allegro/herbert-base-case"
-    config["parameters"].update(
-        {
-            "hidden_size": {
-                "param_type": "searchable",
-                "name": "hidden_size",
-                "type": "int_uniform",
-                "low": 128,
-                "high": 2048,
-                "step": 128,
-            },
-            "use_rnn": {
-                "param_type": "searchable",
-                "name": "use_rnn",
-                "type": "categorical",
-                "choices": [True, False],
-            },
-            "rnn_type": {
-                "param_type": "searchable",
-                "name": "rnn_type",
-                "type": "categorical",
-                "choices": ["LSTM", "GRU"],
-            },
-            "rnn_layers": {
-                "param_type": "searchable",
-                "name": "rnn_layers",
-                "type": "int_uniform",
-                "low": 1,
-                "high": 3,
-                "step": 1,
-            },
-            "dropout": {
-                "param_type": "searchable",
-                "name": "dropout",
-                "type": "discrete_uniform",
-                "low": 0.0,
-                "high": 0.5,
-                "q": 0.05,
-            },
-            "locked_dropout": {
-                "param_type": "searchable",
-                "name": "locked_dropout",
-                "type": "discrete_uniform",
-                "low": 0.0,
-                "high": 0.5,
-                "q": 0.05,
-            },
-            "reproject_embeddings": {
-                "param_type": "searchable",
-                "name": "reproject_embeddings",
-                "type": "categorical",
-                "choices": [True, False],
-            },
-            "use_crf": {
-                "param_type": "searchable",
-                "name": "use_crf",
-                "type": "categorical",
-                "choices": [True, False],
-            },
-        }
-    )
     return config
 
 
@@ -210,26 +132,6 @@ def base_yaml_config_file_path(tmp_path_module: Path, base_config_dict: Dict[str
 
 
 @pytest.fixture()
-def flair_trainer_yaml_config_file_path(
-    tmp_path_module: Path, flair_trainer_config_dict: Dict[str, Any]
-) -> Path:
-    output_path = tmp_path_module.joinpath("flair_trainer_config.yaml")
-    with open(output_path, "w") as f:
-        yaml.dump(flair_trainer_config_dict, f, default_flow_style=False)
-    return output_path
-
-
-@pytest.fixture()
-def flair_sequence_labeling_yaml_config_file_path(
-    tmp_path_module: Path, flair_sequence_labeling_config_dict: Dict[str, Any]
-) -> Path:
-    output_path = tmp_path_module.joinpath("flair_sequence_labeling_config.yaml")
-    with open(output_path, "w") as f:
-        yaml.dump(flair_sequence_labeling_config_dict, f, default_flow_style=False)
-    return output_path
-
-
-@pytest.fixture()
 def lightning_classification_yaml_config_file_path(
     tmp_path_module: Path, lightning_classification_config_dict: Dict[str, Any]
 ) -> Path:
@@ -262,51 +164,6 @@ def assert_config_with_yaml(config_space: BaseConfigSpace, config: Dict[str, Any
                 )
 
 
-def test_flair_trainer_from_yaml_config(
-    flair_trainer_config_dict: Dict[str, Any], flair_trainer_yaml_config_file_path: Path
-) -> None:
-    flair_trainer_config_space = FlairModelTrainerConfigSpace.from_yaml(
-        flair_trainer_yaml_config_file_path
-    )
-    assert hasattr(flair_trainer_config_space, "param_embedding_name")
-    assert (
-        flair_trainer_config_space.param_embedding_name.value
-        == flair_trainer_config_dict["embedding_name"]
-    )
-    assert_config_with_yaml(flair_trainer_config_space, flair_trainer_config_dict)
-
-
-def test_flair_sequence_labeling_from_yaml_trainer_config(
-    flair_trainer_config_dict: Dict[str, Any], flair_trainer_yaml_config_file_path: Path
-) -> None:
-    flair_trainer_config_space = FlairSequenceLabelingConfigSpace.from_yaml(
-        flair_trainer_yaml_config_file_path
-    )
-    assert hasattr(flair_trainer_config_space, "param_embedding_name")
-    assert (
-        flair_trainer_config_space.param_embedding_name.value
-        == flair_trainer_config_dict["embedding_name"]
-    )
-    assert_config_with_yaml(flair_trainer_config_space, flair_trainer_config_dict)
-
-
-def test_flair_sequence_labeling_from_yaml_specific_config(
-    flair_sequence_labeling_config_dict: Dict[str, Any],
-    flair_sequence_labeling_yaml_config_file_path: Path,
-) -> None:
-    flair_sequence_labeling_config_space = FlairSequenceLabelingConfigSpace.from_yaml(
-        flair_sequence_labeling_yaml_config_file_path
-    )
-    assert hasattr(flair_sequence_labeling_config_space, "param_embedding_name")
-    assert (
-        flair_sequence_labeling_config_space.param_embedding_name.value
-        == flair_sequence_labeling_config_dict["embedding_name"]
-    )
-    assert_config_with_yaml(
-        flair_sequence_labeling_config_space, flair_sequence_labeling_config_dict
-    )
-
-
 def test_lightning_classification_from_yaml_config(
     lightning_classification_config_dict: Dict[str, Any],
     lightning_classification_yaml_config_file_path: Path,
@@ -324,28 +181,11 @@ def test_lightning_classification_from_yaml_config(
     )
 
 
-def test_wrong_config_given(
-    lightning_classification_yaml_config_file_path: Path,
-    flair_sequence_labeling_yaml_config_file_path: Path,
-    flair_trainer_yaml_config_file_path: Path,
-) -> None:
-    with pytest.raises(KeyError):
-        LightingTextClassificationConfigSpace.from_yaml(
-            flair_sequence_labeling_yaml_config_file_path
-        )
-    with pytest.raises(KeyError):
-        LightingTextClassificationConfigSpace.from_yaml(flair_trainer_yaml_config_file_path)
-    with pytest.raises(KeyError):
-        FlairSequenceLabelingConfigSpace.from_yaml(lightning_classification_yaml_config_file_path)
-
-
 def test_no_embedding_name_given(
     base_yaml_config_file_path: Path,
 ) -> None:
     with pytest.raises(KeyError):
         LightingTextClassificationConfigSpace.from_yaml(base_yaml_config_file_path)
-    with pytest.raises(KeyError):
-        FlairSequenceLabelingConfigSpace.from_yaml(base_yaml_config_file_path)
 
 
 def test_wrong_param_given(
