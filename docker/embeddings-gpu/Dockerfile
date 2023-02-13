@@ -31,8 +31,8 @@ RUN conda create -n embeddings python=3.9 \
     && echo "source activate embeddings" > ~/.bashrc
 ENV PATH /opt/conda/envs/env/bin:$PATH
 
-# RUN pip install --no-cache-dir poetry==1.2.2 \
-#     && poetry install --no-interaction \
-#     && poetry run poe force-torch-cuda
+RUN pip install --no-cache-dir poetry==1.2.2 \
+    && poetry install --no-interaction \
+    && poetry run poe force-torch-cuda
 
-# CMD ["poetry", "run", "python", "-m", "jupyter", "notebook", "--ip='*'", "--NotebookApp.token=''", "--NotebookApp.password=''", "--allow-root"]
+CMD ["poetry", "run", "python", "-m", "jupyter", "notebook", "--ip='*'", "--NotebookApp.token=''", "--NotebookApp.password=''", "--allow-root"]

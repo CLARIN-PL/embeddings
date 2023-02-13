@@ -8,9 +8,6 @@ services:
     container_name: embeddings
     volumes:
       - .:/app
-      # pass cache to the container, models and datasets are stored there
-      # hence there is no need to redownload them everything docker is cleaned
-      - L:/cache:/root/.cache
     tty: true
     shm_size: "16gb"
     deploy:
