@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="State-of-the-art Text Representations for Natural Language Processing tasks, an initial version of library focus on the Polish Language">
+
+<title>embeddings - CLARIN Embeddings</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="embeddings - CLARIN Embeddings">
+<meta property="og:description" content="State-of-the-art Text Representations for Natural Language Processing tasks, an initial version of library focus on the Polish Language">
+<meta property="og:site-name" content="embeddings">
+<meta name="twitter:title" content="embeddings - CLARIN Embeddings">
+<meta name="twitter:description" content="State-of-the-art Text Representations for Natural Language Processing tasks, an initial version of library focus on the Polish Language">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">embeddings</span>
+    </a>
+  </div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">CLARIN Embeddings</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">CLARIN Embeddings</h1>
+                  <div>
+        <div class="description">
+          State-of-the-art Text Representations for Natural Language Processing tasks, an initial version of library focus on the Polish Language
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link active">CLARIN Embeddings</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">lepiszcze</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./lepiszcze/lepiszcze.html" class="sidebar-item-text sidebar-link">LEPISZCZE</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./lepiszcze/submission.html" class="sidebar-item-text sidebar-link">Submission</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">tutorials</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/baseline_sklearn_models_tutorial.html" class="sidebar-item-text sidebar-link">Baseline Sklearn-based models</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/how_to_use_polsih_static_embeddings.html" class="sidebar-item-text sidebar-link">Static word embeddings</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/tutorial_how_to_use_config_space.html" class="sidebar-item-text sidebar-link">How to use our configs?</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/validate_flair_models_inference.html" class="sidebar-item-text sidebar-link">Model inference</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorials/validate_lightning_models_inference.html" class="sidebar-item-text sidebar-link">LM-based models inference</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation">Installation</a></li>
+  <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example">Example</a></li>
+  <li><a href="#conventions" id="toc-conventions" class="nav-link" data-scroll-target="#conventions">Conventions</a></li>
+  <li><a href="#pipelines" id="toc-pipelines" class="nav-link" data-scroll-target="#pipelines">Pipelines</a>
+  <ul class="collapse">
+  <li><a href="#transformer-embedding-based-pipelines-e.g.-bert-roberta-herbert" id="toc-transformer-embedding-based-pipelines-e.g.-bert-roberta-herbert" class="nav-link" data-scroll-target="#transformer-embedding-based-pipelines-e.g.-bert-roberta-herbert">Transformer embedding based pipelines (e.g.&nbsp;Bert, RoBERTA, Herbert):</a></li>
+  <li><a href="#static-embedding-based-pipelines-e.g.-word2vec-fasttext" id="toc-static-embedding-based-pipelines-e.g.-word2vec-fasttext" class="nav-link" data-scroll-target="#static-embedding-based-pipelines-e.g.-word2vec-fasttext">Static embedding based pipelines (e.g.&nbsp;word2vec, fasttext)</a></li>
+  <li><a href="#writing-custom-huggingface-based-pipeline" id="toc-writing-custom-huggingface-based-pipeline" class="nav-link" data-scroll-target="#writing-custom-huggingface-based-pipeline">Writing custom HuggingFace-based pipeline</a></li>
+  </ul></li>
+  <li><a href="#running-tasks-scripts" id="toc-running-tasks-scripts" class="nav-link" data-scroll-target="#running-tasks-scripts">Running tasks scripts</a>
+  <ul class="collapse">
+  <li><a href="#run-classification-task" id="toc-run-classification-task" class="nav-link" data-scroll-target="#run-classification-task">Run classification task</a></li>
+  <li><a href="#run-sequence-labeling-task" id="toc-run-sequence-labeling-task" class="nav-link" data-scroll-target="#run-sequence-labeling-task">Run sequence labeling task</a></li>
+  <li><a href="#run-pair-classification-task" id="toc-run-pair-classification-task" class="nav-link" data-scroll-target="#run-pair-classification-task">Run pair classification task</a></li>
+  </ul></li>
+  <li><a href="#compatible-datasets" id="toc-compatible-datasets" class="nav-link" data-scroll-target="#compatible-datasets">Compatible datasets</a></li>
+  <li><a href="#passing-task-model-and-task-training-parameters-to-predefined-flair-pipelines" id="toc-passing-task-model-and-task-training-parameters-to-predefined-flair-pipelines" class="nav-link" data-scroll-target="#passing-task-model-and-task-training-parameters-to-predefined-flair-pipelines">Passing task model and task training parameters to predefined flair pipelines</a>
+  <ul class="collapse">
+  <li><a href="#example-with-polemo2-dataset" id="toc-example-with-polemo2-dataset" class="nav-link" data-scroll-target="#example-with-polemo2-dataset">Example with <code>polemo2</code> dataset</a>
+  <ul class="collapse">
+  <li><a href="#flair-pipeline" id="toc-flair-pipeline" class="nav-link" data-scroll-target="#flair-pipeline">Flair pipeline</a></li>
+  <li><a href="#lightning-pipeline" id="toc-lightning-pipeline" class="nav-link" data-scroll-target="#lightning-pipeline">Lightning pipeline</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#static-embeddings" id="toc-static-embeddings" class="nav-link" data-scroll-target="#static-embeddings">Static embeddings</a>
+  <ul class="collapse">
+  <li><a href="#document-embeddings" id="toc-document-embeddings" class="nav-link" data-scroll-target="#document-embeddings">Document embeddings</a></li>
+  <li><a href="#word-embeddings" id="toc-word-embeddings" class="nav-link" data-scroll-target="#word-embeddings">Word embeddings</a></li>
+  </ul></li>
+  <li><a href="#available-embedding-models-for-polish" id="toc-available-embedding-models-for-polish" class="nav-link" data-scroll-target="#available-embedding-models-for-polish">Available embedding models for Polish</a></li>
+  <li><a href="#optimized-pipelines" id="toc-optimized-pipelines" class="nav-link" data-scroll-target="#optimized-pipelines">Optimized pipelines</a>
+  <ul class="collapse">
+  <li><a href="#transformers-embeddings" id="toc-transformers-embeddings" class="nav-link" data-scroll-target="#transformers-embeddings">Transformers embeddings</a></li>
+  <li><a href="#static-embeddings-1" id="toc-static-embeddings-1" class="nav-link" data-scroll-target="#static-embeddings-1">Static embeddings</a></li>
+  <li><a href="#example-with-text-classification" id="toc-example-with-text-classification" class="nav-link" data-scroll-target="#example-with-text-classification">Example with Text Classification</a>
+  <ul class="collapse">
+  <li><a href="#training-model-with-obtained-parameters" id="toc-training-model-with-obtained-parameters" class="nav-link" data-scroll-target="#training-model-with-obtained-parameters">Training model with obtained parameters</a></li>
+  <li><a href="#selection-of-best-embedding-model." id="toc-selection-of-best-embedding-model." class="nav-link" data-scroll-target="#selection-of-best-embedding-model.">Selection of best embedding model.</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/CLARIN-PL/embeddings/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<div class="callout-warning callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The library is currently in an active development state. Some functionalities may be subject to change before the stable release. Users can track our milestones <a href="https://github.com/CLARIN-PL/embeddings/milestones">here</a>.</p>
+</div>
+</div>
+<section id="installation" class="level1">
+<h1>Installation</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install clarinpl-embeddings</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="example" class="level1">
+<h1>Example</h1>
+<p>Text-classification with polemo2 dataset and transformer-based embeddings</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.pipeline.lightning_classification <span class="im">import</span> LightningClassificationPipeline</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> LightningClassificationPipeline(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    dataset_name_or_path<span class="op">=</span><span class="st">"clarin-pl/polemo2-official"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    embedding_name_or_path<span class="op">=</span><span class="st">"allegro/herbert-base-cased"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    input_column_name<span class="op">=</span><span class="st">"text"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    target_column_name<span class="op">=</span><span class="st">"target"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    output_path<span class="op">=</span><span class="st">"."</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pipeline.run())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="warning-as-for-now-default-pipeline-model-hyperparameters-may-provide-poor-results.-it-will-be-subject-to-change-in-further-releases.-we-encourage-users-to-use-optimized-pipelines-to-select-appropriate-hyperparameters." class="level4">
+<h4 class="anchored" data-anchor-id="warning-as-for-now-default-pipeline-model-hyperparameters-may-provide-poor-results.-it-will-be-subject-to-change-in-further-releases.-we-encourage-users-to-use-optimized-pipelines-to-select-appropriate-hyperparameters.">:warning: As for now, default pipeline model hyperparameters may provide poor results. It will be subject to change in further releases. We encourage users to use <a href="#optimized-pipelines">Optimized Pipelines</a> to select appropriate hyperparameters.</h4>
+</section>
+</section>
+<section id="conventions" class="level1">
+<h1>Conventions</h1>
+<p>We use many of the HuggingFace concepts such as models (https://huggingface.co/models) or datasets (https://huggingface.co/datasets) to make our library as easy to use as it is possible. We want to enable users to create, customise, test, and execute NLP / NLU / SLU tasks in the fastest possible manner. Moreover, we present easy to use static embeddings, that were trained by CLARIN-PL.</p>
+</section>
+<section id="pipelines" class="level1">
+<h1>Pipelines</h1>
+<p>We share predefined pipelines for common NLP tasks with corresponding scripts. For Transformer based pipelines we utilize <a href="https://www.pytorchlightning.ai">PyTorch Lighting</a> ⚡ trainers with Transformers <a href="https://huggingface.co/docs/transformers/master/en/model_doc/auto#transformers.AutoModel">AutoModels</a> . For static embedding based pipelines we use <a href="https://github.com/flairNLP/flair">Flair</a> library under the hood.</p>
+<p><strong>REMARK</strong>: As currently we haven’t blocked transformers based pipelines from <strong>flair</strong> pipelines we <strong>may remove it in the nearest future.</strong> We encourage to use <strong>Lightning</strong> based pipelines for transformers.</p>
+<section id="transformer-embedding-based-pipelines-e.g.-bert-roberta-herbert" class="level3">
+<h3 class="anchored" data-anchor-id="transformer-embedding-based-pipelines-e.g.-bert-roberta-herbert">Transformer embedding based pipelines (e.g.&nbsp;Bert, RoBERTA, Herbert):</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>Class</th>
+<th>Script</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Text classification</td>
+<td><a href="embeddings/pipeline/lightning_classification.py">LightningClassificationPipeline</a></td>
+<td><a href="examples/evaluate_lightning_document_classification.py">evaluate_lightning_document_classification.py</a></td>
+</tr>
+<tr class="even">
+<td>Sequence labelling</td>
+<td><a href="embeddings/pipeline/lightning_sequence_labeling.py">LightningSequenceLabelingPipeline</a></td>
+<td><a href="examples/evaluate_lightning_sequence_labeling.py">evaluate_lightning_sequence_labeling.py</a></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="static-embedding-based-pipelines-e.g.-word2vec-fasttext" class="level3">
+<h3 class="anchored" data-anchor-id="static-embedding-based-pipelines-e.g.-word2vec-fasttext">Static embedding based pipelines (e.g.&nbsp;word2vec, fasttext)</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>Class</th>
+<th>Script</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Text classification</td>
+<td><a href="embeddings/pipeline/flair_classification.py">FlairClassificationPipeline</a></td>
+<td><a href="examples/evaluate_document_classification.py">evaluate_document_classification.py</a></td>
+</tr>
+<tr class="even">
+<td>Sequence labelling</td>
+<td><a href="embeddings/pipeline/flair_sequence_labeling.py">FlairSequenceLabelingPipeline</a></td>
+<td><a href="examples/evaluate_sequence_labelling.py">evaluate_sequence_labelling.py</a></td>
+</tr>
+<tr class="odd">
+<td>Sequence pair classification</td>
+<td><a href="embeddings/pipeline/flair_pair_classification.py">FlairPairClassificationPipeline</a></td>
+<td><a href="examples/evaluate_document_pair_classification.py">evaluate_document_pair_classification.py</a></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="writing-custom-huggingface-based-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="writing-custom-huggingface-based-pipeline">Writing custom HuggingFace-based pipeline</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.data.data_loader <span class="im">import</span> HuggingFaceDataLoader</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.data.dataset <span class="im">import</span> Dataset</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.embedding.auto_flair <span class="im">import</span> AutoFlairDocumentEmbedding</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.evaluator.text_classification_evaluator <span class="im">import</span> TextClassificationEvaluator</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.model.flair_model <span class="im">import</span> FlairModel</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.pipeline.standard_pipeline <span class="im">import</span> StandardPipeline</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.task.flair_task.text_classification <span class="im">import</span> TextClassification</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.transformation.flair_transformation.classification_corpus_transformation <span class="im">import</span> (</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    ClassificationCorpusTransformation,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> Dataset(<span class="st">"clarin-pl/polemo2-official"</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>data_loader <span class="op">=</span> HuggingFaceDataLoader()</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>transformation <span class="op">=</span> ClassificationCorpusTransformation(<span class="st">"text"</span>, <span class="st">"target"</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>embedding <span class="op">=</span> AutoFlairDocumentEmbedding.from_hub(<span class="st">"clarin-pl/word2vec-kgr10"</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>task <span class="op">=</span> TextClassification(Path(<span class="st">"."</span>))</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> FlairModel(embedding, task)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>evaluator <span class="op">=</span> TextClassificationEvaluator()</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> StandardPipeline(dataset, data_loader, transformation, model, evaluator)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pipeline.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="running-tasks-scripts" class="level1">
+<h1>Running tasks scripts</h1>
+<p>All up-to-date examples can be found under <a href="examples/">examples</a> path.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> examples</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="run-classification-task" class="level2">
+<h2 class="anchored" data-anchor-id="run-classification-task">Run classification task</h2>
+<p>The example with non-default arguments</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> evaluate_lightning_document_classification.py <span class="dt">\</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">--embedding-name-or-path</span> allegro/herbert-base-cased <span class="dt">\</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">--dataset-name</span> clarin-pl/polemo2-official <span class="dt">\</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">--input-columns-name</span> text <span class="dt">\</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">--target-column-name</span> target</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="run-sequence-labeling-task" class="level2">
+<h2 class="anchored" data-anchor-id="run-sequence-labeling-task">Run sequence labeling task</h2>
+<p>The example with default language model and dataset.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> evaluate_lightning_sequence_labeling.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="run-pair-classification-task" class="level2">
+<h2 class="anchored" data-anchor-id="run-pair-classification-task">Run pair classification task</h2>
+<p>The example with static embedding model.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> evaluate_document_pair_classification.py <span class="dt">\</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">--embedding-name-or-path</span> clarin-pl/word2vec-kgr10</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="compatible-datasets" class="level1">
+<h1>Compatible datasets</h1>
+<p>As most datasets in HuggingFace repository should be compatible with our pipelines, there are several datasets that were tested by the authors.</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>dataset name</th>
+<th>task type</th>
+<th>input_column_name(s)</th>
+<th>target_column_name</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://huggingface.co/datasets/clarin-pl/kpwr-ner">clarin-pl/kpwr-ner</a></td>
+<td>sequence labeling (named entity recognition)</td>
+<td>tokens</td>
+<td>ner</td>
+<td>KPWR-NER is a part of the Polish Corpus of Wrocław University of Technology (KPWr). Its objective is recognition of named entities, e.g., people, institutions etc.</td>
+</tr>
+<tr class="even">
+<td><a href="https://huggingface.co/datasets/clarin-pl/polemo2-official">clarin-pl/polemo2-official</a></td>
+<td>classification (sentiment analysis)</td>
+<td>text</td>
+<td>target</td>
+<td>A corpus of consumer reviews from 4 domains: medicine, hotels, products and school.</td>
+</tr>
+<tr class="odd">
+<td><a href="https://huggingface.co/datasets/clarin-pl/2021-punctuation-restoration">clarin-pl/2021-punctuation-restoration</a></td>
+<td>punctuation restoration</td>
+<td>text_in</td>
+<td>text_out</td>
+<td>Dataset contains original texts and ASR output. It is a part of PolEval 2021 Competition.</td>
+</tr>
+<tr class="even">
+<td><a href="https://huggingface.co/datasets/clarin-pl/nkjp-pos">clarin-pl/nkjp-pos</a></td>
+<td>sequence labeling (part-of-speech tagging)</td>
+<td>tokens</td>
+<td>pos_tags</td>
+<td>NKJP-POS is a part of the National Corpus of Polish. Its objective is part-of-speech tagging, e.g., nouns, verbs, adjectives, adverbs, etc.</td>
+</tr>
+<tr class="odd">
+<td><a href="https://huggingface.co/datasets/clarin-pl/aspectemo">clarin-pl/aspectemo</a></td>
+<td>sequence labeling (sentiment classification)</td>
+<td>tokens</td>
+<td>labels</td>
+<td>AspectEmo Corpus is an extended version of a publicly available PolEmo 2.0 corpus of Polish customer reviews used in many projects on the use of different methods in sentiment analysis.</td>
+</tr>
+<tr class="even">
+<td><a href="https://huggingface.co/datasets/laugustyniak/political-advertising-pl">laugustyniak/political-advertising-pl</a></td>
+<td>sequence labeling (political advertising )</td>
+<td>tokens</td>
+<td>tags</td>
+<td>First publicly open dataset for detecting specific text chunks and categories of political advertising in the Polish language.</td>
+</tr>
+<tr class="odd">
+<td><a href="https://huggingface.co/datasets/laugustyniak/abusive-clauses-pl">laugustyniak/abusive-clauses-pl</a></td>
+<td>classification (abusive-clauses)</td>
+<td>text</td>
+<td>class</td>
+<td>Dataset with Polish abusive clauses examples.</td>
+</tr>
+<tr class="even">
+<td><a href="https://huggingface.co/datasets/allegro/klej-dyk">allegro/klej-dyk</a></td>
+<td>pair classification (question answering)*</td>
+<td>(question, answer)</td>
+<td>target</td>
+<td>The Did You Know (pol. Czy wiesz?) dataset consists of human-annotated question-answer pairs.</td>
+</tr>
+<tr class="odd">
+<td><a href="https://huggingface.co/datasets/allegro/klej-psc">allegro/klej-psc</a></td>
+<td>pair classification (text summarization)*</td>
+<td>(extract_text, summary_text)</td>
+<td>label</td>
+<td>The Polish Summaries Corpus contains news articles and their summaries.</td>
+</tr>
+<tr class="even">
+<td><a href="https://huggingface.co/datasets/allegro/klej-cdsc-e">allegro/klej-cdsc-e</a></td>
+<td>pair classification (textual entailment)*</td>
+<td>(sentence_A, sentence_B)</td>
+<td>entailment_judgment</td>
+<td>The polish sentence pairs which are human-annotated for textualentailment.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><sup>*only pair classification task is supported for now</sup></p>
+</section>
+<section id="passing-task-model-and-task-training-parameters-to-predefined-flair-pipelines" class="level1">
+<h1>Passing task model and task training parameters to predefined flair pipelines</h1>
+<p>Model and training parameters can be controlled via <code>task_model_kwargs</code> and <code>task_train_kwargs</code> parameters that can be populated using the advanced config. Tutorial on how to use configs can be found in <code>/tutorials</code> directory of the repository. Two types of config are defined in our library: BasicConfig and AdvancedConfig. In summary, the BasicConfig takes arguments and automatically assign them into proper keyword group, while the AdvancedConfig takes as the input keyword groups that should be already correctly mapped.</p>
+<p>The list of available config can be found below:</p>
+<section id="flair" class="level4">
+<h4 class="anchored" data-anchor-id="flair"><strong>Flair</strong>:</h4>
+<ul>
+<li>FlairBasicConfig</li>
+<li>FlairSequenceLabelingBasicConfig</li>
+<li>FlairTextClassificationBasicConfig</li>
+<li>FlairSequenceLabelingAdvancedConfig</li>
+<li>FlairTextClassificationAdvancedConfig</li>
+</ul>
+</section>
+<section id="lightning" class="level4">
+<h4 class="anchored" data-anchor-id="lightning"><strong>Lightning</strong>:</h4>
+<ul>
+<li>LightningBasicConfig</li>
+<li>LightningAdvancedConfig</li>
+</ul>
+</section>
+<section id="example-with-polemo2-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="example-with-polemo2-dataset">Example with <code>polemo2</code> dataset</h2>
+<section id="flair-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="flair-pipeline">Flair pipeline</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.pipeline.flair_classification <span class="im">import</span> FlairClassificationPipeline</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.config.flair_config <span class="im">import</span> FlairTextClassificationAdvancedConfig</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> FlairTextClassificationAdvancedConfig(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    task_model_kwargs<span class="op">=</span>{</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"loss_weights"</span>: {</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"plus"</span>: <span class="fl">2.0</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"minus"</span>: <span class="fl">2.0</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    task_train_kwargs<span class="op">=</span>{</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"learning_rate"</span>: <span class="fl">0.01</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"max_epochs"</span>: <span class="dv">20</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> FlairClassificationPipeline(</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    dataset_name<span class="op">=</span><span class="st">"clarin-pl/polemo2-official"</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    embedding_name<span class="op">=</span><span class="st">"clarin-pl/word2vec-kgr10"</span>,</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    input_column_name<span class="op">=</span><span class="st">"text"</span>,</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    target_column_name<span class="op">=</span><span class="st">"target"</span>,</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    output_path<span class="op">=</span><span class="st">"."</span>,</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    config<span class="op">=</span>config</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pipeline.run())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="lightning-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="lightning-pipeline">Lightning pipeline</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.config.lightning_config <span class="im">import</span> LightningBasicConfig</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.pipeline.lightning_classification <span class="im">import</span> LightningClassificationPipeline</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> LightningBasicConfig(</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    learning_rate<span class="op">=</span><span class="fl">0.01</span>, max_epochs<span class="op">=</span><span class="dv">1</span>, max_seq_length<span class="op">=</span><span class="dv">128</span>, finetune_last_n_layers<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    accelerator<span class="op">=</span><span class="st">"cpu"</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> LightningClassificationPipeline(</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    embedding_name_or_path<span class="op">=</span><span class="st">"allegro/herbert-base-cased"</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    dataset_name_or_path<span class="op">=</span><span class="st">"clarin-pl/polemo2-official"</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    input_column_name<span class="op">=</span>[<span class="st">"text"</span>],</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    target_column_name<span class="op">=</span><span class="st">"target"</span>,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    load_dataset_kwargs<span class="op">=</span>{</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"train_domains"</span>: [<span class="st">"hotels"</span>, <span class="st">"medicine"</span>],</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dev_domains"</span>: [<span class="st">"hotels"</span>, <span class="st">"medicine"</span>],</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"test_domains"</span>: [<span class="st">"hotels"</span>, <span class="st">"medicine"</span>],</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"text_cfg"</span>: <span class="st">"text"</span>,</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    output_path<span class="op">=</span><span class="st">"."</span>,</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    config<span class="op">=</span>config</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You can also define an Advanced config with populated keyword arguments. In general, the keywords are passed to the object when constructing specific pipelines. We can identify and trace the keyword arguments to find the possible arguments that can be set in the config kwargs.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.config.lightning_config <span class="im">import</span> LightningAdvancedConfig</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> LightningAdvancedConfig(</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    finetune_last_n_layers<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    task_train_kwargs<span class="op">=</span>{</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"max_epochs"</span>: <span class="dv">1</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"devices"</span>: <span class="st">"auto"</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"accelerator"</span>: <span class="st">"cpu"</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"deterministic"</span>: <span class="va">True</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    task_model_kwargs<span class="op">=</span>{</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"learning_rate"</span>: <span class="fl">5e-4</span>,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"use_scheduler"</span>: <span class="va">False</span>,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"optimizer"</span>: <span class="st">"AdamW"</span>,</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"adam_epsilon"</span>: <span class="fl">1e-8</span>,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"warmup_steps"</span>: <span class="dv">100</span>,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"weight_decay"</span>: <span class="fl">0.0</span>,</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    datamodule_kwargs<span class="op">=</span>{</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"downsample_train"</span>: <span class="fl">0.01</span>,</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"downsample_val"</span>: <span class="fl">0.01</span>,</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">"downsample_test"</span>: <span class="fl">0.05</span>,</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    dataloader_kwargs<span class="op">=</span>{<span class="st">"num_workers"</span>: <span class="dv">0</span>},</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+</section>
+<section id="static-embeddings" class="level1">
+<h1>Static embeddings</h1>
+<p>Computed vectors are stored in <a href="https://github.com/flairNLP/flair">Flair</a> structures</p>
+<ul>
+<li><a href="https://github.com/flairNLP/flair/blob/master/resources/docs/TUTORIAL_1_BASICS.md">Sentences</a>.</li>
+</ul>
+<section id="document-embeddings" class="level2">
+<h2 class="anchored" data-anchor-id="document-embeddings">Document embeddings</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flair.data <span class="im">import</span> Sentence</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.embedding.auto_flair <span class="im">import</span> AutoFlairDocumentEmbedding</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>sentence <span class="op">=</span> Sentence(<span class="st">"Myśl z duszy leci bystro, Nim się w słowach złamie."</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>embedding <span class="op">=</span> AutoFlairDocumentEmbedding.from_hub(<span class="st">"clarin-pl/word2vec-kgr10"</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>embedding.embed([sentence])</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sentence.embedding)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="word-embeddings" class="level2">
+<h2 class="anchored" data-anchor-id="word-embeddings">Word embeddings</h2>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flair.data <span class="im">import</span> Sentence</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.embedding.auto_flair <span class="im">import</span> AutoFlairWordEmbedding</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>sentence <span class="op">=</span> Sentence(<span class="st">"Myśl z duszy leci bystro, Nim się w słowach złamie."</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>embedding <span class="op">=</span> AutoFlairWordEmbedding.from_hub(<span class="st">"clarin-pl/word2vec-kgr10"</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>embedding.embed([sentence])</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> token <span class="kw">in</span> sentence:</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(token)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(token.embedding)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="available-embedding-models-for-polish" class="level1">
+<h1>Available embedding models for Polish</h1>
+<p>Instead of the <code>allegro/herbert-base-cased</code> model, user can pass any model from <a href="https://huggingface.co/models">HuggingFace Hub</a> that is compatible with <a href="https://huggingface.co/transformers/">Transformers</a> or with our library.</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Embedding</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://huggingface.co/clarin-pl/herbert-kgr10">clarin-pl/herbert-kgr10</a></td>
+<td>bert</td>
+<td>HerBERT Large trained on supplementary data - the KGR10 corpus.</td>
+</tr>
+<tr class="even">
+<td><a href="https://huggingface.co/clarin-pl/fastText-kgr10">clarin-pl/fastText-kgr10</a></td>
+<td>static, word</td>
+<td>FastText trained on trained on the KGR10 corpus.</td>
+</tr>
+<tr class="odd">
+<td><a href="https://huggingface.co/clarin-pl/word2vec-kgr10">clarin-pl/word2vec-kgr10</a></td>
+<td>static, word</td>
+<td>Word2vec trained on trained on the KGR10 corpus.</td>
+</tr>
+<tr class="even">
+<td>…</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="optimized-pipelines" class="level1">
+<h1>Optimized pipelines</h1>
+<section id="transformers-embeddings" class="level2">
+<h2 class="anchored" data-anchor-id="transformers-embeddings">Transformers embeddings</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>Optimized Pipeline</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Lightning Text Classification</td>
+<td><a href="embeddings/pipeline/lightning_hps_pipeline.py">OptimizedLightingClassificationPipeline</a></td>
+</tr>
+<tr class="even">
+<td>Lightning Sequence Labeling</td>
+<td><a href="embeddings/pipeline/lightning_hps_pipeline.py">OptimizedLightingSequenceLabelingPipeline</a></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="static-embeddings-1" class="level2">
+<h2 class="anchored" data-anchor-id="static-embeddings-1">Static embeddings</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>Optimized Pipeline</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Flair Text Classification</td>
+<td><a href="embeddings/pipeline/flair_hps_pipeline.py">OptimizedFlairClassificationPipeline</a></td>
+</tr>
+<tr class="even">
+<td>Flair Pair Text Classification</td>
+<td><a href="embeddings/pipeline/flair_hps_pipeline.py">OptimizedFlairPairClassificationPipeline</a></td>
+</tr>
+<tr class="odd">
+<td>Flair Sequence Labeling</td>
+<td><a href="embeddings/pipeline/flair_hps_pipeline.py">OptimizedFlairSequenceLabelingPipeline</a></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="example-with-text-classification" class="level2">
+<h2 class="anchored" data-anchor-id="example-with-text-classification">Example with Text Classification</h2>
+<p>Optimized pipelines can be run via following snippet of code:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.config.lighting_config_space <span class="im">import</span> LightingTextClassificationConfigSpace</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.pipeline.lightning_hps_pipeline <span class="im">import</span> OptimizedLightingClassificationPipeline</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> OptimizedLightingClassificationPipeline(</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    config_space<span class="op">=</span>LightingTextClassificationConfigSpace(</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        embedding_name_or_path<span class="op">=</span><span class="st">"allegro/herbert-base-cased"</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    dataset_name_or_path<span class="op">=</span><span class="st">"clarin-pl/polemo2-official"</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    input_column_name<span class="op">=</span><span class="st">"text"</span>,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    target_column_name<span class="op">=</span><span class="st">"target"</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>).persisting(best_params_path<span class="op">=</span><span class="st">"best_prams.yaml"</span>, log_path<span class="op">=</span><span class="st">"hps_log.pickle"</span>)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>df, metadata <span class="op">=</span> pipeline.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="training-model-with-obtained-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="training-model-with-obtained-parameters">Training model with obtained parameters</h3>
+<p>After the parameters search process we can train model with best parameters found. But firstly we have to set <code>output_path</code> parameter, which is not automatically generated from <code>OptimizedLightingClassificationPipeline</code>.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>metadata[<span class="st">"output_path"</span>] <span class="op">=</span> <span class="st">"."</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now we are able to train the pipeline</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.pipeline.lightning_classification <span class="im">import</span> LightningClassificationPipeline</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> LightningClassificationPipeline(<span class="op">**</span>metadata)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> pipeline.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="selection-of-best-embedding-model." class="level3">
+<h3 class="anchored" data-anchor-id="selection-of-best-embedding-model.">Selection of best embedding model.</h3>
+<p>Instead of performing search with single embedding model we can search with multiple embedding models via passing them as list to ConfigSpace.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> OptimizedLightingClassificationPipeline(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    config_space<span class="op">=</span>LightingTextClassificationConfigSpace(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>        embedding_name_or_path<span class="op">=</span>[<span class="st">"allegro/herbert-base-cased"</span>, <span class="st">"clarin-pl/roberta-polish-kgr10"</span>]</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    dataset_name_or_path<span class="op">=</span><span class="st">"clarin-pl/polemo2-official"</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    input_column_name<span class="op">=</span><span class="st">"text"</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    target_column_name<span class="op">=</span><span class="st">"target"</span>,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>).persisting(best_params_path<span class="op">=</span><span class="st">"best_prams.yaml"</span>, log_path<span class="op">=</span><span class="st">"hps_log.pickle"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

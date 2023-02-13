@@ -1,0 +1,1 @@
+Sitemap: https://CLARIN-PL.github.io/embeddings/sitemap.xml

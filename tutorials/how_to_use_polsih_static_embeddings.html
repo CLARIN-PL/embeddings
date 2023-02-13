@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="How can we use static word embeddings to train models?">
+
+<title>embeddings - Static word embeddings</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="embeddings - Static word embeddings">
+<meta property="og:description" content="How can we use static word embeddings to train models?">
+<meta property="og:site-name" content="embeddings">
+<meta name="twitter:title" content="embeddings - Static word embeddings">
+<meta name="twitter:description" content="How can we use static word embeddings to train models?">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">embeddings</span>
+    </a>
+  </div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Static word embeddings</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">Static word embeddings</h1>
+                  <div>
+        <div class="description">
+          How can we use static word embeddings to train models?
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">CLARIN Embeddings</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">lepiszcze</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lepiszcze/lepiszcze.html" class="sidebar-item-text sidebar-link">LEPISZCZE</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lepiszcze/submission.html" class="sidebar-item-text sidebar-link">Submission</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">tutorials</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/baseline_sklearn_models_tutorial.html" class="sidebar-item-text sidebar-link">Baseline Sklearn-based models</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/how_to_use_polsih_static_embeddings.html" class="sidebar-item-text sidebar-link active">Static word embeddings</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/tutorial_how_to_use_config_space.html" class="sidebar-item-text sidebar-link">How to use our configs?</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/validate_flair_models_inference.html" class="sidebar-item-text sidebar-link">Model inference</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/validate_lightning_models_inference.html" class="sidebar-item-text sidebar-link">LM-based models inference</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#get-embeddings-for-words" id="toc-get-embeddings-for-words" class="nav-link active" data-scroll-target="#get-embeddings-for-words">Get embeddings for words</a></li>
+  <li><a href="#training-model-for-sequence-labelling" id="toc-training-model-for-sequence-labelling" class="nav-link" data-scroll-target="#training-model-for-sequence-labelling">Training model for sequence labelling</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/CLARIN-PL/embeddings/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>This notebook presents how to load Gensim embeddings from file and use them to train <code>Flair</code> model for sequence labelling task.</p>
+<p>Examplary embeddings are located here <a href="http://dsmodels.nlp.ipipan.waw.pl/">http://dsmodels.nlp.ipipan.waw.pl/</a></p>
+<p>They were trained in many different ways:</p>
+<ol type="1">
+<li>Using different corpus.</li>
+<li>Based lemmas or forms.</li>
+<li>With all part of speach or some of them.</li>
+<li>With different vector size.</li>
+<li>With CBOW or Skip-Gram neural net architecture.</li>
+<li>WIth different nerual net training algorithms.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>os.chdir(<span class="st">".."</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pathlib</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flair.data <span class="im">import</span> Sentence</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.defaults <span class="im">import</span> RESULTS_PATH</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.embedding.auto_flair <span class="im">import</span> AutoFlairWordEmbedding</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.evaluator.sequence_labeling_evaluator <span class="im">import</span> SequenceLabelingEvaluator</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.pipeline.flair_sequence_labeling <span class="im">import</span> FlairSequenceLabelingPipeline</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.utils.utils <span class="im">import</span> build_output_path</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>torch.set_printoptions(threshold<span class="op">=</span><span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="get-embeddings-for-words" class="level1">
+<h1>Get embeddings for words</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>embedding_path <span class="op">=</span> pathlib.Path(<span class="st">"../wiki-lemmas-restricted-100-skipg-ns.txt.gz"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>model_type_reference<span class="op">=</span><span class="st">"embeddings.embedding.static.word2vec.IPIPANWord2VecEmbedding"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>embeding <span class="op">=</span> AutoFlairWordEmbedding.from_file(embedding_path, model_type_reference)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>sentence <span class="op">=</span> Sentence(<span class="st">"Nas nie przekonają, że białe jest białe, a czarne jest czarne."</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>embeding.embed([sentence])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2022-02-08 13:10:48,921 - embeddings.embedding.auto_flair - INFO - wiki-lemmas-restricted-100-skipg-ns.txt.gz not compatible with Transformers, trying to initialise as static embedding.
+WARNING:root:Couldn't unpickle model file. Unpickle model with different method.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>[Sentence: "Nas nie przekonają , że białe jest białe , a czarne jest czarne ."   [− Tokens: 14]]</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> token <span class="kw">in</span> sentence:</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(token)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(token.embedding)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Token: 1 Nas
+tensor([0., 0., 0.,  ..., 0., 0., 0.])
+Token: 2 nie
+tensor([0., 0., 0.,  ..., 0., 0., 0.])
+Token: 3 przekonają
+tensor([0., 0., 0.,  ..., 0., 0., 0.])
+Token: 4 ,
+tensor([0., 0., 0.,  ..., 0., 0., 0.])
+Token: 5 że
+tensor([0., 0., 0.,  ..., 0., 0., 0.])
+Token: 6 białe
+tensor([0., 0., 0.,  ..., 0., 0., 0.])
+Token: 7 jest
+tensor([-0.2300, -0.0609,  0.2554,  ...,  0.2459, -0.0658,  0.1421])
+Token: 8 białe
+tensor([0., 0., 0.,  ..., 0., 0., 0.])
+Token: 9 ,
+tensor([0., 0., 0.,  ..., 0., 0., 0.])
+Token: 10 a
+tensor([0., 0., 0.,  ..., 0., 0., 0.])
+Token: 11 czarne
+tensor([0., 0., 0.,  ..., 0., 0., 0.])
+Token: 12 jest
+tensor([-0.2300, -0.0609,  0.2554,  ...,  0.2459, -0.0658,  0.1421])
+Token: 13 czarne
+tensor([0., 0., 0.,  ..., 0., 0., 0.])
+Token: 14 .
+tensor([0., 0., 0.,  ..., 0., 0., 0.])</code></pre>
+</div>
+</div>
+</section>
+<section id="training-model-for-sequence-labelling" class="level1">
+<h1>Training model for sequence labelling</h1>
+<p>Before we train a model we need to define its parameters:</p>
+<ul>
+<li><code>embedding_path</code> - path to file that contains gensim embeddings</li>
+<li><code>dataset_name</code> (that points to the dataset located on huggingface <a href="https://huggingface.co/datasets/">datasets</a>)</li>
+<li><code>input_column_name</code> - specific for selected dataset</li>
+<li><code>target_column_name</code> - specific for selected dataset</li>
+<li><code>root</code> - root path of output path</li>
+<li><code>hidden_size</code> - hidden_size of model that will be trained in sequence labelling task, the model is defined <a href="https://github.com/flairNLP/flair/blob/579c7b70dfcc1d184bd47069f722d7a9ae8b78d7/flair/models/sequence_tagger_model.py#L26">here</a></li>
+</ul>
+<p>Extra important parameters:</p>
+<ul>
+<li><code>task_model_kwargs</code> - parameters of the model that will be trained (e.g.&nbsp;number of RNN layers, type of RNN layers, …)</li>
+<li><code>task_train_kwargs</code> - training parameters (all of them can be found <a href="https://github.com/flairNLP/flair/blob/579c7b70dfcc1d184bd47069f722d7a9ae8b78d7/flair/trainers/trainer.py#L73">here</a>)</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>dataset_name<span class="op">=</span> <span class="st">"clarin-pl/kpwr-ner"</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>input_column_name <span class="op">=</span> <span class="st">"tokens"</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>target_column_name <span class="op">=</span> <span class="st">"ner"</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>root <span class="op">=</span> RESULTS_PATH.joinpath(<span class="st">"pos_tagging"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>output_path <span class="op">=</span> build_output_path(root, embedding_path.stem, dataset_name)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>output_path.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>hidden_size <span class="op">=</span> <span class="dv">64</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>task_train_kwargs <span class="op">=</span> {</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"max_epochs"</span>: <span class="dv">3</span> <span class="co"># for testing purpose only</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> FlairSequenceLabelingPipeline(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    embedding_path,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    dataset_name,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    input_column_name,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    target_column_name,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    output_path,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    hidden_size,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    model_type_reference<span class="op">=</span>model_type_reference,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    task_train_kwargs<span class="op">=</span>task_train_kwargs,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pipeline.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2022-02-08 13:11:37,840 - embeddings.embedding.auto_flair - INFO - wiki-lemmas-restricted-100-skipg-ns.txt.gz not compatible with Transformers, trying to initialise as static embedding.
+WARNING:root:Couldn't unpickle model file. Unpickle model with different method.
+WARNING:datasets.builder:Using custom data configuration default
+WARNING:datasets.builder:Reusing dataset kpwrner (/Users/lukaszkoziol/.cache/huggingface/datasets/clarin-pl___kpwrner/default/0.0.0/001e3d471298007e8412e3a6ccc06bec000dec1bce0cf8e0ba7e5b7e105b1342)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"4ea8ca7d1fd441228dba3214612069e6","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2022-02-08 13:12:11,307 - embeddings.transformation.flair_transformation.corpus_transformation - INFO - Info of ['train', 'test']:
+{'builder_name': 'kpwrner',
+ 'citation': '',
+ 'config_name': 'default',
+ 'dataset_size': 13212646,
+ 'description': 'KPWR-NER tagging dataset.',
+ 'download_checksums': {'https://huggingface.co/datasets/clarin-pl/kpwr-ner/resolve/main/data/kpwr-ner-n82-test.iob': {'checksum': '7b86fd227605b7e5f807eedbcd87573271d8adb86cfddf56c763b1751e71a924',
+                                                                                                                       'num_bytes': 2247780},
+                        'https://huggingface.co/datasets/clarin-pl/kpwr-ner/resolve/main/data/kpwr-ner-n82-train-tune.iob': {'checksum': '7ab673f299b3a9e875c2c46ef1051807d98f923f0356d0be78556c832481efea',
+                                                                                                                             'num_bytes': 6719818}},
+ 'download_size': 8967598,
+ 'features': {'lemmas': Sequence(feature=Value(dtype='string', id=None), length=-1, id=None),
+              'ner': Sequence(feature=ClassLabel(num_classes=161, names=['B-nam_adj', 'B-nam_adj_city', 'B-nam_adj_country', 'B-nam_adj_person', 'B-nam_eve', 'B-nam_eve_human', 'B-nam_eve_human_cultural', 'B-nam_eve_human_holiday', 'B-nam_eve_human_sport', 'B-nam_fac_bridge', 'B-nam_fac_goe', 'B-nam_fac_goe_stop', 'B-nam_fac_park', 'B-nam_fac_road', 'B-nam_fac_square', 'B-nam_fac_system', 'B-nam_liv_animal', 'B-nam_liv_character', 'B-nam_liv_god', 'B-nam_liv_habitant', 'B-nam_liv_person', 'B-nam_loc', 'B-nam_loc_astronomical', 'B-nam_loc_country_region', 'B-nam_loc_gpe_admin1', 'B-nam_loc_gpe_admin2', 'B-nam_loc_gpe_admin3', 'B-nam_loc_gpe_city', 'B-nam_loc_gpe_conurbation', 'B-nam_loc_gpe_country', 'B-nam_loc_gpe_district', 'B-nam_loc_gpe_subdivision', 'B-nam_loc_historical_region', 'B-nam_loc_hydronym', 'B-nam_loc_hydronym_lake', 'B-nam_loc_hydronym_ocean', 'B-nam_loc_hydronym_river', 'B-nam_loc_hydronym_sea', 'B-nam_loc_land', 'B-nam_loc_land_continent', 'B-nam_loc_land_island', 'B-nam_loc_land_mountain', 'B-nam_loc_land_peak', 'B-nam_loc_land_region', 'B-nam_num_house', 'B-nam_num_phone', 'B-nam_org_company', 'B-nam_org_group', 'B-nam_org_group_band', 'B-nam_org_group_team', 'B-nam_org_institution', 'B-nam_org_nation', 'B-nam_org_organization', 'B-nam_org_organization_sub', 'B-nam_org_political_party', 'B-nam_oth', 'B-nam_oth_currency', 'B-nam_oth_data_format', 'B-nam_oth_license', 'B-nam_oth_position', 'B-nam_oth_tech', 'B-nam_oth_www', 'B-nam_pro', 'B-nam_pro_award', 'B-nam_pro_brand', 'B-nam_pro_media', 'B-nam_pro_media_periodic', 'B-nam_pro_media_radio', 'B-nam_pro_media_tv', 'B-nam_pro_media_web', 'B-nam_pro_model_car', 'B-nam_pro_software', 'B-nam_pro_software_game', 'B-nam_pro_title', 'B-nam_pro_title_album', 'B-nam_pro_title_article', 'B-nam_pro_title_book', 'B-nam_pro_title_document', 'B-nam_pro_title_song', 'B-nam_pro_title_treaty', 'B-nam_pro_title_tv', 'B-nam_pro_vehicle', 'I-nam_adj_country', 'I-nam_eve', 'I-nam_eve_human', 'I-nam_eve_human_cultural', 'I-nam_eve_human_holiday', 'I-nam_eve_human_sport', 'I-nam_fac_bridge', 'I-nam_fac_goe', 'I-nam_fac_goe_stop', 'I-nam_fac_park', 'I-nam_fac_road', 'I-nam_fac_square', 'I-nam_fac_system', 'I-nam_liv_animal', 'I-nam_liv_character', 'I-nam_liv_god', 'I-nam_liv_person', 'I-nam_loc', 'I-nam_loc_astronomical', 'I-nam_loc_country_region', 'I-nam_loc_gpe_admin1', 'I-nam_loc_gpe_admin2', 'I-nam_loc_gpe_admin3', 'I-nam_loc_gpe_city', 'I-nam_loc_gpe_conurbation', 'I-nam_loc_gpe_country', 'I-nam_loc_gpe_district', 'I-nam_loc_gpe_subdivision', 'I-nam_loc_historical_region', 'I-nam_loc_hydronym', 'I-nam_loc_hydronym_lake', 'I-nam_loc_hydronym_ocean', 'I-nam_loc_hydronym_river', 'I-nam_loc_hydronym_sea', 'I-nam_loc_land', 'I-nam_loc_land_continent', 'I-nam_loc_land_island', 'I-nam_loc_land_mountain', 'I-nam_loc_land_peak', 'I-nam_loc_land_region', 'I-nam_num_house', 'I-nam_num_phone', 'I-nam_org_company', 'I-nam_org_group', 'I-nam_org_group_band', 'I-nam_org_group_team', 'I-nam_org_institution', 'I-nam_org_nation', 'I-nam_org_organization', 'I-nam_org_organization_sub', 'I-nam_org_political_party', 'I-nam_oth', 'I-nam_oth_currency', 'I-nam_oth_data_format', 'I-nam_oth_license', 'I-nam_oth_position', 'I-nam_oth_tech', 'I-nam_oth_www', 'I-nam_pro', 'I-nam_pro_award', 'I-nam_pro_brand', 'I-nam_pro_media', 'I-nam_pro_media_periodic', 'I-nam_pro_media_radio', 'I-nam_pro_media_tv', 'I-nam_pro_media_web', 'I-nam_pro_model_car', 'I-nam_pro_software', 'I-nam_pro_software_game', 'I-nam_pro_title', 'I-nam_pro_title_album', 'I-nam_pro_title_article', 'I-nam_pro_title_book', 'I-nam_pro_title_document', 'I-nam_pro_title_song', 'I-nam_pro_title_treaty', 'I-nam_pro_title_tv', 'I-nam_pro_vehicle', 'O'], names_file=None, id=None), length=-1, id=None),
+              'orth': Sequence(feature=Value(dtype='string', id=None), length=-1, id=None),
+              'tokens': Sequence(feature=Value(dtype='string', id=None), length=-1, id=None)},
+ 'homepage': 'https://clarin-pl.eu/dspace/handle/11321/294',
+ 'license': '',
+ 'post_processed': None,
+ 'post_processing_size': None,
+ 'size_in_bytes': 22180244,
+ 'splits': {'test': SplitInfo(name='test', num_bytes=3298573, num_examples=4323, dataset_name='kpwrner'),
+            'train': SplitInfo(name='train', num_bytes=9914073, num_examples=13959, dataset_name='kpwrner')},
+ 'supervised_keys': None,
+ 'task_templates': None,
+ 'version': 0.0.0}
+2022-02-08 13:12:11,309 - embeddings.transformation.flair_transformation.corpus_transformation - INFO - Schemas:    DatasetDict({
+    train: Dataset({
+        features: ['tokens', 'lemmas', 'orth', 'ner'],
+        num_rows: 13959
+    })
+    test: Dataset({
+        features: ['tokens', 'lemmas', 'orth', 'ner'],
+        num_rows: 4323
+    })
+})
+WARNING:datasets.arrow_dataset:Loading cached processed dataset at /Users/lukaszkoziol/.cache/huggingface/datasets/clarin-pl___kpwrner/default/0.0.0/001e3d471298007e8412e3a6ccc06bec000dec1bce0cf8e0ba7e5b7e105b1342/cache-5e4722cf782173d2.arrow
+WARNING:datasets.arrow_dataset:Loading cached processed dataset at /Users/lukaszkoziol/.cache/huggingface/datasets/clarin-pl___kpwrner/default/0.0.0/001e3d471298007e8412e3a6ccc06bec000dec1bce0cf8e0ba7e5b7e105b1342/cache-665f7bfa0d3216de.arrow
+2022-02-08 13:12:17,138 - embeddings.task.flair_task.flair_task - WARNING - Dev subset is missing in the corpus - wrapping with an empty list</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2022-02-08 13:12:17,148 ----------------------------------------------------------------------------------------------------
+2022-02-08 13:12:17,149 Model: "SequenceTagger(
+  (embeddings): WordEmbeddingsPL(
+    '../wiki-lemmas-restricted-100-skipg-ns.txt.gz'
+    (embedding): Embedding(446609, 100)
+  )
+  (word_dropout): WordDropout(p=0.05)
+  (locked_dropout): LockedDropout(p=0.5)
+  (embedding2nn): Linear(in_features=100, out_features=100, bias=True)
+  (rnn): LSTM(100, 64, batch_first=True, bidirectional=True)
+  (linear): Linear(in_features=128, out_features=163, bias=True)
+  (beta): 1.0
+  (weights): None
+  (weight_tensor) None
+)"
+2022-02-08 13:12:17,150 ----------------------------------------------------------------------------------------------------
+2022-02-08 13:12:17,151 Corpus: "Corpus: 13959 train + 0 dev + 4323 test sentences"
+2022-02-08 13:12:17,152 ----------------------------------------------------------------------------------------------------
+2022-02-08 13:12:17,153 Parameters:
+2022-02-08 13:12:17,153  - learning_rate: "0.1"
+2022-02-08 13:12:17,154  - mini_batch_size: "32"
+2022-02-08 13:12:17,155  - patience: "3"
+2022-02-08 13:12:17,156  - anneal_factor: "0.5"
+2022-02-08 13:12:17,157  - max_epochs: "3"
+2022-02-08 13:12:17,157  - shuffle: "True"
+2022-02-08 13:12:17,158  - train_with_dev: "True"
+2022-02-08 13:12:17,159  - batch_growth_annealing: "False"
+2022-02-08 13:12:17,160 ----------------------------------------------------------------------------------------------------
+2022-02-08 13:12:17,160 Model training base path: "/Users/lukaszkoziol/Projects/clarin/embeddings/resources/results/pos_tagging/wiki-lemmas-restricted-100-skipg-ns.txt/clarin-pl__kpwr-ner"
+2022-02-08 13:12:17,161 ----------------------------------------------------------------------------------------------------
+2022-02-08 13:12:17,162 Device: cpu
+2022-02-08 13:12:17,162 ----------------------------------------------------------------------------------------------------
+2022-02-08 13:12:17,163 Embeddings storage mode: cpu
+2022-02-08 13:12:17,173 ----------------------------------------------------------------------------------------------------
+2022-02-08 13:12:41,817 epoch 1 - iter 43/437 - loss 0.95137164 - samples/sec: 55.85 - lr: 0.100000
+2022-02-08 13:13:09,632 epoch 1 - iter 86/437 - loss 0.79235960 - samples/sec: 49.48 - lr: 0.100000
+2022-02-08 13:13:27,743 epoch 1 - iter 129/437 - loss 0.79993568 - samples/sec: 75.99 - lr: 0.100000
+2022-02-08 13:13:50,296 epoch 1 - iter 172/437 - loss 0.70606005 - samples/sec: 61.02 - lr: 0.100000
+2022-02-08 13:14:07,252 epoch 1 - iter 215/437 - loss 0.61976304 - samples/sec: 81.17 - lr: 0.100000
+2022-02-08 13:14:32,659 epoch 1 - iter 258/437 - loss 0.58055640 - samples/sec: 54.17 - lr: 0.100000
+2022-02-08 13:15:16,856 epoch 1 - iter 301/437 - loss 0.59306165 - samples/sec: 31.14 - lr: 0.100000
+2022-02-08 13:15:35,274 epoch 1 - iter 344/437 - loss 0.63092813 - samples/sec: 74.73 - lr: 0.100000
+2022-02-08 13:15:56,447 epoch 1 - iter 387/437 - loss 0.66910945 - samples/sec: 65.00 - lr: 0.100000
+2022-02-08 13:16:26,575 epoch 1 - iter 430/437 - loss 0.68428783 - samples/sec: 45.68 - lr: 0.100000
+2022-02-08 13:16:30,780 ----------------------------------------------------------------------------------------------------
+2022-02-08 13:16:30,782 EPOCH 1 done: loss 0.6880 - lr 0.1000000
+2022-02-08 13:16:30,782 BAD EPOCHS (no improvement): 0
+2022-02-08 13:16:30,784 ----------------------------------------------------------------------------------------------------
+2022-02-08 13:17:07,313 epoch 2 - iter 43/437 - loss 0.56538654 - samples/sec: 37.68 - lr: 0.100000
+2022-02-08 13:17:42,529 epoch 2 - iter 86/437 - loss 0.54506007 - samples/sec: 39.08 - lr: 0.100000
+2022-02-08 13:18:15,719 epoch 2 - iter 129/437 - loss 0.54197868 - samples/sec: 41.47 - lr: 0.100000
+2022-02-08 13:18:54,629 epoch 2 - iter 172/437 - loss 0.55047567 - samples/sec: 35.37 - lr: 0.100000
+2022-02-08 13:19:27,185 epoch 2 - iter 215/437 - loss 0.55522700 - samples/sec: 42.27 - lr: 0.100000
+2022-02-08 13:20:09,280 epoch 2 - iter 258/437 - loss 0.55841158 - samples/sec: 32.69 - lr: 0.100000
+2022-02-08 13:20:46,569 epoch 2 - iter 301/437 - loss 0.55715816 - samples/sec: 36.91 - lr: 0.100000
+2022-02-08 13:21:23,416 epoch 2 - iter 344/437 - loss 0.54770699 - samples/sec: 37.35 - lr: 0.100000
+2022-02-08 13:21:54,530 epoch 2 - iter 387/437 - loss 0.53896365 - samples/sec: 44.23 - lr: 0.100000
+2022-02-08 13:22:26,383 epoch 2 - iter 430/437 - loss 0.53573987 - samples/sec: 43.21 - lr: 0.100000
+2022-02-08 13:22:33,840 ----------------------------------------------------------------------------------------------------
+2022-02-08 13:22:33,841 EPOCH 2 done: loss 0.5344 - lr 0.1000000
+2022-02-08 13:22:33,842 BAD EPOCHS (no improvement): 0
+2022-02-08 13:22:33,844 ----------------------------------------------------------------------------------------------------
+2022-02-08 13:23:20,529 epoch 3 - iter 43/437 - loss 0.48468883 - samples/sec: 29.48 - lr: 0.100000
+2022-02-08 13:23:56,509 epoch 3 - iter 86/437 - loss 0.49504739 - samples/sec: 38.25 - lr: 0.100000
+2022-02-08 13:24:36,010 epoch 3 - iter 129/437 - loss 0.49641896 - samples/sec: 34.84 - lr: 0.100000
+2022-02-08 13:25:21,810 epoch 3 - iter 172/437 - loss 0.49006870 - samples/sec: 30.05 - lr: 0.100000
+2022-02-08 13:25:58,303 epoch 3 - iter 215/437 - loss 0.48949477 - samples/sec: 37.71 - lr: 0.100000
+2022-02-08 13:26:37,964 epoch 3 - iter 258/437 - loss 0.48738675 - samples/sec: 34.70 - lr: 0.100000
+2022-02-08 13:27:14,635 epoch 3 - iter 301/437 - loss 0.48331637 - samples/sec: 37.53 - lr: 0.100000
+2022-02-08 13:27:51,305 epoch 3 - iter 344/437 - loss 0.47962623 - samples/sec: 37.53 - lr: 0.100000
+2022-02-08 13:28:28,819 epoch 3 - iter 387/437 - loss 0.47569281 - samples/sec: 36.69 - lr: 0.100000
+2022-02-08 13:29:04,500 epoch 3 - iter 430/437 - loss 0.47695729 - samples/sec: 38.57 - lr: 0.100000
+2022-02-08 13:29:08,761 ----------------------------------------------------------------------------------------------------
+2022-02-08 13:29:08,762 EPOCH 3 done: loss 0.4774 - lr 0.1000000
+2022-02-08 13:29:08,763 BAD EPOCHS (no improvement): 0
+2022-02-08 13:29:09,424 ----------------------------------------------------------------------------------------------------
+2022-02-08 13:29:09,426 Testing using last state of model ...
+2022-02-08 13:30:03,199 0.6285  0.1463  0.2373  0.1379
+2022-02-08 13:30:03,200 
+Results:
+- F-score (micro) 0.2373
+- F-score (macro) 0.023
+- Accuracy 0.1379
+
+By class:
+                           precision    recall  f1-score   support
+
+           nam_liv_person     0.7263    0.4110    0.5249       949
+         nam_loc_gpe_city     0.3789    0.1968    0.2590       437
+      nam_loc_gpe_country     0.6770    0.3053    0.4208       357
+      nam_org_institution     0.0000    0.0000    0.0000       266
+     nam_org_organization     0.5000    0.0041    0.0081       246
+       nam_org_group_team     0.6413    0.3960    0.4896       149
+          nam_adj_country     0.0000    0.0000    0.0000       166
+         nam_pro_software     0.0000    0.0000    0.0000        97
+             nam_fac_road     0.0000    0.0000    0.0000        95
+   nam_pro_title_document     0.0000    0.0000    0.0000        88
+   nam_pro_media_periodic     0.0000    0.0000    0.0000        84
+          nam_org_company     0.4286    0.0395    0.0723        76
+           nam_org_nation     0.0000    0.0000    0.0000        81
+            nam_eve_human     0.0000    0.0000    0.0000        78
+             nam_oth_tech     0.0000    0.0000    0.0000        61
+              nam_fac_goe     0.0000    0.0000    0.0000        64
+       nam_loc_gpe_admin1     0.0000    0.0000    0.0000        64
+  nam_org_political_party     0.0000    0.0000    0.0000        58
+      nam_eve_human_sport     0.0000    0.0000    0.0000        55
+                  nam_adj     0.0000    0.0000    0.0000        52
+         nam_oth_currency     0.0000    0.0000    0.0000        51
+   nam_loc_hydronym_river     0.0000    0.0000    0.0000        51
+       nam_loc_gpe_admin3     0.0000    0.0000    0.0000        47
+            nam_pro_brand     0.0000    0.0000    0.0000        46
+             nam_adj_city     0.0000    0.0000    0.0000        42
+        nam_pro_media_web     0.0000    0.0000    0.0000        40
+       nam_loc_gpe_admin2     0.0000    0.0000    0.0000        36
+            nam_pro_title     0.0000    0.0000    0.0000        35
+              nam_liv_god     0.0000    0.0000    0.0000        35
+   nam_loc_land_continent     0.0000    0.0000    0.0000        32
+           nam_fac_system     0.0000    0.0000    0.0000        26
+        nam_pro_model_car     0.0000    0.0000    0.0000        26
+  nam_loc_gpe_subdivision     0.0000    0.0000    0.0000        26
+         nam_pro_title_tv     0.0000    0.0000    0.0000        24
+            nam_pro_award     0.0000    0.0000    0.0000        23
+                  nam_oth     0.0000    0.0000    0.0000        22
+nam_loc_historical_region     0.0000    0.0000    0.0000        22
+   nam_eve_human_cultural     0.0000    0.0000    0.0000        22
+              nam_oth_www     0.0000    0.0000    0.0000        20
+       nam_org_group_band     0.0000    0.0000    0.0000        19
+            nam_org_group     0.0000    0.0000    0.0000        18
+           nam_adj_person     0.0000    0.0000    0.0000        18
+     nam_loc_gpe_district     0.0000    0.0000    0.0000        18
+          nam_oth_license     0.0000    0.0000    0.0000        11
+           nam_liv_animal     0.0000    0.0000    0.0000        11
+      nam_loc_land_island     0.0000    0.0000    0.0000        11
+            nam_num_house     0.0000    0.0000    0.0000        11
+       nam_pro_title_book     0.0000    0.0000    0.0000        11
+      nam_loc_land_region     0.0000    0.0000    0.0000        11
+             nam_fac_park     0.0000    0.0000    0.0000        10
+         nam_oth_position     0.0000    0.0000    0.0000        10
+      nam_oth_data_format     0.0000    0.0000    0.0000        10
+    nam_loc_land_mountain     0.0000    0.0000    0.0000         9
+    nam_eve_human_holiday     0.0000    0.0000    0.0000         9
+                  nam_eve     0.0000    0.0000    0.0000         8
+            nam_pro_media     0.0000    0.0000    0.0000         8
+         nam_liv_habitant     0.0000    0.0000    0.0000         7
+       nam_pro_title_song     0.0000    0.0000    0.0000         7
+      nam_pro_title_album     0.0000    0.0000    0.0000         7
+         nam_pro_media_tv     0.0000    0.0000    0.0000         7
+           nam_fac_square     0.0000    0.0000    0.0000         6
+          nam_pro_vehicle     0.0000    0.0000    0.0000         4
+   nam_loc_country_region     0.0000    0.0000    0.0000         4
+                  nam_loc     0.0000    0.0000    0.0000         4
+           nam_fac_bridge     0.0000    0.0000    0.0000         4
+         nam_fac_goe_stop     0.0000    0.0000    0.0000         4
+     nam_loc_hydronym_sea     0.0000    0.0000    0.0000         3
+      nam_pro_media_radio     0.0000    0.0000    0.0000         3
+    nam_pro_software_game     0.0000    0.0000    0.0000         3
+ nam_org_organization_sub     0.0000    0.0000    0.0000         3
+    nam_loc_hydronym_lake     0.0000    0.0000    0.0000         2
+                  nam_pro     0.0000    0.0000    0.0000         2
+            nam_num_phone     0.0000    0.0000    0.0000         2
+             nam_loc_land     0.0000    0.0000    0.0000         2
+     nam_pro_title_treaty     0.0000    0.0000    0.0000         2
+   nam_loc_hydronym_ocean     0.0000    0.0000    0.0000         1
+         nam_loc_hydronym     0.0000    0.0000    0.0000         1
+
+                micro avg     0.6285    0.1463    0.2373      4430
+                macro avg     0.0435    0.0176    0.0230      4430
+             weighted avg     0.3042    0.1463    0.1901      4430
+              samples avg     0.1379    0.1379    0.1379      4430
+</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2022-02-08 13:30:03,201 ----------------------------------------------------------------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Users/lukaszkoziol/Projects/clarin/embeddings/.venv/lib/python3.9/site-packages/seqeval/metrics/v1.py:57: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'seqeval__mode_None__scheme_None': {'nam_adj': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 52},
+  'nam_adj_city': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 42},
+  'nam_adj_country': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 166},
+  'nam_adj_person': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 18},
+  'nam_eve': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 8},
+  'nam_eve_human': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 78},
+  'nam_eve_human_cultural': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 22},
+  'nam_eve_human_holiday': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 9},
+  'nam_eve_human_sport': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 55},
+  'nam_fac_bridge': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 4},
+  'nam_fac_goe': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 64},
+  'nam_fac_goe_stop': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 4},
+  'nam_fac_park': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 10},
+  'nam_fac_road': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 95},
+  'nam_fac_square': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 6},
+  'nam_fac_system': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 26},
+  'nam_liv_animal': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 11},
+  'nam_liv_god': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 35},
+  'nam_liv_habitant': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 7},
+  'nam_liv_person': {'precision': 0.7262569832402235,
+   'recall': 0.410958904109589,
+   'f1': 0.5248990578734858,
+   'number': 949},
+  'nam_loc': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 4},
+  'nam_loc_country_region': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 4},
+  'nam_loc_gpe_admin1': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 64},
+  'nam_loc_gpe_admin2': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 36},
+  'nam_loc_gpe_admin3': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 47},
+  'nam_loc_gpe_city': {'precision': 0.3788546255506608,
+   'recall': 0.19679633867276888,
+   'f1': 0.2590361445783133,
+   'number': 437},
+  'nam_loc_gpe_country': {'precision': 0.6770186335403726,
+   'recall': 0.30532212885154064,
+   'f1': 0.42084942084942084,
+   'number': 357},
+  'nam_loc_gpe_district': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 18},
+  'nam_loc_gpe_subdivision': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 26},
+  'nam_loc_historical_region': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 22},
+  'nam_loc_hydronym': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 1},
+  'nam_loc_hydronym_lake': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 2},
+  'nam_loc_hydronym_ocean': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 1},
+  'nam_loc_hydronym_river': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 51},
+  'nam_loc_hydronym_sea': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 3},
+  'nam_loc_land': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 2},
+  'nam_loc_land_continent': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 32},
+  'nam_loc_land_island': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 11},
+  'nam_loc_land_mountain': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 9},
+  'nam_loc_land_region': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 11},
+  'nam_num_house': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 11},
+  'nam_num_phone': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 2},
+  'nam_org_company': {'precision': 0.42857142857142855,
+   'recall': 0.039473684210526314,
+   'f1': 0.07228915662650602,
+   'number': 76},
+  'nam_org_group': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 18},
+  'nam_org_group_band': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 19},
+  'nam_org_group_team': {'precision': 0.6413043478260869,
+   'recall': 0.3959731543624161,
+   'f1': 0.4896265560165975,
+   'number': 149},
+  'nam_org_institution': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 266},
+  'nam_org_nation': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 81},
+  'nam_org_organization': {'precision': 0.5,
+   'recall': 0.0040650406504065045,
+   'f1': 0.00806451612903226,
+   'number': 246},
+  'nam_org_organization_sub': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 3},
+  'nam_org_political_party': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 58},
+  'nam_oth': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 22},
+  'nam_oth_currency': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 51},
+  'nam_oth_data_format': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 10},
+  'nam_oth_license': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 11},
+  'nam_oth_position': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 10},
+  'nam_oth_tech': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 61},
+  'nam_oth_www': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 20},
+  'nam_pro': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 2},
+  'nam_pro_award': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 23},
+  'nam_pro_brand': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 46},
+  'nam_pro_media': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 8},
+  'nam_pro_media_periodic': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 84},
+  'nam_pro_media_radio': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 3},
+  'nam_pro_media_tv': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 7},
+  'nam_pro_media_web': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 40},
+  'nam_pro_model_car': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 26},
+  'nam_pro_software': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 97},
+  'nam_pro_software_game': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 3},
+  'nam_pro_title': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 35},
+  'nam_pro_title_album': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 7},
+  'nam_pro_title_book': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 11},
+  'nam_pro_title_document': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 88},
+  'nam_pro_title_song': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 7},
+  'nam_pro_title_treaty': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 2},
+  'nam_pro_title_tv': {'precision': 0.0,
+   'recall': 0.0,
+   'f1': 0.0,
+   'number': 24},
+  'nam_pro_vehicle': {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'number': 4},
+  'overall_precision': 0.6285160038797284,
+  'overall_recall': 0.14627539503386006,
+  'overall_f1': 0.23731917231276325,
+  'overall_accuracy': 0.9100877192982456},
+ 'data': {'y_true': array([list(['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'B-nam_org_company', 'B-nam_pro_software', 'O']),
+         list(['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'B-nam_org_company', 'B-nam_pro_software', 'O']),
+         list(['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'B-nam_pro_software', 'O', 'O', 'B-nam_pro_software', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O']),
+         ...,
+         list(['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'B-nam_loc_gpe_admin1', 'O']),
+         list(['O', 'O', 'O', 'O', 'B-nam_loc_gpe_city', 'O', 'B-nam_loc_gpe_city', 'I-nam_loc_gpe_city', 'O', 'O', 'O', 'O', 'B-nam_loc_gpe_city', 'O']),
+         list(['O', 'B-nam_loc_gpe_city', 'I-nam_loc_gpe_city', 'O', 'O', 'O', 'O', 'O', 'O', 'B-nam_org_company', 'I-nam_org_company', 'O', 'O', 'O', 'O', 'O', 'O', 'B-nam_loc_hydronym_river', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'])],
+        dtype=object),
+  'y_pred': array([list(['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O']),
+         list(['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O']),
+         list(['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O']),
+         ...,
+         list(['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O']),
+         list(['O', 'O', 'O', 'O', 'B-nam_loc_gpe_city', 'O', 'B-nam_org_group_team', 'I-nam_org_group_team', 'O', 'O', 'O', 'O', 'B-nam_loc_gpe_city', 'O']),
+         list(['O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'B-nam_loc_gpe_city', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'])],
+        dtype=object)}}</code></pre>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

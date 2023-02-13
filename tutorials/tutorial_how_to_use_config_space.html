@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Detailed tutorial about how to pass arguments to embeddings pipelines.">
+
+<title>embeddings - How to use our configs?</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="embeddings - How to use our configs?">
+<meta property="og:description" content="Detailed tutorial about how to pass arguments to embeddings pipelines.">
+<meta property="og:site-name" content="embeddings">
+<meta name="twitter:title" content="embeddings - How to use our configs?">
+<meta name="twitter:description" content="Detailed tutorial about how to pass arguments to embeddings pipelines.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">embeddings</span>
+    </a>
+  </div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">How to use our configs?</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title d-none d-lg-block">How to use our configs?</h1>
+                  <div>
+        <div class="description">
+          Detailed tutorial about how to pass arguments to embeddings pipelines.
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">CLARIN Embeddings</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">lepiszcze</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lepiszcze/lepiszcze.html" class="sidebar-item-text sidebar-link">LEPISZCZE</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lepiszcze/submission.html" class="sidebar-item-text sidebar-link">Submission</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">tutorials</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/baseline_sklearn_models_tutorial.html" class="sidebar-item-text sidebar-link">Baseline Sklearn-based models</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/how_to_use_polsih_static_embeddings.html" class="sidebar-item-text sidebar-link">Static word embeddings</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/tutorial_how_to_use_config_space.html" class="sidebar-item-text sidebar-link active">How to use our configs?</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/validate_flair_models_inference.html" class="sidebar-item-text sidebar-link">Model inference</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/validate_lightning_models_inference.html" class="sidebar-item-text sidebar-link">LM-based models inference</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#lightningbasicconfig" id="toc-lightningbasicconfig" class="nav-link active" data-scroll-target="#lightningbasicconfig">LightningBasicConfig</a></li>
+  <li><a href="#lightningadvancedconfig" id="toc-lightningadvancedconfig" class="nav-link" data-scroll-target="#lightningadvancedconfig">LightningAdvancedConfig</a></li>
+  <li><a href="#running-pipeline-with-basicconfig" id="toc-running-pipeline-with-basicconfig" class="nav-link" data-scroll-target="#running-pipeline-with-basicconfig">Running pipeline with BasicConfig</a>
+  <ul class="collapse">
+  <li><a href="#huggingfacepreprocessingpipeline" id="toc-huggingfacepreprocessingpipeline" class="nav-link" data-scroll-target="#huggingfacepreprocessingpipeline">HuggingFacePreprocessingPipeline</a></li>
+  <li><a href="#preprocessingpipeline.run" id="toc-preprocessingpipeline.run" class="nav-link" data-scroll-target="#preprocessingpipeline.run">PreprocessingPipeline.run</a></li>
+  <li><a href="#lightningbasicconfig-1" id="toc-lightningbasicconfig-1" class="nav-link" data-scroll-target="#lightningbasicconfig-1">LightningBasicConfig</a></li>
+  <li><a href="#lightningclassificationpipeline" id="toc-lightningclassificationpipeline" class="nav-link" data-scroll-target="#lightningclassificationpipeline">LightningClassificationPipeline</a></li>
+  <li><a href="#lightningpipeline.run" id="toc-lightningpipeline.run" class="nav-link" data-scroll-target="#lightningpipeline.run">LightningPipeline.run</a></li>
+  </ul></li>
+  <li><a href="#running-pipeline-with-advancedconfig" id="toc-running-pipeline-with-advancedconfig" class="nav-link" data-scroll-target="#running-pipeline-with-advancedconfig">Running pipeline with AdvancedConfig</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/CLARIN-PL/embeddings/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>Two types of config are defined in our library: <code>BasicConfig</code> and <code>AdvancedConfig</code>. <code>BasicConfig</code> allows for easy use of the most common parameters in the pipeline. However, the objects defined in our pipelines are constructed in a way that they can be further paramatrized with keyword arguments. These arguments can be utilized by constructing the <code>AdvancedConfig</code>.<br>
+In summary, the <code>BasicConfig</code> takes arguments and automatically assign them into proper keyword group, while the <code>AdvancedConfig</code> takes as the input keyword groups that should be already correctly mapped.</p>
+<p>The list of available config can be found below.</p>
+<hr>
+<section id="lightningbasicconfig" class="level3">
+<h3 class="anchored" data-anchor-id="lightningbasicconfig">LightningBasicConfig</h3>
+<blockquote class="blockquote">
+<pre><code> LightningBasicConfig (use_scheduler:bool=True, optimizer:str='Adam',
+                       warmup_steps:int=100, learning_rate:float=0.0001,
+                       adam_epsilon:float=1e-08, weight_decay:float=0.0,
+                       finetune_last_n_layers:int=-1,
+                       classifier_dropout:Optional[float]=None,
+                       max_seq_length:Optional[int]=None,
+                       batch_size:int=32, max_epochs:Optional[int]=None,
+                       early_stopping_monitor:str='val/Loss',
+                       early_stopping_mode:str='min',
+                       early_stopping_patience:int=3)</code></pre>
+</blockquote>
+<hr>
+</section>
+<section id="lightningadvancedconfig" class="level3">
+<h3 class="anchored" data-anchor-id="lightningadvancedconfig">LightningAdvancedConfig</h3>
+<blockquote class="blockquote">
+<pre><code> LightningAdvancedConfig (finetune_last_n_layers:int,
+                          task_model_kwargs:Dict[str,Any],
+                          datamodule_kwargs:Dict[str,Any],
+                          task_train_kwargs:Dict[str,Any],
+                          model_config_kwargs:Dict[str,Any],
+                          early_stopping_kwargs:Dict[str,Any],
+                          tokenizer_kwargs:Dict[str,Any],
+                          batch_encoding_kwargs:Dict[str,Any],
+                          dataloader_kwargs:Dict[str,Any])</code></pre>
+</blockquote>
+</section>
+<section id="running-pipeline-with-basicconfig" class="level2">
+<h2 class="anchored" data-anchor-id="running-pipeline-with-basicconfig">Running pipeline with BasicConfig</h2>
+<p>Let’s run example pipeline on <code>polemo2</code> dataset, for tutorial purposes we use <code>allegro/herbert-base-cased</code>.</p>
+<p>But first we downsample our dataset due to hardware limitations for that purpose we use HuggingFacePreprocessingPipeline</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.pipeline.hf_preprocessing_pipeline <span class="im">import</span> HuggingFacePreprocessingPipeline</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<section id="huggingfacepreprocessingpipeline" class="level3">
+<h3 class="anchored" data-anchor-id="huggingfacepreprocessingpipeline">HuggingFacePreprocessingPipeline</h3>
+<blockquote class="blockquote">
+<pre><code> HuggingFacePreprocessingPipeline (dataset_name:str, persist_path:str, sam
+                                   ple_missing_splits:Optional[Tuple[Optio
+                                   nal[float],Optional[float]]]=None, down
+                                   sample_splits:Optional[Tuple[Optional[f
+                                   loat],Optional[float],Optional[float]]]
+                                   =None, ignore_test_subset:bool=False,
+                                   seed:int=441, load_dataset_kwargs:Optio
+                                   nal[Dict[str,Any]]=None)</code></pre>
+</blockquote>
+<p>Preprocessing pipeline dedicated to work with HuggingFace datasets.</p>
+<p>Then we need to use <code>run</code> method</p>
+<hr>
+</section>
+<section id="preprocessingpipeline.run" class="level3">
+<h3 class="anchored" data-anchor-id="preprocessingpipeline.run">PreprocessingPipeline.run</h3>
+<blockquote class="blockquote">
+<pre><code> PreprocessingPipeline.run ()</code></pre>
+</blockquote>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>prepocessing <span class="op">=</span> HuggingFacePreprocessingPipeline(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    dataset_name<span class="op">=</span><span class="st">"clarin-pl/polemo2-official"</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    persist_path<span class="op">=</span><span class="st">"data/polemo2_downsampled"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    downsample_splits<span class="op">=</span>(<span class="fl">0.001</span>, <span class="fl">0.005</span>, <span class="fl">0.005</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>prepocessing.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Downloading and preparing dataset polemo2-official/all_text (download: 6.37 MiB, generated: 6.30 MiB, post-processed: Unknown size, total: 12.68 MiB) to /home/runner/.cache/huggingface/datasets/clarin-pl___polemo2-official/all_text/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70...
+Dataset polemo2-official downloaded and prepared to /home/runner/.cache/huggingface/datasets/clarin-pl___polemo2-official/all_text/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70. Subsequent calls will reuse this data.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Downloading builder script:   0%|          | 0.00/5.90k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 5.90k/5.90k [00:00&lt;00:00, 4.09MB/s]
+Downloading metadata:   0%|          | 0.00/23.4k [00:00&lt;?, ?B/s]Downloading metadata: 100%|##########| 23.4k/23.4k [00:00&lt;00:00, 11.7MB/s]
+Downloading readme:   0%|          | 0.00/5.35k [00:00&lt;?, ?B/s]Downloading readme: 100%|##########| 5.35k/5.35k [00:00&lt;00:00, 3.73MB/s]
+No config specified, defaulting to: polemo2-official/all_text
+Downloading data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]
+Downloading data:   0%|          | 0.00/5.37M [00:00&lt;?, ?B/s]Downloading data: 100%|##########| 5.37M/5.37M [00:00&lt;00:00, 59.3MB/s]
+Downloading data files: 100%|##########| 1/1 [00:00&lt;00:00,  1.41it/s]Downloading data files: 100%|##########| 1/1 [00:00&lt;00:00,  1.41it/s]
+Extracting data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]Extracting data files: 100%|##########| 1/1 [00:00&lt;00:00, 1547.71it/s]
+Downloading data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]
+Downloading data:   0%|          | 0.00/663k [00:00&lt;?, ?B/s]Downloading data: 100%|##########| 663k/663k [00:00&lt;00:00, 49.5MB/s]
+Downloading data files: 100%|##########| 1/1 [00:00&lt;00:00,  1.83it/s]Downloading data files: 100%|##########| 1/1 [00:00&lt;00:00,  1.82it/s]
+Extracting data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]Extracting data files: 100%|##########| 1/1 [00:00&lt;00:00, 1563.29it/s]
+Downloading data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]
+Downloading data:   0%|          | 0.00/649k [00:00&lt;?, ?B/s]Downloading data: 100%|##########| 649k/649k [00:00&lt;00:00, 41.7MB/s]
+Downloading data files: 100%|##########| 1/1 [00:00&lt;00:00,  1.73it/s]Downloading data files: 100%|##########| 1/1 [00:00&lt;00:00,  1.73it/s]
+Extracting data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]Extracting data files: 100%|##########| 1/1 [00:00&lt;00:00, 1529.09it/s]
+Generating train split:   0%|          | 0/6573 [00:00&lt;?, ? examples/s]Generating train split:  30%|###       | 2000/6573 [00:00&lt;00:00, 17605.41 examples/s]Generating train split:  59%|#####8    | 3860/6573 [00:00&lt;00:00, 18156.77 examples/s]Generating train split: 100%|##########| 6573/6573 [00:00&lt;00:00, 18120.11 examples/s]                                                                                     Generating validation split:   0%|          | 0/823 [00:00&lt;?, ? examples/s]                                                                           Generating test split:   0%|          | 0/820 [00:00&lt;?, ? examples/s]                                                                       0%|          | 0/3 [00:00&lt;?, ?it/s]100%|##########| 3/3 [00:00&lt;00:00, 877.90it/s]
+Flattening the indices:   0%|          | 0/1 [00:00&lt;?, ?ba/s]Flattening the indices: 100%|##########| 1/1 [00:00&lt;00:00, 729.95ba/s]
+Saving the dataset (0/1 shards):   0%|          | 0/7 [00:00&lt;?, ? examples/s]Saving the dataset (1/1 shards): 100%|##########| 7/7 [00:00&lt;00:00, 3144.83 examples/s]                                                                                       Flattening the indices:   0%|          | 0/1 [00:00&lt;?, ?ba/s]Flattening the indices: 100%|##########| 1/1 [00:00&lt;00:00, 852.85ba/s]
+Saving the dataset (0/1 shards):   0%|          | 0/5 [00:00&lt;?, ? examples/s]Saving the dataset (1/1 shards): 100%|##########| 5/5 [00:00&lt;00:00, 2335.10 examples/s]                                                                                       Flattening the indices:   0%|          | 0/1 [00:00&lt;?, ?ba/s]Flattening the indices: 100%|##########| 1/1 [00:00&lt;00:00, 855.63ba/s]
+Saving the dataset (0/1 shards):   0%|          | 0/5 [00:00&lt;?, ? examples/s]Saving the dataset (1/1 shards): 100%|##########| 5/5 [00:00&lt;00:00, 2343.97 examples/s]                                                                                       </code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>DatasetDict({
+    train: Dataset({
+        features: ['text', 'target'],
+        num_rows: 7
+    })
+    validation: Dataset({
+        features: ['text', 'target'],
+        num_rows: 5
+    })
+    test: Dataset({
+        features: ['text', 'target'],
+        num_rows: 5
+    })
+})</code></pre>
+</div>
+</div>
+<p>We have now our data prepared locally, now we need to define our <code>pipeline</code>.</p>
+<p>Let’s start from config. We will use parameters from <a href="https://huggingface.co/clarin-pl/lepiszcze-allegro__herbert-base-cased-polemo2"><code>clarin-pl/lepiszcze-allegro__herbert-base-cased-polemo2</code></a>, which configuration was obtained from <code>extensive hyperparmeter search</code>.</p>
+<div class="callout-warning callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Due to hardware limitation we limit parmeter <code>max_epochs</code> to 1 and we leave <code>early stopping</code> configuration parameters as defaults</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="lightningbasicconfig-1" class="level3">
+<h3 class="anchored" data-anchor-id="lightningbasicconfig-1">LightningBasicConfig</h3>
+<blockquote class="blockquote">
+<pre><code> LightningBasicConfig (use_scheduler:bool=True, optimizer:str='Adam',
+                       warmup_steps:int=100, learning_rate:float=0.0001,
+                       adam_epsilon:float=1e-08, weight_decay:float=0.0,
+                       finetune_last_n_layers:int=-1,
+                       classifier_dropout:Optional[float]=None,
+                       max_seq_length:Optional[int]=None,
+                       batch_size:int=32, max_epochs:Optional[int]=None,
+                       early_stopping_monitor:str='val/Loss',
+                       early_stopping_mode:str='min',
+                       early_stopping_patience:int=3)</code></pre>
+</blockquote>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>cfg <span class="op">=</span> LightningBasicConfig(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>        use_scheduler<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        optimizer<span class="op">=</span><span class="st">"Adam"</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        warmup_steps<span class="op">=</span><span class="dv">100</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        learning_rate<span class="op">=</span><span class="fl">0.001</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        adam_epsilon<span class="op">=</span><span class="fl">1e-06</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        weight_decay<span class="op">=</span><span class="fl">0.001</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        finetune_last_n_layers<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        classifier_dropout<span class="op">=</span><span class="fl">0.2</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        max_seq_length<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        batch_size<span class="op">=</span><span class="dv">64</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        max_epochs<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>cfg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>LightningBasicConfig(use_scheduler=True, optimizer='Adam', warmup_steps=100, learning_rate=0.001, adam_epsilon=1e-06, weight_decay=0.001, finetune_last_n_layers=3, classifier_dropout=0.2, max_seq_length=None, batch_size=64, max_epochs=1, early_stopping_monitor='val/Loss', early_stopping_mode='min', early_stopping_patience=3, tokenizer_kwargs={}, batch_encoding_kwargs={}, dataloader_kwargs={})</code></pre>
+</div>
+</div>
+<p>Now we define pipeline dedicated for text classification <code>LightningClassificationPipeline</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.pipeline.lightning_classification <span class="im">import</span> LightningClassificationPipeline</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+</section>
+<section id="lightningclassificationpipeline" class="level3">
+<h3 class="anchored" data-anchor-id="lightningclassificationpipeline">LightningClassificationPipeline</h3>
+<blockquote class="blockquote">
+<pre><code> LightningClassificationPipeline
+                                  (embedding_name_or_path:Union[str,pathli
+                                  b.Path], dataset_name_or_path:Union[str,
+                                  pathlib.Path], input_column_name:Union[s
+                                  tr,Sequence[str]],
+                                  target_column_name:str,
+                                  output_path:Union[str,pathlib.Path], eva
+                                  luation_filename:str='evaluation.json', 
+                                  config:Union[embeddings.config.lightning
+                                  _config.LightningBasicConfig,embeddings.
+                                  config.lightning_config.LightningAdvance
+                                  dConfig]=LightningBasicConfig(use_schedu
+                                  ler=True, optimizer='Adam',
+                                  warmup_steps=100, learning_rate=0.0001,
+                                  adam_epsilon=1e-08, weight_decay=0.0,
+                                  finetune_last_n_layers=-1,
+                                  classifier_dropout=None,
+                                  max_seq_length=None, batch_size=32,
+                                  max_epochs=None,
+                                  early_stopping_monitor='val/Loss',
+                                  early_stopping_mode='min',
+                                  early_stopping_patience=3,
+                                  tokenizer_kwargs={},
+                                  batch_encoding_kwargs={},
+                                  dataloader_kwargs={}), devices:Union[int
+                                  ,List[int],str,NoneType]='auto', acceler
+                                  ator:Union[str,pytorch_lightning.acceler
+                                  ators.accelerator.Accelerator,NoneType]=
+                                  'auto', logging_config:embeddings.utils.
+                                  loggers.LightningLoggingConfig=Lightning
+                                  LoggingConfig(loggers_names=[],
+                                  tracking_project_name=None,
+                                  wandb_entity=None,
+                                  wandb_logger_kwargs={}), tokenizer_name_
+                                  or_path:Union[pathlib.Path,str,NoneType]
+                                  =None, predict_subset:embeddings.data.da
+                                  taset.LightingDataModuleSubset=&lt;Lighting
+                                  DataModuleSubset.TEST: 'test'&gt;, load_dat
+                                  aset_kwargs:Optional[Dict[str,Any]]=None
+                                  , model_checkpoint_kwargs:Optional[Dict[
+                                  str,Any]]=None)</code></pre>
+</blockquote>
+<p>Helper class that provides a standard way to create an ABC using inheritance.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> asdict <span class="co"># For metrics conversion</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd  <span class="co"># For metrics conversion</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> LightningClassificationPipeline(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    embedding_name_or_path<span class="op">=</span><span class="st">"allegro/herbert-base-cased"</span>,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    dataset_name_or_path<span class="op">=</span><span class="st">"data/polemo2_downsampled/"</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    input_column_name<span class="op">=</span><span class="st">"text"</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    target_column_name<span class="op">=</span><span class="st">"target"</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    output_path<span class="op">=</span><span class="st">"."</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    config<span class="op">=</span>cfg</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Downloading (…)okenizer_config.json:   0%|          | 0.00/229 [00:00&lt;?, ?B/s]Downloading (…)okenizer_config.json: 100%|##########| 229/229 [00:00&lt;00:00, 40.0kB/s]
+Downloading (…)lve/main/config.json:   0%|          | 0.00/472 [00:00&lt;?, ?B/s]Downloading (…)lve/main/config.json: 100%|##########| 472/472 [00:00&lt;00:00, 85.9kB/s]
+Downloading (…)olve/main/vocab.json:   0%|          | 0.00/907k [00:00&lt;?, ?B/s]Downloading (…)olve/main/vocab.json: 100%|##########| 907k/907k [00:00&lt;00:00, 44.5MB/s]
+Downloading (…)olve/main/merges.txt:   0%|          | 0.00/556k [00:00&lt;?, ?B/s]Downloading (…)olve/main/merges.txt: 100%|##########| 556k/556k [00:00&lt;00:00, 32.3MB/s]
+Downloading (…)cial_tokens_map.json:   0%|          | 0.00/129 [00:00&lt;?, ?B/s]Downloading (…)cial_tokens_map.json: 100%|##########| 129/129 [00:00&lt;00:00, 47.2kB/s]
+  0%|          | 0/1 [00:00&lt;?, ?ba/s]100%|##########| 1/1 [00:00&lt;00:00, 87.85ba/s]
+  0%|          | 0/1 [00:00&lt;?, ?ba/s]100%|##########| 1/1 [00:00&lt;00:00, 163.62ba/s]
+  0%|          | 0/1 [00:00&lt;?, ?ba/s]100%|##########| 1/1 [00:00&lt;00:00, 179.37ba/s]
+Casting the dataset:   0%|          | 0/1 [00:00&lt;?, ?ba/s]Casting the dataset: 100%|##########| 1/1 [00:00&lt;00:00, 803.20ba/s]
+Casting the dataset:   0%|          | 0/1 [00:00&lt;?, ?ba/s]Casting the dataset: 100%|##########| 1/1 [00:00&lt;00:00, 1120.87ba/s]
+Casting the dataset:   0%|          | 0/1 [00:00&lt;?, ?ba/s]Casting the dataset: 100%|##########| 1/1 [00:00&lt;00:00, 1105.22ba/s]</code></pre>
+</div>
+</div>
+<p>Similarly as with HuggingFacePreprocessingPipeline we use <code>run</code> method</p>
+<hr>
+</section>
+<section id="lightningpipeline.run" class="level3">
+<h3 class="anchored" data-anchor-id="lightningpipeline.run">LightningPipeline.run</h3>
+<blockquote class="blockquote">
+<pre><code> LightningPipeline.run (run_name:Optional[str]=None)</code></pre>
+</blockquote>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> pipeline.run()</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Converting metrics to DataFrame for better nb display</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> pd.DataFrame.from_dict(asdict(metrics), orient<span class="op">=</span><span class="st">"index"</span>, columns<span class="op">=</span>[<span class="st">"values"</span>])</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Validation sanity check: 0it [00:00, ?it/s]Validation sanity check:   0%|          | 0/1 [00:00&lt;?, ?it/s]Validation sanity check: 100%|##########| 1/1 [00:00&lt;00:00,  1.12it/s]                                                                      Training: 0it [00:00, ?it/s]Training:   0%|          | 0/2 [00:00&lt;?, ?it/s]Epoch 0:   0%|          | 0/2 [00:00&lt;?, ?it/s] Epoch 0:  50%|#####     | 1/2 [00:03&lt;00:03,  3.48s/it]Epoch 0:  50%|#####     | 1/2 [00:03&lt;00:03,  3.48s/it, loss=1.6, v_num=, train/BaseLR=0.000, train/LambdaLR=0.000]
+Validating: 0it [00:00, ?it/s]
+Validating:   0%|          | 0/1 [00:00&lt;?, ?it/s]
+Validating: 100%|##########| 1/1 [00:00&lt;00:00,  1.08it/s]Epoch 0: 100%|##########| 2/2 [00:04&lt;00:00,  2.21s/it, loss=1.6, v_num=, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.200, val/MulticlassPrecision=0.050, val/MulticlassRecall=0.250, val/MulticlassF1Score=0.0833]
+                                                         Epoch 0: 100%|##########| 2/2 [00:05&lt;00:00,  2.98s/it, loss=1.6, v_num=, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.200, val/MulticlassPrecision=0.050, val/MulticlassRecall=0.250, val/MulticlassF1Score=0.0833]
+Testing: 0it [00:00, ?it/s]Testing: 100%|##########| 1/1 [00:00&lt;00:00,  1.20it/s]--------------------------------------------------------------------------------
+DATALOADER:0 TEST RESULTS
+{'test/Loss': 1.6176023483276367,
+ 'test/MulticlassAccuracy': 0.0,
+ 'test/MulticlassF1Score': 0.0,
+ 'test/MulticlassPrecision': 0.0,
+ 'test/MulticlassRecall': 0.0}
+--------------------------------------------------------------------------------
+Testing: 100%|##########| 1/1 [00:00&lt;00:00,  1.19it/s]
+Predicting: 1it [00:00, ?it/s]Predicting: 100%|##########| 1/1 [00:00&lt;?, ?it/s]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Downloading (…)"pytorch_model.bin";:   0%|          | 0.00/654M [00:00&lt;?, ?B/s]Downloading (…)"pytorch_model.bin";:   2%|1         | 10.5M/654M [00:00&lt;00:14, 44.7MB/s]Downloading (…)"pytorch_model.bin";:   3%|3         | 21.0M/654M [00:00&lt;00:13, 47.5MB/s]Downloading (…)"pytorch_model.bin";:   5%|4         | 31.5M/654M [00:00&lt;00:11, 55.5MB/s]Downloading (…)"pytorch_model.bin";:   6%|6         | 41.9M/654M [00:01&lt;00:17, 34.6MB/s]Downloading (…)"pytorch_model.bin";:   8%|8         | 52.4M/654M [00:01&lt;00:15, 39.5MB/s]Downloading (…)"pytorch_model.bin";:  10%|9         | 62.9M/654M [00:01&lt;00:14, 41.6MB/s]Downloading (…)"pytorch_model.bin";:  11%|#1        | 73.4M/654M [00:01&lt;00:15, 36.7MB/s]Downloading (…)"pytorch_model.bin";:  13%|#2        | 83.9M/654M [00:02&lt;00:15, 36.9MB/s]Downloading (…)"pytorch_model.bin";:  14%|#4        | 94.4M/654M [00:02&lt;00:16, 34.9MB/s]Downloading (…)"pytorch_model.bin";:  16%|#6        | 105M/654M [00:02&lt;00:14, 38.8MB/s] Downloading (…)"pytorch_model.bin";:  18%|#7        | 115M/654M [00:02&lt;00:11, 44.9MB/s]Downloading (…)"pytorch_model.bin";:  19%|#9        | 126M/654M [00:03&lt;00:13, 39.1MB/s]Downloading (…)"pytorch_model.bin";:  21%|##        | 136M/654M [00:03&lt;00:12, 40.6MB/s]Downloading (…)"pytorch_model.bin";:  22%|##2       | 147M/654M [00:03&lt;00:12, 41.3MB/s]Downloading (…)"pytorch_model.bin";:  24%|##4       | 157M/654M [00:03&lt;00:10, 45.4MB/s]Downloading (…)"pytorch_model.bin";:  26%|##5       | 168M/654M [00:04&lt;00:12, 37.5MB/s]Downloading (…)"pytorch_model.bin";:  27%|##7       | 178M/654M [00:04&lt;00:13, 35.3MB/s]Downloading (…)"pytorch_model.bin";:  29%|##8       | 189M/654M [00:04&lt;00:11, 40.3MB/s]Downloading (…)"pytorch_model.bin";:  30%|###       | 199M/654M [00:05&lt;00:12, 36.9MB/s]Downloading (…)"pytorch_model.bin";:  32%|###2      | 210M/654M [00:05&lt;00:14, 29.8MB/s]Downloading (…)"pytorch_model.bin";:  34%|###3      | 220M/654M [00:05&lt;00:12, 35.4MB/s]Downloading (…)"pytorch_model.bin";:  35%|###5      | 231M/654M [00:05&lt;00:10, 41.0MB/s]Downloading (…)"pytorch_model.bin";:  37%|###6      | 241M/654M [00:06&lt;00:09, 44.7MB/s]Downloading (…)"pytorch_model.bin";:  38%|###8      | 252M/654M [00:06&lt;00:10, 39.0MB/s]Downloading (…)"pytorch_model.bin";:  40%|####      | 262M/654M [00:06&lt;00:09, 42.2MB/s]Downloading (…)"pytorch_model.bin";:  42%|####1     | 273M/654M [00:06&lt;00:09, 42.1MB/s]Downloading (…)"pytorch_model.bin";:  43%|####3     | 283M/654M [00:07&lt;00:08, 43.7MB/s]Downloading (…)"pytorch_model.bin";:  45%|####4     | 294M/654M [00:07&lt;00:09, 36.3MB/s]Downloading (…)"pytorch_model.bin";:  46%|####6     | 304M/654M [00:07&lt;00:09, 38.6MB/s]Downloading (…)"pytorch_model.bin";:  48%|####8     | 315M/654M [00:07&lt;00:08, 42.3MB/s]Downloading (…)"pytorch_model.bin";:  50%|####9     | 325M/654M [00:08&lt;00:07, 43.5MB/s]Downloading (…)"pytorch_model.bin";:  51%|#####1    | 336M/654M [00:08&lt;00:11, 28.7MB/s]Downloading (…)"pytorch_model.bin";:  53%|#####2    | 346M/654M [00:09&lt;00:09, 31.2MB/s]Downloading (…)"pytorch_model.bin";:  54%|#####4    | 357M/654M [00:09&lt;00:09, 30.9MB/s]Downloading (…)"pytorch_model.bin";:  56%|#####6    | 367M/654M [00:09&lt;00:09, 31.1MB/s]Downloading (…)"pytorch_model.bin";:  58%|#####7    | 377M/654M [00:10&lt;00:10, 26.6MB/s]Downloading (…)"pytorch_model.bin";:  59%|#####9    | 388M/654M [00:10&lt;00:09, 29.1MB/s]Downloading (…)"pytorch_model.bin";:  61%|######    | 398M/654M [00:10&lt;00:07, 32.8MB/s]Downloading (…)"pytorch_model.bin";:  63%|######2   | 409M/654M [00:11&lt;00:06, 35.7MB/s]Downloading (…)"pytorch_model.bin";:  64%|######4   | 419M/654M [00:11&lt;00:06, 35.9MB/s]Downloading (…)"pytorch_model.bin";:  66%|######5   | 430M/654M [00:11&lt;00:05, 37.5MB/s]Downloading (…)"pytorch_model.bin";:  67%|######7   | 440M/654M [00:11&lt;00:05, 41.4MB/s]Downloading (…)"pytorch_model.bin";:  69%|######8   | 451M/654M [00:11&lt;00:04, 45.3MB/s]Downloading (…)"pytorch_model.bin";:  71%|#######   | 461M/654M [00:12&lt;00:05, 34.2MB/s]Downloading (…)"pytorch_model.bin";:  72%|#######2  | 472M/654M [00:12&lt;00:04, 36.5MB/s]Downloading (…)"pytorch_model.bin";:  74%|#######3  | 482M/654M [00:12&lt;00:04, 41.3MB/s]Downloading (…)"pytorch_model.bin";:  75%|#######5  | 493M/654M [00:13&lt;00:03, 44.5MB/s]Downloading (…)"pytorch_model.bin";:  77%|#######6  | 503M/654M [00:13&lt;00:04, 33.0MB/s]Downloading (…)"pytorch_model.bin";:  79%|#######8  | 514M/654M [00:13&lt;00:03, 35.8MB/s]Downloading (…)"pytorch_model.bin";:  80%|########  | 524M/654M [00:13&lt;00:03, 41.8MB/s]Downloading (…)"pytorch_model.bin";:  82%|########1 | 535M/654M [00:14&lt;00:02, 45.6MB/s]Downloading (…)"pytorch_model.bin";:  83%|########3 | 545M/654M [00:14&lt;00:02, 40.2MB/s]Downloading (…)"pytorch_model.bin";:  85%|########4 | 556M/654M [00:14&lt;00:02, 44.9MB/s]Downloading (…)"pytorch_model.bin";:  87%|########6 | 566M/654M [00:14&lt;00:01, 46.3MB/s]Downloading (…)"pytorch_model.bin";:  88%|########8 | 577M/654M [00:15&lt;00:01, 44.7MB/s]Downloading (…)"pytorch_model.bin";:  90%|########9 | 587M/654M [00:15&lt;00:01, 44.3MB/s]Downloading (…)"pytorch_model.bin";:  91%|#########1| 598M/654M [00:15&lt;00:01, 46.1MB/s]Downloading (…)"pytorch_model.bin";:  93%|#########2| 608M/654M [00:15&lt;00:00, 49.0MB/s]Downloading (…)"pytorch_model.bin";:  95%|#########4| 619M/654M [00:15&lt;00:00, 49.5MB/s]Downloading (…)"pytorch_model.bin";:  96%|#########6| 629M/654M [00:16&lt;00:00, 39.1MB/s]Downloading (…)"pytorch_model.bin";:  98%|#########7| 640M/654M [00:16&lt;00:00, 39.1MB/s]Downloading (…)"pytorch_model.bin";:  99%|#########9| 650M/654M [00:16&lt;00:00, 43.3MB/s]Downloading (…)"pytorch_model.bin";: 100%|##########| 654M/654M [00:16&lt;00:00, 38.9MB/s]
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/pytorch_lightning/trainer/data_loading.py:407: UserWarning: The number of training samples (1) is smaller than the logging interval Trainer(log_every_n_steps=50). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+  rank_zero_warn(
+/home/runner/work/embeddings/embeddings/embeddings/metric/hugging_face_metric.py:27: FutureWarning: load_metric is deprecated and will be removed in the next major version of datasets. Use 'evaluate.load' instead, from the new library 🤗 Evaluate: https://huggingface.co/docs/evaluate
+  datasets.load_metric(metric, **init_kwargs) if isinstance(metric, str) else metric
+Downloading builder script:   0%|          | 0.00/1.65k [00:00&lt;?, ?B/s]Downloading builder script: 4.21kB [00:00, 3.02MB/s]                   
+Downloading builder script:   0%|          | 0.00/2.32k [00:00&lt;?, ?B/s]Downloading builder script: 6.50kB [00:00, 3.91MB/s]                   
+Downloading builder script:   0%|          | 0.00/2.52k [00:00&lt;?, ?B/s]Downloading builder script: 7.38kB [00:00, 4.28MB/s]                   
+Downloading builder script:   0%|          | 0.00/2.58k [00:00&lt;?, ?B/s]Downloading builder script: 7.55kB [00:00, 5.26MB/s]                   
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Recall is ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Recall is ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Recall and F-score are ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>accuracy</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>f1_macro</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>f1_micro</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>f1_weighted</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>recall_macro</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>recall_micro</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>recall_weighted</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>precision_macro</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>precision_micro</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>precision_weighted</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>classes</th>
+      <td>{0: {'precision': 0.0, 'recall': 0.0, 'f1': 0....</td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td>{'y_pred': [0, 0, 0, 0, 0], 'y_true': [1, 1, 1...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="running-pipeline-with-advancedconfig" class="level2">
+<h2 class="anchored" data-anchor-id="running-pipeline-with-advancedconfig">Running pipeline with AdvancedConfig</h2>
+<p>As mentioned in previous section <code>LightningBasicConfig</code> is only limited to most important parameters.</p>
+<p>Let’s see an example of the process of defining the parameters in our <code>LightningAdvancedConfig</code>. Tracing back different kwargs we can find:</p>
+<ol type="1">
+<li><p><a href="https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html#trainer-flags"><code>task_train_kwargs</code></a> Parameters that are passed to the <code>Lightning Trainer</code> object.</p></li>
+<li><p><a href="https://github.com/CLARIN-PL/embeddings/blob/main/embeddings/model/lightning_module/lightning_module.py#L19"><code>task_model_kwargs</code></a> Parameters that are passed to the <code>Lightning module</code> object (we use <code>TextClassificationModule</code> which inherits from <code>HuggingFaceLightningModule</code> and <code>HuggingFaceLightningModule</code>).</p></li>
+<li><p><a href="https://github.com/CLARIN-PL/embeddings/blob/main/embeddings/data/datamodule.py#L35"><code>datamodule_kwargs</code></a><br>
+Parameters passed to the datamodule classes, currently <code>HuggingFaceDataModule</code> takes several arguments (such as max_seq_length, processing_batch_size or downsamples args) as an input</p></li>
+<li><p><a href="https://github.com/huggingface/transformers/blob/main/src/transformers/tokenization_utils_base.py#L2456"><code>batch_encoding_kwargs</code></a> Parameters that are defined in <code>__call__</code> method of the tokenizer which allow for manipulation of the tokenized text by setting parameters such as truncation, padding, stride etc. and specifying the return format of the tokenized text</p></li>
+<li><p><a href="https://github.com/huggingface/transformers/blob/074645e32acda6498f16203a8459bb597610f623/src/transformers/models/auto/tokenization_auto.py#L351"><code>tokenizer_kwargs</code></a> This is a generic configuration class of the hugginface model’s tokenizer, possible parameters depends on the tokenizer that is used. For example for bert uncased tokenizer these parameters are present here: https://huggingface.co/bert-base-uncased/blob/main/tokenizer_config.json</p></li>
+<li><p><a href="https://huggingface.co/docs/datasets/v2.0.0/en/package_reference/loading_methods#datasets.load_dataset"><code>load_dataset_kwargs</code></a> Keyword arguments from the <code>datasets.load_dataset method</code> which loads a dataset from the Hugging Face Hub, or a local dataset; mostly metadata for downloading, loading, caching the dataset</p></li>
+<li><p><a href="https://github.com/huggingface/transformers/blob/074645e32acda6498f16203a8459bb597610f623/src/transformers/models/auto/configuration_auto.py#L515"><code>model_config_kwargs</code></a> This is a generic configuration class of the hugginface model, possible parameters depends on the model that is used. For example for bert uncased these parameters are present here: https://huggingface.co/bert-base-uncased/blob/main/config.json</p></li>
+<li><p><a href="https://github.com/PyTorchLightning/pytorch-lightning/blob/5d2d9b09df5359226fea6ad2722592839ac0ebc4/pytorch_lightning/callbacks/early_stopping.py#L35"><code>early_stopping_kwargs</code></a> Params defined in <code>__init__</code> of the <code>EarlyStopping</code> lightning callback; you can specify a metric to monitor and conditions to stop training when it stops improving</p></li>
+<li><p><a href="https://pytorch.org/docs/stable/_modules/torch/utils/data/dataloader.html#DataLoader"><code>dataloader_kwargs</code></a> Defined in <code>__init__</code> of the torch <code>DataLoader</code> object which wraps an iterable around the Dataset to enable easy access to the sample; specify params such as num of workers, sampling or shuffling</p></li>
+</ol>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>advanced_config <span class="op">=</span> LightningAdvancedConfig(</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    finetune_last_n_layers<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    datamodule_kwargs<span class="op">=</span>{</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"max_seq_length"</span>: <span class="va">None</span>,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    task_train_kwargs<span class="op">=</span>{</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"max_epochs"</span>: <span class="dv">1</span>,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"devices"</span>: <span class="st">"auto"</span>,</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"accelerator"</span>: <span class="st">"cpu"</span>,</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"deterministic"</span>: <span class="va">True</span>,</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    task_model_kwargs<span class="op">=</span>{</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"learning_rate"</span>: <span class="fl">0.001</span>,</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"train_batch_size"</span>: <span class="dv">64</span>,</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"eval_batch_size"</span>: <span class="dv">64</span>,</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"use_scheduler"</span>: <span class="va">True</span>,</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"optimizer"</span>: <span class="st">"Adam"</span>,</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"adam_epsilon"</span>: <span class="fl">1e-6</span>,</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"warmup_steps"</span>: <span class="dv">100</span>,</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"weight_decay"</span>: <span class="fl">0.001</span>,</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>    early_stopping_kwargs<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    model_config_kwargs<span class="op">=</span>{<span class="st">"classifier_dropout"</span>: <span class="fl">0.2</span>},</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>    tokenizer_kwargs<span class="op">=</span>{},</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    batch_encoding_kwargs<span class="op">=</span>{},</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>    dataloader_kwargs<span class="op">=</span>{}</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>advanced_config</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>LightningAdvancedConfig(finetune_last_n_layers=0, task_model_kwargs={'learning_rate': 0.001, 'train_batch_size': 64, 'eval_batch_size': 64, 'use_scheduler': True, 'optimizer': 'Adam', 'adam_epsilon': 1e-06, 'warmup_steps': 100, 'weight_decay': 0.001}, datamodule_kwargs={'max_seq_length': None}, task_train_kwargs={'max_epochs': 1, 'devices': 'auto', 'accelerator': 'cpu', 'deterministic': True}, model_config_kwargs={'classifier_dropout': 0.2}, early_stopping_kwargs=None, tokenizer_kwargs={}, batch_encoding_kwargs={}, dataloader_kwargs={})</code></pre>
+</div>
+</div>
+<p>Now we can run pipeline</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> LightningClassificationPipeline(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    embedding_name_or_path<span class="op">=</span><span class="st">"allegro/herbert-base-cased"</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    dataset_name_or_path<span class="op">=</span><span class="st">"data/polemo2_downsampled/"</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    input_column_name<span class="op">=</span><span class="st">"text"</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    target_column_name<span class="op">=</span><span class="st">"target"</span>,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    output_path<span class="op">=</span><span class="st">"."</span>,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    config<span class="op">=</span>advanced_config</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>metrics_adv_cfg <span class="op">=</span> pipeline.run()</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Converting metrics to DataFrame for better nb display</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>metrics_adv_cfg <span class="op">=</span> pd.DataFrame.from_dict(asdict(metrics_adv_cfg), orient<span class="op">=</span><span class="st">"index"</span>, columns<span class="op">=</span>[<span class="st">"values"</span>])</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>metrics_adv_cfg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Validation sanity check: 0it [00:00, ?it/s]Validation sanity check:   0%|          | 0/1 [00:00&lt;?, ?it/s]Validation sanity check: 100%|##########| 1/1 [00:00&lt;00:00,  1.12it/s]                                                                      Training: 0it [00:00, ?it/s]Training:   0%|          | 0/2 [00:00&lt;?, ?it/s]Epoch 0:   0%|          | 0/2 [00:00&lt;?, ?it/s] Epoch 0:  50%|#####     | 1/2 [00:02&lt;00:02,  2.12s/it]Epoch 0:  50%|#####     | 1/2 [00:02&lt;00:02,  2.12s/it, loss=1.5, v_num=, train/BaseLR=0.000, train/LambdaLR=0.000]
+Validating: 0it [00:00, ?it/s]
+Validating:   0%|          | 0/1 [00:00&lt;?, ?it/s]
+Validating: 100%|##########| 1/1 [00:00&lt;00:00,  1.16it/s]Epoch 0: 100%|##########| 2/2 [00:02&lt;00:00,  1.50s/it, loss=1.5, v_num=, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.200, val/MulticlassPrecision=0.0625, val/MulticlassRecall=0.250, val/MulticlassF1Score=0.100]
+                                                         Epoch 0: 100%|##########| 2/2 [00:04&lt;00:00,  2.03s/it, loss=1.5, v_num=, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.200, val/MulticlassPrecision=0.0625, val/MulticlassRecall=0.250, val/MulticlassF1Score=0.100]
+Testing: 0it [00:00, ?it/s]Testing: 100%|##########| 1/1 [00:00&lt;00:00,  1.21it/s]--------------------------------------------------------------------------------
+DATALOADER:0 TEST RESULTS
+{'test/Loss': 1.3993116617202759,
+ 'test/MulticlassAccuracy': 0.0,
+ 'test/MulticlassF1Score': 0.0,
+ 'test/MulticlassPrecision': 0.0,
+ 'test/MulticlassRecall': 0.0}
+--------------------------------------------------------------------------------
+Testing: 100%|##########| 1/1 [00:00&lt;00:00,  1.20it/s]
+Predicting: 1it [00:00, ?it/s]Predicting: 100%|##########| 1/1 [00:00&lt;?, ?it/s]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading cached processed dataset at /home/runner/work/embeddings/embeddings/data/polemo2_downsampled/train/cache-798c0784c1839f82.arrow
+  0%|          | 0/1 [00:00&lt;?, ?ba/s]100%|##########| 1/1 [00:00&lt;00:00, 170.20ba/s]
+Loading cached processed dataset at /home/runner/work/embeddings/embeddings/data/polemo2_downsampled/test/cache-e6d987954fa38d1f.arrow
+Loading cached processed dataset at /home/runner/work/embeddings/embeddings/data/polemo2_downsampled/train/cache-c077b5bab67b5851.arrow
+Casting the dataset:   0%|          | 0/1 [00:00&lt;?, ?ba/s]Casting the dataset: 100%|##########| 1/1 [00:00&lt;00:00, 923.45ba/s]
+Loading cached processed dataset at /home/runner/work/embeddings/embeddings/data/polemo2_downsampled/test/cache-e5f15840a94d9906.arrow
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:623: UserWarning: Checkpoint directory /home/runner/work/embeddings/embeddings/checkpoints exists and is not empty.
+  rank_zero_warn(f"Checkpoint directory {dirpath} exists and is not empty.")
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/pytorch_lightning/trainer/data_loading.py:407: UserWarning: The number of training samples (1) is smaller than the logging interval Trainer(log_every_n_steps=50). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+  rank_zero_warn(
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Recall is ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Recall is ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+/opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Recall and F-score are ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>accuracy</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>f1_macro</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>f1_micro</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>f1_weighted</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>recall_macro</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>recall_micro</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>recall_weighted</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>precision_macro</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>precision_micro</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>precision_weighted</th>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>classes</th>
+      <td>{0: {'precision': 0.0, 'recall': 0.0, 'f1': 0....</td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td>{'y_pred': [0, 0, 0, 0, 0], 'y_true': [1, 1, 1...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
