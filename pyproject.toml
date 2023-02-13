@@ -23,6 +23,7 @@ annoy = { version=">=1.17.0", optional=true}
 appdirs = ">=1.4.4"
 click = "8.0.4" # temporary frozen due to problems with the 8.1.0 version
 datasets = ">=1.16.1"
+evaluate = ">=0.4.0"
 intel-openmp = {version="^2022.0.3", platform="win32"}
 lz4 = { version=">=3.1.10", optional=true}
 numpy = ">=1.20.0, <=1.23.4"
@@ -120,7 +121,8 @@ module = [
     "appdirs",
     "dataset.arrow_dataset",
     "seqeval.*",
-    "transformers"
+    "transformers",
+    "evaluate"
 ]
 ignore_missing_imports = true
 
