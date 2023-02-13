@@ -45,7 +45,6 @@ types-PyYAML = ">=5.4.10"
 types-setuptools = ">=57.4.11"
 typing-extensions = ">=4.0.1.0"
 wandb = ">=0.12.10"
-sacremoses = "^0.0.53"
 setuptools = "^65.5.1"
 
 [tool.poetry.dev-dependencies]
