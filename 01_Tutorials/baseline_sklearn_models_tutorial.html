@@ -190,7 +190,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">lepiszcze</a>
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Tutorials</a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -198,19 +198,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lepiszcze/lepiszcze.html" class="sidebar-item-text sidebar-link">LEPISZCZE</a>
+  <a href="../01_Tutorials/baseline_sklearn_models_tutorial.html" class="sidebar-item-text sidebar-link active">Baseline Sklearn-based models</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lepiszcze/submission.html" class="sidebar-item-text sidebar-link">Submission</a>
+  <a href="../01_Tutorials/tutorial_how_to_use_config_space.html" class="sidebar-item-text sidebar-link">How to use our configs?</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../01_Tutorials/validate_lightning_models_inference.html" class="sidebar-item-text sidebar-link">LM-based models inference</a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">tutorials</a>
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">LEPISZCZE</a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -218,27 +223,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/baseline_sklearn_models_tutorial.html" class="sidebar-item-text sidebar-link active">Baseline Sklearn-based models</a>
+  <a href="../02_LEPISZCZE/lepiszcze.html" class="sidebar-item-text sidebar-link">LEPISZCZE</a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/how_to_use_polsih_static_embeddings.html" class="sidebar-item-text sidebar-link">Static word embeddings</a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/tutorial_how_to_use_config_space.html" class="sidebar-item-text sidebar-link">How to use our configs?</a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/validate_flair_models_inference.html" class="sidebar-item-text sidebar-link">Model inference</a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../tutorials/validate_lightning_models_inference.html" class="sidebar-item-text sidebar-link">LM-based models inference</a>
+  <a href="../02_LEPISZCZE/submission.html" class="sidebar-item-text sidebar-link">Submission</a>
   </div>
 </li>
       </ul>
@@ -280,13 +270,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install xgboost</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Collecting xgboost
-  Downloading xgboost-1.7.1-py3-none-manylinux2014_x86_64.whl (193.6 MB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 193.6/193.6 MB 10.7 MB/s eta 0:00:0000:0100:01
-Requirement already satisfied: numpy in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from xgboost) (1.23.4)
+<pre><code>Requirement already satisfied: xgboost in /opt/conda/envs/embeddings/lib/python3.9/site-packages (1.7.3)
 Requirement already satisfied: scipy in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from xgboost) (1.9.3)
-Installing collected packages: xgboost
-Successfully installed xgboost-1.7.1
+Requirement already satisfied: numpy in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from xgboost) (1.23.4)
 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv</code></pre>
 </div>
 </div>
@@ -317,17 +303,12 @@ WARNING: Running pip as the 'root' user can result in broken permissions and con
 <section id="adaboost-model" class="level2">
 <h2 class="anchored" data-anchor-id="adaboost-model">AdaBoost model</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>embeddings_kwargs <span class="op">=</span> {</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"max_features"</span>: <span class="dv">10000</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"max_df"</span>: <span class="dv">10</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>classifier_kwargs <span class="op">=</span> {</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n_estimators"</span>: <span class="dv">100</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>embeddings_kwargs <span class="op">=</span> {<span class="st">"max_features"</span>: <span class="dv">10000</span>, <span class="st">"max_df"</span>: <span class="dv">10</span>}</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>classifier_kwargs <span class="op">=</span> {<span class="st">"n_estimators"</span>: <span class="dv">100</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>evaluation_filename <span class="op">=</span> <span class="st">"adaboost_tfidf_evaluation.json"</span>  <span class="co">#default name: evaluation_filename.json</span></span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>evaluation_filename <span class="op">=</span> <span class="st">"adaboost_tfidf_evaluation.json"</span>  <span class="co"># default name: evaluation_filename.json</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>output_path <span class="op">=</span> <span class="st">"."</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>adaboost_tfidf_pipeline <span class="op">=</span> SklearnClassificationPipeline(</span>
@@ -339,7 +320,7 @@ WARNING: Running pip as the 'root' user can result in broken permissions and con
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    vectorizer<span class="op">=</span>TfidfVectorizer,</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    evaluation_filename<span class="op">=</span>evaluation_filename,</span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    classifier_kwargs<span class="op">=</span>classifier_kwargs,</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    embedding_kwargs<span class="op">=</span>embeddings_kwargs</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    embedding_kwargs<span class="op">=</span>embeddings_kwargs,</span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
@@ -347,18 +328,18 @@ WARNING: Running pip as the 'root' user can result in broken permissions and con
 <div class="cell-output cell-output-stderr">
 <pre><code>No config specified, defaulting to: polemo2-official/all_text
 Found cached dataset polemo2-official (/root/.cache/huggingface/datasets/clarin-pl___polemo2-official/all_text/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70)
-100%|██████████| 3/3 [00:00&lt;00:00, 276.14it/s]</code></pre>
+100%|██████████| 3/3 [00:00&lt;00:00, 746.58it/s]</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>adaboost_tfidf_result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<pre><code>TextClassificationEvaluationResults(accuracy=0.4658536585365854, f1_macro=0.2856571505243167, f1_micro=0.4658536585365854, f1_weighted=0.3284353721974178, recall_macro=0.346626418679066, recall_micro=0.4658536585365854, recall_weighted=0.4658536585365854, precision_macro=0.31249434337949133, precision_micro=0.4658536585365854, precision_weighted=0.2983611252756568, classes={0: {'precision': 0.8103448275862069, 'recall': 0.3983050847457627, 'f1': 0.5340909090909091, 'support': 118}, 1: {'precision': 0.43963254593175854, 'recall': 0.9882005899705014, 'f1': 0.6085376930063578, 'support': 339}, 2: {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'support': 227}, 3: {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'support': 136}}, data=Predictions(y_pred=array([1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+<pre><code>TextClassificationEvaluationResults(accuracy=0.4695121951219512, f1_macro=0.2911453518233179, f1_micro=0.4695121951219512, f1_weighted=0.33223355506282337, recall_macro=0.3516011699415029, recall_micro=0.4695121951219512, recall_weighted=0.4695121951219512, precision_macro=0.3180081961736342, precision_micro=0.4695121951219512, precision_weighted=0.3020448062562097, classes={0: {'precision': 0.8305084745762712, 'recall': 0.4152542372881356, 'f1': 0.5536723163841808, 'support': 118}, 1: {'precision': 0.44152431011826543, 'recall': 0.9911504424778761, 'f1': 0.610909090909091, 'support': 339}, 2: {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'support': 227}, 3: {'precision': 0.0, 'recall': 0.0, 'f1': 0.0, 'support': 136}}, data=Predictions(y_pred=array([1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1,
-       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1,
+       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-       1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
+       1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1,
        1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -369,24 +350,24 @@ Found cached dataset polemo2-official (/root/.cache/huggingface/datasets/clarin-
        0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+       1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
        1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
-       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
        1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1,
-       1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-       1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-       0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1,
@@ -434,66 +415,58 @@ Found cached dataset polemo2-official (/root/.cache/huggingface/datasets/clarin-
 <section id="old-good-svm" class="level2">
 <h2 class="anchored" data-anchor-id="old-good-svm">Old good SVM</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>svm_kwargs <span class="op">=</span> {</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"kernel"</span>: <span class="st">"linear"</span>,</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"C"</span>: <span class="fl">0.6</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>evaluation_filename_svm_tdidf <span class="op">=</span> <span class="st">"svm_tfidf_evaluation.json"</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>svm_tfidf_pipeline <span class="op">=</span> SklearnClassificationPipeline(</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    dataset_name_or_path<span class="op">=</span>DATASET_NAME,</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    input_column_name<span class="op">=</span><span class="st">"text"</span>,</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    target_column_name<span class="op">=</span><span class="st">"target"</span>,</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    output_path<span class="op">=</span>output_path,</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    classifier<span class="op">=</span>SVC,</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    vectorizer<span class="op">=</span>TfidfVectorizer,</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    evaluation_filename<span class="op">=</span>evaluation_filename_svm_tdidf,</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    classifier_kwargs<span class="op">=</span>svm_kwargs,</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    embedding_kwargs<span class="op">=</span>embeddings_kwargs</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>svm_kwargs <span class="op">=</span> {<span class="st">"kernel"</span>: <span class="st">"linear"</span>, <span class="st">"C"</span>: <span class="fl">0.6</span>}</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>evaluation_filename_svm_tdidf <span class="op">=</span> <span class="st">"svm_tfidf_evaluation.json"</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>svm_tfidf_pipeline <span class="op">=</span> SklearnClassificationPipeline(</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    dataset_name_or_path<span class="op">=</span>DATASET_NAME,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    input_column_name<span class="op">=</span><span class="st">"text"</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    target_column_name<span class="op">=</span><span class="st">"target"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    output_path<span class="op">=</span>output_path,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    classifier<span class="op">=</span>SVC,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    vectorizer<span class="op">=</span>TfidfVectorizer,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    evaluation_filename<span class="op">=</span>evaluation_filename_svm_tdidf,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    classifier_kwargs<span class="op">=</span>svm_kwargs,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    embedding_kwargs<span class="op">=</span>embeddings_kwargs,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>svm_tfidf_result <span class="op">=</span> svm_tfidf_pipeline.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>No config specified, defaulting to: polemo2-official/all_text
 Found cached dataset polemo2-official (/root/.cache/huggingface/datasets/clarin-pl___polemo2-official/all_text/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70)
-100%|██████████| 3/3 [00:00&lt;00:00, 49.09it/s]</code></pre>
+100%|██████████| 3/3 [00:00&lt;00:00, 904.07it/s]</code></pre>
 </div>
 </div>
 </section>
 <section id="kaggle-winner-xgboost" class="level2">
 <h2 class="anchored" data-anchor-id="kaggle-winner-xgboost">Kaggle-winner XGBoost</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>embeddings_kwargs <span class="op">=</span> {</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"max_features"</span>: <span class="dv">10000</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>embeddings_kwargs <span class="op">=</span> {<span class="st">"max_features"</span>: <span class="dv">10000</span>}</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>xgb_kwargs <span class="op">=</span> {<span class="st">"n_estimators"</span>: <span class="dv">200</span>, <span class="st">"max_depth"</span>: <span class="dv">7</span>}</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>xgb_kwargs <span class="op">=</span> {</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n_estimators"</span>: <span class="dv">200</span>,</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"max_depth"</span>: <span class="dv">7</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>evaluation_filename_xgb_tdidf <span class="op">=</span> <span class="st">"xgb_tfidf_evaluation.json"</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>xgb_tfidf_pipeline <span class="op">=</span> SklearnClassificationPipeline(</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    dataset_name_or_path<span class="op">=</span>DATASET_NAME,</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    input_column_name<span class="op">=</span><span class="st">"text"</span>,</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    target_column_name<span class="op">=</span><span class="st">"target"</span>,</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    output_path<span class="op">=</span>output_path,</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    classifier<span class="op">=</span>XGBClassifier,</span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    vectorizer<span class="op">=</span>TfidfVectorizer,</span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    evaluation_filename<span class="op">=</span>evaluation_filename_xgb_tdidf,</span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    classifier_kwargs<span class="op">=</span>xgb_kwargs,</span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    embedding_kwargs<span class="op">=</span>embeddings_kwargs</span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>evaluation_filename_xgb_tdidf <span class="op">=</span> <span class="st">"xgb_tfidf_evaluation.json"</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>xgb_tfidf_pipeline <span class="op">=</span> SklearnClassificationPipeline(</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    dataset_name_or_path<span class="op">=</span>DATASET_NAME,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    input_column_name<span class="op">=</span><span class="st">"text"</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    target_column_name<span class="op">=</span><span class="st">"target"</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    output_path<span class="op">=</span>output_path,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    classifier<span class="op">=</span>XGBClassifier,</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    vectorizer<span class="op">=</span>TfidfVectorizer,</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    evaluation_filename<span class="op">=</span>evaluation_filename_xgb_tdidf,</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    classifier_kwargs<span class="op">=</span>xgb_kwargs,</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    embedding_kwargs<span class="op">=</span>embeddings_kwargs,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>xgb_tfidf_result <span class="op">=</span> xgb_tfidf_pipeline.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>No config specified, defaulting to: polemo2-official/all_text
 Found cached dataset polemo2-official (/root/.cache/huggingface/datasets/clarin-pl___polemo2-official/all_text/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70)
-100%|██████████| 3/3 [00:00&lt;00:00, 53.77it/s]</code></pre>
+100%|██████████| 3/3 [00:00&lt;00:00, 674.94it/s]</code></pre>
 </div>
 </div>
 </section>
@@ -503,24 +476,20 @@ Found cached dataset polemo2-official (/root/.cache/huggingface/datasets/clarin-
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install seaborn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Collecting seaborn
-  Downloading seaborn-0.12.1-py3-none-any.whl (288 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 288.2/288.2 kB 1.5 MB/s eta 0:00:0000:0100:01
-Requirement already satisfied: pandas&gt;=0.25 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from seaborn) (1.5.1)
-Requirement already satisfied: matplotlib!=3.6.1,&gt;=3.1 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from seaborn) (3.6.2)
-Requirement already satisfied: numpy&gt;=1.17 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from seaborn) (1.23.4)
-Requirement already satisfied: packaging&gt;=20.0 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (21.3)
-Requirement already satisfied: fonttools&gt;=4.22.0 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (4.38.0)
-Requirement already satisfied: contourpy&gt;=1.0.1 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (1.0.6)
-Requirement already satisfied: pillow&gt;=6.2.0 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (9.3.0)
-Requirement already satisfied: python-dateutil&gt;=2.7 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (2.8.2)
-Requirement already satisfied: pyparsing&gt;=2.2.1 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (3.0.9)
-Requirement already satisfied: cycler&gt;=0.10 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (0.11.0)
+<pre><code>Requirement already satisfied: seaborn in /opt/conda/envs/embeddings/lib/python3.9/site-packages (0.12.2)
+Requirement already satisfied: numpy!=1.24.0,&gt;=1.17 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from seaborn) (1.23.4)
+Requirement already satisfied: matplotlib!=3.6.1,&gt;=3.1 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from seaborn) (3.6.3)
+Requirement already satisfied: pandas&gt;=0.25 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from seaborn) (1.5.3)
+Requirement already satisfied: contourpy&gt;=1.0.1 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (1.0.7)
 Requirement already satisfied: kiwisolver&gt;=1.0.1 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (1.4.4)
-Requirement already satisfied: pytz&gt;=2020.1 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from pandas&gt;=0.25-&gt;seaborn) (2022.6)
+Requirement already satisfied: pillow&gt;=6.2.0 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (9.4.0)
+Requirement already satisfied: packaging&gt;=20.0 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (23.0)
+Requirement already satisfied: fonttools&gt;=4.22.0 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (4.38.0)
+Requirement already satisfied: cycler&gt;=0.10 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (0.11.0)
+Requirement already satisfied: pyparsing&gt;=2.2.1 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (3.0.9)
+Requirement already satisfied: python-dateutil&gt;=2.7 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (2.8.2)
+Requirement already satisfied: pytz&gt;=2020.1 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from pandas&gt;=0.25-&gt;seaborn) (2022.7.1)
 Requirement already satisfied: six&gt;=1.5 in /opt/conda/envs/embeddings/lib/python3.9/site-packages (from python-dateutil&gt;=2.7-&gt;matplotlib!=3.6.1,&gt;=3.1-&gt;seaborn) (1.16.0)
-Installing collected packages: seaborn
-Successfully installed seaborn-0.12.1
 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv</code></pre>
 </div>
 </div>
@@ -531,9 +500,8 @@ WARNING: Running pip as the 'root' user can result in broken permissions and con
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>methods <span class="op">=</span> [<span class="st">"AdaBoost"</span>, <span class="st">"SVM"</span>, <span class="st">"XGBoost"</span>]</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>f1_scores <span class="op">=</span> [adaboost_tfidf_result.f1_macro, svm_tfidf_result.f1_macro,</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>             xgb_tfidf_result.f1_macro]</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>results_df <span class="op">=</span> pd.DataFrame(data<span class="op">=</span>{<span class="st">"method"</span>: methods, <span class="st">"f1"</span>: f1_scores})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>f1_scores <span class="op">=</span> [adaboost_tfidf_result.f1_macro, svm_tfidf_result.f1_macro, xgb_tfidf_result.f1_macro]</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>results_df <span class="op">=</span> pd.DataFrame(data<span class="op">=</span>{<span class="st">"method"</span>: methods, <span class="st">"f1"</span>: f1_scores})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>))</span>
@@ -645,27 +613,23 @@ WARNING: Running pip as the 'root' user can result in broken permissions and con
 </div>
 <p>It is one of the most important aspect of LEPISZCZE co store all artifacts generated during models design, construction and training, so we gather all hyper parameters.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>hparams <span class="op">=</span> {</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>embeddings_kwargs,</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>xgb_kwargs,</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"vectorizer"</span>: <span class="st">"TfidfVectorizer"</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>hparams <span class="op">=</span> {<span class="op">**</span>embeddings_kwargs, <span class="op">**</span>xgb_kwargs, <span class="st">"vectorizer"</span>: <span class="st">"TfidfVectorizer"</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We also store packages that are used to train model.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>packages <span class="op">=</span> get_installed_packages() </span>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>packages <span class="op">=</span> get_installed_packages()</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>packages[:<span class="dv">10</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<pre><code>['absl-py==1.3.0',
- 'aiohttp==3.8.3',
+<pre><code>['absl-py==1.4.0',
+ 'aiofiles==22.1.0',
+ 'aiohttp==3.8.4',
  'aiosignal==1.3.1',
- 'alembic==1.8.1',
+ 'aiosqlite==0.18.0',
+ 'alembic==1.9.3',
  'anyio==3.6.2',
  'appdirs==1.4.4',
  'argon2-cffi-bindings==21.2.0',
- 'argon2-cffi==21.3.0',
- 'asttokens==2.1.0',
- 'astunparse==1.6.3']</code></pre>
+ 'argon2-cffi==21.3.0']</code></pre>
 </div>
 </div>
 <p>Then, of course we want to get true labels for our dataset. All dataset in LEPISZCZE contains <code>test</code> set, so we need only extract it from the dataset.</p>
@@ -673,28 +637,36 @@ WARNING: Running pip as the 'root' user can result in broken permissions and con
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>TARGET_COLUMN_NAME <span class="op">=</span> <span class="st">"target"</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> datasets.load_dataset(DATASET_NAME)</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>y_true <span class="op">=</span> np.array(dataset[<span class="st">"test"</span>][TARGET_COLUMN_NAME])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>No config specified, defaulting to: polemo2-official/all_text
+Found cached dataset polemo2-official (/root/.cache/huggingface/datasets/clarin-pl___polemo2-official/all_text/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70)
+100%|██████████| 3/3 [00:00&lt;00:00, 835.69it/s]</code></pre>
+</div>
 </div>
 <p>Then, we need also predictions. It is often important to get predictions from several runs to get variation of results.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> [Predictions(y_true<span class="op">=</span>y_true, y_pred<span class="op">=</span>preds) <span class="cf">for</span> preds <span class="kw">in</span> [xgb_tfidf_result.data.y_pred, xgb_tfidf_result.data.y_pred]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> [</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    Predictions(y_true<span class="op">=</span>y_true, y_pred<span class="op">=</span>preds)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> preds <span class="kw">in</span> [xgb_tfidf_result.data.y_pred, xgb_tfidf_result.data.y_pred]</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Finally, we have all necessary information and we can generate submission.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>submission <span class="op">=</span> AveragedSubmission.from_predictions(</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    submission_name<span class="op">=</span><span class="st">"baseline_xgboost_tfidf"</span>,</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    dataset_name<span class="op">=</span>DATASET_NAME,</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    dataset_version<span class="op">=</span>dataset[<span class="st">"train"</span>].info.version.version_str,</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    embedding_name<span class="op">=</span><span class="st">"XGBoost+Tfidf"</span>, <span class="co"># it will be your's submission model name </span></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    predictions<span class="op">=</span>predictions,</span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    hparams<span class="op">=</span>hparams,</span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    packages<span class="op">=</span>packages,</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    task<span class="op">=</span>get_dataset_task(DATASET_NAME),</span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>submission <span class="op">=</span> AveragedSubmission.from_predictions(</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    submission_name<span class="op">=</span><span class="st">"baseline_xgboost_tfidf"</span>,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    dataset_name<span class="op">=</span>DATASET_NAME,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    dataset_version<span class="op">=</span>dataset[<span class="st">"train"</span>].info.version.version_str,</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    embedding_name<span class="op">=</span><span class="st">"XGBoost+Tfidf"</span>,  <span class="co"># it will be your's submission model name</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    predictions<span class="op">=</span>predictions,</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    hparams<span class="op">=</span>hparams,</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    packages<span class="op">=</span>packages,</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    task<span class="op">=</span>get_dataset_task(DATASET_NAME),</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>submission</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>submission</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<pre><code>AveragedSubmission(submission_name='baseline_xgboost_tfidf', dataset_name='clarin-pl/polemo2-official', dataset_version='0.0.0', embedding_name='XGBoost+Tfidf', hparams={'max_features': 10000, 'n_estimators': 200, 'max_depth': 7, 'vectorizer': 'TfidfVectorizer'}, packages=['absl-py==1.3.0', 'aiohttp==3.8.3', 'aiosignal==1.3.1', 'alembic==1.8.1', 'anyio==3.6.2', 'appdirs==1.4.4', 'argon2-cffi-bindings==21.2.0', 'argon2-cffi==21.3.0', 'asttokens==2.1.0', 'astunparse==1.6.3', 'async-timeout==4.0.2', 'attrs==22.1.0', 'autopage==0.5.1', 'babel==2.11.0', 'backcall==0.2.0', 'beautifulsoup4==4.11.1', 'black==21.12b0', 'bleach==5.0.1', 'bpemb==0.3.4', 'cachecontrol==0.12.11', 'cachetools==5.2.0', 'cachy==0.3.0', 'catalogue==2.0.8', 'certifi==2022.9.24', 'cffi==1.15.1', 'charset-normalizer==2.1.1', 'clarinpl-embeddings==0.0.1', 'cleo==1.0.0a5', 'click==8.0.4', 'cliff==3.10.1', 'cloudpickle==2.2.0', 'cmaes==0.9.0', 'cmd2==2.4.2', 'colorlog==6.7.0', 'conllu==4.5.2', 'contourpy==1.0.6', 'coverage==6.2', 'crashtest==0.3.1', 'cryptography==38.0.3', 'cycler==0.11.0', 'datasets==2.6.1', 'debugpy==1.6.3', 'decorator==5.1.1', 'defusedxml==0.7.1', 'deprecated==1.2.13', 'dill==0.3.5.1', 'distlib==0.3.6', 'docker-pycreds==0.4.0', 'dulwich==0.20.50', 'entrypoints==0.4', 'execnb==0.1.4', 'executing==1.2.0', 'fastcore==1.5.27', 'fastjsonschema==2.16.2', 'filelock==3.8.0', 'flair==0.11.3', 'fonttools==4.38.0', 'frozenlist==1.3.3', 'fsspec==2022.11.0', 'ftfy==6.1.1', 'future==0.18.2', 'gdown==4.4.0', 'gensim==4.2.0', 'ghapi==1.0.3', 'gitdb==4.0.9', 'gitpython==3.1.29', 'google-auth-oauthlib==0.4.6', 'google-auth==2.14.1', 'greenlet==2.0.1', 'grpcio==1.50.0', 'html5lib==1.1', 'huggingface-hub==0.10.1', 'hyperopt==0.2.7', 'idna==3.4', 'importlib-metadata==3.10.1', 'iniconfig==1.1.1', 'ipykernel==6.17.1', 'ipython-genutils==0.2.0', 'ipython==8.6.0', 'isort==5.10.1', 'janome==0.4.2', 'jaraco.classes==3.2.3', 'jedi==0.18.1', 'jeepney==0.8.0', 'jinja2==3.1.2', 'joblib==1.2.0', 'json5==0.9.10', 'jsonschema==4.17.0', 'jupyter-client==7.4.5', 'jupyter-core==5.0.0', 'jupyter-server==1.23.1', 'jupyterlab-pygments==0.2.2', 'jupyterlab-server==2.15.2', 'jupyterlab==3.5.0', 'keyring==23.11.0', 'kiwisolver==1.4.4', 'konoha==4.6.5', 'langdetect==1.0.9', 'lockfile==0.12.2', 'lxml==4.9.1', 'mako==1.2.3', 'markdown==3.3.4', 'markupsafe==2.1.1', 'matplotlib-inline==0.1.6', 'matplotlib==3.6.2', 'mistune==2.0.4', 'more-itertools==9.0.0', 'mpld3==0.3', 'msgpack==1.0.4', 'multidict==6.0.2', 'multiprocess==0.70.13', 'mypy-extensions==0.4.3', 'mypy==0.931', 'nbclassic==0.4.8', 'nbclient==0.7.0', 'nbconvert==7.2.4', 'nbdev==2.3.9', 'nbformat==5.7.0', 'nest-asyncio==1.5.6', 'networkx==2.8.8', 'notebook-shim==0.2.2', 'notebook==6.5.2', 'numpy==1.23.4', 'nvidia-cublas-cu11==11.10.3.66', 'nvidia-cuda-nvrtc-cu11==11.7.99', 'nvidia-cuda-runtime-cu11==11.7.99', 'nvidia-cudnn-cu11==8.5.0.96', 'oauthlib==3.2.2', 'optuna==2.10.1', 'overrides==3.1.0', 'packaging==21.3', 'pandas==1.5.1', 'pandocfilters==1.5.0', 'parso==0.8.3', 'pastel==0.2.1', 'pathspec==0.10.2', 'pathtools==0.1.2', 'pbr==5.11.0', 'pexpect==4.8.0', 'pickleshare==0.7.5', 'pillow==9.3.0', 'pip==22.3.1', 'pkginfo==1.8.3', 'platformdirs==2.5.4', 'pluggy==1.0.0', 'poethepoet==0.11.0', 'poetry-core==1.3.2', 'poetry-plugin-export==1.2.0', 'poetry==1.2.2', 'pptree==3.1', 'prettytable==3.5.0', 'prometheus-client==0.15.0', 'promise==2.3', 'prompt-toolkit==3.0.32', 'protobuf==3.20.3', 'psutil==5.9.4', 'ptyprocess==0.7.0', 'pure-eval==0.2.2', 'py4j==0.10.9.7', 'py==1.11.0', 'pyarrow==10.0.0', 'pyasn1-modules==0.2.8', 'pyasn1==0.4.8', 'pycparser==2.21', 'pydantic==1.10.2', 'pydeprecate==0.3.1', 'pyflakes==2.4.0', 'pygments==2.13.0', 'pylev==1.4.0', 'pyparsing==3.0.9', 'pyperclip==1.8.2', 'pyrsistent==0.19.2', 'pysocks==1.7.1', 'pytest-env==0.6.2', 'pytest==6.2.5', 'python-dateutil==2.8.2', 'pytorch-lightning==1.5.4', 'pytz==2022.6', 'pyyaml==6.0', 'pyzmq==24.0.1', 'regex==2022.10.31', 'requests-oauthlib==1.3.1', 'requests-toolbelt==0.9.1', 'requests==2.28.1', 'responses==0.18.0', 'rsa==4.9', 'sacremoses==0.0.53', 'scikit-learn==1.1.3', 'scipy==1.9.3', 'secretstorage==3.3.3', 'segtok==1.5.11', 'send2trash==1.8.0', 'sentencepiece==0.1.95', 'sentry-sdk==1.10.1', 'seqeval==1.2.2', 'setproctitle==1.3.2', 'setuptools-scm==7.0.5', 'setuptools==65.5.1', 'shellingham==1.5.0', 'shortuuid==1.0.10', 'six==1.16.0', 'smart-open==6.2.0', 'smmap==5.0.0', 'sniffio==1.3.0', 'soupsieve==2.3.2.post1', 'sqlalchemy==1.4.44', 'sqlitedict==2.0.0', 'srsly==2.4.5', 'stack-data==0.6.1', 'stevedore==4.1.1', 'tabulate==0.9.0', 'tensorboard-data-server==0.6.1', 'tensorboard-plugin-wit==1.8.1', 'tensorboard==2.11.0', 'terminado==0.17.0', 'threadpoolctl==3.1.0', 'tinycss2==1.2.1', 'tokenizers==0.13.2', 'toml==0.10.2', 'tomli==1.2.3', 'tomlkit==0.11.6', 'torch==1.12.1+cu113', 'torchaudio==0.12.1+cu113', 'torchmetrics==0.10.2', 'torchvision==0.13.1+cu113', 'tornado==6.2', 'tqdm==4.64.1', 'traitlets==5.5.0', 'transformers==4.24.0', 'typer==0.7.0', 'types-pyyaml==6.0.12.2', 'types-requests==2.26.1', 'types-setuptools==65.5.0.3', 'typing-extensions==4.4.0', 'urllib3==1.26.12', 'virtualenv==20.16.7', 'wandb==0.13.5', 'watchdog==2.1.9', 'wcwidth==0.2.5', 'webencodings==0.5.1', 'websocket-client==1.4.2', 'werkzeug==2.2.2', 'wheel==0.38.4', 'wikipedia-api==0.5.4', 'wrapt==1.14.1', 'xxhash==3.1.0', 'yarl==1.8.1', 'zipp==3.10.0'], predictions=[Predictions(y_pred=array([1, 3, 2, 2, 3, 0, 0, 0, 1, 3, 1, 0, 2, 2, 2, 1, 1, 1, 1, 1, 1, 2,
+<pre><code>AveragedSubmission(submission_name='baseline_xgboost_tfidf', dataset_name='clarin-pl/polemo2-official', dataset_version='0.0.0', embedding_name='XGBoost+Tfidf', hparams={'max_features': 10000, 'n_estimators': 200, 'max_depth': 7, 'vectorizer': 'TfidfVectorizer'}, packages=['absl-py==1.4.0', 'aiofiles==22.1.0', 'aiohttp==3.8.4', 'aiosignal==1.3.1', 'aiosqlite==0.18.0', 'alembic==1.9.3', 'anyio==3.6.2', 'appdirs==1.4.4', 'argon2-cffi-bindings==21.2.0', 'argon2-cffi==21.3.0', 'arrow==1.2.3', 'asttokens==2.2.1', 'astunparse==1.6.3', 'async-timeout==4.0.2', 'attrs==22.2.0', 'babel==2.11.0', 'backcall==0.2.0', 'beautifulsoup4==4.11.2', 'black==21.12b0', 'bleach==6.0.0', 'cachetools==5.3.0', 'catalogue==2.0.8', 'certifi==2022.12.7', 'cffi==1.15.1', 'charset-normalizer==3.0.1', 'click==8.0.4', 'cmaes==0.9.1', 'colorlog==6.7.0', 'comm==0.1.2', 'contourpy==1.0.7', 'coverage==6.2', 'cycler==0.11.0', 'datasets==2.9.0', 'debugpy==1.6.6', 'decorator==5.1.1', 'defusedxml==0.7.1', 'dill==0.3.6', 'docker-pycreds==0.4.0', 'execnb==0.1.5', 'executing==1.2.0', 'fastcore==1.5.28', 'fastjsonschema==2.16.2', 'filelock==3.9.0', 'fonttools==4.38.0', 'fqdn==1.5.1', 'frozenlist==1.3.3', 'fsspec==2023.1.0', 'future==0.18.3', 'ghapi==1.0.3', 'gitdb==4.0.10', 'gitpython==3.1.30', 'google-auth-oauthlib==0.4.6', 'google-auth==2.16.0', 'greenlet==2.0.2', 'grpcio==1.51.1', 'huggingface-hub==0.12.0', 'idna==3.4', 'importlib-metadata==6.0.0', 'iniconfig==2.0.0', 'ipykernel==6.21.2', 'ipython-genutils==0.2.0', 'ipython==8.10.0', 'isoduration==20.11.0', 'isort==5.10.1', 'jedi==0.18.2', 'jinja2==3.1.2', 'joblib==1.2.0', 'json5==0.9.11', 'jsonpointer==2.3', 'jsonschema==4.17.3', 'jupyter-client==8.0.2', 'jupyter-core==5.2.0', 'jupyter-events==0.5.0', 'jupyter-server-fileid==0.6.0', 'jupyter-server-terminals==0.4.4', 'jupyter-server-ydoc==0.6.1', 'jupyter-server==2.2.1', 'jupyter-ydoc==0.2.2', 'jupyterlab-pygments==0.2.2', 'jupyterlab-server==2.19.0', 'jupyterlab==3.6.1', 'kiwisolver==1.4.4', 'mako==1.2.4', 'markdown==3.4.1', 'markupsafe==2.1.2', 'matplotlib-inline==0.1.6', 'matplotlib==3.6.3', 'mistune==2.0.5', 'multidict==6.0.4', 'multiprocess==0.70.14', 'mypy-extensions==1.0.0', 'mypy==0.991', 'nbclassic==0.5.1', 'nbclient==0.7.2', 'nbconvert==7.2.9', 'nbdev==2.3.11', 'nbformat==5.7.3', 'nest-asyncio==1.5.6', 'notebook-shim==0.2.2', 'notebook==6.5.2', 'numpy==1.23.4', 'oauthlib==3.2.2', 'optuna==3.1.0', 'packaging==23.0', 'pandas==1.5.3', 'pandocfilters==1.5.0', 'parso==0.8.3', 'pastel==0.2.1', 'pathspec==0.11.0', 'pathtools==0.1.2', 'pexpect==4.8.0', 'pickleshare==0.7.5', 'pillow==9.4.0', 'pip==23.0', 'platformdirs==3.0.0', 'pluggy==1.0.0', 'poethepoet==0.11.0', 'prometheus-client==0.16.0', 'prompt-toolkit==3.0.36', 'protobuf==4.21.12', 'psutil==5.9.4', 'ptyprocess==0.7.0', 'pure-eval==0.2.2', 'py==1.11.0', 'pyarrow==11.0.0', 'pyasn1-modules==0.2.8', 'pyasn1==0.4.8', 'pycparser==2.21', 'pydantic==1.10.4', 'pydeprecate==0.3.1', 'pyflakes==2.4.0', 'pygments==2.14.0', 'pyparsing==3.0.9', 'pyrsistent==0.19.3', 'pytest-env==0.6.2', 'pytest==6.2.5', 'python-dateutil==2.8.2', 'python-json-logger==2.0.5', 'pytorch-lightning==1.5.4', 'pytz==2022.7.1', 'pyyaml==6.0', 'pyzmq==25.0.0', 'regex==2022.10.31', 'requests-oauthlib==1.3.1', 'requests==2.28.2', 'responses==0.18.0', 'rfc3339-validator==0.1.4', 'rfc3986-validator==0.1.1', 'rsa==4.9', 'sacremoses==0.0.53', 'scikit-learn==1.2.1', 'scipy==1.9.3', 'seaborn==0.12.2', 'send2trash==1.8.0', 'sentry-sdk==1.15.0', 'seqeval==1.2.2', 'setproctitle==1.3.2', 'setuptools==65.7.0', 'six==1.16.0', 'smmap==5.0.0', 'sniffio==1.3.0', 'soupsieve==2.3.2.post1', 'sqlalchemy==2.0.3', 'srsly==2.4.5', 'stack-data==0.6.2', 'tensorboard-data-server==0.7.0', 'tensorboard-plugin-wit==1.8.1', 'tensorboard==2.12.0', 'terminado==0.17.1', 'threadpoolctl==3.1.0', 'tinycss2==1.2.1', 'tokenize-rt==5.0.0', 'tokenizers==0.13.2', 'toml==0.10.2', 'tomli==1.2.3', 'torch==1.12.1+cu113', 'torchaudio==0.12.1+cu113', 'torchmetrics==0.11.1', 'torchvision==0.13.1+cu113', 'tornado==6.2', 'tqdm==4.64.1', 'traitlets==5.9.0', 'transformers==4.26.1', 'typer==0.7.0', 'types-docutils==0.19.1.3', 'types-pyyaml==6.0.12.6', 'types-requests==2.26.1', 'types-setuptools==67.2.0.1', 'typing-extensions==4.4.0', 'uri-template==1.2.0', 'urllib3==1.26.14', 'wandb==0.13.10', 'watchdog==2.2.1', 'wcwidth==0.2.6', 'webcolors==1.12', 'webencodings==0.5.1', 'websocket-client==1.5.1', 'werkzeug==2.2.2', 'wheel==0.38.4', 'xgboost==1.7.3', 'xxhash==3.2.0', 'y-py==0.5.5', 'yarl==1.8.2', 'ypy-websocket==0.8.2', 'zipp==3.13.0'], predictions=[Predictions(y_pred=array([1, 3, 2, 2, 3, 0, 0, 0, 1, 3, 1, 0, 2, 2, 2, 1, 1, 1, 1, 1, 1, 2,
        2, 3, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 3, 2, 3, 1, 1, 2, 1, 1, 3,
        0, 1, 1, 0, 1, 1, 2, 0, 2, 2, 1, 2, 2, 1, 2, 2, 2, 3, 3, 2, 0, 1,
        0, 1, 0, 2, 2, 1, 2, 1, 1, 2, 1, 2, 2, 0, 2, 3, 1, 1, 1, 2, 1, 1,
@@ -847,11 +819,15 @@ WARNING: Running pip as the 'root' user can result in broken permissions and con
 </div>
 <p>Then, just save the submission to json file.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>submission.save_json(root<span class="op">=</span><span class="st">"../../lepiszcze-submissions/baselines"</span>, filename<span class="op">=</span><span class="st">"baseline-xgboost-with-tfidf.json"</span>, compress<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>submission.save_json(</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    root<span class="op">=</span><span class="st">"../../lepiszcze-submissions/baselines"</span>,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span><span class="st">"baseline-xgboost-with-tfidf.json"</span>,</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    compress<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then, finish submission by following <a href="https://lepiszcze.ml/submission/#4-submit-via-pull-request">instruction</a></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls ..<span class="op">/</span>..<span class="op">/</span>lepiszcze<span class="op">-</span>submissions<span class="op">/</span>baselines</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ls ..<span class="op">/</span>..<span class="op">/</span>lepiszcze<span class="op">-</span>submissions<span class="op">/</span>baselines</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>baseline-xgboost-with-tfidf.json  baseline_xgboost_tfidf_predictions.json</code></pre>
 </div>
