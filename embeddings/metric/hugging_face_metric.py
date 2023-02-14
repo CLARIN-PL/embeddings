@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Union
 
-import datasets
+import evaluate
 import torch
 from numpy import typing as nptyping
 
@@ -12,7 +12,7 @@ HF_metric_input = Union[List[Any], nptyping.NDArray[Any], torch.Tensor]
 class HuggingFaceMetric(Metric[HF_metric_input, Dict[Any, Any]]):
     def __init__(
         self,
-        metric: Union[str, datasets.Metric],
+        metric: Union[str, evaluate.Metric],
         compute_kwargs: Optional[Dict[str, Any]] = None,
         **init_kwargs: Any,
     ):
@@ -23,9 +23,7 @@ class HuggingFaceMetric(Metric[HF_metric_input, Dict[Any, Any]]):
                 "Otherwise it would not return results in dict."
             )
 
-        self.metric = (
-            datasets.load_metric(metric, **init_kwargs) if isinstance(metric, str) else metric
-        )
+        self.metric = evaluate.load(metric, **init_kwargs) if isinstance(metric, str) else metric
         self.compute_kwargs = {} if compute_kwargs is None else compute_kwargs
 
     def compute(

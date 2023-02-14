@@ -23,6 +23,7 @@ annoy = { version=">=1.17.0", optional=true}
 appdirs = ">=1.4.4"
 click = "8.0.4" # temporary frozen due to problems with the 8.1.0 version
 datasets = ">=1.16.1"
+evaluate = ">=0.4.0"
 intel-openmp = {version="^2022.0.3", platform="win32"}
 lz4 = { version=">=3.1.10", optional=true}
 numpy = ">=1.20.0, <=1.23.4"
@@ -45,7 +46,7 @@ types-PyYAML = ">=5.4.10"
 types-setuptools = ">=57.4.11"
 typing-extensions = ">=4.0.1.0"
 wandb = ">=0.12.10"
-setuptools = "^65.5.1"
+setuptools = ">=65.5.1"
 
 [tool.poetry.dev-dependencies]
 black = "21.12b0"
@@ -57,11 +58,11 @@ pytest = "6.2.5"
 types-requests = "2.26.1"
 coverage = {extras = ["toml"], version = "6.2"}
 pytest-env = "0.6.2"
-nbdev = "^2.3.9"
-jupyterlab = "^3.5.0"
+nbdev = ">=2.3.9"
+jupyterlab = ">=3.5.0"
 
 [tool.poetry.group.dev.dependencies]
-nbdev = "^2.3.11"
+nbdev = ">=2.3.11"
 
 [tool.poe.tasks]
 black = "black --check ./"
@@ -128,7 +129,8 @@ module = [
     "appdirs",
     "dataset.arrow_dataset",
     "seqeval.*",
-    "transformers"
+    "transformers",
+    "evaluate"
 ]
 ignore_missing_imports = true
 
