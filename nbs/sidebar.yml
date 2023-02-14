@@ -11,8 +11,3 @@ website:
         contents:
           - 02_LEPISZCZE/00_lepiszcze.ipynb
           - 02_LEPISZCZE/01_submission.ipynb
-      - section: tutorials
-        contents:
-          - tutorials/baseline_sklearn_models_tutorial.ipynb
-          - tutorials/tutorial_how_to_use_config_space.ipynb
-          - tutorials/validate_lightning_models_inference.ipynb
