@@ -2,14 +2,17 @@ website:
   sidebar:
     contents:
       - index.ipynb
-      - section: lepiszcze
+      - section: Tutorials
         contents:
-          - lepiszcze/00_lepiszcze.ipynb
-          - lepiszcze/01_submission.ipynb
+          - 01_Tutorials/baseline_sklearn_models_tutorial.ipynb
+          - 01_Tutorials/tutorial_how_to_use_config_space.ipynb
+          - 01_Tutorials/validate_lightning_models_inference.ipynb
+      - section: LEPISZCZE
+        contents:
+          - 02_LEPISZCZE/00_lepiszcze.ipynb
+          - 02_LEPISZCZE/01_submission.ipynb
       - section: tutorials
         contents:
           - tutorials/baseline_sklearn_models_tutorial.ipynb
-          - tutorials/how_to_use_polsih_static_embeddings.ipynb
           - tutorials/tutorial_how_to_use_config_space.ipynb
-          - tutorials/validate_flair_models_inference.ipynb
           - tutorials/validate_lightning_models_inference.ipynb
