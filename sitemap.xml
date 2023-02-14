@@ -2,26 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://CLARIN-PL.github.io/embeddings/index.html</loc>
-    <lastmod>2023-02-14T14:13:58.184Z</lastmod>
+    <lastmod>2023-02-14T15:00:36.548Z</lastmod>
   </url>
   <url>
     <loc>https://CLARIN-PL.github.io/embeddings/02_LEPISZCZE/lepiszcze.html</loc>
-    <lastmod>2023-02-14T14:13:58.864Z</lastmod>
+    <lastmod>2023-02-14T15:00:37.228Z</lastmod>
   </url>
   <url>
     <loc>https://CLARIN-PL.github.io/embeddings/02_LEPISZCZE/submission.html</loc>
-    <lastmod>2023-02-14T14:13:59.200Z</lastmod>
+    <lastmod>2023-02-14T15:00:37.568Z</lastmod>
   </url>
   <url>
     <loc>https://CLARIN-PL.github.io/embeddings/01_Tutorials/baseline_sklearn_models_tutorial.html</loc>
-    <lastmod>2023-02-14T14:13:59.632Z</lastmod>
+    <lastmod>2023-02-14T15:00:38.008Z</lastmod>
   </url>
   <url>
     <loc>https://CLARIN-PL.github.io/embeddings/01_Tutorials/validate_lightning_models_inference.html</loc>
-    <lastmod>2023-02-14T14:13:59.988Z</lastmod>
+    <lastmod>2023-02-14T15:00:38.348Z</lastmod>
   </url>
   <url>
     <loc>https://CLARIN-PL.github.io/embeddings/01_Tutorials/tutorial_how_to_use_config_space.html</loc>
-    <lastmod>2023-02-14T14:14:00.404Z</lastmod>
+    <lastmod>2023-02-14T15:00:38.756Z</lastmod>
   </url>
 </urlset>
