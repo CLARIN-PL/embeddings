@@ -1,0 +1,13 @@
+website:
+  sidebar:
+    contents:
+      - index.ipynb
+      - section: Tutorials
+        contents:
+          - 01_Tutorials/baseline_sklearn_models_tutorial.ipynb
+          - 01_Tutorials/tutorial_how_to_use_config_space.ipynb
+          - 01_Tutorials/validate_lightning_models_inference.ipynb
+      - section: LEPISZCZE
+        contents:
+          - 02_LEPISZCZE/00_lepiszcze.ipynb
+          - 02_LEPISZCZE/01_submission.ipynb
