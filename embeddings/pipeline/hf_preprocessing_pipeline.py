@@ -22,6 +22,8 @@ from embeddings.utils.hf_persister import HuggingFaceDatasetLocalPersister
 class HuggingFacePreprocessingPipeline(
     PreprocessingPipeline[str, datasets.DatasetDict, datasets.DatasetDict]
 ):
+    """Preprocessing pipeline dedicated to work with HuggingFace datasets."""
+
     def __init__(
         self,
         dataset_name: str,

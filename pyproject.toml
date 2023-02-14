@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "clarinpl-embeddings"
-version = "0.0.1"
+version = "0.2.0"
 description = ""
 license = "MIT"
 authors = [
@@ -46,6 +46,7 @@ types-PyYAML = ">=5.4.10"
 types-setuptools = ">=57.4.11"
 typing-extensions = ">=4.0.1.0"
 wandb = ">=0.12.10"
+setuptools = ">=65.5.1"
 
 [tool.poetry.dev-dependencies]
 black = "21.12b0"
@@ -57,6 +58,11 @@ pytest = "6.2.5"
 types-requests = "2.26.1"
 coverage = {extras = ["toml"], version = "6.2"}
 pytest-env = "0.6.2"
+nbdev = ">=2.3.9"
+jupyterlab = ">=3.5.0"
+
+[tool.poetry.group.dev.dependencies]
+nbdev = ">=2.3.11"
 
 [tool.poe.tasks]
 black = "black --check ./"
@@ -76,13 +82,14 @@ check_local = ["black", "isort", "pyflakes", "mypy_local", "mypy_examples_local"
 fix = ["black_fix", "isort_fix"]
 all = ["check", "test"]
 fix_check = ["fix", "check"]
+force-torch-cuda = "python -m pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113"
 
 [tool.poetry.extras]
 developer = ["black", "mypy", "typing-extensions"]
 
 [build-system]
-requires = ["poetry>=1.1.5"]
-build-backend = "poetry.masonry.api"
+requires = ["setuptools", "poetry>=1.2", "poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 testpaths = "tests"
@@ -93,6 +100,7 @@ env = [
 
 [tool.black]
 line-length = 100
+exclude = ["embeddings/_modidx.py"]
 
 [tool.isort]
 line_length = 100
