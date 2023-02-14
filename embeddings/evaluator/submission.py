@@ -1,7 +1,7 @@
 import json
 import tempfile
 from abc import ABC
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from io import TextIOWrapper
 from pathlib import Path
 from statistics import mean, median, stdev
@@ -14,6 +14,11 @@ from wandb.apis.public import Run
 
 from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import Predictions
+from embeddings.evaluator.leaderboard import (
+    HUGGINGFACE_DATASET_LEADERBOARD_DATASET_MAPPING,
+    LEADERBOARD_DATASET_TASK_MAPPING,
+    LeaderboardTask,
+)
 from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEvaluator
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.utils.json_dict_persister import CustomJsonEncoder
@@ -30,9 +35,13 @@ class _BaseSubmission(ABC):
     packages: List[str]
     predictions: Union[Predictions, List[Predictions]]
     config: Optional[Dict[str, Any]]  # any additional config
+    dataset_key: str = field(init=False)
+    leaderboard_task_name: LeaderboardTask = field(init=False)
 
     def __post_init__(self) -> None:
         self.submission_name = standardize_name(self.submission_name)
+        self.dataset_key = HUGGINGFACE_DATASET_LEADERBOARD_DATASET_MAPPING[self.dataset_name]
+        self.leaderboard_task_name = LEADERBOARD_DATASET_TASK_MAPPING[self.dataset_key]
 
     def save_json(
         self,
@@ -58,7 +67,9 @@ class _BaseSubmission(ABC):
 
     def without_predictions(self) -> Dict[str, Any]:
         result = asdict(self)
-        result.pop("predictions")
+        for k in ("predictions", "dataset_key"):
+            result.pop(k)
+
         return result
 
 
@@ -91,6 +102,8 @@ class Submission(_BaseSubmission):
         wandb_config_path: T_path,
         best_params_path: T_path,
         task: str,
+        dataset_name: Optional[str] = None,
+        additional_config: Optional[Dict[str, Any]] = None,
     ) -> "Submission":
         wandb_config_path = Path(wandb_config_path)
         if wandb_config_path.is_dir():
@@ -109,16 +122,17 @@ class Submission(_BaseSubmission):
         evaluator = cls._get_evaluator_cls(task)(return_input_data=False, **evaluator_kwargs)
         metrics = evaluator.evaluate(data=predictions).metrics
         packages = srsly.read_json(str(packages_file_path))
+        dataset_name = wandb_cfg["dataset_name_or_path"] if not dataset_name else dataset_name
         return cls(
             submission_name=submission_name,
-            dataset_name=wandb_cfg["dataset_name_or_path"],
-            dataset_version=wandb_cfg["dataset_version"],
-            embedding_name=wandb_cfg["embedding_name_or_path"],
+            dataset_name=dataset_name,
+            dataset_version=wandb_cfg["dataset_version"]["value"],
+            embedding_name=wandb_cfg["embedding_name_or_path"]["value"],
             metrics=metrics,
             predictions=predictions,
             hparams=hparams["config"],
             packages=packages,
-            config=wandb_cfg,
+            config=additional_config,
         )
 
     @staticmethod
@@ -128,6 +142,7 @@ class Submission(_BaseSubmission):
         hps_summary_run: Run,
         task: str,
         root: Optional[T_path] = None,
+        additional_config: Optional[Dict[str, Any]] = None,
     ) -> "Submission":
         assert retrain_run.state == "finished"
 
@@ -173,12 +188,41 @@ class Submission(_BaseSubmission):
 
         return Submission(
             submission_name=submission_name,
-            dataset_name=config["dataset_name_or_path"],
-            dataset_version=config["dataset_version"],
-            embedding_name=config["embedding_name_or_path"],
+            dataset_name=config["dataset_name_or_path"]["value"],
+            dataset_version=config["dataset_version"]["value"],
+            embedding_name=config["embedding_name_or_path"]["value"],
             metrics=metrics,
             predictions=predictions,
             hparams=hparams["config"],
+            packages=packages,
+            config=additional_config,
+        )
+
+    @staticmethod
+    def from_predictions(
+        submission_name: str,
+        dataset_name: str,
+        dataset_version: str,
+        embedding_name: str,
+        predictions: Predictions,
+        hparams: Dict[str, Any],
+        packages: List[str],
+        task: str,
+        evaluator_kwargs: Optional[Dict[str, Any]] = None,
+        config: Optional[Dict[str, Any]] = None,  # any additional config
+    ) -> "Submission":
+        evaluator = Submission._get_evaluator_cls(task)(
+            return_input_data=False, **(evaluator_kwargs or {})
+        )
+        metrics = evaluator.evaluate(data=predictions).metrics
+        return Submission(
+            submission_name=submission_name,
+            dataset_name=dataset_name,
+            dataset_version=dataset_version,
+            embedding_name=embedding_name,
+            metrics=metrics,
+            predictions=predictions,
+            hparams=hparams,
             packages=packages,
             config=config,
         )
@@ -213,16 +257,18 @@ class AveragedSubmission(_BaseSubmission):
         wandb_config_paths: List[T_path],
         best_params_path: T_path,
         task: str,
+        dataset_name: Optional[str] = None,
     ) -> "AveragedSubmission":
         assert len(evaluation_file_paths) == len(packages_file_paths) == len(wandb_config_paths)
         submissions = [
             Submission.from_local_disk(
-                submission_name,
-                evaluation_file_path,
-                packages_file_path,
-                wandb_config_path,
-                best_params_path,
-                task,
+                submission_name=submission_name,
+                evaluation_file_path=evaluation_file_path,
+                packages_file_path=packages_file_path,
+                wandb_config_path=wandb_config_path,
+                best_params_path=best_params_path,
+                task=task,
+                dataset_name=dataset_name,
             )
             for evaluation_file_path, packages_file_path, wandb_config_path in zip(
                 evaluation_file_paths, packages_file_paths, wandb_config_paths
@@ -262,6 +308,37 @@ class AveragedSubmission(_BaseSubmission):
         )
 
     @classmethod
+    def from_predictions(
+        cls,
+        submission_name: str,
+        dataset_name: str,
+        dataset_version: str,
+        embedding_name: str,
+        predictions: Sequence[Predictions],
+        hparams: Dict[str, Any],
+        packages: List[str],
+        task: str,
+        evaluator_kwargs: Optional[Dict[str, Any]] = None,
+        config: Optional[Dict[str, Any]] = None,  # any additional config
+    ) -> "AveragedSubmission":
+        submissions = [
+            Submission.from_predictions(
+                submission_name=submission_name,
+                dataset_name=dataset_name,
+                dataset_version=dataset_version,
+                embedding_name=embedding_name,
+                predictions=predictions_,
+                hparams=hparams,
+                packages=packages,
+                task=task,
+                evaluator_kwargs=evaluator_kwargs,
+                config=config,
+            )
+            for predictions_ in predictions
+        ]
+        return AveragedSubmission.from_submissions(submissions)
+
+    @classmethod
     def _aggregate_metrics_dicts(
         cls, dicts: Sequence[Dict[str, Any]]
     ) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
@@ -297,6 +374,7 @@ class AveragedSubmission(_BaseSubmission):
     @staticmethod
     def _get_common_fields(submission: Submission) -> Dict[str, Any]:
         result = asdict(submission)
-        result.pop("predictions")
-        result.pop("metrics")
+        for k in ("predictions", "metrics", "dataset_key", "leaderboard_task_name"):
+            result.pop(k)
+
         return result
