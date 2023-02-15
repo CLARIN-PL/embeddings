@@ -30,13 +30,14 @@ class SeqevalTorchMetric(Metric):
         self.add_state("y_pred", default=list(), dist_reduce_fx="cat")
         self.add_state("y_true", default=list(), dist_reduce_fx="cat")
 
-    # ignoring due to different types defined in parent abstract method
-    def update(self, preds: torch.Tensor, target: torch.Tensor) -> None:  # type: ignore
+    def update(self, preds: torch.Tensor, target: torch.Tensor) -> None:
         assert preds.shape == target.shape
+        assert isinstance(self.y_pred, list) and isinstance(self.y_true, list)
         self.y_pred += [preds]
         self.y_true += [target]
 
     def compute(self) -> Dict[str, float]:
+        assert isinstance(self.y_pred, list) and isinstance(self.y_true, list)
         result = self.metric.compute(**self._input_format(preds=self.y_pred, targets=self.y_true))
         result.pop("classes")
         result = {k: v for k, v in result.items() if self.average in k}
@@ -46,6 +47,6 @@ class SeqevalTorchMetric(Metric):
         self, preds: List[torch.Tensor], targets: List[torch.Tensor]
     ) -> Dict[str, List[List[str]]]:
         return {
-            "y_true": [self.class_label.int2str(x) for x in preds],
-            "y_pred": [self.class_label.int2str(x) for x in targets],
+            "y_true": [list(self.class_label.int2str(x)) for x in preds],
+            "y_pred": [list(self.class_label.int2str(x)) for x in targets],
         }

@@ -1,9 +1,8 @@
-name: CI Main
-on: release
+name: CI Docs
+on: pull_request
 
 jobs:
-  publish:
-    environment: Deployment
+  test_doc_build:
     strategy:
       fail-fast: false
       matrix:
@@ -27,15 +26,21 @@ jobs:
         id: cached-poetry-dependencies
         with:
           path: .venv
-          key: release-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            main-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
-            main-venv-${{ runner.os }}-${{matrix.python-version}}-
+          key: main-venv-${{ runner.os }}-${{matrix.python-version}}-${{ hashFiles('**/poetry.lock') }}
       - name: Install deps
         run: poetry install -vv --no-interaction --no-root --extras "developer"
-      - name: Build and publish
+      - name: Make package editable
+        run: poetry run pip install --editable ./
+      - name: Build docs
+        run: poetry run nbdev_docs
+      - name: test docs build
         run: |
-          poetry version "$(git describe --tags --abbrev=0)"
-          poetry build
-          poetry publish --username __token__ --password ${{ secrets.PYPI_API_TOKEN }}
-
+          poetry run nbdev_docs
+          if [ -f "_docs/index.html" ]; then
+            echo "docs built successfully."
+          else
+            echo "index page not found in rendered docs."
+            ls -la
+            ls -la _docs
+            exit 1
+          fi

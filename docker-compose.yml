@@ -1,0 +1,17 @@
+version: "3.0"
+
+services:
+  embeddings:
+    build:
+      context: .
+      dockerfile: ./docker/embeddings-gpu/Dockerfile
+    container_name: embeddings
+    volumes:
+      - .:/app
+    tty: true
+    shm_size: "16gb"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]

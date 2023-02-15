@@ -1,6 +1,7 @@
 import abc
+import inspect
 from inspect import signature
-from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar
+from typing import Any, Dict, Generic, List, Literal, Optional, Tuple, TypeVar
 
 import numpy as np
 import pytorch_lightning as pl
@@ -37,6 +38,7 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         **kwargs: Any,
     ):
         super().__init__()
+        assert inspect.ismethod(self.save_hyperparameters)
         self.save_hyperparameters(ignore=["downstream_model_type"])  # cannot pickle model type
         self.metrics = metrics
 
@@ -121,24 +123,38 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         self.test_metrics = self.metrics.clone(prefix="test/")
 
     def get_default_metrics(self) -> MetricCollection:
+        assert isinstance(self.hparams, dict)
+
+        task: Literal["multiclass", "binary"] = (
+            "multiclass" if self.hparams["num_classes"] > 2 else "binary"
+        )
+
+        # Accuracy, Precision etc. no longer inherits from Metric subclass as it is helper class
         return MetricCollection(
             [
-                Accuracy(num_classes=self.hparams.num_classes),
-                Precision(num_classes=self.hparams.num_classes, average="macro"),
-                Recall(num_classes=self.hparams.num_classes, average="macro"),
-                F1Score(num_classes=self.hparams.num_classes, average="macro"),
+                Accuracy(num_classes=self.hparams["num_classes"], task=task),  # type: ignore[list-item]
+                Precision(
+                    num_classes=self.hparams["num_classes"], average="macro", task=task
+                ),  # type: ignore[list-item]
+                Recall(
+                    num_classes=self.hparams["num_classes"], average="macro", task=task
+                ),  # type: ignore[list-item]
+                F1Score(
+                    num_classes=self.hparams["num_classes"], average="macro", task=task
+                ),  # type: ignore[list-item]
             ]
         )
 
     def configure_optimizers(self) -> Tuple[List[Optimizer], List[Any]]:
         """Prepare optimizer and schedule (linear warmup and decay)"""
+        assert isinstance(self.hparams, dict)
         no_decay = ["bias", "LayerNorm.weight"]
         optimizer_grouped_parameters = [
             {
                 "params": [
                     p for n, p in self.named_parameters() if not any(nd in n for nd in no_decay)
                 ],
-                "weight_decay": self.hparams.weight_decay,
+                "weight_decay": self.hparams["weight_decay"],
             },
             {
                 "params": [
@@ -147,17 +163,16 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
                 "weight_decay": 0.0,
             },
         ]
-
-        optimizer_cls = getattr(torch.optim, self.hparams.optimizer)
+        optimizer_cls = getattr(torch.optim, self.hparams["optimizer"])
         assert "lr" in signature(optimizer_cls).parameters
         assert "eps" in signature(optimizer_cls).parameters
         optimizer = optimizer_cls(
             optimizer_grouped_parameters,
-            lr=self.hparams.learning_rate,
-            eps=self.hparams.adam_epsilon,
+            lr=self.hparams["learning_rate"],
+            eps=self.hparams["adam_epsilon"],
         )
 
-        if self.hparams.use_scheduler:
+        if self.hparams["use_scheduler"]:
             lr_schedulers = self._get_schedulers(optimizer=optimizer)
         else:
             lr_schedulers = []
@@ -165,9 +180,10 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         return [optimizer], lr_schedulers
 
     def _get_schedulers(self, optimizer: Optimizer) -> List[Dict[str, Any]]:
+        assert isinstance(self.hparams, dict)
         scheduler = get_linear_schedule_with_warmup(
             optimizer,
-            num_warmup_steps=self.hparams.warmup_steps,
+            num_warmup_steps=self.hparams["warmup_steps"],
             num_training_steps=self.total_steps,
         )
         return [{"scheduler": scheduler, "interval": "step", "frequency": 1}]

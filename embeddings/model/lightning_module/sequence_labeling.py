@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional, Tuple
 
 import torch
 from datasets import ClassLabel
+from pytorch_lightning.utilities.parsing import AttributeDict
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torchmetrics import MetricCollection
 from transformers import AutoModelForTokenClassification
@@ -63,6 +64,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         loss, logits, preds = self.shared_step(**batch)
         self.train_metrics(preds[labels != self.ignore_index], labels[labels != self.ignore_index])
         self.log("train/Loss", loss)
+        assert isinstance(self.hparams, AttributeDict)
         if self.hparams.use_scheduler:
             assert self.trainer is not None
             last_lr = self.trainer.lr_schedulers[0]["scheduler"].get_last_lr()
@@ -98,8 +100,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         metrics: MetricCollection,
         prog_bar: bool = False,
     ) -> Dict[str, float]:
-        metric_values = metrics.compute()[metrics.prefix + next(iter(metrics))]
-        metric_values = {metrics.prefix + k: v for k, v in metric_values.items()}
+        metric_values = metrics.compute()
         assert isinstance(metric_values, dict)
         metrics.reset()
         self.log_dict(metric_values, prog_bar=prog_bar)

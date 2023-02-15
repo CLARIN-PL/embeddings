@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional
 
 import numpy as np
+from datasets import ClassLabel
 from numpy import typing as nptyping
 from torch.utils.data import DataLoader
 
@@ -80,8 +81,9 @@ class SequenceLabelingTask(LightningTask):
         self, data: nptyping.NDArray[Any], ground_truth_data: nptyping.NDArray[Any]
     ) -> List[str]:
         assert self.model is not None
+        assert isinstance(self.model.class_label, ClassLabel)
         return [
-            self.model.class_label.int2str(x.item())
+            str(self.model.class_label.int2str(x.item()))
             for x in data[ground_truth_data != self.model.ignore_index]
         ]
 

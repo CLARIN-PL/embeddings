@@ -1,28 +1,26 @@
 import abc
-import gc
 import logging
 import os
 from abc import ABC
 from dataclasses import dataclass, field
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, Generic, Optional, Tuple, Type, TypeVar
 
 import optuna
 import pandas as pd
-import torch
 from optuna import Study
 
 from embeddings.config.config_space import ConfigSpace, SampledParameters
 from embeddings.data.dataset import Data
 from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import EvaluationResults
-from embeddings.pipeline.evaluation_pipeline import ModelEvaluationPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.pipeline.pipelines_metadata import EvaluationMetadata, Metadata
 from embeddings.pipeline.preprocessing_pipeline import PreprocessingPipeline
 from embeddings.pipeline.standard_pipeline import LoaderResult, ModelResult, TransformationResult
 from embeddings.utils.hps_persister import HPSResultsPersister
 from embeddings.utils.loggers import LightningLoggingConfig
+from embeddings.utils.torch_utils import cleanup_torch_model_artifacts
 from embeddings.utils.utils import standardize_name
 
 EvaluationResult = TypeVar("EvaluationResult", bound=EvaluationResults)
@@ -35,14 +33,8 @@ class OptunaCallback(ABC):
 
 
 class TorchGarbageCollectorOptunaCallback(OptunaCallback):
-    @staticmethod
-    def _cleanup() -> None:
-        gc.collect()
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()  # type: ignore
-
     def __call__(self, study: Study, trial: optuna.trial.FrozenTrial) -> None:
-        TorchGarbageCollectorOptunaCallback._cleanup()
+        cleanup_torch_model_artifacts()
 
 
 class OptimizedPipeline(ABC, Generic[Metadata]):
@@ -107,9 +99,8 @@ class OptunaPipeline(
         preprocessing_pipeline: Optional[
             PreprocessingPipeline[Data, LoaderResult, TransformationResult]
         ],
-        evaluation_pipeline: Union[
-            Type[ModelEvaluationPipeline[Data, LoaderResult, ModelResult, EvaluationResult]],
-            Type[LightningPipeline[TransformationResult, ModelResult, EvaluationResult]],
+        evaluation_pipeline: Type[
+            LightningPipeline[TransformationResult, ModelResult, EvaluationResult]
         ],
         pruner: optuna.pruners.BasePruner,
         sampler: optuna.samplers.BaseSampler,
@@ -117,7 +108,7 @@ class OptunaPipeline(
         dataset_path: T_path,
         metric_name: str,
     ):
-        self.config_space = config_space
+        self.config_space: ConfigSpace = config_space
         self.preprocessing_pipeline = preprocessing_pipeline
         self.evaluation_pipeline = evaluation_pipeline
         self.pruner = pruner
@@ -183,10 +174,7 @@ class OptunaPipeline(
 
     def _get_evaluation_pipeline(
         self, **kwargs: Any
-    ) -> Union[
-        ModelEvaluationPipeline[Data, LoaderResult, ModelResult, EvaluationResult],
-        LightningPipeline[TransformationResult, ModelResult, EvaluationResult],
-    ]:
+    ) -> LightningPipeline[TransformationResult, ModelResult, EvaluationResult]:
         return self.evaluation_pipeline(**kwargs)
 
     def _pre_run_hook(self) -> None:
@@ -218,8 +206,7 @@ class _HuggingFaceOptimizedPipelineDefaultsBase(ABC):
     ignore_preprocessing_pipeline: bool = False
 
 
-# Mypy currently properly don't handle dataclasses with abstract methods  https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
+@dataclass
 class AbstractHuggingFaceOptimizedPipeline(
     _HuggingFaceOptimizedPipelineDefaultsBase,
     _HuggingFaceOptimizedPipelineBase[ConfigSpace],

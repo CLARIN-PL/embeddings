@@ -1,0 +1,16 @@
+.dvc
+.history
+
+**/.git
+**/.gitignore
+**/.vscode
+**/coverage
+**/.env
+**/.aws
+**/.ssh
+README.md
+**/.DS_Store
+**/venv
+**/env
+
+webpage

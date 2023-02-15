@@ -1,7 +1,10 @@
+"""CLARIN-PL embeddings edited evaluate/seqeval metric. """
+
 import importlib
 from typing import Any, Dict, List, Optional, Union
 
 import datasets
+import evaluate
 from seqeval.metrics import accuracy_score, classification_report
 
 _CITATION = """\
@@ -64,7 +67,7 @@ Returns:
 Examples:
     >>> predictions = [['O', 'O', 'B-MISC', 'I-MISC', 'I-MISC', 'I-MISC', 'O'], ['B-PER', 'I-PER', 'O']]
     >>> references = [['O', 'O', 'O', 'B-MISC', 'I-MISC', 'I-MISC', 'O'], ['B-PER', 'I-PER', 'O']]
-    >>> seqeval = datasets.load_metric("seqeval")
+    >>> seqeval = evaluate.load("seqeval")
     >>> results = seqeval.compute(predictions=predictions, references=references)
     >>> print(list(results.keys()))
     ['MISC', 'PER', 'overall_precision', 'overall_recall', 'overall_f1', 'overall_accuracy']
@@ -75,11 +78,12 @@ Examples:
 """
 
 
-class SeqevalMetric(datasets.Metric):
+# type ignore added due to subclass Any issue
+class SeqevalMetric(evaluate.Metric):  # type:ignore[misc]
     # the class is rewritten basing on
-    # https://github.com/huggingface/datasets/blob/master/metrics/seqeval/seqeval.py
-    def _info(self) -> datasets.MetricInfo:
-        return datasets.MetricInfo(
+    # https://github.com/huggingface/evaluate/blob/main/metrics/seqeval/seqeval.py
+    def _info(self) -> evaluate.MetricInfo:
+        return evaluate.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
             homepage="https://github.com/chakki-works/seqeval",
