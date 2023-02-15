@@ -14,10 +14,6 @@ from transformers.modeling_outputs import QuestionAnsweringModelOutput
 def unwrap_outputs_from_batches(
     predictions: List[Dict[str, Union[QuestionAnsweringModelOutput, Dict[str, torch.Tensor]]]]
 ) -> Dict[str, Dict[str, torch.Tensor]]:
-    """
-    TODO: Refactor
-    Move to embedding/transformation/lightning_transformation/question_answering_output_transformation.py
-    """
     tensors_lists_dict: Dict[str, Dict[str, List[torch.Tensor]]] = {}
 
     for batch_id, batch in enumerate(predictions):
@@ -42,13 +38,6 @@ def unwrap_outputs_from_batches(
 
 
 class QABasePostprocessor(abc.ABC):
-    """
-    TODO: Refactor
-    Move to embedding/transformation/lightning_transformation/question_answering_output_transformation.py
-
-    Refactor pt 2:
-    - Add transformation as base class, and change name of postprocess to transformer
-    """
     @abc.abstractmethod
     def postprocess(
         self,
@@ -62,9 +51,6 @@ class QABasePostprocessor(abc.ABC):
 
 class QAPredictionPostProcessor(QABasePostprocessor):
     """
-    TODO:
-    Move to embedding/transformation/lightning_transformation/question_answering_output_transformation.py
-
     Based on QA huggingface transformers pipeline.
     https://github.com/huggingface/transformers/blob/d6b8e9cec7301ba02f642588a6f12e78ec3b9798/examples/pytorch/question-answering/utils_qa.py#L31
     https://colab.research.google.com/github/huggingface/notebooks/blob/main/examples/question_answering.ipynb#scrollTo=n9qywopnIrJH
