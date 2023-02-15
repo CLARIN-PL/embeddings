@@ -1,29 +1,12 @@
-import abc
 from typing import List, Dict, Union, Any
 
 import datasets
 
-from embeddings.task.lightning_task.question_answering import SQUAD_V2_PREDICTED_ANSWER_TYPE, SQUAD_V2_GOLD_ANSWER_TYPE
+from embeddings.metric.hugging_face_metric import HuggingFaceMetric
+from embeddings.model.lightning_module.question_answering import QA_PREDICTED_ANSWER_TYPE, QA_GOLD_ANSWER_TYPE
 
 
-class QAMetric(abc.ABC):
-    """
-    TODO:
-    Refactor pt 2:
-    - Decide whether we need additional seperate base QA metric class
-    """
-
-    """TODO: Refactor it as metric"""
-    @abc.abstractmethod
-    def calculate(
-        self,
-        predictions: List[SQUAD_V2_PREDICTED_ANSWER_TYPE],
-        references: List[SQUAD_V2_GOLD_ANSWER_TYPE],
-    ) -> Dict[str, Union[float, int]]:
-        pass
-
-
-class SQUADv2Metric(QAMetric):
+class SQUADv2Metric(HuggingFaceMetric):
     """
     TODO:
     Refactor:
@@ -36,8 +19,8 @@ class SQUADv2Metric(QAMetric):
 
     def calculate(
         self,
-        predictions: List[SQUAD_V2_PREDICTED_ANSWER_TYPE],
-        references: List[SQUAD_V2_GOLD_ANSWER_TYPE],
+        predictions: List[QA_PREDICTED_ANSWER_TYPE],
+        references: List[QA_GOLD_ANSWER_TYPE],
     ) -> Dict[Any, Any]:
         metrics = self.metric.compute(
             predictions=predictions,

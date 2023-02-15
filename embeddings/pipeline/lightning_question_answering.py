@@ -9,9 +9,9 @@ from tqdm import tqdm
 from embeddings.config.lightning_config import LightningBasicConfig, LightningConfig
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
-from embeddings.data.qa_datamodule import QAHuggingFaceDataModule
+from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
 from embeddings.evaluator.evaluation_results import Predictions, QuestionAnsweringEvaluationResults
-from embeddings.evaluator.question_answering_evaluator import QASquadV2Evaluator
+from embeddings.evaluator.question_answering_evaluator import QuestionAnsweringEvaluator
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline, EvaluationResult
 from embeddings.task.lightning_task import question_answering
@@ -43,17 +43,13 @@ class LightningQuestionAnsweringPipeline(
         model_checkpoint_kwargs = model_checkpoint_kwargs if model_checkpoint_kwargs else {}
         output_path = Path(output_path)
         self.evaluation_filename = evaluation_filename
-        datamodule = QAHuggingFaceDataModule(
+        datamodule = QuestionAnsweringDataModule(
             dataset_name_or_path=dataset_name_or_path,
             tokenizer_name_or_path=tokenizer_name_or_path,
             train_batch_size=config.task_model_kwargs["train_batch_size"],
             eval_batch_size=config.task_model_kwargs["eval_batch_size"],
-            max_seq_length=config.task_model_kwargs["max_seq_length"]
-            if config.task_model_kwargs["max_seq_length"] is not None
-            else 512,
-            doc_stride=config.task_model_kwargs["doc_stride"]
-            if config.task_model_kwargs["doc_stride"] is not None
-            else 128,
+            max_seq_length=config.task_model_kwargs["max_seq_length"],
+            doc_stride=config.task_model_kwargs["doc_stride"],
         )
         datamodule.setup(stage="fit")
 
@@ -66,10 +62,9 @@ class LightningQuestionAnsweringPipeline(
             task_train_kwargs=task_train_kwargs,
             early_stopping_kwargs=config.early_stopping_kwargs,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
-            mlflow_logger=None,
         )
         model = LightningModel(task, predict_subset)
-        evaluator = QASquadV2Evaluator()
+        evaluator = QuestionAnsweringEvaluator()
         super().__init__(datamodule, model, evaluator, output_path, logging_config)
 
     def run(self, run_name: Optional[str] = None) -> EvaluationResult:

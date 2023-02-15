@@ -9,22 +9,17 @@ from torch.utils.data import DataLoader
 from transformers import AutoModelForQuestionAnswering, AutoConfig, AutoModel
 from transformers.modeling_outputs import QuestionAnsweringModelOutput
 
+from embeddings.data.datamodule import HuggingFaceDataset
 from embeddings.data.dataset import Dataset
 from embeddings.data.io import T_path
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.model.lightning_module.lightning_module import LightningModule
 
-HuggingFaceDataset = Type[Dataset]  # to refactor
+QA_PREDICTED_ANSWER_TYPE = Dict[str, Union[str, int, float]]
+QA_GOLD_ANSWER_TYPE = Dict[str, Union[Dict[str, Union[List[str], List[Any]]], str, int]]
 
 
-class PretrainedQAModel(pl.LightningModule):  # type: ignore
-    """
-    TODO:
-    Refactor pt. 2
-    Refactor in separate PR (create seperate task for inference)
-    https://github.com/CLARIN-PL/embeddings/issues/279
-    """
-
+class QuestionAnsweringInferenceModule(pl.LightningModule):
     def __init__(self, model_name: str) -> None:
         super().__init__()
         self.model = AutoModelForQuestionAnswering.from_pretrained(model_name)
@@ -49,13 +44,8 @@ class PretrainedQAModel(pl.LightningModule):  # type: ignore
             return_predictions=True,
         )
 
-class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
-    """
-    TODO:
-    Refactor pt. 2:
-    - Refactor functions `setup`, `forward` `freeze_transformer`
-    """
 
+class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
     downstream_model_type = AutoModelForQuestionAnswering
 
     def __init__(

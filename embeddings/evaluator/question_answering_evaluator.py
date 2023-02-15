@@ -1,29 +1,26 @@
 import abc
-from typing import Dict, Any, Tuple, List
+from typing import Dict, Any, Tuple, List, Union
+
+import torch
+from numpy import typing as nptyping
 
 from tqdm.auto import tqdm
 
 from embedding.transformation.lightning_transformation.question_answering_output_transformation import \
     QAPredictionPostProcessor
+from embeddings.evaluator.metrics_evaluator import MetricsEvaluator
+from embeddings.metric.metric import Metric
 from embeddings.metric.question_answering import SQUADv2Metric
-from embeddings.task.lightning_task.question_answering import SQUAD_V2_GOLD_ANSWER_TYPE, SQUAD_V2_PREDICTED_ANSWER_TYPE
+from embeddings.model.lightning_module.question_answering import QA_GOLD_ANSWER_TYPE, QA_PREDICTED_ANSWER_TYPE
 
 
-class QAEvaluator(abc.ABC):
-    """
-    TODO:
-    Rewrite it as evaluator
-    """
-
-    @abc.abstractmethod
-    def evaluate(self, scores: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-        pass
-
-
-class QASquadV2Evaluator(QAEvaluator):
+class QuestionAnsweringEvaluator(MetricsEvaluator):
     """
     TODO:
     Rewrite it as evaluator"""
+
+    def metrics(self) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
+        pass
 
     def __init__(self, no_answer_threshold: float = 1.0):
         self.metric = SQUADv2Metric(no_answer_threshold=no_answer_threshold)
@@ -36,7 +33,7 @@ class QASquadV2Evaluator(QAEvaluator):
         for split in tqdm(scores.keys(), desc="Split"):
             outputs[split] = self.postprocessor.postprocess(**scores[split])
 
-            references: List[SQUAD_V2_GOLD_ANSWER_TYPE] = []
+            references: List[QA_GOLD_ANSWER_TYPE] = []
             for example_id, example in enumerate(outputs[split]):
                 references.append(
                     {
@@ -49,7 +46,7 @@ class QASquadV2Evaluator(QAEvaluator):
                         },
                     }
                 )
-            predictions: List[SQUAD_V2_PREDICTED_ANSWER_TYPE] = [
+            predictions: List[QA_PREDICTED_ANSWER_TYPE] = [
                 {"id": it_id, **it["predicted_answer"]} for it_id, it in enumerate(outputs[split])
             ]
             metrics[split] = SQUADv2Metric().calculate(

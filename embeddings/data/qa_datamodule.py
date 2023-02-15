@@ -98,7 +98,7 @@ class CharToTokenMapper:
         return features
 
 
-class QAHuggingFaceDataModule(HuggingFaceDataModule):
+class QuestionAnsweringDataModule(HuggingFaceDataModule):
     DEFAULT_BATCH_ENCODING_KWARGS = {
         "padding": "max_length",
         "truncation": "only_second",
@@ -156,11 +156,11 @@ class QAHuggingFaceDataModule(HuggingFaceDataModule):
             seed=seed,
             **kwargs,
         )
-        self.dataset = None  # type: ignore
-        self.splits = list(self.dataset_raw.keys())  # type: ignore
+        self.dataset = None
+        self.splits = list(self.dataset_raw.keys())
         self.process_data(stage="fit")
 
-    def process_data(self, stage: Optional[str]) -> None:  # type: ignore
+    def process_data(self, stage: Optional[str]) -> None:
         assert isinstance(self.dataset_raw, datasets.DatasetDict)
         self.dataset = deepcopy(self.dataset_raw)
         if stage == "fit":
