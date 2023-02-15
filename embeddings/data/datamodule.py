@@ -107,6 +107,20 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
         return dataset_info, dataset_version
 
+    def predict_dataloader(
+        self,
+    ) -> Union[DataLoader[HuggingFaceDataset], Sequence[DataLoader[HuggingFaceDataset]]]:
+        return [
+            DataLoader(
+                dataset=self.dataset[split],
+                batch_size=self.eval_batch_size,
+                collate_fn=self.collate_fn,
+                shuffle=False,
+                **self.dataloader_kwargs,
+            )
+            for split in self.splits
+        ]
+
     @abc.abstractmethod
     def prepare_labels(self) -> None:
         pass

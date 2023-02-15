@@ -248,17 +248,3 @@ class QAHuggingFaceDataModule(HuggingFaceDataModule):
 
     def _class_encode_column(self, column_name: str) -> None:
         pass
-
-    def predict_dataloader(
-        self,
-    ) -> Union[DataLoader[HuggingFaceDataset], Sequence[DataLoader[HuggingFaceDataset]]]:
-        return [
-            DataLoader(
-                dataset=self.dataset[split],  # type: ignore
-                batch_size=self.eval_batch_size,
-                collate_fn=self.collate_fn,
-                shuffle=False,
-                **self.dataloader_kwargs,
-            )
-            for split in self.splits
-        ]
