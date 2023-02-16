@@ -99,7 +99,6 @@ env = [
 
 [tool.black]
 line-length = 100
-exclude = ["embeddings/_modidx.py"]
 
 [tool.isort]
 line_length = 100
