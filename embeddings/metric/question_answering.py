@@ -1,6 +1,6 @@
 from typing import List, Dict, Union, Any
 
-import datasets
+import evaluate
 
 from embeddings.metric.hugging_face_metric import HuggingFaceMetric
 from embeddings.model.lightning_module.question_answering import QA_PREDICTED_ANSWER_TYPE, QA_GOLD_ANSWER_TYPE
@@ -14,7 +14,7 @@ class SQUADv2Metric(HuggingFaceMetric):
     """
 
     def __init__(self, no_answer_threshold: float = 1.0) -> None:
-        self.metric = datasets.load_metric("squad_v2")
+        self.metric = evaluate.load("squad_v2")
         self.no_answer_threshold = no_answer_threshold
 
     def calculate(
