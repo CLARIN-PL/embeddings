@@ -6,7 +6,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from torch.utils.data import DataLoader
-from transformers import AutoModel
+from transformers import AutoModel, AutoTokenizer
 
 from embeddings.data.datamodule import HuggingFaceDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
@@ -45,6 +45,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         self.model: Optional[HuggingFaceLightningModule] = None
         self.trainer: Optional[pl.Trainer] = None
         self.logging_config = logging_config
+        self.tokenizer: Optional[AutoTokenizer] = None
 
     @property
     def best_epoch(self) -> Optional[float]:
@@ -85,6 +86,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
     ) -> None:
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
+        self.tokenizer = data.tokenizer
 
         callbacks = self._get_callbacks(dataset_subsets=list(data.load_dataset().keys()))
         self.trainer = pl.Trainer(
