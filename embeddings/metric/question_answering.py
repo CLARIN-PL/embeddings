@@ -1,9 +1,12 @@
-from typing import List, Dict, Union, Any
+from typing import Any, Dict, List
 
 import evaluate
 
 from embeddings.metric.hugging_face_metric import HuggingFaceMetric
-from embeddings.model.lightning_module.question_answering import QA_PREDICTED_ANSWER_TYPE, QA_GOLD_ANSWER_TYPE
+from embeddings.model.lightning_module.question_answering import (
+    QA_GOLD_ANSWER_TYPE,
+    QA_PREDICTED_ANSWER_TYPE,
+)
 
 
 class SQUADv2Metric(HuggingFaceMetric):

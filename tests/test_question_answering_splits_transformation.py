@@ -1,14 +1,13 @@
-from typing import Dict, Any
+from typing import Any, Dict
 
+import datasets
 import numpy as np
 import pandas as pd
+import pytest
 
 from embeddings.transformation.hf_transformation.qa_data_split_transformation import (
     QuestionAnsweringSplitsTransformation,
 )
-
-import datasets
-import pytest
 
 
 @pytest.fixture(scope="module")

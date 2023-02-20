@@ -1,18 +1,16 @@
 import sys
 from collections import ChainMap
-from typing import Dict, Optional, Union, Sequence, List, Any, Type
+from typing import Any, Dict, List, Optional, Sequence, Union
 
 import pytorch_lightning as pl
 import torch
 from pytorch_lightning.utilities.types import STEP_OUTPUT
 from torch.utils.data import DataLoader
-from transformers import AutoModelForQuestionAnswering, AutoConfig, AutoModel
+from transformers import AutoConfig, AutoModel, AutoModelForQuestionAnswering
 from transformers.modeling_outputs import QuestionAnsweringModelOutput
 
 from embeddings.data.datamodule import HuggingFaceDataset
-from embeddings.data.dataset import Dataset
 from embeddings.data.io import T_path
-from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.model.lightning_module.lightning_module import LightningModule
 
 QA_PREDICTED_ANSWER_TYPE = Dict[str, Union[str, int, float]]
@@ -49,11 +47,11 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
     downstream_model_type = AutoModelForQuestionAnswering
 
     def __init__(
-            self,
-            model_name_or_path: T_path,
-            finetune_last_n_layers: int,
-            config_kwargs: Optional[Dict[str, Any]] = None,
-            task_model_kwargs: Optional[Dict[str, Any]] = None,
+        self,
+        model_name_or_path: T_path,
+        finetune_last_n_layers: int,
+        config_kwargs: Optional[Dict[str, Any]] = None,
+        task_model_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
 
         super().__init__(metrics=None, **task_model_kwargs if task_model_kwargs else {})

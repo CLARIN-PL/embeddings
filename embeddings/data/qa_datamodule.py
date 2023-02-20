@@ -1,15 +1,15 @@
 from copy import deepcopy
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import datasets
 import pandas as pd
 from datasets import DatasetDict
 from datasets.utils import Version
-from embeddings.data.datamodule import HuggingFaceDataModule, HuggingFaceDataset
+from transformers import AutoTokenizer, BatchEncoding
+
+from embeddings.data.datamodule import HuggingFaceDataModule
 from embeddings.data.io import T_path
 from embeddings.utils.utils import initialize_kwargs
-from torch.utils.data import DataLoader
-from transformers import AutoTokenizer, BatchEncoding
 
 
 class CharToTokenMapper:

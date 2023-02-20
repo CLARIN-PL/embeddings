@@ -1,17 +1,19 @@
-import abc
-from typing import Dict, Any, Tuple, List, Union
+from typing import Any, Dict, List, Tuple, Union
 
 import torch
 from numpy import typing as nptyping
-
 from tqdm.auto import tqdm
 
-from embedding.transformation.lightning_transformation.question_answering_output_transformation import \
-    QAPredictionPostProcessor
+from embedding.transformation.lightning_transformation.question_answering_output_transformation import (
+    QAPredictionPostProcessor,
+)
 from embeddings.evaluator.metrics_evaluator import MetricsEvaluator
 from embeddings.metric.metric import Metric
 from embeddings.metric.question_answering import SQUADv2Metric
-from embeddings.model.lightning_module.question_answering import QA_GOLD_ANSWER_TYPE, QA_PREDICTED_ANSWER_TYPE
+from embeddings.model.lightning_module.question_answering import (
+    QA_GOLD_ANSWER_TYPE,
+    QA_PREDICTED_ANSWER_TYPE,
+)
 
 
 class QuestionAnsweringEvaluator(MetricsEvaluator):

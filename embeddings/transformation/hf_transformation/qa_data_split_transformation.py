@@ -1,6 +1,6 @@
 from typing import Optional
 
-from datasets import DatasetDict, Dataset
+from datasets import Dataset, DatasetDict
 from sklearn.model_selection import train_test_split
 
 from embeddings.transformation.transformation import Transformation

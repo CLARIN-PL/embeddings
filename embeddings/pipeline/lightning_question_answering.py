@@ -2,9 +2,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import datasets
-import pandas as pd
 from pytorch_lightning.accelerators import Accelerator
-from tqdm import tqdm
 
 from embeddings.config.lightning_config import LightningBasicConfig, LightningConfig
 from embeddings.data.dataset import LightingDataModuleSubset
@@ -13,7 +11,7 @@ from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
 from embeddings.evaluator.evaluation_results import Predictions, QuestionAnsweringEvaluationResults
 from embeddings.evaluator.question_answering_evaluator import QuestionAnsweringEvaluator
 from embeddings.model.lightning_model import LightningModel
-from embeddings.pipeline.lightning_pipeline import LightningPipeline, EvaluationResult
+from embeddings.pipeline.lightning_pipeline import EvaluationResult, LightningPipeline
 from embeddings.task.lightning_task import question_answering
 from embeddings.utils.loggers import LightningLoggingConfig
 from embeddings.utils.utils import standardize_name
