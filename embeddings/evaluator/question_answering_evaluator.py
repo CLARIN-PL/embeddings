@@ -17,11 +17,9 @@ from embeddings.model.lightning_module.question_answering import (
 
 
 class QuestionAnsweringEvaluator(MetricsEvaluator):
-    """
-    TODO:
-    Rewrite it as evaluator"""
-
-    def metrics(self) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
+    def metrics(
+        self,
+    ) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
         pass
 
     def __init__(self, no_answer_threshold: float = 1.0):
