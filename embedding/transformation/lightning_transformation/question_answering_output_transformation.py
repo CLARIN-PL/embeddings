@@ -119,7 +119,7 @@ class QAPredictionPostProcessor(QABasePostprocessor):
     ) -> List[Dict[str, Any]]:
         for prediction in predictions:
             offsets = prediction.pop("offsets")
-            prediction["text"] = context[offsets[0] : offsets[1]]
+            prediction["text"] = context[offsets[0]: offsets[1]]
 
         return predictions
 

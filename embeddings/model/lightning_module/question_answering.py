@@ -24,16 +24,16 @@ class QuestionAnsweringInferenceModule(pl.LightningModule):
         self.trainer = pl.Trainer(devices="auto", accelerator="auto")
 
     def predict_step(
-            self, batch: Dict[str, torch.Tensor], batch_idx: int, dataloader_idx: Optional[int] = None
+        self, batch: Dict[str, torch.Tensor], batch_idx: int, dataloader_idx: Optional[int] = None
     ) -> Dict[str, Union[QuestionAnsweringModelOutput, Dict[str, torch.Tensor]]]:
         outputs = self.model(**batch)
         return {"data": batch, "outputs": outputs}
 
     def predict(
-            self,
-            dataloaders: Union[
-                DataLoader[HuggingFaceDataset], Sequence[DataLoader[HuggingFaceDataset]]
-            ],
+        self,
+        dataloaders: Union[
+            DataLoader[HuggingFaceDataset], Sequence[DataLoader[HuggingFaceDataset]]
+        ],
     ) -> List[Dict[str, Union[QuestionAnsweringModelOutput, Dict[str, torch.Tensor]]]]:
         assert self.trainer is not None
         return self.trainer.predict(  # type: ignore

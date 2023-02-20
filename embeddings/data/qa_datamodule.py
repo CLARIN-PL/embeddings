@@ -34,9 +34,7 @@ class CharToTokenMapper:
             else answers["answer_start"]
         )
         end_char = start_char + len(
-            answers["text"][0]
-            if isinstance(answers["text"], list)
-            else answers["text"]
+            answers["text"][0] if isinstance(answers["text"], list) else answers["text"]
         )
         return start_char, end_char
 

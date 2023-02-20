@@ -71,7 +71,9 @@ class LightningQuestionAnsweringPipeline(
         self._save_artifacts()
         self.model.task.build_task_model()
         self.model.task.fit(self.datamodule)
-        model_result = self.model.task.postprocess(data=self.datamodule, predict_subset=self.model.predict_subset)
+        model_result = self.model.task.postprocess(
+            data=self.datamodule, predict_subset=self.model.predict_subset
+        )
         result = self.evaluator.evaluate(model_result)
         self._finish_logging()
         return result

@@ -11,7 +11,6 @@ from embeddings.utils.loggers import LightningLoggingConfig
 
 
 class QuestionAnsweringTask(LightningTask):
-
     def __init__(
         self,
         model_name_or_path: T_path,
@@ -56,9 +55,7 @@ class QuestionAnsweringTask(LightningTask):
         return self.trainer.predict(model=self.model, dataloaders=dataloader)
 
     def postprocess(
-        self,
-        data: HuggingFaceDataModule,
-        predict_subset: LightingDataModuleSubset = None
+        self, data: HuggingFaceDataModule, predict_subset: LightingDataModuleSubset = None
     ) -> Dict[str, Any]:
         data_loader = data.get_subset(predict_subset)
         scores = {}

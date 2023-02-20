@@ -71,6 +71,7 @@ class TextClassificationEvaluationResults(EvaluationResults):
 class SequenceLabelingEvaluationResults(EvaluationResults):
     pass
 
+
 @dataclass
 class QuestionAnsweringEvaluationResults(EvaluationResults):
     pass
