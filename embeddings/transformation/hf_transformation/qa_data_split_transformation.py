@@ -24,19 +24,19 @@ class QuestionAnsweringSplitsTransformation(Transformation[Dataset, DatasetDict]
         self.stratify_column = stratify_column
 
     def transform(self, data: Dataset) -> DatasetDict:
-        data = data.to_pandas()
+        data_df = data.to_pandas()
         dataset = DatasetDict()
-        unique_contexts = list(sorted(data[self.context_column].unique()))
+        unique_contexts = list(sorted(data_df[self.context_column].unique()))
         context_ids = list(range(len(unique_contexts)))
         contexts_mapping = dict(zip(unique_contexts, context_ids))
-        data["context_id"] = data.apply(lambda x: contexts_mapping[x[self.context_column]], axis=1)
+        data_df["context_id"] = data_df.apply(lambda x: contexts_mapping[x[self.context_column]], axis=1)
 
         stratify = None
         if self.stratify_column:
-            assert self.stratify_column in data.columns
+            assert self.stratify_column in data_df.columns
             stratify = []
             for context_id in context_ids:
-                df = data[data.context_id == context_id]
+                df = data_df[data_df.context_id == context_id]
                 value = df[self.stratify_column].values
                 assert len(value.unique()) == 1
                 stratify.append(value.unique()[0])
@@ -49,7 +49,7 @@ class QuestionAnsweringSplitsTransformation(Transformation[Dataset, DatasetDict]
         )
 
         dataset["train"] = Dataset.from_pandas(
-            data[data.context_id.isin(train_indices)], preserve_index=False
+            data_df[data_df.context_id.isin(train_indices)], preserve_index=False
         )
 
         if self.dev_size and self.test_size:
@@ -60,20 +60,20 @@ class QuestionAnsweringSplitsTransformation(Transformation[Dataset, DatasetDict]
             )
 
             dataset["validation"] = Dataset.from_pandas(
-                data[data.context_id.isin(dev_indices)], preserve_index=False
+                data_df[data_df.context_id.isin(dev_indices)], preserve_index=False
             )
             dataset["test"] = Dataset.from_pandas(
-                data[data.context_id.isin(test_indices)], preserve_index=False
+                data_df[data_df.context_id.isin(test_indices)], preserve_index=False
             )
 
         elif self.dev_size and not self.test_size:
             dataset["validation"] = Dataset.from_pandas(
-                data[data.context_id.isin(validation_indices)], preserve_index=False
+                data_df[data_df.context_id.isin(validation_indices)], preserve_index=False
             )
 
         elif self.test_size and not self.dev_size:
             dataset["test"] = Dataset.from_pandas(
-                data[data.context_id.isin(validation_indices)], preserve_index=False
+                data_df[data_df.context_id.isin(validation_indices)], preserve_index=False
             )
 
         return dataset
