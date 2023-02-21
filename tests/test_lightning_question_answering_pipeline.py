@@ -62,13 +62,13 @@ def dataset_dict() -> datasets.DatasetDict:
             "frequencies around 12 GHz. HEMTs based on gallium nitride and aluminium gallium nitride (AlGaN/GaN "
             "HEMTs) provide a still higher electron mobility and are being developed for various applications.",
             'Once known as "the Gibraltar of the West" and "Fortress Bermuda", Bermuda today is defended by forces of '
-            'the British government. For the first two centuries of settlement, the most potent armed force operating '
-            'from Bermuda was its merchant shipping fleet, which turned to privateering at every opportunity. The '
-            'Bermuda government maintained a local militia. After the American Revolutionary War, Bermuda was '
-            'established as the Western Atlantic headquarters of the Royal Navy. Once the Royal Navy established a '
-            'base and dockyard defended by regular soldiers, however, the militias were disbanded following the War '
-            'of 1812. At the end of the 19th century, the colony raised volunteer units to form a reserve for the '
-            'military garrison.',
+            "the British government. For the first two centuries of settlement, the most potent armed force operating "
+            "from Bermuda was its merchant shipping fleet, which turned to privateering at every opportunity. The "
+            "Bermuda government maintained a local militia. After the American Revolutionary War, Bermuda was "
+            "established as the Western Atlantic headquarters of the Royal Navy. Once the Royal Navy established a "
+            "base and dockyard defended by regular soldiers, however, the militias were disbanded following the War "
+            "of 1812. At the end of the 19th century, the colony raised volunteer units to form a reserve for the "
+            "military garrison.",
             "Some NPOs which are particularly well known, often for the charitable or social nature of their "
             "activities performed during a long period of time, include Amnesty International, Oxfam, "
             "Rotary International, Kiwanis International, Carnegie Corporation of New York, Nourishing USA, "
@@ -88,19 +88,19 @@ def dataset_dict() -> datasets.DatasetDict:
             "composition. In his last years, he was financially supported by his admirer Jane Stirling, "
             "who also arranged for him to visit Scotland in 1848. Through most of his life, Chopin suffered from poor "
             "health. He died in Paris in 1849, probably of tuberculosis.",
-            'Armenian literature dates back to 400 AD, when Mesrop Mashtots first invented the Armenian alphabet. '
-            'This period of time is often viewed as the Golden Age of Armenian literature. Early Armenian literature '
+            "Armenian literature dates back to 400 AD, when Mesrop Mashtots first invented the Armenian alphabet. "
+            "This period of time is often viewed as the Golden Age of Armenian literature. Early Armenian literature "
             'was written by the "father of Armenian history", Moses of Chorene, who authored The History of Armenia. '
-            'The book covers the time-frame from the formation of the Armenian people to the fifth century AD. The '
-            'nineteenth century beheld a great literary movement that was to give rise to modern Armenian literature. '
-            'This period of time, during which Armenian culture flourished, is known as the Revival period (Zartonki '
-            'sherchan). The Revivalist authors of Constantinople and Tiflis, almost identical to the Romanticists of '
-            'Europe, were interested in encouraging Armenian nationalism. Most of them adopted the newly created '
-            'Eastern or Western variants of the Armenian language depending on the targeted audience, and preferred '
-            'them over classical Armenian (grabar). This period ended after the Hamidian massacres, when Armenians '
-            'experienced turbulent times. As Armenian history of the 1920s and of the Genocide came to be more openly '
-            'discussed, writers like Paruyr Sevak, Gevork Emin, Silva Kaputikyan and Hovhannes Shiraz began a new era '
-            'of literature.',
+            "The book covers the time-frame from the formation of the Armenian people to the fifth century AD. The "
+            "nineteenth century beheld a great literary movement that was to give rise to modern Armenian literature. "
+            "This period of time, during which Armenian culture flourished, is known as the Revival period (Zartonki "
+            "sherchan). The Revivalist authors of Constantinople and Tiflis, almost identical to the Romanticists of "
+            "Europe, were interested in encouraging Armenian nationalism. Most of them adopted the newly created "
+            "Eastern or Western variants of the Armenian language depending on the targeted audience, and preferred "
+            "them over classical Armenian (grabar). This period ended after the Hamidian massacres, when Armenians "
+            "experienced turbulent times. As Armenian history of the 1920s and of the Genocide came to be more openly "
+            "discussed, writers like Paruyr Sevak, Gevork Emin, Silva Kaputikyan and Hovhannes Shiraz began a new era "
+            "of literature.",
             "Towards the end of the 1990s and into the 2000s, producers such as Daft Punk, Stardust, Cassius, "
             "St. Germain and DJ Falcon began producing a new sound out of Paris's house scene. Together, "
             "they laid the groundwork for what would be known as the French house movement. By combining the "
