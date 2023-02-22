@@ -25,9 +25,29 @@ class SQUADv2Metric(HuggingFaceMetric):
         predictions: List[QA_PREDICTED_ANSWER_TYPE],
         references: List[QA_GOLD_ANSWER_TYPE],
     ) -> Dict[Any, Any]:
+        expected_predictions = [
+            {
+                "id": str(i),
+                "prediction_text": pred["prediction_text"],
+                "no_answer_probability": pred["no_answer_probability"],
+            }
+            for i, pred in enumerate(predictions)
+        ]
+
+        expected_references = [
+            {
+                "id": str(i),
+                "answers": {
+                    "text": ref["answers"]["text"],
+                    "answer_start": ref["answers"]["answer_start"],
+                },
+            }
+            for i, ref in enumerate(references)
+        ]
+
         metrics = self.metric.compute(
-            predictions=predictions,
-            references=references,
+            predictions=expected_predictions,
+            references=expected_references,
             no_answer_threshold=self.no_answer_threshold,
         )
         assert metrics is not None
