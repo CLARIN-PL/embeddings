@@ -1,13 +1,13 @@
 import random
 from pathlib import Path
-from typing import Dict, Any
-from tqdm import tqdm
+from typing import Any, Dict
 
 import datasets
 import numpy as np
 import pytest
 import torch
 from _pytest.tmpdir import TempdirFactory
+from tqdm import tqdm
 
 from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
 from embeddings.evaluator.question_answering_evaluator import QuestionAnsweringEvaluator
@@ -175,8 +175,9 @@ def dataset_dict() -> datasets.DatasetDict:
 
 
 @pytest.fixture(scope="module")
-def question_answering_data_module(tmp_path_module: Path,
-                                   dataset_dict: datasets.DatasetDict) -> QuestionAnsweringDataModule:
+def question_answering_data_module(
+    tmp_path_module: Path, dataset_dict: datasets.DatasetDict
+) -> QuestionAnsweringDataModule:
     dataset = dataset_dict
     dataset.save_to_disk(tmp_path_module / "data_sample")
     return QuestionAnsweringDataModule(
@@ -202,7 +203,7 @@ def question_answering_task() -> QuestionAnsweringTask:
             "use_scheduler": False,
             "warmup_steps": None,
             "train_batch_size": 5,
-            "eval_batch_size": 5
+            "eval_batch_size": 5,
         },
         output_path=".",
         model_config_kwargs={},
@@ -210,21 +211,17 @@ def question_answering_task() -> QuestionAnsweringTask:
             "max_epochs": 1,
             "devices": "auto",
             "accelerator": "auto",
-            "deterministic": True
+            "deterministic": True,
         },
-        early_stopping_kwargs={
-            "monitor": "val/Loss",
-            "patience": 1,
-            "mode": "min"
-        },
-        model_checkpoint_kwargs={}
+        early_stopping_kwargs={"monitor": "val/Loss", "patience": 1, "mode": "min"},
+        model_checkpoint_kwargs={},
     )
 
 
 @pytest.fixture(scope="module")
 def scores(
-        question_answering_data_module: QuestionAnsweringDataModule,
-        question_answering_task: QuestionAnsweringTask,
+    question_answering_data_module: QuestionAnsweringDataModule,
+    question_answering_task: QuestionAnsweringTask,
 ) -> Dict[str, Any]:
     datamodule = question_answering_data_module
     task = question_answering_task
@@ -259,15 +256,23 @@ def test_question_answering_evaluator(scores: Dict[str, Any]):
     np.testing.assert_almost_equal(validation_metrics["f1"], 3.8394892, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["total"], 10.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["HasAns_exact"], 0.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(validation_metrics["HasAns_f1"], 4.2660992, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(
+        validation_metrics["HasAns_f1"], 4.2660992, decimal=pytest.decimal
+    )
     np.testing.assert_almost_equal(validation_metrics["HasAns_total"], 9.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["NoAns_exact"], 0.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["NoAns_f1"], 0.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["NoAns_total"], 1.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["best_exact"], 10.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(validation_metrics["best_exact_thresh"], 0.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(validation_metrics["best_f1"], 13.5294117, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(validation_metrics["best_f1_thresh"], 0.0, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(
+        validation_metrics["best_exact_thresh"], 0.0, decimal=pytest.decimal
+    )
+    np.testing.assert_almost_equal(
+        validation_metrics["best_f1"], 13.5294117, decimal=pytest.decimal
+    )
+    np.testing.assert_almost_equal(
+        validation_metrics["best_f1_thresh"], 0.0, decimal=pytest.decimal
+    )
 
     assert "context" in sample_output.keys()
     assert "questions" in sample_output.keys()
@@ -276,4 +281,6 @@ def test_question_answering_evaluator(scores: Dict[str, Any]):
     assert isinstance(sample_output["context"], str)
     assert isinstance(sample_output["questions"], str)
     assert sample_output["answers"] is None or isinstance(sample_output["answers"], dict)
-    assert sample_output["predicted_answer"] is None or isinstance(sample_output["predicted_answer"], dict)
+    assert sample_output["predicted_answer"] is None or isinstance(
+        sample_output["predicted_answer"], dict
+    )

@@ -29,7 +29,9 @@ class QuestionAnsweringSplitsTransformation(Transformation[Dataset, DatasetDict]
         unique_contexts = list(sorted(data_df[self.context_column].unique()))
         context_ids = list(range(len(unique_contexts)))
         contexts_mapping = dict(zip(unique_contexts, context_ids))
-        data_df["context_id"] = data_df.apply(lambda x: contexts_mapping[x[self.context_column]], axis=1)
+        data_df["context_id"] = data_df.apply(
+            lambda x: contexts_mapping[x[self.context_column]], axis=1
+        )
 
         stratify = None
         if self.stratify_column:
