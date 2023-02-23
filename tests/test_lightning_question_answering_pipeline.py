@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from _pytest.tmpdir import TempdirFactory
 
-from embeddings.config.lightning_config import LightningAdvancedConfig
+from embeddings.config.lightning_config import LightningQABasicConfig
 from embeddings.pipeline.lightning_question_answering import LightningQuestionAnsweringPipeline
 
 
@@ -168,8 +168,8 @@ def dataset_dict() -> datasets.DatasetDict:
 
 
 @pytest.fixture(scope="module")
-def config() -> LightningAdvancedConfig:
-    return LightningAdvancedConfig(
+def config() -> LightningQABasicConfig:
+    return LightningQABasicConfig(
         finetune_last_n_layers=-1,
         task_train_kwargs={
             "max_epochs": 1,
@@ -198,7 +198,6 @@ def config() -> LightningAdvancedConfig:
             "patience": 3,
         },
         tokenizer_kwargs={},
-        batch_encoding_kwargs={},
         dataloader_kwargs={},
         model_config_kwargs={},
     )
@@ -206,7 +205,7 @@ def config() -> LightningAdvancedConfig:
 
 @pytest.fixture(scope="module")
 def lightning_question_answering_pipeline(
-    config: LightningAdvancedConfig, tmp_path_module: Path, dataset_dict: datasets.DatasetDict
+    config: LightningQABasicConfig, tmp_path_module: Path, dataset_dict: datasets.DatasetDict
 ):
     dataset = dataset_dict
     dataset.save_to_disk(tmp_path_module / "data_sample")
@@ -223,7 +222,7 @@ def lightning_question_answering_pipeline(
 
 def test_lightning_advanced_config(config):
     lightning_config = config
-    assert isinstance(lightning_config, LightningAdvancedConfig)
+    assert isinstance(lightning_config, LightningQABasicConfig)
     assert hasattr(lightning_config, "finetune_last_n_layers")
     assert hasattr(lightning_config, "task_train_kwargs")
     assert hasattr(lightning_config, "task_model_kwargs")
