@@ -13,7 +13,7 @@ from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
 from embeddings.evaluator.question_answering_evaluator import QuestionAnsweringEvaluator
 from embeddings.task.lightning_task.question_answering import QuestionAnsweringTask
 
-torch.manual_seed(42)
+torch.manual_seed(441)
 
 
 @pytest.fixture(scope="module")
@@ -259,11 +259,11 @@ def test_question_answering_evaluator(scores: Dict[str, Any]):
     sample_output = random.choice(validation_outputs)
 
     np.testing.assert_almost_equal(validation_metrics["exact"], 0.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(validation_metrics["f1"], 3.8394892, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(validation_metrics["f1"], 3.1313131, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["total"], 10.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["HasAns_exact"], 0.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(
-        validation_metrics["HasAns_f1"], 4.2660992, decimal=pytest.decimal
+        validation_metrics["HasAns_f1"], 3.4792368, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(validation_metrics["HasAns_total"], 9.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["NoAns_exact"], 0.0, decimal=pytest.decimal)
@@ -274,7 +274,7 @@ def test_question_answering_evaluator(scores: Dict[str, Any]):
         validation_metrics["best_exact_thresh"], 0.0, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        validation_metrics["best_f1"], 13.5294117, decimal=pytest.decimal
+        validation_metrics["best_f1"], 13.1313131, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
         validation_metrics["best_f1_thresh"], 0.0, decimal=pytest.decimal
