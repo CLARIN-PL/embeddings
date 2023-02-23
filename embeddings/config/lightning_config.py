@@ -113,4 +113,25 @@ class LightningAdvancedConfig(AdvancedConfig):
         )
 
 
+@dataclass
+class LightningQABasicConfig(LightningBasicConfig):
+    batch_encoding_kwargs: Dict[str, Any] = field(
+        default_factory=lambda: {
+            "padding": "max_length",
+            "truncation": "only_second",
+            "return_offsets_mapping": True,
+            "return_overflowing_tokens": True,
+        }
+    )
+    doc_stride: int = 64
+    max_seq_length: int = 128
+    task_model_kwargs: Dict[str, Any] = None
+    task_train_kwargs: Dict[str, Any] = None
+    model_config_kwargs: Dict[str, Any] = None
+    early_stopping_kwargs: Dict[str, Any] = None
+    dataloader_kwargs: Dict[str, Any] = None
+    tokenizer_kwargs: Dict[str, Any] = None
+    datamodule_kwargs: Dict[str, Any] = None
+
+
 LightningConfig = Union[LightningBasicConfig, LightningAdvancedConfig]
