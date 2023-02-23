@@ -187,6 +187,12 @@ def question_answering_data_module(
         eval_batch_size=5,
         max_seq_length=256,
         doc_stride=128,
+        batch_encoding_kwargs={
+            "padding": "max_length",
+            "truncation": "only_second",
+            "return_offsets_mapping": True,
+            "return_overflowing_tokens": True,
+        },
     )
 
 
