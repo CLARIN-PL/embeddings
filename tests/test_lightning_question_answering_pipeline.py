@@ -220,7 +220,7 @@ def lightning_question_answering_pipeline(
     )
 
 
-def test_lightning_advanced_config(config):
+def test_lightning_advanced_config(config: LightningQABasicConfig):
     lightning_config = config
     assert isinstance(lightning_config, LightningQABasicConfig)
     assert hasattr(lightning_config, "finetune_last_n_layers")
