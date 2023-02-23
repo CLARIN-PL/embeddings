@@ -9,7 +9,6 @@ from transformers import AutoTokenizer, BatchEncoding
 
 from embeddings.data.datamodule import HuggingFaceDataModule
 from embeddings.data.io import T_path
-from embeddings.utils.utils import initialize_kwargs
 
 
 class CharToTokenMapper:
@@ -97,13 +96,6 @@ class CharToTokenMapper:
 
 
 class QuestionAnsweringDataModule(HuggingFaceDataModule):
-    DEFAULT_BATCH_ENCODING_KWARGS = {
-        "padding": "max_length",
-        "truncation": "only_second",
-        "return_offsets_mapping": True,
-        "return_overflowing_tokens": True,
-    }
-
     def __init__(
         self,
         dataset_name_or_path: T_path,
@@ -125,9 +117,7 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
         self.question_field = question_field
         self.context_field = context_field
         self.doc_stride = doc_stride
-        self.batch_encoding_kwargs = initialize_kwargs(
-            self.DEFAULT_BATCH_ENCODING_KWARGS, batch_encoding_kwargs
-        )
+        self.batch_encoding_kwargs = batch_encoding_kwargs
         self.overflow_to_sample_mapping: Dict[str, List[List[List[int]]]] = {}
         self.offset_mapping: Dict[str, List[int]] = {}
         self.dataset_raw: Optional[datasets.DatasetDict] = None
