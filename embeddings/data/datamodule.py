@@ -18,6 +18,7 @@ import pytorch_lightning as pl
 from datasets import ClassLabel, Dataset, DatasetDict
 from datasets import Sequence as HFSequence
 from torch.utils.data import DataLoader
+from torch.utils.data.dataset import Dataset as TorchDataset
 from transformers import AutoTokenizer, BatchEncoding
 
 from embeddings.data import dataset as embeddings_dataset
@@ -35,6 +36,17 @@ from embeddings.utils.utils import initialize_kwargs
 Data = TypeVar("Data")
 HuggingFaceDataset = Type[Dataset]
 _logger = get_logger(__name__)
+
+
+class TorchFromHuggingFaceDataset(TorchDataset[HuggingFaceDataset]):
+    def __init__(self, dataset: Dataset):
+        self.dataset = dataset
+
+    def __getitem__(self, index: int) -> Any:
+        return self.dataset[index]
+
+    def __len__(self) -> int:
+        return len(self.dataset)
 
 
 class BaseDataModule(abc.ABC, pl.LightningDataModule, Generic[Data]):
@@ -112,7 +124,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
     ) -> Union[DataLoader[HuggingFaceDataset], Sequence[DataLoader[HuggingFaceDataset]]]:
         return [
             DataLoader(
-                dataset=self.dataset[split],
+                dataset=TorchFromHuggingFaceDataset(self.dataset[split]),
                 batch_size=self.eval_batch_size,
                 collate_fn=self.collate_fn,
                 shuffle=False,

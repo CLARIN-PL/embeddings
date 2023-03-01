@@ -1,3 +1,5 @@
+import typing
+from collections import defaultdict
 from copy import deepcopy
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -144,11 +146,22 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
             seed=seed,
             **kwargs,
         )
-        self.dataset = None
-        self.splits = list(self.dataset_raw.keys())
+        self.dataset = DatasetDict(defaultdict(lambda: DatasetDict(defaultdict(list))))
+        if isinstance(self.dataset_raw, datasets.DatasetDict):
+            self.splits: List[str] = list(self.dataset_raw.keys())
+        else:
+            self.splits = ["train", "validation"]
         self.process_data(stage="fit")
 
-    def process_data(self, stage: Optional[str]) -> None:
+    @typing.overload
+    def process_data(self, stage: Optional[str] = None) -> None:
+        pass
+
+    @typing.overload
+    def process_data(self, stage: Optional[str] = None, arg2: Optional[int] = None) -> None:
+        pass
+
+    def process_data(self, stage: Optional[str] = None, arg2: Optional[int] = None) -> None:
         assert isinstance(self.dataset_raw, datasets.DatasetDict)
         self.dataset = deepcopy(self.dataset_raw)
         if stage == "fit":

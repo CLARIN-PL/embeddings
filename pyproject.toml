@@ -129,6 +129,7 @@ module = [
     "dataset.arrow_dataset",
     "seqeval.*",
     "transformers",
+    "transformers.*",
     "evaluate"
 ]
 ignore_missing_imports = true

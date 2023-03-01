@@ -1,5 +1,6 @@
 from typing import Optional
 
+import pandas as pd
 from datasets import Dataset, DatasetDict
 from sklearn.model_selection import train_test_split
 
@@ -24,7 +25,7 @@ class QuestionAnsweringSplitsTransformation(Transformation[Dataset, DatasetDict]
         self.stratify_column = stratify_column
 
     def transform(self, data: Dataset) -> DatasetDict:
-        data_df = data.to_pandas()
+        data_df: pd.DataFrame = data.to_pandas()
         dataset = DatasetDict()
         unique_contexts = list(sorted(data_df[self.context_column].unique()))
         context_ids = list(range(len(unique_contexts)))

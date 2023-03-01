@@ -38,14 +38,14 @@ class SQUADv2Metric(HuggingFaceMetric):
             {
                 "id": str(i),
                 "answers": {
-                    "text": ref["answers"]["text"],
-                    "answer_start": ref["answers"]["answer_start"],
+                    "text": ref["answers"]["text"],  # type: ignore
+                    "answer_start": ref["answers"]["answer_start"],  # type: ignore
                 },
             }
             for i, ref in enumerate(references)
         ]
 
-        metrics = self.metric.compute(
+        metrics: Dict[Any, Any] = self.metric.compute(
             predictions=expected_predictions,
             references=expected_references,
             no_answer_threshold=self.no_answer_threshold,

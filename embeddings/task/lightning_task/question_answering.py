@@ -1,6 +1,6 @@
 import os
 import warnings
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from embeddings.data.datamodule import HuggingFaceDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
@@ -55,7 +55,7 @@ class QuestionAnsweringTask(LightningTask):
         return self.trainer.predict(model=self.model, dataloaders=dataloader)
 
     def postprocess(
-        self, data: HuggingFaceDataModule, predict_subset: LightingDataModuleSubset = None
+        self, data: HuggingFaceDataModule, predict_subset: Union[str, LightingDataModuleSubset]
     ) -> Dict[str, Any]:
         data_loader = data.get_subset(predict_subset)
         scores = {}

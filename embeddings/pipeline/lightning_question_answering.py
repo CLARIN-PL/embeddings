@@ -11,7 +11,7 @@ from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
 from embeddings.evaluator.evaluation_results import Predictions, QuestionAnsweringEvaluationResults
 from embeddings.evaluator.question_answering_evaluator import QuestionAnsweringEvaluator
 from embeddings.model.lightning_model import LightningModel
-from embeddings.pipeline.lightning_pipeline import EvaluationResult, LightningPipeline
+from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task import question_answering
 from embeddings.utils.loggers import LightningLoggingConfig
 from embeddings.utils.utils import standardize_name
@@ -66,14 +66,14 @@ class LightningQuestionAnsweringPipeline(
         evaluator = QuestionAnsweringEvaluator()
         super().__init__(datamodule, model, evaluator, output_path, logging_config)
 
-    def run(self, run_name: Optional[str] = None) -> EvaluationResult:
+    def run(self, run_name: Optional[str] = None) -> QuestionAnsweringEvaluationResults:
         if run_name:
             run_name = standardize_name(run_name)
         self._save_artifacts()
-        self.model.task.build_task_model()
-        self.model.task.fit(self.datamodule)
-        model_result = self.model.task.postprocess(
-            data=self.datamodule, predict_subset=self.model.predict_subset
+        self.model.task.build_task_model()  # type:ignore
+        self.model.task.fit(self.datamodule)  # type:ignore
+        model_result = self.model.task.postprocess(  # type:ignore
+            data=self.datamodule, predict_subset=self.model.predict_subset  # type:ignore
         )
         result = self.evaluator.evaluate(model_result)
         self._finish_logging()

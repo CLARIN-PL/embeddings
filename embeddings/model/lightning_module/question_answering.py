@@ -21,7 +21,7 @@ class QuestionAnsweringInferenceModule(pl.LightningModule):
     def __init__(self, model_name: str) -> None:
         super().__init__()
         self.model = AutoModelForQuestionAnswering.from_pretrained(model_name)
-        self.trainer = pl.Trainer(devices="auto", accelerator="auto")
+        self.trainer = pl.Trainer(devices="auto", accelerator="auto")  # type: ignore
 
     def predict_step(
         self, batch: Dict[str, torch.Tensor], batch_idx: int, dataloader_idx: Optional[int] = None
@@ -36,7 +36,7 @@ class QuestionAnsweringInferenceModule(pl.LightningModule):
         ],
     ) -> List[Dict[str, Union[QuestionAnsweringModelOutput, Dict[str, torch.Tensor]]]]:
         assert self.trainer is not None
-        return self.trainer.predict(  # type: ignore
+        return self.trainer.predict(
             model=self,
             dataloaders=dataloaders,
             return_predictions=True,
@@ -55,7 +55,7 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
     ) -> None:
 
         super().__init__(metrics=None, **task_model_kwargs if task_model_kwargs else {})
-        self.save_hyperparameters({"downstream_model_type": self.downstream_model_type.__name__})
+        self.save_hyperparameters({"downstream_model_type": self.downstream_model_type.__name__})  # type: ignore
         self.downstream_model_type = self.downstream_model_type
         self.config_kwargs = config_kwargs if config_kwargs else {}
         self.target_names: Optional[List[str]] = None
@@ -66,14 +66,14 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
 
     def _init_model(self) -> None:
         self.config = AutoConfig.from_pretrained(
-            self.hparams.model_name_or_path,
+            self.hparams.model_name_or_path,  # type: ignore
             **self.config_kwargs,
         )
         self.model: AutoModel = self.downstream_model_type.from_pretrained(
-            self.hparams.model_name_or_path, config=self.config
+            self.hparams.model_name_or_path, config=self.config  # type: ignore
         )
-        if self.hparams.finetune_last_n_layers > -1:
-            self.freeze_transformer(finetune_last_n_layers=self.hparams.finetune_last_n_layers)
+        if self.hparams.finetune_last_n_layers > -1:  # type: ignore
+            self.freeze_transformer(finetune_last_n_layers=self.hparams.finetune_last_n_layers)  # type: ignore
 
     def freeze_transformer(self, finetune_last_n_layers: int) -> None:
         """Borrowed from clarinpl-embeddings library"""
@@ -127,7 +127,7 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
         outputs = self(**batch)
 
         self.log("train/Loss", outputs.loss)
-        if self.hparams.use_scheduler:
+        if self.hparams.use_scheduler:  # type: ignore
             assert self.trainer is not None
             last_lr = self.trainer.lr_schedulers[0]["scheduler"].get_last_lr()
             self.log("train/BaseLR", last_lr[0], prog_bar=True)
