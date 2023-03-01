@@ -17,6 +17,10 @@ from embeddings.model.lightning_module.question_answering import (
 
 
 class QuestionAnsweringEvaluator(MetricsEvaluator):
+    """
+    TODO: Correct type hints so that mypy doesn't return any errors
+    """
+
     def metrics(
         self,
     ) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
