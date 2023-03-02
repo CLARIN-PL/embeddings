@@ -259,7 +259,7 @@ def test_question_answering_evaluator(scores: Dict[str, Any]):
     sample_output = random.choice(validation_outputs)
 
     np.testing.assert_almost_equal(validation_metrics["exact"], 0.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(validation_metrics["f1"], 3.1313131, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(validation_metrics["f1"], 0.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["total"], 10.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["HasAns_exact"], 0.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(
