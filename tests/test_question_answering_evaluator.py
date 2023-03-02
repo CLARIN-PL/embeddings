@@ -262,9 +262,7 @@ def test_question_answering_evaluator(scores: Dict[str, Any]):
     np.testing.assert_almost_equal(validation_metrics["f1"], 0.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["total"], 10.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["HasAns_exact"], 0.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(
-        validation_metrics["HasAns_f1"], 0.0, decimal=pytest.decimal
-    )
+    np.testing.assert_almost_equal(validation_metrics["HasAns_f1"], 0.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["HasAns_total"], 9.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["NoAns_exact"], 0.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["NoAns_f1"], 0.0, decimal=pytest.decimal)
@@ -273,9 +271,7 @@ def test_question_answering_evaluator(scores: Dict[str, Any]):
     np.testing.assert_almost_equal(
         validation_metrics["best_exact_thresh"], 0.0, decimal=pytest.decimal
     )
-    np.testing.assert_almost_equal(
-        validation_metrics["best_f1"], 10.0, decimal=pytest.decimal
-    )
+    np.testing.assert_almost_equal(validation_metrics["best_f1"], 10.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(
         validation_metrics["best_f1_thresh"], 0.0, decimal=pytest.decimal
     )
