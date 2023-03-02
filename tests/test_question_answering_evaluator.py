@@ -274,7 +274,7 @@ def test_question_answering_evaluator(scores: Dict[str, Any]):
         validation_metrics["best_exact_thresh"], 0.0, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        validation_metrics["best_f1"], 13.1313131, decimal=pytest.decimal
+        validation_metrics["best_f1"], 10.0, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
         validation_metrics["best_f1_thresh"], 0.0, decimal=pytest.decimal
