@@ -6,6 +6,7 @@ import pytest
 from _pytest.tmpdir import TempdirFactory
 
 from embeddings.config.lightning_config import LightningQABasicConfig
+from embeddings.evaluator.evaluation_results import QuestionAnsweringEvaluationResults
 from embeddings.pipeline.lightning_question_answering import LightningQuestionAnsweringPipeline
 
 
@@ -241,9 +242,9 @@ def test_lightning_question_answering_pipeline(
 ):
     pipeline = lightning_question_answering_pipeline
     results = pipeline.run()
-    assert isinstance(results, tuple)
+    assert isinstance(results, QuestionAnsweringEvaluationResults)
 
-    metrics = results[0]["validation"]
+    metrics = results.metrics
     np.testing.assert_almost_equal(metrics["f1"], 10.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["total"], 10.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["HasAns_f1"], 0.0, decimal=pytest.decimal)

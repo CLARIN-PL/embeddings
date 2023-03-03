@@ -7,7 +7,6 @@ import numpy as np
 import pytest
 import torch
 from _pytest.tmpdir import TempdirFactory
-from tqdm import tqdm
 
 from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
 from embeddings.evaluator.question_answering_evaluator import QuestionAnsweringEvaluator
@@ -237,25 +236,23 @@ def scores(
     datamodule.process_data(stage="test")
     predict_dataloader = datamodule.predict_dataloader()
 
-    scores = {}
+    dataloader = predict_dataloader[0]
+    model_outputs = task.predict(dataloader)
+    scores = {
+        "examples": datamodule.dataset_raw["validation"].to_pandas(),
+        "outputs": model_outputs,
+        "overflow_to_sample_mapping": datamodule.overflow_to_sample_mapping["validation"],
+        "offset_mapping": datamodule.offset_mapping["validation"],
+    }
 
-    for split_id, split in tqdm(enumerate(datamodule.splits)):
-        dataloader = predict_dataloader[split_id]
-        model_outputs = task.predict(dataloader)
-        scores[split] = {
-            "examples": datamodule.dataset_raw[split].to_pandas(),
-            "outputs": model_outputs,
-            "overflow_to_sample_mapping": datamodule.overflow_to_sample_mapping[split],
-            "offset_mapping": datamodule.offset_mapping[split],
-        }
     return scores
 
 
 def test_question_answering_evaluator(scores: Dict[str, Any]):
     evaluator = QuestionAnsweringEvaluator()
-    metrics, outputs = evaluator.evaluate(scores)
-    validation_metrics = metrics["validation"]
-    validation_outputs = outputs["validation"]
+    result = evaluator.evaluate(scores)
+    validation_metrics = result.metrics
+    validation_outputs = result.data
     sample_output = random.choice(validation_outputs)
 
     np.testing.assert_almost_equal(validation_metrics["exact"], 0.0, decimal=pytest.decimal)

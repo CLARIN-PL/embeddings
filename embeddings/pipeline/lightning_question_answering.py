@@ -75,6 +75,7 @@ class LightningQuestionAnsweringPipeline(
         model_result = self.model.task.postprocess(  # type:ignore
             data=self.datamodule, predict_subset=self.model.predict_subset  # type:ignore
         )
-        result = self.evaluator.evaluate(model_result)
+        result = model_result[self.model.predict_subset]  # type: ignore
+        result = self.evaluator.evaluate(result)
         self._finish_logging()
-        return result
+        return result  # type: ignore

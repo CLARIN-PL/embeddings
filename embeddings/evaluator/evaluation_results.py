@@ -1,6 +1,6 @@
 from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import srsly
@@ -40,8 +40,20 @@ class Predictions:
         )
 
 
+Data = Union[Predictions, List[Dict[str, Any]]]
+
+
 @dataclass
 class EvaluationResults:
+    @property
+    def metrics(self) -> Dict[str, Any]:
+        result = asdict(self)
+        result.pop("data")
+        return result
+
+
+@dataclass
+class TextClassificationEvaluationResults(EvaluationResults):
     accuracy: float
     f1_macro: float
     f1_micro: float
@@ -53,25 +65,38 @@ class EvaluationResults:
     precision_micro: float
     precision_weighted: float
     classes: Dict[str, Dict[str, Union[float, int]]]
-    data: Optional[Predictions]
-
-    @property
-    def metrics(self) -> Dict[str, Any]:
-        result = asdict(self)
-        result.pop("data")
-        return result
-
-
-@dataclass
-class TextClassificationEvaluationResults(EvaluationResults):
-    pass
+    data: Optional[Data] = None
 
 
 @dataclass
 class SequenceLabelingEvaluationResults(EvaluationResults):
-    pass
+    accuracy: float
+    f1_macro: float
+    f1_micro: float
+    f1_weighted: float
+    recall_macro: float
+    recall_micro: float
+    recall_weighted: float
+    precision_macro: float
+    precision_micro: float
+    precision_weighted: float
+    classes: Dict[str, Dict[str, Union[float, int]]]
+    data: Optional[Data] = None
 
 
 @dataclass
 class QuestionAnsweringEvaluationResults(EvaluationResults):
-    pass
+    exact: float
+    f1: float
+    total: float
+    HasAns_exact: float
+    HasAns_f1: float
+    HasAns_total: float
+    NoAns_exact: float
+    NoAns_f1: float
+    NoAns_total: float
+    best_exact: float
+    best_exact_thresh: float
+    best_f1: float
+    best_f1_thresh: float
+    data: Optional[Data] = None
