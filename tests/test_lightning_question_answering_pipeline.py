@@ -3,8 +3,8 @@ from pathlib import Path
 import datasets
 import numpy as np
 import pytest
-from _pytest.tmpdir import TempdirFactory
 import torch
+from _pytest.tmpdir import TempdirFactory
 
 from embeddings.config.lightning_config import LightningQABasicConfig
 from embeddings.evaluator.evaluation_results import QuestionAnsweringEvaluationResults
