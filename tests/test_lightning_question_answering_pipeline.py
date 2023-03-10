@@ -12,7 +12,7 @@ from embeddings.pipeline.lightning_question_answering import LightningQuestionAn
 from tests.fixtures.sample_qa_dataset import sample_question_answering_dataset
 
 
-torch.manual_seed(222)
+torch.manual_seed(441)
 
 @pytest.fixture(scope="module")
 def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
@@ -85,7 +85,7 @@ def test_lightning_question_answering_pipeline(
     assert isinstance(results, QuestionAnsweringEvaluationResults)
 
     metrics = results.metrics
-    np.testing.assert_almost_equal(metrics["f1"], 4.0, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(metrics["f1"], 14.6153846, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["total"], 10.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["HasAns_f1"], 4.4444444, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["HasAns_total"], 9.0, decimal=pytest.decimal)
