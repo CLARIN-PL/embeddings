@@ -57,6 +57,7 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
 
         super().__init__(metrics=None, **task_model_kwargs if task_model_kwargs else {})
         self.save_hyperparameters({"downstream_model_type": self.downstream_model_type.__name__})  # type: ignore
+        # without type: ignore error: "Tensor" not callable  [operator]
         self.downstream_model_type = self.downstream_model_type
         self.config_kwargs = config_kwargs if config_kwargs else {}
         self.target_names: Optional[List[str]] = None
@@ -128,6 +129,8 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
 
         self.log("train/Loss", outputs.loss)
         if self.hparams.use_scheduler:  # type: ignore
+            # without type: ignore mypy throws an error
+            # Item "Tensor" of "Union[Tensor, Module]" has no attribute "use_scheduler"
             assert self.trainer is not None
             last_lr = self.trainer.lr_schedulers[0]["scheduler"].get_last_lr()
             self.log("train/BaseLR", last_lr[0], prog_bar=True)
