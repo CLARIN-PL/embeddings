@@ -5,9 +5,10 @@ from typing import Any, Dict, List, Optional, TypeVar
 import srsly
 from transformers import AutoModel, AutoTokenizer
 
+from embeddings.data.datamodule import Data
 from embeddings.data.io import T_path
-from embeddings.model.lightning_module.lightning_module import LightningModule
-from embeddings.pipeline.lightning_pipeline import LightningPipeline
+from embeddings.model.lightning_module.lightning_module import LightningModule, Model
+from embeddings.pipeline.lightning_pipeline import EvaluationResult, LightningPipeline, ModelResult
 from embeddings.task.lightning_task.lightning_task import LightningTask
 from embeddings.utils.utils import get_installed_packages
 
@@ -20,12 +21,12 @@ class HuggingFaceModelExporter:
     add_installed_packages_file: bool = True
     add_hparams_configuration: bool = True
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not isinstance(self.path, pathlib.Path):
             self.path = pathlib.Path(self.path)
 
     @staticmethod
-    def _check_model(model: Optional[LightningModule]) -> None:
+    def _check_model(model: Optional[LightningModule[Model]]) -> None:
         if not model:
             raise LightningTask.MODEL_UNDEFINED_EXCEPTION
 
@@ -46,24 +47,14 @@ class HuggingFaceModelExporter:
         return model
 
     def export_model_from_pipeline(
-        self, pipeline: LightningPipeline, tokenizer: Optional[AutoTokenizer] = None
+        self,
+        pipeline: LightningPipeline[Data, ModelResult, EvaluationResult],
+        tokenizer: Optional[AutoTokenizer] = None,
     ) -> None:
-        HuggingFaceModelExporter._check_model(pipeline.model.task.model)
-        if not tokenizer:
-            HuggingFaceModelExporter._check_tokenizer(
-                pipeline.model.task.tokenizer,
-                msg="Use pipeline.run() or pass tokenizer explicitly!",
-            )
-            tokenizer = pipeline.model.task.tokenizer
+        task = getattr(pipeline.model, "task")
+        assert task
 
-        self.export(
-            model=pipeline.model.task.model.model,
-            tokenizer=tokenizer,
-            target_names=getattr(pipeline.model.task, "target_names", None),
-            hparams=dict(pipeline.model.task.model.hparams)
-            if self.add_hparams_configuration
-            else None,
-        )
+        self.export_model_from_task(task=task, tokenizer=tokenizer)
 
     def export_model_from_task(
         self, task: TaskModel, tokenizer: Optional[AutoTokenizer] = None
@@ -72,15 +63,20 @@ class HuggingFaceModelExporter:
         if not tokenizer:
             HuggingFaceModelExporter._check_tokenizer(
                 task.tokenizer,
-                msg="Use task.fit(), task.fit_predict(), or pass tokenizer explicitly!",
+                msg="Tokenizer not found, re-run pipeline/task or pass tokenizer explicitly!",
             )
             tokenizer = task.tokenizer
 
+        model = getattr(task.model, "model", None)
+        hparams = getattr(task.model, "hparams", None)
+        assert model
+        assert hparams
+
         self.export(
-            model=task.model.model,
+            model=model,
             tokenizer=tokenizer,
             target_names=getattr(task, "target_names", None),
-            hparams=task.model.hparams if self.add_hparams_configuration else None,
+            hparams=hparams if self.add_hparams_configuration else None,
         )
 
     def export(
@@ -90,6 +86,7 @@ class HuggingFaceModelExporter:
         target_names: Optional[List[str]],
         hparams: Optional[Dict[str, Any]] = None,
     ) -> None:
+        assert isinstance(self.path, pathlib.Path)
         self.path.mkdir(parents=True, exist_ok=False)
 
         if self.add_hparams_configuration:
