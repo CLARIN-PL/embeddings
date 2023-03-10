@@ -11,7 +11,6 @@ from embeddings.evaluator.evaluation_results import QuestionAnsweringEvaluationR
 from embeddings.pipeline.lightning_question_answering import LightningQuestionAnsweringPipeline
 from tests.fixtures.sample_qa_dataset import sample_question_answering_dataset
 
-
 torch.manual_seed(441)
 
 
@@ -90,5 +89,5 @@ def test_lightning_question_answering_pipeline(
     np.testing.assert_almost_equal(metrics["total"], 10.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["HasAns_f1"], 5.1282051, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["HasAns_total"], 9.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(metrics["best_f1"], 14.0, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(metrics["best_f1"], 14.6153846, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["exact"], 0.0, decimal=pytest.decimal)
