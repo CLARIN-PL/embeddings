@@ -4,11 +4,14 @@ import datasets
 import numpy as np
 import pytest
 from _pytest.tmpdir import TempdirFactory
+import torch
 
 from embeddings.config.lightning_config import LightningQABasicConfig
 from embeddings.evaluator.evaluation_results import QuestionAnsweringEvaluationResults
 from embeddings.pipeline.lightning_question_answering import LightningQuestionAnsweringPipeline
 from tests.fixtures.sample_qa_dataset import sample_question_answering_dataset
+
+torch.manual_seed(441)
 
 
 @pytest.fixture(scope="module")
@@ -21,35 +24,19 @@ def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
 def config() -> LightningQABasicConfig:
     return LightningQABasicConfig(
         finetune_last_n_layers=-1,
-        task_train_kwargs={
-            "max_epochs": 1,
-            "devices": "auto",
-            "accelerator": "auto",
-            "deterministic": True,
-        },
-        task_model_kwargs={
-            "learning_rate": 5e-4,
-            "train_batch_size": 5,
-            "eval_batch_size": 5,
-            "use_scheduler": False,
-            "optimizer": "Adam",
-            "adam_epsilon": 1e-8,
-            "warmup_steps": None,
-            "weight_decay": 1e-3,
-            "max_seq_length": 128,
-            "doc_stride": 64,
-        },
-        datamodule_kwargs={
-            "max_seq_length": 64,
-        },
-        early_stopping_kwargs={
-            "monitor": "val/Loss",
-            "mode": "min",
-            "patience": 3,
-        },
-        tokenizer_kwargs={},
-        dataloader_kwargs={},
-        model_config_kwargs={},
+        max_epochs=1,
+        learning_rate=5e-4,
+        use_scheduler=False,
+        optimizer="Adam",
+        adam_epsilon=1e-8,
+        warmup_steps=None,
+        weight_decay=1e-3,
+        max_seq_length=128,
+        doc_stride=64,
+        early_stopping_monitor="val/Loss",
+        early_stopping_mode="min",
+        early_stopping_patience=3,
+        deterministic=True,
     )
 
 
@@ -72,7 +59,7 @@ def lightning_question_answering_pipeline(
     )
 
 
-def test_lightning_advanced_config(config: LightningQABasicConfig):
+def test_lightning_qa_basic_config(config: LightningQABasicConfig):
     lightning_config = config
     assert isinstance(lightning_config, LightningQABasicConfig)
     assert hasattr(lightning_config, "finetune_last_n_layers")

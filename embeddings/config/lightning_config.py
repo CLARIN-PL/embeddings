@@ -125,16 +125,26 @@ class LightningQABasicConfig(LightningBasicConfig):
     )
     doc_stride: int = 64
     max_seq_length: int = 128
-    # those type: ignores are necessary for mypy to pass
-    # when they are gone and default values are None, mypy doesn't pass
-    # when field() function is used to generate empty dict, there are errors when initializing
-    task_model_kwargs: Dict[str, Any] = None  # type: ignore
-    task_train_kwargs: Dict[str, Any] = None  # type: ignore
-    model_config_kwargs: Dict[str, Any] = None  # type: ignore
-    early_stopping_kwargs: Dict[str, Any] = None  # type: ignore
-    dataloader_kwargs: Dict[str, Any] = None  # type: ignore
-    tokenizer_kwargs: Dict[str, Any] = None  # type: ignore
-    datamodule_kwargs: Dict[str, Any] = None  # type: ignore
+    deterministic: bool = True
+
+    @property
+    def task_model_kwargs(self) -> Dict[str, Any]:
+        task_model_kwargs = self._parse_fields(self.TASK_MODEL_KEYS)
+        task_model_kwargs.update(
+            {
+                "train_batch_size": self.train_batch_size,
+                "eval_batch_size": self.eval_batch_size,
+                "max_seq_length": self.max_seq_length,
+                "doc_stride": self.doc_stride,
+            }
+        )
+        return task_model_kwargs
+
+    @property
+    def task_train_kwargs(self) -> Dict[str, Any]:
+        task_train_kwargs = self._parse_fields(self.TASK_TRAIN_KEYS)
+        task_train_kwargs.update({"deterministic": self.deterministic})
+        return task_train_kwargs
 
 
 LightningConfig = Union[LightningBasicConfig, LightningAdvancedConfig]
