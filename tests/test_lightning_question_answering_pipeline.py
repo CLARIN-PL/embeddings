@@ -11,8 +11,8 @@ from embeddings.evaluator.evaluation_results import QuestionAnsweringEvaluationR
 from embeddings.pipeline.lightning_question_answering import LightningQuestionAnsweringPipeline
 from tests.fixtures.sample_qa_dataset import sample_question_answering_dataset
 
-torch.manual_seed(441)
 
+torch.manual_seed(222)
 
 @pytest.fixture(scope="module")
 def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
@@ -71,8 +71,10 @@ def test_lightning_qa_basic_config(config: LightningQABasicConfig):
     assert hasattr(lightning_config, "batch_encoding_kwargs")
     assert hasattr(lightning_config, "dataloader_kwargs")
     assert hasattr(lightning_config, "model_config_kwargs")
+    assert hasattr(lightning_config, "deterministic")
     assert isinstance(lightning_config.task_model_kwargs, dict)
     assert "learning_rate" in lightning_config.task_model_kwargs.keys()
+    assert config.task_train_kwargs["deterministic"] == True
 
 
 def test_lightning_question_answering_pipeline(
@@ -83,9 +85,9 @@ def test_lightning_question_answering_pipeline(
     assert isinstance(results, QuestionAnsweringEvaluationResults)
 
     metrics = results.metrics
-    np.testing.assert_almost_equal(metrics["f1"], 10.0, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(metrics["f1"], 4.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["total"], 10.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(metrics["HasAns_f1"], 0.0, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(metrics["HasAns_f1"], 4.4444444, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["HasAns_total"], 9.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(metrics["best_f1"], 10.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(metrics["exact"], 10.0, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(metrics["best_f1"], 14.0, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(metrics["exact"], 0.0, decimal=pytest.decimal)
