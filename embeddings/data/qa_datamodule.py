@@ -51,11 +51,8 @@ class CharToTokenMapper:
     ) -> BatchEncoding:
         """Based on: https://github.com/huggingface/transformers/blob/main/examples/pytorch/question-answering/run_qa.py"""
 
-        sample_mapping = features.pop("overflow_to_sample_mapping")
-        offset_mapping = features.pop("offset_mapping")
-
-        features["overflow_to_sample_mapping"] = sample_mapping
-        features["offset_mapping"] = offset_mapping
+        sample_mapping = features["overflow_to_sample_mapping"].copy()
+        offset_mapping = features["offset_mapping"].copy()
 
         features["start_positions"] = []
         features["end_positions"] = []
@@ -146,7 +143,6 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
             seed=seed,
             **kwargs,
         )
-        self.dataset = DatasetDict(defaultdict(lambda: DatasetDict(defaultdict(list))))
         if isinstance(self.dataset_raw, datasets.DatasetDict):
             self.splits: List[str] = list(self.dataset_raw.keys())
         else:
@@ -154,14 +150,14 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
         self.process_data(stage="fit")
 
     @typing.overload
-    def process_data(self, stage: Optional[str] = None) -> None:
+    def process_data(self) -> None:
         pass
 
     @typing.overload
-    def process_data(self, stage: Optional[str] = None, arg2: Optional[int] = None) -> None:
+    def process_data(self, stage: Optional[str] = None) -> None:
         pass
 
-    def process_data(self, stage: Optional[str] = None, arg2: Optional[int] = None) -> None:
+    def process_data(self, stage: Optional[str] = None) -> None:
         assert isinstance(self.dataset_raw, datasets.DatasetDict)
         self.dataset = deepcopy(self.dataset_raw)
         if stage == "fit":

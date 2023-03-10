@@ -125,6 +125,9 @@ class LightningQABasicConfig(LightningBasicConfig):
     )
     doc_stride: int = 64
     max_seq_length: int = 128
+    # those type: ignores are necessary for mypy to pass
+    # when they are gone and default values are None, mypy doesn't pass
+    # when field() function is used to generate empty dict, there are errors when initializing
     task_model_kwargs: Dict[str, Any] = None  # type: ignore
     task_train_kwargs: Dict[str, Any] = None  # type: ignore
     model_config_kwargs: Dict[str, Any] = None  # type: ignore

@@ -156,12 +156,10 @@ class QAPredictionPostProcessor(QABasePostprocessor):
                     "end_token_index": 0,
                 }
 
-            predictions.extend(
-                self._get_topk_not_cls_predictions_from_output(
-                    start_logits=start_logits[1:],
-                    end_logits=end_logits[1:],
-                    offset_mapping=offset_mappings[output_index],
-                )
+            predictions += self._get_topk_not_cls_predictions_from_output(
+                start_logits=start_logits[1:],
+                end_logits=end_logits[1:],
+                offset_mapping=offset_mappings[output_index],
             )
 
         predictions.append(min_no_answer_score)  # type: ignore

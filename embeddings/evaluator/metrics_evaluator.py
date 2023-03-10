@@ -26,6 +26,6 @@ class MetricsEvaluator(
 
     @abc.abstractmethod
     def evaluate(
-        self, data: Union[Dict[str, nptyping.NDArray[Any]], Predictions, Dict[str, Any]]
+        self, data: Union[Dict[str, nptyping.NDArray[Any]], Predictions]
     ) -> EvaluationResultsType:
         pass

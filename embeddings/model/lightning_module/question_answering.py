@@ -21,6 +21,7 @@ class QuestionAnsweringInferenceModule(pl.LightningModule):
     def __init__(self, model_name: str) -> None:
         super().__init__()
         self.model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+        # without type: ignore mypy throws error: Incompatible types in assignment
         self.trainer = pl.Trainer(devices="auto", accelerator="auto")  # type: ignore
 
     def predict_step(
