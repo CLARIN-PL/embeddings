@@ -10,12 +10,6 @@ from embeddings.model.lightning_module.question_answering import (
 
 
 class SQUADv2Metric(HuggingFaceMetric):
-    """
-    TODO:
-    Refactor:
-    embeddings/metric/question_answering.py
-    """
-
     def __init__(self, no_answer_threshold: float = 1.0) -> None:
         self.metric = evaluate.load("squad_v2")
         self.no_answer_threshold = no_answer_threshold
