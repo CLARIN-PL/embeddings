@@ -14,6 +14,7 @@ from tests.fixtures.sample_qa_dataset import sample_question_answering_dataset
 
 torch.manual_seed(441)
 
+
 @pytest.fixture(scope="module")
 def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
     path = tmpdir_factory.mktemp(__name__)
