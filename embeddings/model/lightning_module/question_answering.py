@@ -18,11 +18,11 @@ QA_GOLD_ANSWER_TYPE = Dict[str, Union[Dict[str, Union[List[str], List[Any]]], st
 
 
 class QuestionAnsweringInferenceModule(pl.LightningModule):
-    def __init__(self, model_name: str) -> None:
+    def __init__(self, model_name: str, devices: str = "auto", accelerator: str = "auto") -> None:
         super().__init__()
         self.model = AutoModelForQuestionAnswering.from_pretrained(model_name)
         # without type: ignore mypy throws error: Incompatible types in assignment
-        self.trainer = pl.Trainer(devices="auto", accelerator="auto")  # type: ignore
+        self.trainer = pl.Trainer(devices=devices, accelerator=accelerator)  # type: ignore
 
     def predict_step(
         self, batch: Dict[str, torch.Tensor], batch_idx: int, dataloader_idx: Optional[int] = None
