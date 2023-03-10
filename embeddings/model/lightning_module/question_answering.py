@@ -77,7 +77,6 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
             self.freeze_transformer(finetune_last_n_layers=self.hparams.finetune_last_n_layers)  # type: ignore
 
     def freeze_transformer(self, finetune_last_n_layers: int) -> None:
-        """Borrowed from clarinpl-embeddings library"""
         if finetune_last_n_layers == 0:
             for name, param in self.model.base_model.named_parameters():
                 param.requires_grad = False
