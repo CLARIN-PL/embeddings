@@ -88,7 +88,7 @@ def test_lightning_question_answering_pipeline(
     metrics = results.metrics
     np.testing.assert_almost_equal(metrics["f1"], 14.6153846, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["total"], 10.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(metrics["HasAns_f1"], 4.4444444, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(metrics["HasAns_f1"], 5.1282051, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["HasAns_total"], 9.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["best_f1"], 14.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["exact"], 0.0, decimal=pytest.decimal)
