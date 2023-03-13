@@ -128,9 +128,9 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
         outputs = self(**batch)
 
         self.log("train/Loss", outputs.loss)
+        # without type: ignore mypy throws an error
+        # Item "Tensor" of "Union[Tensor, Module]" has no attribute "use_scheduler"
         if self.hparams.use_scheduler:  # type: ignore
-            # without type: ignore mypy throws an error
-            # Item "Tensor" of "Union[Tensor, Module]" has no attribute "use_scheduler"
             assert self.trainer is not None
             last_lr = self.trainer.lr_schedulers[0]["scheduler"].get_last_lr()
             self.log("train/BaseLR", last_lr[0], prog_bar=True)
