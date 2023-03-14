@@ -36,9 +36,12 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         early_stopping_kwargs: Dict[str, Any],
         model_checkpoint_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
+        hf_task_name: str,
     ):
         super().__init__()
-        self.output_path = Path(output_path)
+
+        self.output_path: Path = Path(output_path)
+        self.hf_task_name = hf_task_name
         self.task_train_kwargs = task_train_kwargs
         self.early_stopping_kwargs = early_stopping_kwargs
         self.model_checkpoint_kwargs = model_checkpoint_kwargs

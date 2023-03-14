@@ -35,6 +35,7 @@ class SequenceLabelingTask(ClassificationLightningTask):
             early_stopping_kwargs,
             model_checkpoint_kwargs,
             logging_config,
+            hf_task_name="token-classification",
         )
         self.model_name_or_path = model_name_or_path
         self.num_classes = num_classes
