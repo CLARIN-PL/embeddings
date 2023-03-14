@@ -109,6 +109,12 @@ def test_lightning_sequence_labeling_pipeline(
     assert_inference_from_checkpoint(result, pipeline, tmp_path_module)
 
 
+def test_lightning_sequence_labeling_task_name(
+    lightning_sequence_labeling_pipeline: LightningSequenceLabelingPipeline,
+):
+    assert lightning_sequence_labeling_pipeline.model.task.hf_task_name == "token-classification"
+
+
 def assert_result_values(result: SequenceLabelingEvaluationResults) -> None:
     np.testing.assert_almost_equal(
         result.accuracy,

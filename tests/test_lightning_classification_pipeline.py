@@ -99,6 +99,12 @@ def lightning_classification_pipeline(
     )
 
 
+def test_lightning_classification_task_name(
+    lightning_classification_pipeline: LightningClassificationPipeline,
+):
+    assert lightning_classification_pipeline.model.task.hf_task_name == "sequence-classification"
+
+
 def test_lightning_classification_pipeline(
     lightning_classification_pipeline: LightningClassificationPipeline,
     tmp_path_module: Path,
