@@ -27,6 +27,7 @@ evaluate = ">=0.4.0"
 intel-openmp = {version="^2022.0.3", platform="win32"}
 lz4 = { version=">=3.1.10", optional=true}
 numpy = ">=1.20.0, <=1.23.4"
+onnx = ">=1.13.1"
 optuna = ">=2.9.1"
 Pillow = ">=8.2.0"
 pydantic = ">=1.8.2"
@@ -40,7 +41,7 @@ scipy = ">=1.6.2"
 tensorboard = ">=2.4.1"
 tokenizers = ">=0.13.2"
 torch = ">=1.9, <1.12.0"
-transformers = ">=4.26.0"
+transformers = {extras = ["onnx"], version = ">=4.26.0"}
 typer = ">=0.4.0"
 types-PyYAML = ">=5.4.10"
 types-setuptools = ">=57.4.11"
@@ -130,7 +131,8 @@ module = [
     "seqeval.*",
     "transformers",
     "transformers.*",
-    "evaluate"
+    "evaluate",
+    "datasets"
 ]
 ignore_missing_imports = true
 
