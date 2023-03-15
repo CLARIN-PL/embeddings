@@ -16,6 +16,10 @@ from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessi
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
 from embeddings.utils.model_exporter import HuggingFaceModelExporter, ONNXModelExporter
 
+LIGHTNING_TEXT_CLASSIFICATION_PIPELINE_OUTPUT_TYPE = Tuple[
+    LightningClassificationPipeline, TextClassificationEvaluationResults
+]
+
 
 @pytest.fixture(scope="module")
 def tmp_path_module(tmpdir_factory: TempdirFactory) -> Path:
@@ -104,7 +108,7 @@ def lightning_text_classification_pipeline(
     config: LightningAdvancedConfig,
     embedding_name: str,
     tmp_path_module: Path,
-) -> Tuple[LightningClassificationPipeline, TextClassificationEvaluationResults]:
+) -> LIGHTNING_TEXT_CLASSIFICATION_PIPELINE_OUTPUT_TYPE:
     pipeline = LightningClassificationPipeline(
         embedding_name_or_path=embedding_name,
         devices="auto",
@@ -149,60 +153,7 @@ def evaluate_hf_model(
     y_pred = torch.IntTensor(preds).numpy()
     y_true = torch.IntTensor(y_true).numpy()
     predictions = Predictions(y_pred=y_pred, y_true=y_true)
-    results = TextClassificationEvaluator().evaluate(predictions)
-    return results
-
-
-def test_hf_model_exporter_from_pipeline(
-    embedding_name: str,
-    lightning_text_classification_pipeline: Tuple[
-        LightningClassificationPipeline, TextClassificationEvaluationResults
-    ],
-    config: LightningAdvancedConfig,
-    tmp_path_module: Path,
-    dataset_kwargs: Dict[str, Any],
-    comparison_metrics_keys: List[str],
-    hf_datamodule: TextClassificationDataModule,
-):
-    path = tmp_path_module / "hf_model_pipeline"
-    exporter = HuggingFaceModelExporter(path=path)
-    pretrained_pipeline = lightning_text_classification_pipeline[0]
-    pretrained_metrics = lightning_text_classification_pipeline[1]
-    exporter.export_model_from_pipeline(pretrained_pipeline)
-    results = evaluate_hf_model(model_path=path, datamodule=hf_datamodule)
-
-    for metric_key in comparison_metrics_keys:
-        numpy.testing.assert_almost_equal(
-            getattr(pretrained_metrics, metric_key),
-            getattr(results, metric_key),
-            decimal=pytest.decimal,
-        )
-
-
-def test_hf_model_exporter_from_task(
-    embedding_name: str,
-    lightning_text_classification_pipeline: Tuple[
-        LightningClassificationPipeline, TextClassificationEvaluationResults
-    ],
-    config: LightningAdvancedConfig,
-    tmp_path_module: Path,
-    dataset_kwargs: Dict[str, Any],
-    comparison_metrics_keys: List[str],
-    hf_datamodule: TextClassificationDataModule,
-):
-    path = tmp_path_module / "hf_model_task"
-    exporter = HuggingFaceModelExporter(path=path)
-    pretrained_pipeline = lightning_text_classification_pipeline[0]
-    pretrained_metrics = lightning_text_classification_pipeline[1]
-    exporter.export_model_from_task(pretrained_pipeline.model.task)
-    results = evaluate_hf_model(model_path=path, datamodule=hf_datamodule)
-
-    for metric_key in comparison_metrics_keys:
-        numpy.testing.assert_almost_equal(
-            getattr(pretrained_metrics, metric_key),
-            getattr(results, metric_key),
-            decimal=pytest.decimal,
-        )
+    return TextClassificationEvaluator().evaluate(predictions)
 
 
 def evaluate_onnx_model(
@@ -225,15 +176,71 @@ def evaluate_onnx_model(
     y_pred = torch.IntTensor(preds).numpy()
     y_true = torch.IntTensor(y_true).numpy()
     predictions = Predictions(y_pred=y_pred, y_true=y_true)
-    results = TextClassificationEvaluator().evaluate(predictions)
-    return results
+    return TextClassificationEvaluator().evaluate(predictions)
+
+
+def assert_metrics_almost_equal(
+    pretrained_model_metrics: TextClassificationEvaluationResults,
+    loaded_model_metrics: TextClassificationEvaluationResults,
+    metric_keys: List[str],
+) -> None:
+    for metric_key in metric_keys:
+        numpy.testing.assert_almost_equal(
+            getattr(pretrained_model_metrics, metric_key),
+            getattr(loaded_model_metrics, metric_key),
+            decimal=pytest.decimal,
+        )
+
+
+def test_hf_model_exporter_from_pipeline(
+    embedding_name: str,
+    lightning_text_classification_pipeline: LIGHTNING_TEXT_CLASSIFICATION_PIPELINE_OUTPUT_TYPE,
+    config: LightningAdvancedConfig,
+    tmp_path_module: Path,
+    dataset_kwargs: Dict[str, Any],
+    comparison_metrics_keys: List[str],
+    hf_datamodule: TextClassificationDataModule,
+):
+    path = tmp_path_module / "hf_model_pipeline"
+    exporter = HuggingFaceModelExporter(path=path)
+
+    pretrained_pipeline, pretrained_metrics = lightning_text_classification_pipeline
+    exporter.export_model_from_pipeline(pretrained_pipeline)
+
+    loaded_model_results = evaluate_hf_model(model_path=path, datamodule=hf_datamodule)
+    assert_metrics_almost_equal(
+        pretrained_model_metrics=pretrained_metrics,
+        loaded_model_metrics=loaded_model_results,
+        metric_keys=comparison_metrics_keys,
+    )
+
+
+def test_hf_model_exporter_from_task(
+    embedding_name: str,
+    lightning_text_classification_pipeline: LIGHTNING_TEXT_CLASSIFICATION_PIPELINE_OUTPUT_TYPE,
+    config: LightningAdvancedConfig,
+    tmp_path_module: Path,
+    dataset_kwargs: Dict[str, Any],
+    comparison_metrics_keys: List[str],
+    hf_datamodule: TextClassificationDataModule,
+):
+    path = tmp_path_module / "hf_model_task"
+    exporter = HuggingFaceModelExporter(path=path)
+
+    pretrained_pipeline, pretrained_metrics = lightning_text_classification_pipeline
+    exporter.export_model_from_task(pretrained_pipeline.model.task)
+
+    loaded_model_results = evaluate_hf_model(model_path=path, datamodule=hf_datamodule)
+    assert_metrics_almost_equal(
+        pretrained_model_metrics=pretrained_metrics,
+        loaded_model_metrics=loaded_model_results,
+        metric_keys=comparison_metrics_keys,
+    )
 
 
 def test_onnx_model_exporter_from_pipeline(
     embedding_name: str,
-    lightning_text_classification_pipeline: Tuple[
-        LightningClassificationPipeline, TextClassificationEvaluationResults
-    ],
+    lightning_text_classification_pipeline: LIGHTNING_TEXT_CLASSIFICATION_PIPELINE_OUTPUT_TYPE,
     config: LightningAdvancedConfig,
     tmp_path_module: Path,
     dataset_kwargs: Dict[str, Any],
@@ -242,24 +249,21 @@ def test_onnx_model_exporter_from_pipeline(
 ):
     path = tmp_path_module / "onnx_model_pipeline"
     exporter = ONNXModelExporter(path=path)
-    pretrained_pipeline = lightning_text_classification_pipeline[0]
-    pretrained_metrics = lightning_text_classification_pipeline[1]
-    exporter.export_model_from_pipeline(pretrained_pipeline)
-    results = evaluate_onnx_model(model_path=path, datamodule=hf_datamodule)
 
-    for metric_key in comparison_metrics_keys:
-        numpy.testing.assert_almost_equal(
-            getattr(pretrained_metrics, metric_key),
-            getattr(results, metric_key),
-            decimal=pytest.decimal,
-        )
+    pretrained_pipeline, pretrained_metrics = lightning_text_classification_pipeline
+    exporter.export_model_from_pipeline(pretrained_pipeline)
+
+    loaded_model_results = evaluate_onnx_model(model_path=path, datamodule=hf_datamodule)
+    assert_metrics_almost_equal(
+        pretrained_model_metrics=pretrained_metrics,
+        loaded_model_metrics=loaded_model_results,
+        metric_keys=comparison_metrics_keys,
+    )
 
 
 def test_onnx_model_exporter_from_task(
     embedding_name: str,
-    lightning_text_classification_pipeline: Tuple[
-        LightningClassificationPipeline, TextClassificationEvaluationResults
-    ],
+    lightning_text_classification_pipeline: LIGHTNING_TEXT_CLASSIFICATION_PIPELINE_OUTPUT_TYPE,
     config: LightningAdvancedConfig,
     tmp_path_module: Path,
     dataset_kwargs: Dict[str, Any],
@@ -268,14 +272,13 @@ def test_onnx_model_exporter_from_task(
 ):
     path = tmp_path_module / "onnx_model_task"
     exporter = ONNXModelExporter(path=path)
-    pretrained_pipeline = lightning_text_classification_pipeline[0]
-    pretrained_metrics = lightning_text_classification_pipeline[1]
-    exporter.export_model_from_task(pretrained_pipeline.model.task)
-    results = evaluate_onnx_model(model_path=path, datamodule=hf_datamodule)
 
-    for metric_key in comparison_metrics_keys:
-        numpy.testing.assert_almost_equal(
-            getattr(pretrained_metrics, metric_key),
-            getattr(results, metric_key),
-            decimal=pytest.decimal,
-        )
+    pretrained_pipeline, pretrained_metrics = lightning_text_classification_pipeline
+    exporter.export_model_from_task(pretrained_pipeline.model.task)
+
+    loaded_model_results = evaluate_onnx_model(model_path=path, datamodule=hf_datamodule)
+    assert_metrics_almost_equal(
+        pretrained_model_metrics=pretrained_metrics,
+        loaded_model_metrics=loaded_model_results,
+        metric_keys=comparison_metrics_keys,
+    )

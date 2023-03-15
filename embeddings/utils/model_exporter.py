@@ -18,6 +18,10 @@ from embeddings.utils.utils import get_installed_packages
 _logger = get_logger(__name__)
 
 
+class ExportMisconfigurationError(Exception):
+    pass
+
+
 @dataclasses.dataclass
 class BaseModelExporter(abc.ABC):
     path: dataclasses.InitVar[T_path]
@@ -36,7 +40,7 @@ class BaseModelExporter(abc.ABC):
     @staticmethod
     def _check_tokenizer(tokenizer: Optional[AutoTokenizer]) -> None:
         if not tokenizer:
-            raise ValueError(
+            raise ExportMisconfigurationError(
                 "Tokenizer not found, re-run pipeline/task or pass tokenizer explicitly!"
             )
 
@@ -48,6 +52,7 @@ class BaseModelExporter(abc.ABC):
     @staticmethod
     def _map_target_names(model: AutoModel, target_names: List[str]) -> AutoModel:
         if target_names:
+            assert len(target_names) == model.config.id2label.keys()
             id2label = {k: v for k, v in zip(model.config.id2label.keys(), target_names)}
             label2id = {k: v for k, v in zip(target_names, model.config.id2label.keys())}
 
@@ -91,7 +96,7 @@ class BaseModelExporter(abc.ABC):
 
         hparams = getattr(self._task_to_export.model, "hparams", None)
         if self.add_hparams_configuration and not hparams:
-            raise ValueError(
+            raise ExportMisconfigurationError(
                 "Couldn't obtain hparams from task. "
                 'Check your task model or set "add_hparams_configuration" parameter to "False"'
             )
