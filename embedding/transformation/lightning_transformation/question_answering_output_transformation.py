@@ -126,11 +126,12 @@ class QAPredictionPostProcessor(QABasePostprocessor):
     @staticmethod
     def _get_softmax_scores_with_sort(predictions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         scores = torch.from_numpy(np.array([pred.pop("score") for pred in predictions]))
-        softmax_scores = torch.functional.F.softmax(scores)  # type: ignore
+        # Module torch.functional does not explicitly export attritube "F"
+        softmax_scores = torch.functional.F.softmax(scores)  # type: ignore[attr-defined]
         for prob, pred in zip(softmax_scores, predictions):
             pred["softmax_score"] = prob
-
-        return sorted(predictions, key=lambda x: x["softmax_score"], reverse=True)  # type: ignore
+        # mypy thinks the function only returns Any
+        return sorted(predictions, key=lambda x: x["softmax_score"], reverse=True)  # type: ignore[no-any-return]
 
     def _postprocess_example(
         self,
@@ -161,9 +162,10 @@ class QAPredictionPostProcessor(QABasePostprocessor):
                 end_logits=end_logits[1:],
                 offset_mapping=offset_mappings[output_index],
             )
-
-        predictions.append(min_no_answer_score)  # type: ignore
-        predictions = sorted(predictions, key=lambda x: x["score"], reverse=True)[  # type: ignore
+        # Argument 1 to "append" of "list" has incompatible type "Optional[Dict[str, object]]"; expected "Dict[str, Any]"
+        predictions.append(min_no_answer_score)  # type: ignore[arg-type]
+        # mypy thinks the function only returns Any
+        predictions = sorted(predictions, key=lambda x: x["score"], reverse=True)[  # type: ignore[no-any-return]
             : self.top_k_answers
         ]
         predictions = self._get_predicted_text_from_context(

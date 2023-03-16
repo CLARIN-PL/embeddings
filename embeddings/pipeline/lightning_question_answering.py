@@ -72,12 +72,12 @@ class LightningQuestionAnsweringPipeline(
         self._save_artifacts()
         # without type: ignore mypy throws errors: Model nas no attribute...
         # this applies to every line below
-        self.model.task.build_task_model()  # type:ignore
-        self.model.task.fit(self.datamodule)  # type:ignore
-        model_result = self.model.task.postprocess(  # type:ignore
-            data=self.datamodule, predict_subset=self.model.predict_subset  # type:ignore
+        self.model.task.build_task_model()  # type: ignore[attr-defined]
+        self.model.task.fit(self.datamodule)  # type: ignore[attr-defined]
+        model_result = self.model.task.postprocess(  # type: ignore[attr-defined]
+            data=self.datamodule, predict_subset=self.model.predict_subset  # type: ignore[attr-defined]
         )
-        result = model_result[self.model.predict_subset]  # type: ignore
+        result = model_result[self.model.predict_subset]  # type: ignore[attr-defined]
         result = self.evaluator.evaluate(result)
         assert isinstance(result, QuestionAnsweringEvaluationResults)
         self._finish_logging()

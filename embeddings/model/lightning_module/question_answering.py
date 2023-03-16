@@ -22,7 +22,7 @@ class QuestionAnsweringInferenceModule(pl.LightningModule):
         super().__init__()
         self.model = AutoModelForQuestionAnswering.from_pretrained(model_name)
         # without type: ignore mypy throws error: Incompatible types in assignment
-        self.trainer = pl.Trainer(devices=devices, accelerator=accelerator)  # type: ignore
+        self.trainer = pl.Trainer(devices=devices, accelerator=accelerator)  # type: ignore[assignment]
 
     def predict_step(
         self, batch: Dict[str, torch.Tensor], batch_idx: int, dataloader_idx: Optional[int] = None
@@ -68,14 +68,18 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
 
     def _init_model(self) -> None:
         self.config = AutoConfig.from_pretrained(
-            self.hparams.model_name_or_path,  # type: ignore
+            # item "Tensor" of "Union[Tensor, Module]" has no attribute "model_name_or_path"
+            self.hparams.model_name_or_path,  # type: ignore[union-attr]
             **self.config_kwargs,
         )
         self.model: AutoModel = self.downstream_model_type.from_pretrained(
-            self.hparams.model_name_or_path, config=self.config  # type: ignore
+            self.hparams.model_name_or_path, config=self.config  # type: ignore[union-attr]
         )
-        if self.hparams.finetune_last_n_layers > -1:  # type: ignore
-            self.freeze_transformer(finetune_last_n_layers=self.hparams.finetune_last_n_layers)  # type: ignore
+        # item "Tensor" of "Union[Tensor, Module]" has no attribute "finetune_last_n_layers"
+        # unsupported operand type for <
+        if self.hparams.finetune_last_n_layers > -1:  # type: ignore[union-attr, operator]
+            # Argument "finetune_last_n_layers" to "freeze_transformer" of "QuestionAnsweringModule" has incompatible type "Union[Any, Tensor, Module]"; expected "int"
+            self.freeze_transformer(finetune_last_n_layers=self.hparams.finetune_last_n_layers)  # type: ignore[union-attr, arg-type]
 
     def freeze_transformer(self, finetune_last_n_layers: int) -> None:
         if finetune_last_n_layers == 0:
@@ -130,7 +134,7 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
         self.log("train/Loss", outputs.loss)
         # without type: ignore mypy throws an error
         # Item "Tensor" of "Union[Tensor, Module]" has no attribute "use_scheduler"
-        if self.hparams.use_scheduler:  # type: ignore
+        if self.hparams.use_scheduler:  # type: ignore[union-attr]
             assert self.trainer is not None
             last_lr = self.trainer.lr_schedulers[0]["scheduler"].get_last_lr()
             self.log("train/BaseLR", last_lr[0], prog_bar=True)

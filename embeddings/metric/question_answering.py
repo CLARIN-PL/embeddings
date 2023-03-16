@@ -32,8 +32,9 @@ class SQUADv2Metric(HuggingFaceMetric):
             {
                 "id": str(i),
                 "answers": {
-                    "text": ref["answers"]["text"],  # type: ignore
-                    "answer_start": ref["answers"]["answer_start"],  # type: ignore
+                    # mypy thinks that references are not indexable
+                    "text": ref["answers"]["text"],  # type: ignore[index]
+                    "answer_start": ref["answers"]["answer_start"],  # type: ignore[index]
                 },
             }
             for i, ref in enumerate(references)
