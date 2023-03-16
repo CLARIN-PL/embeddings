@@ -130,7 +130,9 @@ module = [
     "seqeval.*",
     "transformers",
     "transformers.*",
-    "evaluate"
+    "evaluate",
+    "datasets",
+    "datasets.*"
 ]
 ignore_missing_imports = true
 
