@@ -88,7 +88,7 @@ class SeqevalMetric(evaluate.Metric):  # type:ignore[misc]
             citation=_CITATION,
             homepage="https://github.com/chakki-works/seqeval",
             inputs_description=_KWARGS_DESCRIPTION,
-            features=datasets.Features(
+            features=datasets.Features(  # type: ignore
                 {
                     "predictions": datasets.Sequence(
                         datasets.Value("string", id="label"), id="sequence"

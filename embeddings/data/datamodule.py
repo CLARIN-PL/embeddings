@@ -184,7 +184,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
     def train_dataloader(self) -> DataLoader[HuggingFaceDataset]:
         return DataLoader(
-            dataset=self.dataset["train"],
+            dataset=self.dataset["train"],  # type: ignore
             batch_size=self.train_batch_size,
             collate_fn=self.collate_fn,
             shuffle=True,
@@ -193,10 +193,10 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
     # Ignoring the type of val_dataloader method from supertype "DataHooks" allowing for None
     # and training without validation dataset.
-    def val_dataloader(self) -> Optional[DataLoader[HuggingFaceDataset]]:  # type: ignore[override]
+    def val_dataloader(self) -> Optional[DataLoader[HuggingFaceDataset]]:  # type: ignore
         if "validation" in self.dataset:
             return DataLoader(
-                dataset=self.dataset["validation"],
+                dataset=self.dataset["validation"],  # type: ignore
                 batch_size=self.eval_batch_size,
                 collate_fn=self.collate_fn,
                 shuffle=False,
@@ -207,7 +207,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
     def test_dataloader(self) -> DataLoader[HuggingFaceDataset]:
         return DataLoader(
-            dataset=self.dataset["test"],
+            dataset=self.dataset["test"],  # type: ignore
             batch_size=self.eval_batch_size,
             collate_fn=self.collate_fn,
             shuffle=False,
