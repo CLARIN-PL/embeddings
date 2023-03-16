@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Union
 import datasets
 from pytorch_lightning.accelerators import Accelerator
 
-from embeddings.config.lightning_config import LightningQABasicConfig
+from embeddings.config.lightning_config import LightningQABasicConfig, LightningQAConfig
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
@@ -26,7 +26,7 @@ class LightningQuestionAnsweringPipeline(
         dataset_name_or_path: T_path,
         output_path: T_path,
         evaluation_filename: str = "evaluation.json",
-        config: LightningQABasicConfig = LightningQABasicConfig(),
+        config: LightningQAConfig = LightningQABasicConfig(),
         devices: Optional[Union[List[int], str, int]] = "auto",
         accelerator: Optional[Union[str, Accelerator]] = "auto",
         logging_config: LightningLoggingConfig = LightningLoggingConfig(),
@@ -35,20 +35,23 @@ class LightningQuestionAnsweringPipeline(
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         model_checkpoint_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
+        self.evaluation_filename = evaluation_filename
+
         task_train_kwargs = config.task_train_kwargs
         task_train_kwargs.update({"devices": devices, "accelerator": accelerator})
         tokenizer_name_or_path = tokenizer_name_or_path or embedding_name_or_path
         model_checkpoint_kwargs = model_checkpoint_kwargs if model_checkpoint_kwargs else {}
         output_path = Path(output_path)
-        self.evaluation_filename = evaluation_filename
+
         datamodule = QuestionAnsweringDataModule(
             dataset_name_or_path=dataset_name_or_path,
             tokenizer_name_or_path=tokenizer_name_or_path,
             train_batch_size=config.task_model_kwargs["train_batch_size"],
             eval_batch_size=config.task_model_kwargs["eval_batch_size"],
-            max_seq_length=config.max_seq_length,
-            doc_stride=config.doc_stride,
+            doc_stride=config.task_model_kwargs["doc_stride"],
             batch_encoding_kwargs=config.batch_encoding_kwargs,
+            load_dataset_kwargs=load_dataset_kwargs,
+            **config.datamodule_kwargs
         )
         datamodule.setup(stage="fit")
 
