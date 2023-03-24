@@ -113,4 +113,24 @@ class LightningAdvancedConfig(AdvancedConfig):
         )
 
 
+@dataclass
+class LightningQABasicConfig(LightningBasicConfig):
+    batch_encoding_kwargs: Dict[str, Any] = field(
+        default_factory=lambda: {
+            "padding": "max_length",
+            "truncation": "only_second",
+            "return_offsets_mapping": True,
+            "return_overflowing_tokens": True,
+        }
+    )
+    doc_stride: int = 64
+
+    @property
+    def task_model_kwargs(self) -> Dict[str, Any]:
+        task_model_kwargs = super().task_model_kwargs
+        task_model_kwargs["doc_stride"] = self.doc_stride
+        return task_model_kwargs
+
+
 LightningConfig = Union[LightningBasicConfig, LightningAdvancedConfig]
+LightningQAConfig = Union[LightningQABasicConfig, LightningAdvancedConfig]
