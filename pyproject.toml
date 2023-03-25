@@ -130,6 +130,7 @@ module = [
     "dataset.arrow_dataset",
     "seqeval.*",
     "transformers",
+    "transformers.modeling_outputs",
     "transformers.onnx",
     "evaluate",
     "datasets"
