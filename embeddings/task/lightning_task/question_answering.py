@@ -40,6 +40,7 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
             early_stopping_kwargs=early_stopping_kwargs,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
             logging_config=LightningLoggingConfig.from_flags(),
+            hf_task_name="question-answering"
         )
         self.model_name_or_path = model_name_or_path
         self.model_config_kwargs = model_config_kwargs
