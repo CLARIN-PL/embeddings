@@ -6,6 +6,7 @@ import pytest
 import pytorch_lightning as pl
 import torch
 from _pytest.tmpdir import TempdirFactory
+from transformers import AlbertForSequenceClassification
 
 from embeddings.config.lightning_config import LightningAdvancedConfig
 from embeddings.data.datamodule import TextClassificationDataModule
@@ -20,7 +21,6 @@ from .model_export.evaluate import (
     evaluate_hf_model_text_classification,
     evaluate_onnx_text_classification,
 )
-from transformers import AlbertForSequenceClassification
 
 LIGHTNING_TEXT_CLASSIFICATION_PIPELINE_OUTPUT_TYPE = Tuple[
     LightningClassificationPipeline, TextClassificationEvaluationResults
@@ -110,25 +110,6 @@ def config() -> LightningAdvancedConfig:
     )
 
 
-# @pytest.fixture(scope="module")
-# def lightning_classification_pipeline(
-#     dataset_kwargs: Dict[str, Any],
-#     config: LightningAdvancedConfig,
-#     tmp_path_module: Path,
-# ) -> LightningClassificationPipeline:
-#     return LightningClassificationPipeline(
-#         embedding_name_or_path="allegro/herbert-base-cased",
-#         output_path=tmp_path_module,
-#         config=config,
-#         devices="auto",
-#         accelerator="cpu",
-#         model_checkpoint_kwargs={
-#             "filename": "last",
-#             "monitor": None,
-#             "save_last": False,
-#         },
-#         **dataset_kwargs,
-#     )
 @pytest.fixture(scope="module")
 def comparison_metrics_keys() -> List[str]:
     return [
@@ -178,7 +159,10 @@ def lightning_text_classification_pipeline(
 def test_lightning_classification_task_name(
     lightning_text_classification_pipeline: LIGHTNING_TEXT_CLASSIFICATION_PIPELINE_OUTPUT_TYPE,
 ):
-    assert lightning_text_classification_pipeline[0].model.task.hf_task_name == "sequence-classification"
+    assert (
+        lightning_text_classification_pipeline[0].model.task.hf_task_name
+        == "sequence-classification"
+    )
 
 
 def test_lightning_classification_pipeline(
