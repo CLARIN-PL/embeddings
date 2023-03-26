@@ -133,7 +133,8 @@ module = [
     "transformers.modeling_outputs",
     "transformers.onnx",
     "evaluate",
-    "datasets"
+    "datasets",
+    "datasets.utils"
 ]
 ignore_missing_imports = true
 
