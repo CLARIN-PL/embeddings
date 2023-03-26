@@ -1,10 +1,12 @@
 import abc
 import dataclasses
+import json
 import pathlib
 from typing import Any, Dict, List, Optional
 
 import srsly
 import transformers.onnx
+from datasets import ClassLabel
 from transformers import AutoModel, AutoTokenizer
 from transformers.onnx import FeaturesManager
 
@@ -52,7 +54,7 @@ class BaseModelExporter(abc.ABC):
     @staticmethod
     def _map_target_names(model: AutoModel, target_names: List[str]) -> AutoModel:
         if target_names:
-            assert len(target_names) == model.config.id2label.keys()
+            assert len(target_names) == len(model.config.id2label.keys())
             id2label = {k: v for k, v in zip(model.config.id2label.keys(), target_names)}
             label2id = {k: v for k, v in zip(target_names, model.config.id2label.keys())}
 
@@ -88,7 +90,16 @@ class BaseModelExporter(abc.ABC):
             tokenizer = task.tokenizer
         self._tokenizer_to_export = tokenizer
 
-        label_names = getattr(task, "target_names", None)
+        label_names = None
+        if task.hf_task_name == "sequence-classification":
+            label_names = getattr(task, "target_names", None)
+        elif task.hf_task_name == "token-classification":
+            class_label: Optional[ClassLabel] = getattr(
+                self._task_to_export.model, "class_label", None
+            )
+            if class_label:
+                label_names = class_label.names
+
         if label_names:
             self._model_to_export = BaseModelExporter._map_target_names(
                 self._model_to_export, target_names=label_names
@@ -147,6 +158,9 @@ class ONNXModelExporter(BaseModelExporter):
             output=self._export_path / "model.onnx",
             opset=onnx_config.default_onnx_opset,
         )
+        self._tokenizer_to_export.save_pretrained(self._export_path)
+        with open(self._export_path / "config.json", "w") as f:
+            json.dump(obj=self._model_to_export.config.to_dict(), fp=f)
 
         self._onnx_export_metadata = {
             "onnx_config": onnx_config,
