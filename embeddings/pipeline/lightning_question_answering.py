@@ -8,13 +8,12 @@ from embeddings.config.lightning_config import LightningQABasicConfig, Lightning
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
-from embeddings.evaluator.evaluation_results import Predictions, QuestionAnsweringEvaluationResults
+from embeddings.evaluator.evaluation_results import QuestionAnsweringEvaluationResults
 from embeddings.evaluator.question_answering_evaluator import QuestionAnsweringEvaluator
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task import question_answering
 from embeddings.utils.loggers import LightningLoggingConfig
-from embeddings.utils.utils import standardize_name
 
 
 class LightningQuestionAnsweringPipeline(

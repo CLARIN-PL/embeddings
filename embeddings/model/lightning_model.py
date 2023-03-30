@@ -1,15 +1,8 @@
-from typing import Any, Dict, Generic, Optional, TypeVar, Union
+from typing import Any, Generic, Optional
 
-from embeddings.data.datamodule import HuggingFaceDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
-from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.model.model import Model
-from embeddings.task.lightning_task.lightning_task import (
-    ClassificationLightningTask,
-    LightningDataModule,
-    LightningTask,
-)
-from embeddings.task.lightning_task.question_answering import QuestionAnsweringTask
+from embeddings.task.lightning_task.lightning_task import LightningDataModule, LightningTask
 from embeddings.task.task import Output
 
 

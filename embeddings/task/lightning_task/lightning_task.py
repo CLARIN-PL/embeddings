@@ -15,7 +15,7 @@ from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
 from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.model.lightning_module.lightning_module import LightningModule
-from embeddings.task.task import Input, Output, Task
+from embeddings.task.task import Output, Task
 from embeddings.utils.lightning_callbacks.best_epoch_callback import BestEpochCallback
 from embeddings.utils.loggers import LightningLoggingConfig, get_logger
 from embeddings.utils.torch_utils import cleanup_torch_model_artifacts
