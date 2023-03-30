@@ -58,7 +58,7 @@ def config() -> LightningAdvancedConfig:
 @pytest.fixture(scope="module")
 def basic_config() -> LightningQABasicConfig:
     return LightningQABasicConfig(
-        finetune_last_n_layers=0,
+        finetune_last_n_layers=1,
         max_epochs=1,
         learning_rate=5e-4,
         use_scheduler=False,
@@ -87,7 +87,6 @@ def lightning_question_answering_pipeline(
         output_path=tmp_path_module,
         config=config,
         evaluation_filename="evaluation.json",
-        predict_subset="validation",
         model_checkpoint_kwargs={"filename": "last", "monitor": None, "save_last": False},
         dataset_name_or_path=tmp_path_module / "data_sample",
     )
@@ -118,8 +117,8 @@ def test_lightning_question_answering_pipeline(
 
     metrics = results.metrics
     np.testing.assert_almost_equal(metrics["exact"], 0.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(metrics["f1"], 2.2222222, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(metrics["total"], 10.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(metrics["HasAns_f1"], 2.4691358, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(metrics["f1"], 1.8518519, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(metrics["total"], 9.0, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(metrics["HasAns_f1"], 1.8518519, decimal=pytest.decimal)
     np.testing.assert_almost_equal(metrics["HasAns_total"], 9.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(metrics["best_f1"], 12.2222222, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(metrics["best_f1"], 1.8518519, decimal=pytest.decimal)

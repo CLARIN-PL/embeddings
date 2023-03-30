@@ -14,7 +14,7 @@ from embeddings.metric.sequence_labeling import (
 )
 
 
-class SequenceLabelingEvaluator(MetricsEvaluator[SequenceLabelingEvaluationResults]):
+class SequenceLabelingEvaluator(MetricsEvaluator[Predictions, SequenceLabelingEvaluationResults]):
     def __init__(
         self,
         return_input_data: bool = True,

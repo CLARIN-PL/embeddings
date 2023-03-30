@@ -1,6 +1,6 @@
 import abc
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Type
+from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import Callback, ModelCheckpoint
@@ -11,18 +11,22 @@ from transformers import AutoModel
 from embeddings.data.datamodule import HuggingFaceDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
+from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
 from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.model.lightning_module.lightning_module import LightningModule
-from embeddings.task.task import Task
+from embeddings.task.task import Input, Output, Task
 from embeddings.utils.lightning_callbacks.best_epoch_callback import BestEpochCallback
 from embeddings.utils.loggers import LightningLoggingConfig, get_logger
 from embeddings.utils.torch_utils import cleanup_torch_model_artifacts
 
 _logger = get_logger(__name__)
 
+LightningDataModules = Union[HuggingFaceDataModule, QuestionAnsweringDataModule]
+LightningDataModule = TypeVar("LightningDataModule", bound=LightningDataModules)
 
-class LightningTask(Task[HuggingFaceDataModule, Predictions]):
+
+class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModule, Output]):
     MODEL_UNDEFINED_EXCEPTION = ValueError("Model undefined. Use build_task_model() first!")
 
     def __init__(
@@ -34,13 +38,13 @@ class LightningTask(Task[HuggingFaceDataModule, Predictions]):
         logging_config: LightningLoggingConfig,
     ):
         super().__init__()
-        self.output_path: Path = Path(output_path)
+        self.output_path = Path(output_path)
         self.task_train_kwargs = task_train_kwargs
         self.early_stopping_kwargs = early_stopping_kwargs
         self.model_checkpoint_kwargs = model_checkpoint_kwargs
-        self.logging_config = logging_config
         self.model: Optional[HuggingFaceLightningModule] = None
         self.trainer: Optional[pl.Trainer] = None
+        self.logging_config = logging_config
 
     @property
     def best_epoch(self) -> Optional[float]:
@@ -76,7 +80,7 @@ class LightningTask(Task[HuggingFaceDataModule, Predictions]):
 
     def fit(
         self,
-        data: HuggingFaceDataModule,
+        data: LightningDataModule,
         run_name: Optional[str] = None,
     ) -> None:
         if not self.model:
@@ -97,8 +101,62 @@ class LightningTask(Task[HuggingFaceDataModule, Predictions]):
             raise e
 
     @abc.abstractmethod
-    def predict(self, dataloader: DataLoader[Any], return_names: bool = True) -> Predictions:
+    def fit_predict(
+        self,
+        data: LightningDataModule,
+        predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
+        run_name: Optional[str] = None,
+    ) -> Output:
         pass
+
+    @abc.abstractmethod
+    def predict(self, dataloader: DataLoader[Any], return_names: bool = True) -> Output:
+        pass
+
+    @abc.abstractmethod
+    def build_task_model(self) -> None:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def from_checkpoint(
+        cls,
+        checkpoint_path: T_path,
+        output_path: T_path,
+        task_train_kwargs: Optional[Dict[str, Any]] = None,
+        logging_config: Optional[LightningLoggingConfig] = None,
+    ) -> "LightningTask[LightningDataModule, Output]":
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def restore_task_model(
+        cls,
+        checkpoint_path: T_path,
+        output_path: T_path,
+        lightning_module: Type[LightningModule[AutoModel]],
+        task_train_kwargs: Optional[Dict[str, Any]],
+        logging_config: Optional[LightningLoggingConfig],
+    ) -> "LightningTask[LightningDataModule, Output]":
+        pass
+
+
+class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictions]):
+    def __init__(
+        self,
+        output_path: T_path,
+        task_train_kwargs: Dict[str, Any],
+        early_stopping_kwargs: Dict[str, Any],
+        model_checkpoint_kwargs: Dict[str, Any],
+        logging_config: LightningLoggingConfig,
+    ):
+        super().__init__(
+            output_path=output_path,
+            task_train_kwargs=task_train_kwargs,
+            early_stopping_kwargs=early_stopping_kwargs,
+            model_checkpoint_kwargs=model_checkpoint_kwargs,
+            logging_config=logging_config,
+        )
 
     def fit_predict(
         self,
@@ -109,17 +167,10 @@ class LightningTask(Task[HuggingFaceDataModule, Predictions]):
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
         self.fit(data, run_name=run_name)
-        if "test" in data.dataset:
-            assert isinstance(self.trainer, pl.Trainer)
-            self.trainer.test(self.model, data.test_dataloader())
         dataloader = data.get_subset(subset=predict_subset)
         assert isinstance(dataloader, DataLoader)
         result = self.predict(dataloader=dataloader)
         return result
-
-    @abc.abstractmethod
-    def build_task_model(self) -> None:
-        pass
 
     @classmethod
     def restore_task_model(
@@ -129,7 +180,7 @@ class LightningTask(Task[HuggingFaceDataModule, Predictions]):
         lightning_module: Type[LightningModule[AutoModel]],
         task_train_kwargs: Optional[Dict[str, Any]],
         logging_config: Optional[LightningLoggingConfig],
-    ) -> "LightningTask":
+    ) -> "ClassificationLightningTask":
         model = lightning_module.load_from_checkpoint(str(checkpoint_path))
         trainer = pl.Trainer(default_root_dir=str(output_path), **task_train_kwargs or {})
         init_kwargs = {
@@ -149,14 +200,3 @@ class LightningTask(Task[HuggingFaceDataModule, Predictions]):
         task.trainer = trainer
         model.trainer = trainer
         return task
-
-    @classmethod
-    @abc.abstractmethod
-    def from_checkpoint(
-        cls,
-        checkpoint_path: T_path,
-        output_path: T_path,
-        task_train_kwargs: Optional[Dict[str, Any]] = None,
-        logging_config: Optional[LightningLoggingConfig] = None,
-    ) -> "LightningTask":
-        pass

@@ -5,7 +5,7 @@ import datasets
 from pytorch_lightning.accelerators import Accelerator
 
 from embeddings.config.lightning_config import LightningBasicConfig, LightningConfig
-from embeddings.data.datamodule import SequenceLabelingDataModule
+from embeddings.data.datamodule import HuggingFaceDataModule, SequenceLabelingDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelingEvaluationResults
@@ -13,7 +13,7 @@ from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEva
 from embeddings.metric.sequence_labeling import EvaluationMode, TaggingScheme
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
-from embeddings.task.lightning_task.sequence_labeling import SequenceLabelingTask
+from embeddings.task.lightning_task.sequence_labeling import SequenceLabelingTaskClassification
 from embeddings.utils.json_dict_persister import JsonPersister
 from embeddings.utils.loggers import LightningLoggingConfig
 
@@ -59,7 +59,7 @@ class LightningSequenceLabelingPipeline(
             dataloader_kwargs=config.dataloader_kwargs,
             **config.datamodule_kwargs
         )
-        task = SequenceLabelingTask(
+        task = SequenceLabelingTaskClassification(
             model_name_or_path=embedding_name_or_path,
             output_path=output_path,
             num_classes=datamodule.num_classes,
@@ -73,7 +73,9 @@ class LightningSequenceLabelingPipeline(
             tagging_scheme=tagging_scheme,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
         )
-        model = LightningModel(task=task, predict_subset=predict_subset)
+        model: LightningModel[HuggingFaceDataModule, Predictions] = LightningModel(
+            task=task, predict_subset=predict_subset
+        )
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         ).persisting(JsonPersister(path=output_path.joinpath(evaluation_filename)))

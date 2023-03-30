@@ -89,14 +89,14 @@ class QuestionAnsweringEvaluationResults(EvaluationResults):
     exact: float
     f1: float
     total: float
-    HasAns_exact: float
-    HasAns_f1: float
-    HasAns_total: float
-    NoAns_exact: float
-    NoAns_f1: float
-    NoAns_total: float
     best_exact: float
     best_exact_thresh: float
     best_f1: float
     best_f1_thresh: float
+    HasAns_exact: Optional[float] = None
+    HasAns_f1: Optional[float] = None
+    HasAns_total: Optional[float] = None
+    NoAns_exact: Optional[float] = None
+    NoAns_f1: Optional[float] = None
+    NoAns_total: Optional[float] = None
     data: Optional[Data] = None

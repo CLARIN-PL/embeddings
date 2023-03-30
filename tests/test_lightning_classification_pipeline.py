@@ -11,7 +11,7 @@ from embeddings.config.lightning_config import LightningAdvancedConfig
 from embeddings.evaluator.evaluation_results import TextClassificationEvaluationResults
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_classification import LightningClassificationPipeline
-from embeddings.task.lightning_task.text_classification import TextClassificationTask
+from embeddings.task.lightning_task.text_classification import TextClassificationTaskClassification
 
 
 @pytest.fixture(scope="module")
@@ -137,7 +137,7 @@ def assert_inference_from_checkpoint(
     tmp_path_module: Path,
 ) -> None:
     ckpt_path = tmp_path_module / "checkpoints" / "last.ckpt"
-    task_from_ckpt = TextClassificationTask.from_checkpoint(
+    task_from_ckpt = TextClassificationTaskClassification.from_checkpoint(
         checkpoint_path=ckpt_path.resolve(),
         output_path=tmp_path_module,
     )

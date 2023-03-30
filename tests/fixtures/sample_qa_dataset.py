@@ -4,7 +4,7 @@ import pytest
 
 @pytest.fixture(scope="module")
 def sample_question_answering_dataset() -> datasets.DatasetDict:
-    train_dict = {
+    data = {
         "id": [
             "57262779271a42140099d5f1",
             "572fb38ea23a5019007fc8cb",
@@ -16,6 +16,24 @@ def sample_question_answering_dataset() -> datasets.DatasetDict:
             "5706b9072eaba6190074ac7e",
             "5731309ce6313a140071cce8",
             "56cf69144df3c31400b0d745",
+            "dKj4lOcFhJ7nSbW9Xq3eLmGx",
+            "wNk6pRyUqH9sTgX8mL7fZdJc",
+            "tGh2kMjNlP9cFeY3qR5sBwEa",
+            "pWf8vZuNcD6mGtY5lHr9sQjK",
+            "xLs9eTgPjK6cBmH8wZfQyUaD",
+            "nMf2yQjK5sUcHgP8lRw6vBtZ",
+            "tSd7vFqMkL9cXjR2wN4zGhYb",
+            "dKj7sLpR6tZ9nTfQcX8vB2hY",
+            "hDy2sWzJ6xL9pRc5nFq4vG8t",
+            "cTb7vHsN6fZ2jLpK9rX5qG8m",
+            "bRf2mX9zL8vK6tHs5nD7qPjW",
+            "pRq8nKcV5sB2mLjH9zF6xG7t",
+            "zDc6vHjK9bX2sRqP5fL8tW4n",
+            "rJf5uNvB8dQcZtL6wHs4pKmW",
+            "mPf9zGqK7rL5tYwNcD8vBjHs",
+            "sRf2jHc5tZ8vB9nKpL6mXqWw",
+            "nFq5tL7vH2sRjPbK9wX8cZm",
+            "kHc8vL5sP6tRjN2mZ9wXqFb",
         ],
         "title": [
             "East_India_Company",
@@ -28,6 +46,24 @@ def sample_question_answering_dataset() -> datasets.DatasetDict:
             "House_music",
             "Kievan_Rus%27",
             "Frédéric_Chopin",
+            "The Importance of Proper Hydration",
+            "The Benefits of Regular Exercise",
+            "Tips for Making Healthy Eating Choices",
+            "Benefits of Meditation for Mental Health",
+            "Ways to Reduce Stress and Anxiety",
+            "The Benefits of Spending Time Outdoors",
+            "The Benefits of a Positive Attitude",
+            "The Importance of Time Management",
+            "The Benefits of Mindfulness Meditation",
+            "The Importance of Positive Thinking",
+            "The Importance of Self-Care",
+            "The Importance of Financial Planning",
+            "The Benefits of Yoga",
+            "The Importance of Digital Privacy",
+            "The Importance of Environmental Sustainability",
+            "The Benefits of Reading",
+            "The Benefits of Regular Exercise",
+            "The Benefits of Volunteerism",
         ],
         "context": [
             "The company, which benefited from the imperial patronage, soon expanded its commercial trading "
@@ -115,6 +151,53 @@ def sample_question_answering_dataset() -> datasets.DatasetDict:
             "Antoni Radziwiłł, governor of the Grand Duchy of Posen—himself an accomplished composer and aspiring "
             "cellist. For the prince and his pianist daughter Wanda, he composed his Introduction and Polonaise "
             "brillante in C major for cello and piano, Op. 3.",
+            "Drinking enough water is crucial for maintaining good health, as it helps regulate body temperature, "
+            "keep joints lubricated, and remove waste. Without proper hydration, our bodies can become dehydrated,"
+            " leading to fatigue, dizziness, and other symptoms.",
+            "Regular exercise has numerous benefits for both physical and mental health. It can help reduce the risk "
+            "of chronic diseases like heart disease and diabetes, improve mood and mental health, and increase energy "
+            "levels and overall well-being.",
+            "Making healthy eating choices can be a challenge, especially when surrounded by tempting but unhealthy "
+            "options. To make it easier, try planning out your meals in advance, focusing on whole, nutrient-dense "
+            "foods, and allowing yourself occasional treats in moderation.",
+            "Meditation has been shown to have numerous benefits for mental health. It can help reduce symptoms of "
+            "anxiety and depression, improve focus and concentration, and increase feelings of well-being and "
+            "happiness.",
+            "Stress and anxiety can take a toll on both physical and mental health. To reduce these feelings, "
+            "try practicing relaxation techniques like deep breathing or yoga, getting regular exercise, and seeking "
+            "support from friends, family, or a mental health professional.",
+            "Spending time outdoors can have numerous benefits for physical and mental health. It can help reduce "
+            "stress and anxiety, improve mood and cognitive function, and increase exposure to natural light and "
+            "fresh air.",
+            "A positive attitude can have numerous benefits for mental and physical health. It can help reduce stress "
+            "and anxiety, improve relationships with others, and increase resilience in the face of challenges.",
+            "Effective time management is key to achieving success in both personal and professional life. By "
+            "prioritizing tasks, setting goals, and minimizing distractions, individuals can increase productivity "
+            "and reduce stress.",
+            "Mindfulness meditation has been shown to have numerous benefits for mental health. It can help reduce "
+            "stress and anxiety, improve focus and concentration, and promote feelings of calm and relaxation.",
+            "Positive thinking can have a powerful impact on mental health and well-being. By focusing on the good in "
+            "life and practicing gratitude, individuals can reduce negative thoughts and improve overall mood.",
+            "Self-care is crucial for maintaining good mental and physical health. By taking time for oneself and "
+            "engaging in activities that promote relaxation and well-being, individuals can reduce stress and improve "
+            "overall quality of life.",
+            "Effective financial planning is key to achieving long-term financial goals. By creating a budget, "
+            "saving money, and investing wisely, individuals can secure their financial future and reduce financial "
+            "stress.",
+            "Yoga has been shown to have numerous physical and mental health benefits. It can help reduce stress and "
+            "anxiety, improve flexibility and balance, and promote feelings of calm and relaxation.",
+            "Protecting one's digital privacy is crucial in today's connected world. By using strong passwords, "
+            "avoiding public Wi-Fi, and being mindful of personal information shared online, individuals can reduce "
+            "the risk of identity theft and other cybercrimes.",
+            "Protecting the environment is crucial for the health of the planet and future generations. By reducing "
+            "waste, conserving energy, and using environmentally friendly products, individuals can help promote "
+            "sustainability and reduce the impact of climate change.",
+            "Reading has numerous benefits for mental health and cognitive function. It can improve vocabulary and "
+            "language skills, reduce stress and anxiety, and promote empathy and understanding.",
+            "Regular exercise has numerous benefits for physical and mental health. It can improve cardiovascular "
+            "health, reduce the risk of chronic diseases, and promote feelings of happiness and well-being.",
+            "Volunteerism has numerous benefits for mental health and social connections. It can improve feelings of "
+            "purpose and meaning, reduce social isolation, and promote a sense of community and belonging.",
         ],
         "question": [
             "what were the walled forts of Fort William in Bengal, Fort St George in Madras and Bombay castle before "
@@ -129,6 +212,24 @@ def sample_question_answering_dataset() -> datasets.DatasetDict:
             "Daft Punk began producing a new sound out of what european city?",
             "What was considered too be Kiev's most important route for trade?",
             "When did Chopin visit Berlin?",
+            "Why is drinking enough water crucial for maintaining good health?",
+            "What are some benefits of regular exercise?",
+            "What are some tips for making healthy eating choices?",
+            "What are some benefits of meditation for mental health?",
+            "What are some ways to reduce stress and anxiety?",
+            "What are some benefits of spending time outdoors?",
+            "What are some benefits of a positive attitude?",
+            "Why is time management important?",
+            "What are some benefits of mindfulness meditation?",
+            "Why is positive thinking important?",
+            "Why is self-care important?",
+            "Why is financial planning important?",
+            "What are some benefits of practicing yoga?",
+            "Why is digital privacy important?",
+            "Why is environmental sustainability important?",
+            "What are some benefits of reading?",
+            "What are some benefits of regular exercise?",
+            "What are some benefits of volunteerism?",
         ],
         "answers": [
             {"text": ["major factories"], "answer_start": [742]},
@@ -141,14 +242,40 @@ def sample_question_answering_dataset() -> datasets.DatasetDict:
             {"text": ["Paris"], "answer_start": [158]},
             {"text": ["Dnieper River"], "answer_start": [200]},
             {"text": ["September 1828"], "answer_start": [3]},
+            {"text": ["it helps regulate body temperature"], "answer_start": [65]},
+            {"text": ["reduce the risk of chronic diseases"], "answer_start": [88]},
+            {"text": ["focusing on whole, nutrient-dense foods"], "answer_start": [171]},
+            {"text": ["reduce symptoms of anxiety and depression"], "answer_start": [83]},
+            {"text": ["practicing relaxation techniques"], "answer_start": [101]},
+            {"text": ["reduce stress and anxiety"], "answer_start": [94]},
+            {"text": ["reduce stress and anxiety"], "answer_start": [91]},
+            {"text": ["increase productivity and reduce stress"], "answer_start": [177]},
+            {"text": ["reduce stress and anxiety"], "answer_start": [95]},
+            {"text": ["reduce negative thoughts and improve overall mood"], "answer_start": [152]},
+            {"text": ["reduce stress and improve overall quality of life"], "answer_start": [180]},
+            {
+                "text": ["secure their financial future and reduce financial stress"],
+                "answer_start": [150],
+            },
+            {"text": ["reduce stress and anxiety"], "answer_start": [86]},
+            {
+                "text": ["reduce the risk of identity theft and other cybercrimes"],
+                "answer_start": [195],
+            },
+            {
+                "text": ["promote sustainability and reduce the impact of climate change"],
+                "answer_start": [195],
+            },
+            {"text": ["improve vocabulary and language skills"], "answer_start": [79]},
+            {"text": ["improve cardiovascular health"], "answer_start": [78]},
+            {"text": ["improve feelings of purpose and meaning"], "answer_start": [84]},
         ],
     }
-    validation_dict = train_dict.copy()
-    train_dataset = datasets.Dataset.from_dict(train_dict)
-    validation_dataset = datasets.Dataset.from_dict(validation_dict)
+    dataset = datasets.Dataset.from_dict(data)
     return datasets.DatasetDict(
         {
-            "train": train_dataset,
-            "validation": validation_dataset,
+            "train": datasets.Dataset.from_dict(dataset[0:14]),
+            "validation": datasets.Dataset.from_dict(dataset[14:19]),
+            "test": datasets.Dataset.from_dict(dataset[19:]),
         }
     )
