@@ -153,7 +153,10 @@ def lightning_sequence_labeling_pipeline(
 def test_lightning_sequence_labeling_task_name(
     lightning_sequence_labeling_pipeline: LIGHTNING_TOKEN_CLASSIFICATION_PIPELINE_OUTPUT_TYPE,
 ):
-    assert lightning_sequence_labeling_pipeline[0].model.task.hf_task_name.value == "token-classification"
+    assert (
+        lightning_sequence_labeling_pipeline[0].model.task.hf_task_name.value
+        == "token-classification"
+    )
 
 
 def test_lightning_sequence_labeling_pipeline(
