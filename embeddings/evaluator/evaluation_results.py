@@ -45,10 +45,15 @@ Data = Union[Predictions, List[Dict[str, Any]]]
 
 @dataclass
 class EvaluationResults:
-    def __call__(self, show_data: bool = False) -> Union["EvaluationResults", Dict[str, Any]]:
-        if show_data:
-            return self
-        return self.metrics
+    def __repr__(self) -> str:
+        fields = asdict(self)
+        fields.pop("data")
+        return (
+            self.__class__.__qualname__
+            + "("
+            + ", ".join([f"{k}={v}" for k, v in fields.items()])
+            + ")"
+        )
 
     @property
     def metrics(self) -> Dict[str, Any]:
@@ -57,7 +62,7 @@ class EvaluationResults:
         return result
 
 
-@dataclass
+@dataclass(repr=False)
 class TextClassificationEvaluationResults(EvaluationResults):
     accuracy: float
     f1_macro: float
@@ -73,7 +78,7 @@ class TextClassificationEvaluationResults(EvaluationResults):
     data: Optional[Data] = None
 
 
-@dataclass
+@dataclass(repr=False)
 class SequenceLabelingEvaluationResults(EvaluationResults):
     accuracy: float
     f1_macro: float
@@ -89,7 +94,7 @@ class SequenceLabelingEvaluationResults(EvaluationResults):
     data: Optional[Data] = None
 
 
-@dataclass
+@dataclass(repr=False)
 class QuestionAnsweringEvaluationResults(EvaluationResults):
     exact: float
     f1: float
