@@ -16,7 +16,9 @@ from embeddings.model.lightning_module.question_answering import (
 )
 
 
-class QuestionAnsweringEvaluator(MetricsEvaluator[QuestionAnsweringEvaluationResults]):
+class QuestionAnsweringEvaluator(
+    MetricsEvaluator[Dict[str, Any], QuestionAnsweringEvaluationResults]
+):
     def metrics(
         self,
     ) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:

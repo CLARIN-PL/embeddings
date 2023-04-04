@@ -6,9 +6,10 @@ import datasets
 import pandas as pd
 from datasets import DatasetDict
 from datasets.utils import Version
+from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, BatchEncoding
 
-from embeddings.data.datamodule import HuggingFaceDataModule
+from embeddings.data.datamodule import HuggingFaceDataModule, HuggingFaceDataset
 from embeddings.data.io import T_path
 
 
@@ -244,3 +245,8 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
 
     def _class_encode_column(self, column_name: str) -> None:
         pass
+
+    def test_dataloader(self) -> DataLoader[HuggingFaceDataset]:
+        if "test" in self.splits and not "test" in self.dataset.keys():
+            self.process_data(stage="test")
+        return super().test_dataloader()

@@ -10,7 +10,9 @@ from embeddings.metric.metric import Metric
 from embeddings.metric.prfs_per_class_metric import PRFSPerClassMetric
 
 
-class TextClassificationEvaluator(MetricsEvaluator[TextClassificationEvaluationResults]):
+class TextClassificationEvaluator(
+    MetricsEvaluator[Predictions, TextClassificationEvaluationResults]
+):
     def metrics(
         self,
     ) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:

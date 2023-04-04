@@ -104,22 +104,22 @@ def test_question_answering_evaluator(scores: Dict[str, Any]):
     sample_output = random.choice(validation_outputs)
 
     np.testing.assert_almost_equal(validation_metrics["exact"], 0.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(validation_metrics["f1"], 3.1313131, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(validation_metrics["total"], 10.0, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(validation_metrics["f1"], 12.3076923, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(validation_metrics["total"], 5.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(validation_metrics["HasAns_exact"], 0.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(
-        validation_metrics["HasAns_f1"], 3.4792368, decimal=pytest.decimal
+        validation_metrics["HasAns_f1"], 12.3076923, decimal=pytest.decimal
     )
-    np.testing.assert_almost_equal(validation_metrics["HasAns_total"], 9.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(validation_metrics["NoAns_exact"], 0.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(validation_metrics["NoAns_f1"], 0.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(validation_metrics["NoAns_total"], 1.0, decimal=pytest.decimal)
-    np.testing.assert_almost_equal(validation_metrics["best_exact"], 10.0, decimal=pytest.decimal)
+    np.testing.assert_almost_equal(validation_metrics["HasAns_total"], 5.0, decimal=pytest.decimal)
+    assert validation_metrics["NoAns_exact"] is None
+    assert validation_metrics["NoAns_f1"] is None
+    assert validation_metrics["NoAns_total"] is None
+    np.testing.assert_almost_equal(validation_metrics["best_exact"], 0.0, decimal=pytest.decimal)
     np.testing.assert_almost_equal(
         validation_metrics["best_exact_thresh"], 0.0, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
-        validation_metrics["best_f1"], 13.1313131, decimal=pytest.decimal
+        validation_metrics["best_f1"], 12.3076923, decimal=pytest.decimal
     )
     np.testing.assert_almost_equal(
         validation_metrics["best_f1_thresh"], 0.0, decimal=pytest.decimal

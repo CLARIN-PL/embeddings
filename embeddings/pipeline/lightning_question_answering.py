@@ -8,17 +8,16 @@ from embeddings.config.lightning_config import LightningQABasicConfig, Lightning
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
-from embeddings.evaluator.evaluation_results import Predictions, QuestionAnsweringEvaluationResults
+from embeddings.evaluator.evaluation_results import QuestionAnsweringEvaluationResults
 from embeddings.evaluator.question_answering_evaluator import QuestionAnsweringEvaluator
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task import question_answering
 from embeddings.utils.loggers import LightningLoggingConfig
-from embeddings.utils.utils import standardize_name
 
 
 class LightningQuestionAnsweringPipeline(
-    LightningPipeline[datasets.DatasetDict, Predictions, QuestionAnsweringEvaluationResults]
+    LightningPipeline[datasets.DatasetDict, Dict[str, Any], QuestionAnsweringEvaluationResults]
 ):
     def __init__(
         self,
@@ -65,23 +64,8 @@ class LightningQuestionAnsweringPipeline(
             early_stopping_kwargs=config.early_stopping_kwargs,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
         )
-        model = LightningModel(task, predict_subset)
+        model: LightningModel[QuestionAnsweringDataModule, Dict[str, Any]] = LightningModel(
+            task, predict_subset
+        )
         evaluator = QuestionAnsweringEvaluator()
         super().__init__(datamodule, model, evaluator, output_path, logging_config)
-
-    def run(self, run_name: Optional[str] = None) -> QuestionAnsweringEvaluationResults:
-        if run_name:
-            run_name = standardize_name(run_name)
-        self._save_artifacts()
-        # without type: ignore mypy throws errors: Model nas no attribute...
-        # this applies to every line below
-        self.model.task.build_task_model()  # type: ignore[attr-defined]
-        self.model.task.fit(self.datamodule)  # type: ignore[attr-defined]
-        model_result = self.model.task.postprocess(  # type: ignore[attr-defined]
-            data=self.datamodule, predict_subset=self.model.predict_subset  # type: ignore[attr-defined]
-        )
-        result = model_result[self.model.predict_subset]  # type: ignore[attr-defined]
-        result = self.evaluator.evaluate(result)
-        assert isinstance(result, QuestionAnsweringEvaluationResults)
-        self._finish_logging()
-        return result

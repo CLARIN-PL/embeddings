@@ -5,7 +5,7 @@ import datasets
 from pytorch_lightning.accelerators import Accelerator
 
 from embeddings.config.lightning_config import LightningBasicConfig, LightningConfig
-from embeddings.data.datamodule import TextClassificationDataModule
+from embeddings.data.datamodule import HuggingFaceDataModule, TextClassificationDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import Predictions, TextClassificationEvaluationResults
@@ -69,7 +69,9 @@ class LightningClassificationPipeline(
             logging_config=logging_config,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
         )
-        model = LightningModel(task=task, predict_subset=predict_subset)
+        model: LightningModel[HuggingFaceDataModule, Predictions] = LightningModel(
+            task=task, predict_subset=predict_subset
+        )
         evaluator = TextClassificationEvaluator().persisting(
             JsonPersister(path=output_path.joinpath(evaluation_filename))
         )

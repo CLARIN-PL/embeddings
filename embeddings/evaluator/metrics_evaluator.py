@@ -8,12 +8,13 @@ from embeddings.evaluator.evaluation_results import EvaluationResults, Predictio
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.metric.metric import Metric
 
+EvaluatorInput = TypeVar("EvaluatorInput", bound=Union[Predictions, Dict[str, Any]])
 EvaluationResultsType = TypeVar("EvaluationResultsType", bound=EvaluationResults)
 
 
 class MetricsEvaluator(
-    Evaluator[Predictions, EvaluationResultsType],
-    Generic[EvaluationResultsType],
+    Evaluator[EvaluatorInput, EvaluationResultsType],
+    Generic[EvaluatorInput, EvaluationResultsType],
 ):
     def __init__(self, return_input_data: bool = True):
         self.return_input_data = return_input_data
