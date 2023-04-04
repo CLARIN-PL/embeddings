@@ -151,7 +151,7 @@ class ONNXModelExporter(BaseModelExporter):
 
     def _export_model(self) -> None:
         model_kind, model_onnx_config = FeaturesManager.check_supported_model_or_raise(
-            model=self._model_to_export, feature=self._task_to_export.hf_task_name
+            model=self._model_to_export, feature=self._task_to_export.hf_task_name.value
         )
         onnx_config = model_onnx_config(self._model_to_export.config)
         onnx_inputs, onnx_outputs = transformers.onnx.export(

@@ -160,7 +160,7 @@ def test_lightning_classification_task_name(
     lightning_text_classification_pipeline: LIGHTNING_TEXT_CLASSIFICATION_PIPELINE_OUTPUT_TYPE,
 ):
     assert (
-        lightning_text_classification_pipeline[0].model.task.hf_task_name
+        lightning_text_classification_pipeline[0].model.task.hf_task_name.value
         == "sequence-classification"
     )
 
