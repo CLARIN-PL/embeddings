@@ -13,7 +13,7 @@ from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelin
 from embeddings.pipeline.hf_preprocessing_pipeline import HuggingFacePreprocessingPipeline
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.pipeline.lightning_sequence_labeling import LightningSequenceLabelingPipeline
-from embeddings.task.lightning_task.sequence_labeling import SequenceLabelingTaskClassification
+from embeddings.task.lightning_task.sequence_labeling import SequenceLabelingTask
 
 
 @pytest.fixture(scope="module")
@@ -150,7 +150,7 @@ def assert_inference_from_checkpoint(
     tmp_path_module: Path,
 ) -> None:
     ckpt_path = tmp_path_module / "checkpoints" / "last.ckpt"
-    task_from_ckpt = SequenceLabelingTaskClassification.from_checkpoint(
+    task_from_ckpt = SequenceLabelingTask.from_checkpoint(
         checkpoint_path=ckpt_path.resolve(),
         output_path=tmp_path_module,
     )

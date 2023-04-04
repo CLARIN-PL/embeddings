@@ -13,7 +13,7 @@ from embeddings.evaluator.sequence_labeling_evaluator import SequenceLabelingEva
 from embeddings.metric.sequence_labeling import EvaluationMode, TaggingScheme
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
-from embeddings.task.lightning_task.sequence_labeling import SequenceLabelingTaskClassification
+from embeddings.task.lightning_task.sequence_labeling import SequenceLabelingTask
 from embeddings.utils.json_dict_persister import JsonPersister
 from embeddings.utils.loggers import LightningLoggingConfig
 
@@ -59,7 +59,7 @@ class LightningSequenceLabelingPipeline(
             dataloader_kwargs=config.dataloader_kwargs,
             **config.datamodule_kwargs
         )
-        task = SequenceLabelingTaskClassification(
+        task = SequenceLabelingTask(
             model_name_or_path=embedding_name_or_path,
             output_path=output_path,
             num_classes=datamodule.num_classes,

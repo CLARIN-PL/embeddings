@@ -12,7 +12,7 @@ from embeddings.evaluator.evaluation_results import Predictions, TextClassificat
 from embeddings.evaluator.text_classification_evaluator import TextClassificationEvaluator
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
-from embeddings.task.lightning_task.text_classification import TextClassificationTaskClassification
+from embeddings.task.lightning_task.text_classification import TextClassificationTask
 from embeddings.utils.json_dict_persister import JsonPersister
 from embeddings.utils.loggers import LightningLoggingConfig
 
@@ -57,7 +57,7 @@ class LightningClassificationPipeline(
             dataloader_kwargs=config.dataloader_kwargs,
             **config.datamodule_kwargs
         )
-        task = TextClassificationTaskClassification(
+        task = TextClassificationTask(
             model_name_or_path=embedding_name_or_path,
             output_path=output_path,
             num_classes=datamodule.num_classes,

@@ -13,7 +13,7 @@ from embeddings.task.lightning_task.lightning_task import ClassificationLightnin
 from embeddings.utils.loggers import LightningLoggingConfig
 
 
-class SequenceLabelingTaskClassification(ClassificationLightningTask):
+class SequenceLabelingTask(ClassificationLightningTask):
     def __init__(
         self,
         model_name_or_path: T_path,
