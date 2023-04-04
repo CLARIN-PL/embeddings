@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.model.lightning_module.text_classification import TextClassificationModule
+from embeddings.task.lightning_task.hf_task import HuggingFaceTaskName
 from embeddings.task.lightning_task.lightning_task import ClassificationLightningTask
 from embeddings.utils.loggers import LightningLoggingConfig
 
@@ -30,7 +31,7 @@ class TextClassificationTask(ClassificationLightningTask):
             early_stopping_kwargs,
             model_checkpoint_kwargs,
             logging_config,
-            hf_task_name="sequence-classification",
+            hf_task_name=HuggingFaceTaskName.text_classification,
         )
         self.model_name_or_path = model_name_or_path
         self.num_classes = num_classes

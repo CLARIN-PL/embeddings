@@ -15,6 +15,7 @@ from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
 from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.model.lightning_module.lightning_module import LightningModule
+from embeddings.task.lightning_task.hf_task import HuggingFaceTaskName
 from embeddings.task.task import Output, Task
 from embeddings.utils.lightning_callbacks.best_epoch_callback import BestEpochCallback
 from embeddings.utils.loggers import LightningLoggingConfig, get_logger
@@ -36,7 +37,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         early_stopping_kwargs: Dict[str, Any],
         model_checkpoint_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
-        hf_task_name: str,
+        hf_task_name: HuggingFaceTaskName,
     ):
         super().__init__()
 
@@ -154,6 +155,7 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
         early_stopping_kwargs: Dict[str, Any],
         model_checkpoint_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
+        hf_task_name: HuggingFaceTaskName,
     ):
         super().__init__(
             output_path=output_path,
@@ -161,6 +163,7 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
             early_stopping_kwargs=early_stopping_kwargs,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
             logging_config=logging_config,
+            hf_task_name=hf_task_name,
         )
 
     def fit_predict(

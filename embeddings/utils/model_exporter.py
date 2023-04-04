@@ -13,6 +13,7 @@ from transformers.onnx import FeaturesManager
 from embeddings.data.datamodule import Data
 from embeddings.data.io import T_path
 from embeddings.pipeline.lightning_pipeline import EvaluationResult, LightningPipeline, ModelResult
+from embeddings.task.lightning_task import SUPPORTED_HF_TASKS
 from embeddings.task.lightning_task.lightning_task import LightningTask
 from embeddings.utils.loggers import get_logger
 from embeddings.utils.utils import get_installed_packages
@@ -31,7 +32,7 @@ class BaseModelExporter(abc.ABC):
     add_hparams_configuration: bool = True
 
     _export_path: pathlib.Path = dataclasses.field(init=False)
-    _task_to_export: LightningTask = dataclasses.field(init=False)
+    _task_to_export: SUPPORTED_HF_TASKS = dataclasses.field(init=False)
     _tokenizer_to_export: AutoTokenizer = dataclasses.field(init=False)
     _model_to_export: AutoModel = dataclasses.field(init=False)
 
@@ -74,7 +75,9 @@ class BaseModelExporter(abc.ABC):
         self.export_model_from_task(task=task, tokenizer=tokenizer)
 
     def export_model_from_task(
-        self, task: LightningTask, tokenizer: Optional[AutoTokenizer] = None
+        self,
+        task: SUPPORTED_HF_TASKS,
+        tokenizer: Optional[AutoTokenizer] = None,
     ) -> None:
         self._task_to_export = task
         self._check_task()
@@ -91,9 +94,9 @@ class BaseModelExporter(abc.ABC):
         self._tokenizer_to_export = tokenizer
 
         label_names = None
-        if task.hf_task_name == "sequence-classification":
+        if task.hf_task_name.value == "sequence-classification":
             label_names = getattr(task, "target_names", None)
-        elif task.hf_task_name == "token-classification":
+        elif task.hf_task_name.value == "token-classification":
             class_label: Optional[ClassLabel] = getattr(
                 self._task_to_export.model, "class_label", None
             )
