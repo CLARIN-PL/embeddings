@@ -45,6 +45,11 @@ Data = Union[Predictions, List[Dict[str, Any]]]
 
 @dataclass
 class EvaluationResults:
+    def __call__(self, show_data: bool = False) -> Union["EvaluationResults", Dict[str, Any]]:
+        if show_data:
+            return self
+        return self.metrics
+
     @property
     def metrics(self) -> Dict[str, Any]:
         result = asdict(self)
