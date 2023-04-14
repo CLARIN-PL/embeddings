@@ -19,14 +19,15 @@ from embeddings.model.lightning_module.question_answering import (
 class QuestionAnsweringEvaluator(
     MetricsEvaluator[Dict[str, Any], QuestionAnsweringEvaluationResults]
 ):
+    def __init__(self, no_answer_threshold: float = 1.0):
+        super().__init__(return_input_data=True)
+        self.metric = SQUADv2Metric(no_answer_threshold=no_answer_threshold)
+        self.postprocessor = QAPredictionPostProcessor()
+
     def metrics(
         self,
     ) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
         return {}
-
-    def __init__(self, no_answer_threshold: float = 1.0):
-        self.metric = SQUADv2Metric(no_answer_threshold=no_answer_threshold)
-        self.postprocessor = QAPredictionPostProcessor()
 
     def evaluate(
         self, data: Union[Dict[str, nptyping.NDArray[Any]], Predictions, Dict[str, Any]]
