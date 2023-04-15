@@ -22,7 +22,8 @@ def unwrap_outputs_from_batches(
             for tensor_key, tensor in batch[key].items():
                 if tensor_key == "loss":
                     continue
-                assert isinstance(tensor, torch.Tensor)
+                if isinstance(tensor, np.ndarray):
+                    tensor = torch.from_numpy(tensor)
                 if tensor.dtype in {torch.bfloat16, torch.float16}:
                     tensor = tensor.to(dtype=torch.float32)
                 tensors_lists_dict[key][tensor_key].append(tensor)

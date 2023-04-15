@@ -6,7 +6,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from torch.utils.data import DataLoader
-from transformers import AutoModel
+from transformers import AutoModel, AutoTokenizer
 
 from embeddings.data.datamodule import HuggingFaceDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
@@ -15,6 +15,7 @@ from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
 from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.model.lightning_module.huggingface_module import HuggingFaceLightningModule
 from embeddings.model.lightning_module.lightning_module import LightningModule
+from embeddings.task.lightning_task.hf_task import HuggingFaceTaskName
 from embeddings.task.task import Output, Task
 from embeddings.utils.lightning_callbacks.best_epoch_callback import BestEpochCallback
 from embeddings.utils.loggers import LightningLoggingConfig, get_logger
@@ -36,15 +37,19 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         early_stopping_kwargs: Dict[str, Any],
         model_checkpoint_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
+        hf_task_name: HuggingFaceTaskName,
     ):
         super().__init__()
-        self.output_path = Path(output_path)
+
+        self.output_path: Path = Path(output_path)
+        self.hf_task_name = hf_task_name
         self.task_train_kwargs = task_train_kwargs
         self.early_stopping_kwargs = early_stopping_kwargs
         self.model_checkpoint_kwargs = model_checkpoint_kwargs
         self.model: Optional[HuggingFaceLightningModule] = None
         self.trainer: Optional[pl.Trainer] = None
         self.logging_config = logging_config
+        self.tokenizer: Optional[AutoTokenizer] = None
 
     @property
     def best_epoch(self) -> Optional[float]:
@@ -85,6 +90,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
     ) -> None:
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
+        self.tokenizer = data.tokenizer
 
         callbacks = self._get_callbacks(dataset_subsets=list(data.load_dataset().keys()))
         self.trainer = pl.Trainer(
@@ -149,6 +155,7 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
         early_stopping_kwargs: Dict[str, Any],
         model_checkpoint_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
+        hf_task_name: HuggingFaceTaskName,
     ):
         super().__init__(
             output_path=output_path,
@@ -156,6 +163,7 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
             early_stopping_kwargs=early_stopping_kwargs,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
             logging_config=logging_config,
+            hf_task_name=hf_task_name,
         )
 
     def fit_predict(

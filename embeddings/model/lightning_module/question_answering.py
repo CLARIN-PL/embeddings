@@ -125,7 +125,7 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
 
     def shared_step(self, **batch: Any) -> Any:
         outputs = self(**batch)
-        return {"data": batch, "outputs": outputs}
+        return {"data": batch, "outputs": dict(outputs.items())}
 
     def training_step(self, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
         batch, batch_idx = args

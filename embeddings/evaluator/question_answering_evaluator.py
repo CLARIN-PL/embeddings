@@ -3,9 +3,6 @@ from typing import Any, Dict, List, Union
 import torch
 from numpy import typing as nptyping
 
-from embedding.transformation.lightning_transformation.question_answering_output_transformation import (
-    QAPredictionPostProcessor,
-)
 from embeddings.evaluator.evaluation_results import Predictions, QuestionAnsweringEvaluationResults
 from embeddings.evaluator.metrics_evaluator import MetricsEvaluator
 from embeddings.metric.metric import Metric
@@ -14,19 +11,23 @@ from embeddings.model.lightning_module.question_answering import (
     QA_GOLD_ANSWER_TYPE,
     QA_PREDICTED_ANSWER_TYPE,
 )
+from embeddings.transformation.lightning_transformation.question_answering_output_transformation import (
+    QAPredictionPostProcessor,
+)
 
 
 class QuestionAnsweringEvaluator(
     MetricsEvaluator[Dict[str, Any], QuestionAnsweringEvaluationResults]
 ):
+    def __init__(self, no_answer_threshold: float = 1.0):
+        super().__init__(return_input_data=True)
+        self.metric = SQUADv2Metric(no_answer_threshold=no_answer_threshold)
+        self.postprocessor = QAPredictionPostProcessor()
+
     def metrics(
         self,
     ) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
         return {}
-
-    def __init__(self, no_answer_threshold: float = 1.0):
-        self.metric = SQUADv2Metric(no_answer_threshold=no_answer_threshold)
-        self.postprocessor = QAPredictionPostProcessor()
 
     def evaluate(
         self, data: Union[Dict[str, nptyping.NDArray[Any]], Predictions, Dict[str, Any]]

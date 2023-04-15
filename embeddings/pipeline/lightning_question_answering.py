@@ -23,6 +23,9 @@ class LightningQuestionAnsweringPipeline(
         self,
         embedding_name_or_path: T_path,
         dataset_name_or_path: T_path,
+        context_column_name: str,
+        question_column_name: str,
+        answer_column_name: str,
         output_path: T_path,
         evaluation_filename: str = "evaluation.json",
         config: LightningQAConfig = LightningQABasicConfig(),
@@ -44,6 +47,9 @@ class LightningQuestionAnsweringPipeline(
 
         datamodule = QuestionAnsweringDataModule(
             dataset_name_or_path=dataset_name_or_path,
+            context_field=context_column_name,
+            question_field=question_column_name,
+            target_field=answer_column_name,
             tokenizer_name_or_path=tokenizer_name_or_path,
             train_batch_size=config.task_model_kwargs["train_batch_size"],
             eval_batch_size=config.task_model_kwargs["eval_batch_size"],

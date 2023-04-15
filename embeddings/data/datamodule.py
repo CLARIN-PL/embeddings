@@ -184,7 +184,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
     def train_dataloader(self) -> DataLoader[HuggingFaceDataset]:
         return DataLoader(
-            dataset=self.dataset["train"],  # type: ignore
+            dataset=self.dataset["train"],
             batch_size=self.train_batch_size,
             collate_fn=self.collate_fn,
             shuffle=True,
@@ -196,7 +196,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
     def val_dataloader(self) -> Optional[DataLoader[HuggingFaceDataset]]:  # type: ignore
         if "validation" in self.dataset:
             return DataLoader(
-                dataset=self.dataset["validation"],  # type: ignore
+                dataset=self.dataset["validation"],
                 batch_size=self.eval_batch_size,
                 collate_fn=self.collate_fn,
                 shuffle=False,
@@ -207,7 +207,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
 
     def test_dataloader(self) -> DataLoader[HuggingFaceDataset]:
         return DataLoader(
-            dataset=self.dataset["test"],  # type: ignore
+            dataset=self.dataset["test"],
             batch_size=self.eval_batch_size,
             collate_fn=self.collate_fn,
             shuffle=False,

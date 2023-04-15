@@ -12,6 +12,7 @@ from embeddings.data.io import T_path
 from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
 from embeddings.model.lightning_module.lightning_module import LightningModule
 from embeddings.model.lightning_module.question_answering import QuestionAnsweringModule
+from embeddings.task.lightning_task.hf_task import HuggingFaceTaskName
 from embeddings.task.lightning_task.lightning_task import LightningTask
 from embeddings.utils.loggers import LightningLoggingConfig
 
@@ -40,6 +41,7 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
             early_stopping_kwargs=early_stopping_kwargs,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
             logging_config=LightningLoggingConfig.from_flags(),
+            hf_task_name=HuggingFaceTaskName.question_answering,
         )
         self.model_name_or_path = model_name_or_path
         self.model_config_kwargs = model_config_kwargs
