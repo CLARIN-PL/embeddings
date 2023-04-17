@@ -33,11 +33,17 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
     def setup(self, stage: Optional[str] = None) -> None:
         if stage in ("fit", None):
             assert self.trainer is not None
-            self.target_names = self.trainer.datamodule.target_names
-            if self.hparams.use_scheduler:
-                train_loader = self.trainer.datamodule.train_dataloader()
-                gpus = getattr(self.trainer, "gpus") if getattr(self.trainer, "gpus") else 0
-                tb_size = self.hparams.train_batch_size * max(1, gpus)
+            datamodule = getattr(self.trainer, "datamodule")
+
+            self.target_names = datamodule.target_names
+            use_scheduler = getattr(self.hparams, "use_scheduler")
+            if use_scheduler:
+                train_loader = datamodule.train_dataloader()
+                train_batch_size = getattr(self.hparams, "train_batch_size")
+                if not self.trainer.max_epochs:
+                    raise ValueError("Unable to retrieve max_epochs from trainer.")
+
+                tb_size = train_batch_size * max(1, self.trainer.num_devices)
                 ab_size = tb_size * self.trainer.accumulate_grad_batches
                 self.total_steps: int = int(
                     (len(train_loader.dataset) / ab_size) * float(self.trainer.max_epochs)
@@ -85,7 +91,8 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
 
     def on_save_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
         assert self.trainer is not None
-        checkpoint["target_names"] = self.trainer.datamodule.target_names
+        datamodule = getattr(self.trainer, "datamodule")
+        checkpoint["target_names"] = datamodule.target_names
 
     def on_load_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
         self.target_names = checkpoint["target_names"]

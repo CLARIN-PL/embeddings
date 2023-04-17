@@ -6,9 +6,9 @@ from typing import Any, Dict, Generic, List, Literal, Optional, Tuple, TypeVar
 import numpy as np
 import pytorch_lightning as pl
 import torch
+from lightning_fabric.utilities.exceptions import MisconfigurationException
 from numpy import typing as nptyping
-from pytorch_lightning.utilities.exceptions import MisconfigurationException
-from pytorch_lightning.utilities.types import STEP_OUTPUT
+from pytorch_lightning.utilities.types import _PREDICT_OUTPUT, STEP_OUTPUT
 from torch.nn.functional import softmax
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
@@ -74,7 +74,9 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
     def predict(
         self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Dict[str, nptyping.NDArray[Any]]:
-        logits, predictions = zip(*self._predict_with_trainer(dataloader))
+        predict_output = self._predict_with_trainer(dataloader)
+        assert predict_output
+        logits, predictions = zip(*predict_output)
         probabilities = softmax(torch.cat(logits), dim=1).numpy()
         predictions = torch.cat(predictions).numpy()
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
@@ -82,11 +84,13 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         assert all(isinstance(x, np.ndarray) for x in result.values())
         return result
 
-    def _predict_with_trainer(self, dataloader: DataLoader[HuggingFaceDataset]) -> torch.Tensor:
+    def _predict_with_trainer(
+        self, dataloader: DataLoader[HuggingFaceDataset]
+    ) -> Optional[_PREDICT_OUTPUT]:
         assert self.trainer is not None
         try:
             return self.trainer.predict(
-                model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="best"
+                model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="last"
             )
         except MisconfigurationException:  # model loaded but not fitted
             _logger.warning(
@@ -98,13 +102,13 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
                 return_predictions=True,
             )
 
-    def training_epoch_end(self, outputs: List[Any]) -> None:
+    def on_train_epoch_end(self) -> None:
         self._aggregate_and_log_metrics(self.train_metrics)
 
-    def validation_epoch_end(self, outputs: List[Any]) -> None:
+    def on_validation_epoch_end(self) -> None:
         self._aggregate_and_log_metrics(self.val_metrics, prog_bar=True)
 
-    def test_epoch_end(self, outputs: List[Any]) -> None:
+    def on_test_epoch_end(self) -> None:
         self._aggregate_and_log_metrics(self.test_metrics)
 
     def _aggregate_and_log_metrics(

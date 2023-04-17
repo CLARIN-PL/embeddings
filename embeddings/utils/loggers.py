@@ -7,7 +7,6 @@ from typing import Any, Dict, Iterable, List, Optional, Union
 
 import wandb
 from pytorch_lightning import loggers as pl_loggers
-from pytorch_lightning.loggers import LightningLoggerBase
 from typing_extensions import Literal
 
 from embeddings.data.io import T_path
@@ -83,10 +82,10 @@ class LightningLoggingConfig:
         self,
         output_path: T_path,
         run_name: Optional[str] = None,
-    ) -> List[LightningLoggerBase]:
+    ) -> List[pl_loggers.Logger]:
         """Based on configuration, provides pytorch-lightning loggers' callbacks."""
         output_path = Path(output_path)
-        loggers: List[LightningLoggerBase] = []
+        loggers: List[pl_loggers.Logger] = []
 
         if self.use_tensorboard():
             loggers.append(
@@ -97,10 +96,14 @@ class LightningLoggingConfig:
             )
 
         if self.use_wandb():
+            if not self.tracking_project_name:
+                raise ValueError(
+                    "Tracking project name is not passed. Pass tracking_project_name argument!"
+                )
             save_dir = output_path.joinpath("wandb")
             save_dir.mkdir(exist_ok=True)
             loggers.append(
-                pl_loggers.WandbLogger(
+                pl_loggers.wandb.WandbLogger(
                     name=run_name,
                     save_dir=str(save_dir),
                     project=self.tracking_project_name,
@@ -112,7 +115,10 @@ class LightningLoggingConfig:
 
         if self.use_csv():
             loggers.append(
-                pl_loggers.CSVLogger(name=run_name, save_dir=str(output_path.joinpath("csv")))
+                pl_loggers.CSVLogger(
+                    name=run_name if run_name else "",
+                    save_dir=str(output_path.joinpath("csv")),
+                )
             )
 
         return loggers

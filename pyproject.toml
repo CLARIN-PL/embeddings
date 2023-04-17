@@ -31,7 +31,7 @@ onnx = ">=1.13.1"
 optuna = ">=2.9.1"
 Pillow = ">=8.2.0"
 pydantic = ">=1.8.2"
-pytorch-lightning = "1.5.4"
+lightning = "2.0.0"
 requests = ">=2.25.1"
 sacremoses = ">=0.0.53"
 scikit-learn = ">=1.0.0"
@@ -57,6 +57,7 @@ types-setuptools = ">=57.4.11"
 typing-extensions = ">=4.0.1.0"
 wandb = ">=0.12.10"
 setuptools = ">=65.5.1"
+fastapi = ">=0.88"
 
 [tool.poetry.dev-dependencies]
 black = "23.3.0"
@@ -143,7 +144,8 @@ module = [
     "transformers.onnx",
     "evaluate",
     "datasets",
-    "datasets.utils"
+    "datasets.utils",
+    "lightning_fabric.utilities.exceptions"
 ]
 ignore_missing_imports = true
 

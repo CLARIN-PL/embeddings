@@ -105,12 +105,13 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
     ) -> "QuestionAnsweringTask":
         model = lightning_module.load_from_checkpoint(str(checkpoint_path))
         trainer = pl.Trainer(default_root_dir=str(output_path), **task_train_kwargs or {})
+        hparams = getattr(model, "hparams")
         init_kwargs = {
-            "model_name_or_path": model.hparams.model_name_or_path,
+            "model_name_or_path": hparams.model_name_or_path,
             "output_path": output_path,
-            "finetune_last_n_layers": model.hparams.finetune_last_n_layers,
-            "model_config_kwargs": model.hparams.config_kwargs,
-            "task_model_kwargs": model.hparams.task_model_kwargs,
+            "finetune_last_n_layers": hparams.finetune_last_n_layers,
+            "model_config_kwargs": hparams.config_kwargs,
+            "task_model_kwargs": hparams.task_model_kwargs,
             "task_train_kwargs": task_train_kwargs or {},
             "early_stopping_kwargs": {},
             "model_checkpoint_kwargs": {},
@@ -119,7 +120,8 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
         task = cls(**init_kwargs)
         task.model = model
         task.trainer = trainer
-        model.trainer = trainer
+        # Due to "Self? has no attribute "trainer"" error
+        model.trainer = trainer  # type: ignore[attr-defined]
         return task
 
     @classmethod

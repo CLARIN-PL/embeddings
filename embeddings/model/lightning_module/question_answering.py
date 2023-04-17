@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Sequence, Union
 
 import pytorch_lightning as pl
 import torch
-from pytorch_lightning.utilities.types import STEP_OUTPUT
+from pytorch_lightning.utilities.types import _PREDICT_OUTPUT, STEP_OUTPUT
 from torch.utils.data import DataLoader
 from transformers import AutoConfig, AutoModel, AutoModelForQuestionAnswering
 from transformers.modeling_outputs import QuestionAnsweringModelOutput
@@ -21,8 +21,7 @@ class QuestionAnsweringInferenceModule(pl.LightningModule):
     def __init__(self, model_name: str, devices: str = "auto", accelerator: str = "auto") -> None:
         super().__init__()
         self.model = AutoModelForQuestionAnswering.from_pretrained(model_name)
-        # without type: ignore mypy throws error: Incompatible types in assignment
-        self.trainer = pl.Trainer(devices=devices, accelerator=accelerator)  # type: ignore[assignment]
+        self.trainer = pl.Trainer(devices=devices, accelerator=accelerator)
 
     def predict_step(
         self, batch: Dict[str, torch.Tensor], batch_idx: int, dataloader_idx: Optional[int] = None
@@ -35,13 +34,15 @@ class QuestionAnsweringInferenceModule(pl.LightningModule):
         dataloaders: Union[
             DataLoader[HuggingFaceDataset], Sequence[DataLoader[HuggingFaceDataset]]
         ],
-    ) -> List[Dict[str, Union[QuestionAnsweringModelOutput, Dict[str, torch.Tensor]]]]:
+    ) -> _PREDICT_OUTPUT:
         assert self.trainer is not None
-        return self.trainer.predict(
+        predict_output = self.trainer.predict(
             model=self,
             dataloaders=dataloaders,
             return_predictions=True,
         )
+        assert predict_output
+        return predict_output
 
 
 class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
@@ -103,11 +104,16 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
         """Borrowed from clarinpl-embeddings library"""
         if stage in ("fit", None):
             assert self.trainer is not None
-            if self.hparams.use_scheduler:
-                train_loader = self.trainer.datamodule.train_dataloader()
-                gpus = getattr(self.trainer, "gpus") if getattr(self.trainer, "gpus") else 0
-                tb_size = self.hparams.train_batch_size * max(1, gpus)
+            use_scheduler = getattr(self.hparams, "use_scheduler")
+            if use_scheduler:
+                datamodule = getattr(self.trainer, "datamodule")
+                train_batch_size = getattr(self.hparams, "train_batch_size")
+                if not self.trainer.max_epochs:
+                    raise ValueError("Unable to retrieve max_epochs from trainer.")
+                train_loader = datamodule.train_dataloader()
+                tb_size = train_batch_size * max(1, self.trainer.num_devices)
                 ab_size = tb_size * self.trainer.accumulate_grad_batches
+
                 self.total_steps: int = int(
                     (len(train_loader.dataset) / ab_size) * float(self.trainer.max_epochs)
                 )
@@ -135,7 +141,7 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
         # Item "Tensor" of "Union[Tensor, Module]" has no attribute "use_scheduler"
         if self.hparams.use_scheduler:  # type: ignore[union-attr]
             assert self.trainer is not None
-            last_lr = self.trainer.lr_schedulers[0]["scheduler"].get_last_lr()
+            last_lr = self.trainer.lr_scheduler_configs[0].scheduler.get_last_lr()
             self.log("train/BaseLR", last_lr[0], prog_bar=True)
             self.log("train/LambdaLR", last_lr[1], prog_bar=True)
         return {"loss": outputs.loss}
@@ -155,11 +161,11 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
         batch, batch_idx = args
         return self.shared_step(**batch)
 
-    def training_epoch_end(self, outputs: List[Any]) -> None:
+    def on_train_epoch_end(self) -> None:
         pass
 
-    def validation_epoch_end(self, outputs: List[Any]) -> None:
+    def on_validation_epoch_end(self) -> None:
         pass
 
-    def test_epoch_end(self, outputs: List[Any]) -> None:
+    def on_test_epoch_end(self) -> None:
         pass

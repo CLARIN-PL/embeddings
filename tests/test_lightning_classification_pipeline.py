@@ -1,9 +1,9 @@
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+import lightning as L
 import numpy as np
 import pytest
-import pytorch_lightning as pl
 import torch
 from _pytest.tmpdir import TempdirFactory
 from transformers import AlbertForSequenceClassification
@@ -138,13 +138,13 @@ def lightning_text_classification_pipeline(
     embedding_name: str,
     tmp_path_module: Path,
 ) -> LIGHTNING_TEXT_CLASSIFICATION_PIPELINE_OUTPUT_TYPE:
-    pl.seed_everything(441, workers=True)
+    L.seed_everything(441, workers=True)
     pipeline = LightningClassificationPipeline(
         embedding_name_or_path=embedding_name,
         output_path=tmp_path_module,
         config=config,
         devices="auto",
-        accelerator="cpu",
+        accelerator="auto",
         model_checkpoint_kwargs={
             "filename": "last",
             "monitor": None,

@@ -2,9 +2,9 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 import datasets
+import lightning as L
 import numpy as np
 import pytest
-import pytorch_lightning as pl
 from _pytest.tmpdir import TempdirFactory
 from transformers import AlbertForQuestionAnswering
 
@@ -167,7 +167,7 @@ def lightning_question_answering_pipeline(
         model_checkpoint_kwargs={"filename": "last", "monitor": None, "save_last": False},
         **dataset_kwargs,
     )
-    pl.seed_everything(441, workers=True)
+    L.seed_everything(441, workers=True)
     metrics = pipeline.run()
     return pipeline, metrics
 
