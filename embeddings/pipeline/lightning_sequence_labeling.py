@@ -5,7 +5,7 @@ import datasets
 from pytorch_lightning.accelerators import Accelerator
 
 from embeddings.config.lightning_config import LightningBasicConfig, LightningConfig
-from embeddings.data.datamodule import SequenceLabelingDataModule
+from embeddings.data.datamodule import HuggingFaceDataModule, SequenceLabelingDataModule
 from embeddings.data.dataset import LightingDataModuleSubset
 from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import Predictions, SequenceLabelingEvaluationResults
@@ -73,7 +73,9 @@ class LightningSequenceLabelingPipeline(
             tagging_scheme=tagging_scheme,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
         )
-        model = LightningModel(task=task, predict_subset=predict_subset)
+        model: LightningModel[HuggingFaceDataModule, Predictions] = LightningModel(
+            task=task, predict_subset=predict_subset
+        )
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         ).persisting(JsonPersister(path=output_path.joinpath(evaluation_filename)))

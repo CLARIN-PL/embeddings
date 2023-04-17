@@ -9,11 +9,12 @@ from embeddings.data.io import T_path
 from embeddings.evaluator.evaluation_results import Predictions
 from embeddings.metric.sequence_labeling import EvaluationMode, TaggingScheme
 from embeddings.model.lightning_module.sequence_labeling import SequenceLabelingModule
-from embeddings.task.lightning_task.lightning_task import LightningTask
+from embeddings.task.lightning_task.hf_task import HuggingFaceTaskName
+from embeddings.task.lightning_task.lightning_task import ClassificationLightningTask
 from embeddings.utils.loggers import LightningLoggingConfig
 
 
-class SequenceLabelingTask(LightningTask):
+class SequenceLabelingTask(ClassificationLightningTask):
     def __init__(
         self,
         model_name_or_path: T_path,
@@ -35,6 +36,7 @@ class SequenceLabelingTask(LightningTask):
             early_stopping_kwargs,
             model_checkpoint_kwargs,
             logging_config,
+            hf_task_name=HuggingFaceTaskName.sequence_labeling,
         )
         self.model_name_or_path = model_name_or_path
         self.num_classes = num_classes
@@ -94,7 +96,7 @@ class SequenceLabelingTask(LightningTask):
         output_path: T_path,
         task_train_kwargs: Optional[Dict[str, Any]] = None,
         logging_config: Optional[LightningLoggingConfig] = None,
-    ) -> "LightningTask":
+    ) -> "ClassificationLightningTask":
         return cls.restore_task_model(
             checkpoint_path=checkpoint_path,
             output_path=output_path,

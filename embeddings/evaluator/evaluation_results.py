@@ -1,6 +1,6 @@
 from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import srsly
@@ -40,8 +40,30 @@ class Predictions:
         )
 
 
+Data = Union[Predictions, List[Dict[str, Any]]]
+
+
 @dataclass
 class EvaluationResults:
+    def __repr__(self) -> str:
+        fields = asdict(self)
+        fields.pop("data")
+        return (
+            self.__class__.__qualname__
+            + "("
+            + ", ".join([f"{k}={v}" for k, v in fields.items()])
+            + ")"
+        )
+
+    @property
+    def metrics(self) -> Dict[str, Any]:
+        result = asdict(self)
+        result.pop("data")
+        return result
+
+
+@dataclass(repr=False)
+class TextClassificationEvaluationResults(EvaluationResults):
     accuracy: float
     f1_macro: float
     f1_micro: float
@@ -53,20 +75,38 @@ class EvaluationResults:
     precision_micro: float
     precision_weighted: float
     classes: Dict[str, Dict[str, Union[float, int]]]
-    data: Optional[Predictions]
-
-    @property
-    def metrics(self) -> Dict[str, Any]:
-        result = asdict(self)
-        result.pop("data")
-        return result
+    data: Optional[Data] = None
 
 
-@dataclass
-class TextClassificationEvaluationResults(EvaluationResults):
-    pass
-
-
-@dataclass
+@dataclass(repr=False)
 class SequenceLabelingEvaluationResults(EvaluationResults):
-    pass
+    accuracy: float
+    f1_macro: float
+    f1_micro: float
+    f1_weighted: float
+    recall_macro: float
+    recall_micro: float
+    recall_weighted: float
+    precision_macro: float
+    precision_micro: float
+    precision_weighted: float
+    classes: Dict[str, Dict[str, Union[float, int]]]
+    data: Optional[Data] = None
+
+
+@dataclass(repr=False)
+class QuestionAnsweringEvaluationResults(EvaluationResults):
+    exact: float
+    f1: float
+    total: float
+    best_exact: float
+    best_exact_thresh: float
+    best_f1: float
+    best_f1_thresh: float
+    HasAns_exact: Optional[float] = None
+    HasAns_f1: Optional[float] = None
+    HasAns_total: Optional[float] = None
+    NoAns_exact: Optional[float] = None
+    NoAns_f1: Optional[float] = None
+    NoAns_total: Optional[float] = None
+    data: Optional[Data] = None

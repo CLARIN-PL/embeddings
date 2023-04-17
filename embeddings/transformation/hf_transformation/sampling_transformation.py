@@ -89,7 +89,7 @@ class SampleSplitsHuggingFaceTransformation(SampleSplitsTransformation):
     def _train_test_split(
         self, data: datasets.Dataset, test_fraction: float
     ) -> datasets.DatasetDict:
-        return data.train_test_split(test_size=test_fraction, seed=self.seed)  # type: ignore
+        return data.train_test_split(test_size=test_fraction, seed=self.seed)
 
 
 class SampleSplitsStratifiedTransformation(SampleSplitsTransformation):
