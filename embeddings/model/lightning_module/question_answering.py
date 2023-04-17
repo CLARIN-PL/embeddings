@@ -54,7 +54,6 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
         config_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
-
         super().__init__(metrics=None, **task_model_kwargs if task_model_kwargs else {})
         # without type: ignore error: "Tensor" not callable  [operator]
         self.save_hyperparameters({"downstream_model_type": self.downstream_model_type.__name__})  # type: ignore

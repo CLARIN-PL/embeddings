@@ -159,7 +159,6 @@ def lightning_question_answering_pipeline(
     sample_question_answering_dataset: datasets.DatasetDict,
     dataset_kwargs: Dict[str, str],
 ) -> LIGHTNING_QA_PIPELINE_OUTPUT_TYPE:
-
     pipeline = LightningQuestionAnsweringPipeline(
         embedding_name_or_path=embedding_name,
         output_path=tmp_path_module,

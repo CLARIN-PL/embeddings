@@ -385,7 +385,8 @@ class SequenceLabelingDataModule(HuggingFaceDataModule):
         We set the label for the first token of each word.
         For the other tokens in a word, we set the label to either the current label or -100,
         depending on the label_all_tokens flag.
-        Source: https://github.com/PyTorchLightning/lightning-transformers/blob/fc4703498a057476205dd4e518f8fcd09654c31b/lightning_transformers/task/nlp/token_classification/data.py"""
+        Source: https://github.com/PyTorchLightning/lightning-transformers/blob/fc4703498a057476205dd4e518f8fcd09654c31b/lightning_transformers/task/nlp/token_classification/data.py
+        """
         encoded_labels = []
         for i, label in enumerate(labels):
             word_ids = encodings.word_ids(batch_index=i)
