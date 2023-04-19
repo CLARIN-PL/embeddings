@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import pytorch_lightning as pl
+import torch
 from pytorch_lightning.callbacks import Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from torch.utils.data import DataLoader
@@ -38,6 +39,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         model_checkpoint_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
         hf_task_name: HuggingFaceTaskName,
+        compile_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
         super().__init__()
 
@@ -46,6 +48,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         self.task_train_kwargs = task_train_kwargs
         self.early_stopping_kwargs = early_stopping_kwargs
         self.model_checkpoint_kwargs = model_checkpoint_kwargs
+        self.compile_model_kwargs = compile_model_kwargs
         self.model: Optional[HuggingFaceLightningModule] = None
         self.trainer: Optional[pl.Trainer] = None
         self.logging_config = logging_config
@@ -158,12 +161,14 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
         model_checkpoint_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
         hf_task_name: HuggingFaceTaskName,
+        compile_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(
             output_path=output_path,
             task_train_kwargs=task_train_kwargs,
             early_stopping_kwargs=early_stopping_kwargs,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
+            compile_model_kwargs=compile_model_kwargs,
             logging_config=logging_config,
             hf_task_name=hf_task_name,
         )

@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Any, Dict, Generic, Optional, TypeVar
 
 import srsly
+import yaml
 
 from embeddings.data.datamodule import BaseDataModule, Data
 from embeddings.evaluator.evaluator import Evaluator
@@ -35,12 +36,16 @@ class LightningPipeline(
         evaluator: Evaluator[ModelResult, EvaluationResult],
         output_path: Path,
         logging_config: LightningLoggingConfig,
+        pipeline_kwargs: Dict[str, Any]
     ) -> None:
         self.datamodule = datamodule
         self.model = model
         self.evaluator = evaluator
         self.output_path = output_path
         self.logging_config = logging_config
+        self.pipeline_kwargs = pipeline_kwargs
+        _ = self.pipeline_kwargs.pop("self")
+        _ = self.pipeline_kwargs.pop("pipeline_kwargs")
 
     def run(self, run_name: Optional[str] = None) -> EvaluationResult:
         if run_name:
@@ -52,7 +57,9 @@ class LightningPipeline(
         return result
 
     def _save_artifacts(self) -> None:
-        srsly.write_json(self.output_path.joinpath("packages.json"), get_installed_packages())
+        srsly.write_json(self.output_path / "packages.json", get_installed_packages())
+        with open(self.output_path / "pipeline_config.yaml", "w") as f:
+            yaml.dump(self.pipeline_kwargs, stream=f)
 
     def _finish_logging(self) -> None:
         if self.logging_config.use_wandb():

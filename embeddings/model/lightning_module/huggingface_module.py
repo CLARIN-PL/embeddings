@@ -4,6 +4,7 @@ import sys
 from collections import ChainMap
 from typing import Any, Dict, List, Optional, Type
 
+import torch
 from torchmetrics import MetricCollection
 from transformers import AutoConfig, AutoModel
 
@@ -21,12 +22,14 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
         metrics: Optional[MetricCollection] = None,
         config_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
+        model_compile_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(metrics=metrics, **task_model_kwargs if task_model_kwargs else {})
         assert inspect.ismethod(self.save_hyperparameters)
         self.save_hyperparameters({"downstream_model_type": downstream_model_type.__name__})
         self.downstream_model_type = downstream_model_type
         self.config_kwargs = config_kwargs if config_kwargs else {}
+        self.model_compile_kwargs = model_compile_kwargs
         self.target_names: Optional[List[str]] = None
         self._init_model()
 
@@ -60,6 +63,8 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
         self.model: AutoModel = self.downstream_model_type.from_pretrained(
             self.hparams["model_name_or_path"], config=self.config
         )
+        if isinstance(self.model_compile_kwargs, dict):
+            self.model = torch.compile(self.model, **self.model_compile_kwargs)
         if self.hparams["finetune_last_n_layers"] > -1:
             self.freeze_transformer(finetune_last_n_layers=self.hparams["finetune_last_n_layers"])
 

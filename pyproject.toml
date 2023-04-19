@@ -31,7 +31,7 @@ onnx = ">=1.13.1"
 optuna = ">=2.9.1"
 Pillow = ">=8.2.0"
 pydantic = ">=1.8.2"
-lightning = "2.0.0"
+lightning = "2.0.1"
 requests = ">=2.25.1"
 sacremoses = ">=0.0.53"
 scikit-learn = ">=1.0.0"
@@ -40,17 +40,9 @@ srsly = ">=2.4.1"
 scipy = ">=1.6.2"
 tensorboard = ">=2.4.1"
 tokenizers = ">=0.13.2"
-torch = [  # temporal solution
-    {url="https://download.pytorch.org/whl/cpu/torch-2.0.0%2Bcpu-cp39-cp39-linux_x86_64.whl", python=">=3.9,<3.10", markers = "sys_platform == 'linux'"},
-    {url="https://download.pytorch.org/whl/cpu/torch-2.0.0%2Bcpu-cp39-cp39-win_amd64.whl", python=">=3.9,<3.10", markers="sys_platform == 'win32'"},
-    {url="https://download.pytorch.org/whl/cpu/torch-2.0.0%2Bcpu-cp38-cp38-linux_x86_64.whl", python=">=3.8,<3.9", markers = "sys_platform == 'linux'"},
-    {url="https://download.pytorch.org/whl/cpu/torch-2.0.0%2Bcpu-cp38-cp38-win_amd64.whl", python=">=3.8,<3.9", markers="sys_platform == 'win32'"},
-    {url="https://download.pytorch.org/whl/cpu/torch-2.0.0-cp39-none-macosx_11_0_arm64.whl", python=">=3.9,<3.10", markers = "sys.platform == 'darwin' and platform_machine == 'arm64'"},
-    {url="https://download.pytorch.org/whl/cpu/torch-2.0.0-cp39-none-macosx_10_9_x86_64.whl", python=">=3.9,<3.10", markers = "sys.platform == 'darwin' and platform_machine == 'x86_64'"},
-    {url="https://download.pytorch.org/whl/cpu/torch-2.0.0-cp38-none-macosx_11_0_arm64.whl", python=">=3.8,<3.9", markers = "sys.platform == 'darwin' and platform_machine == 'arm64'"},
-    {url="https://download.pytorch.org/whl/cpu/torch-2.0.0-cp38-none-macosx_10_9_x86_64.whl", python=">=3.8,<3.9", markers = "sys.platform == 'darwin' and platform_machine == 'x86_64'"}
-]
-transformers = {extras = ["onnx"], version = ">=4.26.0"}
+torch = "2.0.0"
+torchmetrics = ">=0.11.4"
+transformers = {extras = ["onnx"], version = ">=4.28.1"}
 typer = ">=0.4.0"
 types-PyYAML = ">=5.4.10"
 types-setuptools = ">=57.4.11"

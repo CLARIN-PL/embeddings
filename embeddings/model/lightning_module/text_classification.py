@@ -23,6 +23,7 @@ class TextClassificationModule(HuggingFaceLightningModule):
         metrics: Optional[MetricCollection] = None,
         config_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
+        model_compile_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
             model_name_or_path=model_name_or_path,
@@ -32,6 +33,7 @@ class TextClassificationModule(HuggingFaceLightningModule):
             metrics=metrics,
             config_kwargs=config_kwargs,
             task_model_kwargs=task_model_kwargs,
+            model_compile_kwargs=model_compile_kwargs,
         )
 
     def shared_step(self, **batch: Any) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:

@@ -28,6 +28,7 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
         early_stopping_kwargs: Dict[str, Any],
         model_checkpoint_kwargs: Dict[str, Any],
         finetune_last_n_layers: int = -1,
+        compile_model_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         os.environ["TOKENIZERS_PARALLELISM"] = "TRUE"
         # disable a thousand of warnings of HF
@@ -40,6 +41,7 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
             task_train_kwargs=task_train_kwargs,
             early_stopping_kwargs=early_stopping_kwargs,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
+            compile_model_kwargs=compile_model_kwargs,
             logging_config=LightningLoggingConfig.from_flags(),
             hf_task_name=HuggingFaceTaskName.question_answering,
         )
@@ -55,6 +57,7 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
             finetune_last_n_layers=self.finetune_last_n_layers,
             config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
+            model_compile_kwargs=self.compile_model_kwargs,
         )
 
     def predict(self, dataloader: Any, return_names: bool = True) -> Any:

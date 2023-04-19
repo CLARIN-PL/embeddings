@@ -36,6 +36,7 @@ class LightningClassificationPipeline(
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         model_checkpoint_kwargs: Optional[Dict[str, Any]] = None,
+        compile_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
         task_train_kwargs = config.task_train_kwargs
         task_train_kwargs.update({"devices": devices, "accelerator": accelerator})
@@ -43,6 +44,7 @@ class LightningClassificationPipeline(
         model_checkpoint_kwargs = model_checkpoint_kwargs if model_checkpoint_kwargs else {}
         output_path = Path(output_path)
         self.evaluation_filename = evaluation_filename
+        pipeline_kwargs = locals()
 
         datamodule = TextClassificationDataModule(
             tokenizer_name_or_path=tokenizer_name_or_path,
@@ -68,6 +70,7 @@ class LightningClassificationPipeline(
             early_stopping_kwargs=config.early_stopping_kwargs,
             logging_config=logging_config,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
+            compile_model_kwargs=compile_model_kwargs,
         )
         model: LightningModel[HuggingFaceDataModule, Predictions] = LightningModel(
             task=task, predict_subset=predict_subset
@@ -75,4 +78,4 @@ class LightningClassificationPipeline(
         evaluator = TextClassificationEvaluator().persisting(
             JsonPersister(path=output_path.joinpath(evaluation_filename))
         )
-        super().__init__(datamodule, model, evaluator, output_path, logging_config)
+        super().__init__(datamodule, model, evaluator, output_path, logging_config, pipeline_kwargs=pipeline_kwargs)

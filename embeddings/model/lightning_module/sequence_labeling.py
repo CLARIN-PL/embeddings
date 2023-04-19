@@ -31,6 +31,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         ignore_index: int = -100,
         config_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
+        model_compile_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
             model_name_or_path=model_name_or_path,
@@ -40,6 +41,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
             metrics=metrics,
             config_kwargs=config_kwargs,
             task_model_kwargs=task_model_kwargs,
+            model_compile_kwargs=model_compile_kwargs,
         )
         self.ignore_index = ignore_index
         self.evaluation_mode = evaluation_mode

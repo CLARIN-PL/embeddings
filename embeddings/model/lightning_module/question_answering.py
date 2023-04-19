@@ -54,13 +54,18 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
         finetune_last_n_layers: int,
         config_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
+        model_compile_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
-        super().__init__(metrics=None, **task_model_kwargs if task_model_kwargs else {})
+        super().__init__(
+            metrics=None,
+            **task_model_kwargs if task_model_kwargs else {},
+        )
         # without type: ignore error: "Tensor" not callable  [operator]
         self.save_hyperparameters({"downstream_model_type": self.downstream_model_type.__name__})  # type: ignore
         self.downstream_model_type = self.downstream_model_type
         self.config_kwargs = config_kwargs if config_kwargs else {}
         self.target_names: Optional[List[str]] = None
+        self.model_compile_kwargs = model_compile_kwargs
         self._init_model()
 
     def _init_metrics(self) -> None:
@@ -74,7 +79,10 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
         )
         self.model: AutoModel = self.downstream_model_type.from_pretrained(
             self.hparams.model_name_or_path, config=self.config  # type: ignore[union-attr]
+
         )
+        if isinstance(self.model_compile_kwargs, dict):
+            self.model = torch.compile(self.model, **self.model_compile_kwargs)
         # item "Tensor" of "Union[Tensor, Module]" has no attribute "finetune_last_n_layers"
         # unsupported operand type for <
         if self.hparams.finetune_last_n_layers > -1:  # type: ignore[union-attr, operator]
