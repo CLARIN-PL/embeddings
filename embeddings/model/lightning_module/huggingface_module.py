@@ -65,6 +65,7 @@ class HuggingFaceLightningModule(LightningModule[AutoModel], abc.ABC):
         )
         if isinstance(self.model_compile_kwargs, dict):
             self.model = torch.compile(self.model, **self.model_compile_kwargs)
+
         if self.hparams["finetune_last_n_layers"] > -1:
             self.freeze_transformer(finetune_last_n_layers=self.hparams["finetune_last_n_layers"])
 

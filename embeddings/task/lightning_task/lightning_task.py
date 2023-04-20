@@ -97,11 +97,28 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         self.tokenizer = data.tokenizer
 
         callbacks = self._get_callbacks(dataset_subsets=list(data.load_dataset().keys()))
+
+        inference_mode = (
+            self.task_train_kwargs.pop("inference_mode")
+            if "inference_mode" in self.task_train_kwargs.keys()
+            else None
+        )
+        if isinstance(self.compile_model_kwargs, dict):
+            _logger.warning(
+                "PyTorch 2.0 compile mode is turned on! Pass None to compile_model_kwargs if the behavior is unintended."
+            )
+            if not inference_mode:
+                _logger.warning(
+                    "PyTorch 2.0 compile mode does not support inference_mode! Setting Lightning Trainer inference_mode to False!"
+                )
+                inference_mode = False
+
         self.trainer = pl.Trainer(
             default_root_dir=str(self.output_path),
             callbacks=callbacks,
             logger=self.logging_config.get_lightning_loggers(self.output_path, run_name),
-            **self.task_train_kwargs
+            inference_mode=inference_mode,
+            **self.task_train_kwargs,
         )
         try:
             self.trainer.fit(self.model, data)
