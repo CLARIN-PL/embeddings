@@ -79,7 +79,6 @@ class QuestionAnsweringModule(LightningModule[AutoModelForQuestionAnswering]):
         )
         self.model: AutoModel = self.downstream_model_type.from_pretrained(
             self.hparams.model_name_or_path, config=self.config  # type: ignore[union-attr]
-
         )
         if isinstance(self.model_compile_kwargs, dict):
             self.model = torch.compile(self.model, **self.model_compile_kwargs)

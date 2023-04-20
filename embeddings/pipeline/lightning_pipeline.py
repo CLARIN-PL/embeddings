@@ -36,7 +36,7 @@ class LightningPipeline(
         evaluator: Evaluator[ModelResult, EvaluationResult],
         output_path: Path,
         logging_config: LightningLoggingConfig,
-        pipeline_kwargs: Dict[str, Any]
+        pipeline_kwargs: Dict[str, Any],
     ) -> None:
         self.datamodule = datamodule
         self.model = model

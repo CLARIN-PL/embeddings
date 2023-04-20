@@ -77,4 +77,11 @@ class LightningQuestionAnsweringPipeline(
             task, predict_subset
         )
         evaluator = QuestionAnsweringEvaluator()
-        super().__init__(datamodule, model, evaluator, output_path, logging_config, pipeline_kwargs=pipeline_kwargs)
+        super().__init__(
+            datamodule,
+            model,
+            evaluator,
+            output_path,
+            logging_config,
+            pipeline_kwargs=pipeline_kwargs,
+        )

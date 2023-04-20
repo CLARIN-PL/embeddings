@@ -1,7 +1,6 @@
 from typing import Any, Dict, Optional
 
 import numpy as np
-import torch
 from torch.utils.data import DataLoader
 
 from embeddings.data.io import T_path

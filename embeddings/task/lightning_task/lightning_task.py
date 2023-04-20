@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import pytorch_lightning as pl
-import torch
 from pytorch_lightning.callbacks import Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from torch.utils.data import DataLoader

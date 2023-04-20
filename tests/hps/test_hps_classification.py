@@ -224,7 +224,7 @@ def test_hparams_best_params_files_compatibility(
 ) -> None:
     df, metadata = classification_hps_run_result
 
-    with open(retrain_tmp_path / "csv" / "version_0" / "hparams.yaml") as f:
+    with open(retrain_tmp_path / "pipeline_config.yaml") as f:
         hparams = yaml.load(f, Loader=yaml.Loader)
 
     with open(tmp_path_module / "best_params.yaml") as f:
@@ -273,7 +273,7 @@ def assert_compare_params_values(
     hparams: Dict[str, Any],
     metadata: LightningClassificationPipelineMetadata,
 ) -> None:
-    assert hparams["model_name_or_path"] == best_params["embedding_name_or_path"]
+    assert hparams["embedding_name_or_path"] == best_params["embedding_name_or_path"]
     hparams = {k: v for k, v in hparams.items() if k in best_params.keys() and k != "config"}
     for k in hparams.keys():
         if k == "dataset_name_or_path":

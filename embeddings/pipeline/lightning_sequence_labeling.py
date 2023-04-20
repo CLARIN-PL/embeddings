@@ -82,4 +82,11 @@ class LightningSequenceLabelingPipeline(
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         ).persisting(JsonPersister(path=output_path.joinpath(evaluation_filename)))
-        super().__init__(datamodule, model, evaluator, output_path, logging_config, pipeline_kwargs=pipeline_kwargs)
+        super().__init__(
+            datamodule,
+            model,
+            evaluator,
+            output_path,
+            logging_config,
+            pipeline_kwargs=pipeline_kwargs,
+        )
