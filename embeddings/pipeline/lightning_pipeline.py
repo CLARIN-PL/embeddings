@@ -44,8 +44,8 @@ class LightningPipeline(
         self.output_path = output_path
         self.logging_config = logging_config
         self.pipeline_kwargs = pipeline_kwargs
-        _ = self.pipeline_kwargs.pop("self")
-        _ = self.pipeline_kwargs.pop("pipeline_kwargs")
+        self.pipeline_kwargs.pop("self")
+        self.pipeline_kwargs.pop("pipeline_kwargs")
 
     def run(self, run_name: Optional[str] = None) -> EvaluationResult:
         if run_name:
