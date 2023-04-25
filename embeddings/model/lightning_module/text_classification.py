@@ -23,6 +23,7 @@ class TextClassificationModule(HuggingFaceLightningModule):
         metrics: Optional[MetricCollection] = None,
         config_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
+        model_compile_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
             model_name_or_path=model_name_or_path,
@@ -32,6 +33,7 @@ class TextClassificationModule(HuggingFaceLightningModule):
             metrics=metrics,
             config_kwargs=config_kwargs,
             task_model_kwargs=task_model_kwargs,
+            model_compile_kwargs=model_compile_kwargs,
         )
 
     def shared_step(self, **batch: Any) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -48,7 +50,7 @@ class TextClassificationModule(HuggingFaceLightningModule):
         self.log("train/Loss", loss)
         if self.hparams["use_scheduler"]:
             assert self.trainer is not None
-            last_lr = self.trainer.lr_schedulers[0]["scheduler"].get_last_lr()
+            last_lr = self.trainer.lr_scheduler_configs[0].scheduler.get_last_lr()
             self.log("train/BaseLR", last_lr[0], prog_bar=True)
             self.log("train/LambdaLR", last_lr[1], prog_bar=True)
         return {"loss": loss}

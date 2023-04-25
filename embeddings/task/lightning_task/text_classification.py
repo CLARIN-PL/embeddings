@@ -23,6 +23,7 @@ class TextClassificationTask(ClassificationLightningTask):
         early_stopping_kwargs: Dict[str, Any],
         model_checkpoint_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
+        compile_model_kwargs: Optional[Dict[str, Any]] = None,
         finetune_last_n_layers: int = -1,
     ) -> None:
         super().__init__(
@@ -31,6 +32,7 @@ class TextClassificationTask(ClassificationLightningTask):
             early_stopping_kwargs,
             model_checkpoint_kwargs,
             logging_config,
+            compile_model_kwargs=compile_model_kwargs,
             hf_task_name=HuggingFaceTaskName.text_classification,
         )
         self.model_name_or_path = model_name_or_path
@@ -39,6 +41,7 @@ class TextClassificationTask(ClassificationLightningTask):
         self.task_model_kwargs = task_model_kwargs
         self.finetune_last_n_layers = finetune_last_n_layers
         self.task_train_kwargs = task_train_kwargs
+        self.compile_model_kwargs = compile_model_kwargs
 
     def build_task_model(self) -> None:
         self.model = TextClassificationModule(
@@ -47,6 +50,7 @@ class TextClassificationTask(ClassificationLightningTask):
             finetune_last_n_layers=self.finetune_last_n_layers,
             config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
+            model_compile_kwargs=self.compile_model_kwargs,
         )
 
     def predict(self, dataloader: DataLoader[Any], return_names: bool = True) -> Predictions:

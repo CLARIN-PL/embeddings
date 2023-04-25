@@ -29,6 +29,7 @@ class SequenceLabelingTask(ClassificationLightningTask):
         finetune_last_n_layers: int = -1,
         evaluation_mode: EvaluationMode = EvaluationMode.CONLL,
         tagging_scheme: Optional[TaggingScheme] = None,
+        compile_model_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
             output_path,
@@ -36,6 +37,7 @@ class SequenceLabelingTask(ClassificationLightningTask):
             early_stopping_kwargs,
             model_checkpoint_kwargs,
             logging_config,
+            compile_model_kwargs=compile_model_kwargs,
             hf_task_name=HuggingFaceTaskName.sequence_labeling,
         )
         self.model_name_or_path = model_name_or_path
@@ -55,6 +57,7 @@ class SequenceLabelingTask(ClassificationLightningTask):
             tagging_scheme=self.tagging_scheme,
             config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
+            model_compile_kwargs=self.compile_model_kwargs,
         )
 
     def predict(self, dataloader: DataLoader[Any], return_names: bool = True) -> Predictions:

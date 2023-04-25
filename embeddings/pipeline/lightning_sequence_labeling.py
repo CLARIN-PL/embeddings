@@ -39,12 +39,14 @@ class LightningSequenceLabelingPipeline(
         predict_subset: LightingDataModuleSubset = LightingDataModuleSubset.TEST,
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         model_checkpoint_kwargs: Optional[Dict[str, Any]] = None,
+        compile_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
         task_train_kwargs = config.task_train_kwargs
         task_train_kwargs.update({"devices": devices, "accelerator": accelerator})
         tokenizer_name_or_path = tokenizer_name_or_path or embedding_name_or_path
         model_checkpoint_kwargs = model_checkpoint_kwargs if model_checkpoint_kwargs else {}
         output_path = Path(output_path)
+        pipeline_kwargs = locals()
 
         datamodule = SequenceLabelingDataModule(
             tokenizer_name_or_path=tokenizer_name_or_path,
@@ -72,6 +74,7 @@ class LightningSequenceLabelingPipeline(
             evaluation_mode=evaluation_mode,
             tagging_scheme=tagging_scheme,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
+            compile_model_kwargs=compile_model_kwargs,
         )
         model: LightningModel[HuggingFaceDataModule, Predictions] = LightningModel(
             task=task, predict_subset=predict_subset
@@ -79,4 +82,11 @@ class LightningSequenceLabelingPipeline(
         evaluator = SequenceLabelingEvaluator(
             evaluation_mode=evaluation_mode, tagging_scheme=tagging_scheme
         ).persisting(JsonPersister(path=output_path.joinpath(evaluation_filename)))
-        super().__init__(datamodule, model, evaluator, output_path, logging_config)
+        super().__init__(
+            datamodule,
+            model,
+            evaluator,
+            output_path,
+            logging_config,
+            pipeline_kwargs=pipeline_kwargs,
+        )

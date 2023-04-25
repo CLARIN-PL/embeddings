@@ -28,6 +28,7 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
         early_stopping_kwargs: Dict[str, Any],
         model_checkpoint_kwargs: Dict[str, Any],
         finetune_last_n_layers: int = -1,
+        compile_model_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         os.environ["TOKENIZERS_PARALLELISM"] = "TRUE"
         # disable a thousand of warnings of HF
@@ -40,6 +41,7 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
             task_train_kwargs=task_train_kwargs,
             early_stopping_kwargs=early_stopping_kwargs,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
+            compile_model_kwargs=compile_model_kwargs,
             logging_config=LightningLoggingConfig.from_flags(),
             hf_task_name=HuggingFaceTaskName.question_answering,
         )
@@ -55,6 +57,7 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
             finetune_last_n_layers=self.finetune_last_n_layers,
             config_kwargs=self.model_config_kwargs,
             task_model_kwargs=self.task_model_kwargs,
+            model_compile_kwargs=self.compile_model_kwargs,
         )
 
     def predict(self, dataloader: Any, return_names: bool = True) -> Any:
@@ -105,12 +108,13 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
     ) -> "QuestionAnsweringTask":
         model = lightning_module.load_from_checkpoint(str(checkpoint_path))
         trainer = pl.Trainer(default_root_dir=str(output_path), **task_train_kwargs or {})
+        hparams = getattr(model, "hparams")
         init_kwargs = {
-            "model_name_or_path": model.hparams.model_name_or_path,
+            "model_name_or_path": hparams.model_name_or_path,
             "output_path": output_path,
-            "finetune_last_n_layers": model.hparams.finetune_last_n_layers,
-            "model_config_kwargs": model.hparams.config_kwargs,
-            "task_model_kwargs": model.hparams.task_model_kwargs,
+            "finetune_last_n_layers": hparams.finetune_last_n_layers,
+            "model_config_kwargs": hparams.config_kwargs,
+            "task_model_kwargs": hparams.task_model_kwargs,
             "task_train_kwargs": task_train_kwargs or {},
             "early_stopping_kwargs": {},
             "model_checkpoint_kwargs": {},
@@ -119,7 +123,8 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
         task = cls(**init_kwargs)
         task.model = model
         task.trainer = trainer
-        model.trainer = trainer
+        # Due to "Self? has no attribute "trainer"" error
+        model.trainer = trainer  # type: ignore[attr-defined]
         return task
 
     @classmethod

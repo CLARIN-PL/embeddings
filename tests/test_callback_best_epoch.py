@@ -3,9 +3,9 @@ from tempfile import TemporaryDirectory
 from typing import Any, Dict, Tuple
 
 import datasets
+import lightning as L
 import numpy as np
 import pytest
-import pytorch_lightning as pl
 from _pytest.tmpdir import TempdirFactory
 
 from embeddings.config.lightning_config import LightningAdvancedConfig
@@ -53,7 +53,7 @@ def config() -> LightningAdvancedConfig:
         task_train_kwargs={
             "max_epochs": 3,
             "devices": "auto",
-            "accelerator": "cpu",
+            "accelerator": "auto",
             "deterministic": True,
         },
         task_model_kwargs={
@@ -95,7 +95,7 @@ def test_lightning_classification_pipeline(
         datasets.DatasetDict, Dict[str, np.ndarray], Dict[str, Any]
     ],
 ) -> None:
-    pl.seed_everything(441, workers=True)
+    L.seed_everything(441, workers=True)
     pipeline = lightning_classification_pipeline
     _ = pipeline.run()
 

@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import Any, Dict
 
 import datasets
+import lightning as L
 import numpy as np
 import pytest
-import pytorch_lightning as pl
 from _pytest.tmpdir import TempdirFactory
 
 from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
@@ -75,7 +75,7 @@ def scores(
     question_answering_data_module: QuestionAnsweringDataModule,
     question_answering_task: QuestionAnsweringTask,
 ) -> Dict[str, Any]:
-    pl.seed_everything(441, workers=True)
+    L.seed_everything(441, workers=True)
     datamodule = question_answering_data_module
     task = question_answering_task
     datamodule.setup(stage="fit")

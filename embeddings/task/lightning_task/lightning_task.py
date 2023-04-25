@@ -38,6 +38,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         model_checkpoint_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
         hf_task_name: HuggingFaceTaskName,
+        compile_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
         super().__init__()
 
@@ -46,6 +47,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         self.task_train_kwargs = task_train_kwargs
         self.early_stopping_kwargs = early_stopping_kwargs
         self.model_checkpoint_kwargs = model_checkpoint_kwargs
+        self.compile_model_kwargs = compile_model_kwargs
         self.model: Optional[HuggingFaceLightningModule] = None
         self.trainer: Optional[pl.Trainer] = None
         self.logging_config = logging_config
@@ -56,7 +58,8 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         if self.trainer is None:
             return None
 
-        for callback in self.trainer.callbacks:
+        callbacks = getattr(self.trainer, "callbacks")
+        for callback in callbacks:
             if isinstance(callback, BestEpochCallback):
                 return callback.best_epoch
         return None
@@ -66,7 +69,8 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         if self.trainer is None:
             return None
 
-        for callback in self.trainer.callbacks:
+        callbacks = getattr(self.trainer, "callbacks")
+        for callback in callbacks:
             if isinstance(callback, BestEpochCallback):
                 return callback.best_score.item()
         return None
@@ -93,11 +97,28 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         self.tokenizer = data.tokenizer
 
         callbacks = self._get_callbacks(dataset_subsets=list(data.load_dataset().keys()))
+
+        inference_mode = (
+            self.task_train_kwargs.pop("inference_mode")
+            if "inference_mode" in self.task_train_kwargs.keys()
+            else None
+        )
+        if isinstance(self.compile_model_kwargs, dict):
+            _logger.warning(
+                "PyTorch 2.0 compile mode is turned on! Pass None to compile_model_kwargs if the behavior is unintended."
+            )
+            if inference_mode or inference_mode is None:
+                _logger.warning(
+                    "PyTorch 2.0 compile mode does not support inference_mode! Setting Lightning Trainer inference_mode to False!"
+                )
+                inference_mode = False
+
         self.trainer = pl.Trainer(
             default_root_dir=str(self.output_path),
             callbacks=callbacks,
             logger=self.logging_config.get_lightning_loggers(self.output_path, run_name),
-            **self.task_train_kwargs
+            inference_mode=inference_mode,
+            **self.task_train_kwargs,
         )
         try:
             self.trainer.fit(self.model, data)
@@ -156,12 +177,14 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
         model_checkpoint_kwargs: Dict[str, Any],
         logging_config: LightningLoggingConfig,
         hf_task_name: HuggingFaceTaskName,
+        compile_model_kwargs: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(
             output_path=output_path,
             task_train_kwargs=task_train_kwargs,
             early_stopping_kwargs=early_stopping_kwargs,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
+            compile_model_kwargs=compile_model_kwargs,
             logging_config=logging_config,
             hf_task_name=hf_task_name,
         )
@@ -191,13 +214,14 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
     ) -> "ClassificationLightningTask":
         model = lightning_module.load_from_checkpoint(str(checkpoint_path))
         trainer = pl.Trainer(default_root_dir=str(output_path), **task_train_kwargs or {})
+        hparams = getattr(model, "hparams")
         init_kwargs = {
-            "model_name_or_path": model.hparams.model_name_or_path,
+            "model_name_or_path": hparams.model_name_or_path,
             "output_path": output_path,
-            "num_classes": model.hparams.num_classes,
-            "finetune_last_n_layers": model.hparams.finetune_last_n_layers,
-            "model_config_kwargs": model.hparams.config_kwargs,
-            "task_model_kwargs": model.hparams.task_model_kwargs,
+            "num_classes": hparams.num_classes,
+            "finetune_last_n_layers": hparams.finetune_last_n_layers,
+            "model_config_kwargs": hparams.config_kwargs,
+            "task_model_kwargs": hparams.task_model_kwargs,
             "task_train_kwargs": task_train_kwargs or {},
             "early_stopping_kwargs": {},
             "model_checkpoint_kwargs": {},
@@ -206,5 +230,6 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
         task = cls(**init_kwargs)
         task.model = model
         task.trainer = trainer
-        model.trainer = trainer
+        # Due to "Self? has no attribute "trainer"" error
+        model.trainer = trainer  # type: ignore[attr-defined]
         return task

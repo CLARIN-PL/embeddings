@@ -1,9 +1,9 @@
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+import lightning as L
 import numpy as np
 import pytest
-import pytorch_lightning as pl
 import torch
 from _pytest.tmpdir import TempdirFactory
 from transformers import AlbertForTokenClassification
@@ -80,7 +80,7 @@ def config() -> LightningAdvancedConfig:
         task_train_kwargs={
             "max_epochs": 1,
             "devices": "auto",
-            "accelerator": "cpu",
+            "accelerator": "auto",
             "deterministic": True,
         },
         task_model_kwargs={
@@ -134,7 +134,7 @@ def lightning_sequence_labeling_pipeline(
     config: LightningAdvancedConfig,
     tmp_path_module: Path,
 ) -> LIGHTNING_TOKEN_CLASSIFICATION_PIPELINE_OUTPUT_TYPE:
-    pl.seed_everything(441)
+    L.seed_everything(441)
     pipeline = LightningSequenceLabelingPipeline(
         output_path=tmp_path_module,
         embedding_name_or_path=embedding_name,

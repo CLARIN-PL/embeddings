@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional, Tuple
 
+import numpy as np
 import torch
 from datasets import ClassLabel
 from pytorch_lightning.utilities.parsing import AttributeDict
@@ -30,6 +31,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         ignore_index: int = -100,
         config_kwargs: Optional[Dict[str, Any]] = None,
         task_model_kwargs: Optional[Dict[str, Any]] = None,
+        model_compile_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
             model_name_or_path=model_name_or_path,
@@ -39,6 +41,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
             metrics=metrics,
             config_kwargs=config_kwargs,
             task_model_kwargs=task_model_kwargs,
+            model_compile_kwargs=model_compile_kwargs,
         )
         self.ignore_index = ignore_index
         self.evaluation_mode = evaluation_mode
@@ -48,7 +51,8 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
     def setup(self, stage: Optional[str] = None) -> None:
         if stage in ("fit", None):
             assert self.trainer is not None
-            self.class_label = self.trainer.datamodule.dataset["train"].features["labels"].feature
+            datamodule = getattr(self.trainer, "datamodule")
+            self.class_label = datamodule.dataset["train"].features["labels"].feature
             assert isinstance(self.class_label, ClassLabel)
         super().setup(stage=stage)
 
@@ -67,7 +71,7 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
         assert isinstance(self.hparams, AttributeDict)
         if self.hparams.use_scheduler:
             assert self.trainer is not None
-            last_lr = self.trainer.lr_schedulers[0]["scheduler"].get_last_lr()
+            last_lr = self.trainer.lr_scheduler_configs[0].scheduler.get_last_lr()
             self.log("train/BaseLR", last_lr[0], prog_bar=True)
             self.log("train/LambdaLR", last_lr[1], prog_bar=True)
         return {"loss": loss}
@@ -102,7 +106,9 @@ class SequenceLabelingModule(HuggingFaceLightningModule):
     ) -> Dict[str, float]:
         metric_values = metrics.compute()
         assert isinstance(metric_values, dict)
-        metrics.reset()
+        metric_values = {
+            k: v.astype("np.float32") for k, v in metric_values.items() if isinstance(v, np.ndarray)
+        }  # Due to lack of float64 support in MPS
         self.log_dict(metric_values, prog_bar=prog_bar)
         return metric_values
 

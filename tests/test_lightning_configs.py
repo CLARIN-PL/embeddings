@@ -2,8 +2,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict
 
+import lightning as L
 import pytest
-import pytorch_lightning as pl
 from _pytest.tmpdir import TempdirFactory
 
 from embeddings.config.lightning_config import (
@@ -143,7 +143,7 @@ def test_lightning_classification_basic_config(
     dataset_kwargs: Dict[str, Any],
     result_path: "TemporaryDirectory[str]",
 ) -> None:
-    pl.seed_everything(441, workers=True)
+    L.seed_everything(441, workers=True)
     pipeline = LightningClassificationPipeline(
         embedding_name_or_path="hf-internal-testing/tiny-albert",
         output_path=result_path.name,
@@ -160,7 +160,7 @@ def test_lightning_classification_advanced_config(
     dataset_kwargs: Dict[str, Any],
     result_path: "TemporaryDirectory[str]",
 ) -> None:
-    pl.seed_everything(441, workers=True)
+    L.seed_everything(441, workers=True)
     pipeline = LightningClassificationPipeline(
         embedding_name_or_path="hf-internal-testing/tiny-albert",
         output_path=result_path.name,

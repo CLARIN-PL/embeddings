@@ -74,7 +74,6 @@ class QAPredictionPostProcessor(QABasePostprocessor):
     def _get_topk_not_cls_predictions_from_output(
         self, start_logits: torch.Tensor, end_logits: torch.Tensor, offset_mapping: List[List[int]]
     ) -> List[Dict[str, Any]]:
-
         topk_start_indices = torch.topk(start_logits, self.top_k_answers).indices.tolist()
         topk_end_indices = torch.topk(end_logits, self.top_k_answers).indices.tolist()
         topk_predictions = []

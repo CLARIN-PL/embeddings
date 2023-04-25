@@ -53,9 +53,7 @@ class BaseDataModule(abc.ABC, pl.LightningDataModule, Generic[Data]):
     dataset: Data
 
     def __init__(self, **kwargs: Any) -> None:
-        # ignoring the type to avoid calling to untyped function "__init__" in typed context error
-        # caused by pl.LightningDataModule __init__ method not being typed
-        super().__init__()  # type: ignore
+        super().__init__()
         self.save_hyperparameters()
 
 
@@ -191,9 +189,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
             **self.dataloader_kwargs,
         )
 
-    # Ignoring the type of val_dataloader method from supertype "DataHooks" allowing for None
-    # and training without validation dataset.
-    def val_dataloader(self) -> Optional[DataLoader[HuggingFaceDataset]]:  # type: ignore
+    def val_dataloader(self) -> Union[DataLoader[HuggingFaceDataset], List[Any]]:
         if "validation" in self.dataset:
             return DataLoader(
                 dataset=self.dataset["validation"],
@@ -203,7 +199,7 @@ class HuggingFaceDataModule(BaseDataModule[DatasetDict]):
                 **self.dataloader_kwargs,
             )
         else:
-            return None
+            return []
 
     def test_dataloader(self) -> DataLoader[HuggingFaceDataset]:
         return DataLoader(
@@ -385,7 +381,8 @@ class SequenceLabelingDataModule(HuggingFaceDataModule):
         We set the label for the first token of each word.
         For the other tokens in a word, we set the label to either the current label or -100,
         depending on the label_all_tokens flag.
-        Source: https://github.com/PyTorchLightning/lightning-transformers/blob/fc4703498a057476205dd4e518f8fcd09654c31b/lightning_transformers/task/nlp/token_classification/data.py"""
+        Source: https://github.com/PyTorchLightning/lightning-transformers/blob/fc4703498a057476205dd4e518f8fcd09654c31b/lightning_transformers/task/nlp/token_classification/data.py
+        """
         encoded_labels = []
         for i, label in enumerate(labels):
             word_ids = encodings.word_ids(batch_index=i)
