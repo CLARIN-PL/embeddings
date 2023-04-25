@@ -107,7 +107,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
             _logger.warning(
                 "PyTorch 2.0 compile mode is turned on! Pass None to compile_model_kwargs if the behavior is unintended."
             )
-            if inference_mode:
+            if inference_mode or inference_mode is None:
                 _logger.warning(
                     "PyTorch 2.0 compile mode does not support inference_mode! Setting Lightning Trainer inference_mode to False!"
                 )
