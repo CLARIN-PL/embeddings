@@ -243,7 +243,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
    
   <ul>
   <li><a href="#preprocess-and-downsample-data" id="toc-preprocess-and-downsample-data" class="nav-link active" data-scroll-target="#preprocess-and-downsample-data">Preprocess and downsample data</a></li>
-  <li><a href="#preprocess_data" id="toc-preprocess_data" class="nav-link" data-scroll-target="#preprocess_data">preprocess_data</a></li>
   <li><a href="#train-simple-downsampled-pipeline" id="toc-train-simple-downsampled-pipeline" class="nav-link" data-scroll-target="#train-simple-downsampled-pipeline">Train simple downsampled pipeline</a></li>
   <li><a href="#load-model-from-chechpoint-automatically-generated-with-trainer" id="toc-load-model-from-chechpoint-automatically-generated-with-trainer" class="nav-link" data-scroll-target="#load-model-from-chechpoint-automatically-generated-with-trainer">Load model from chechpoint automatically generated with Trainer</a></li>
   <li><a href="#use-task-from-checkpoint-for-predictions" id="toc-use-task-from-checkpoint-for-predictions" class="nav-link" data-scroll-target="#use-task-from-checkpoint-for-predictions">Use task from checkpoint for predictions</a></li>
@@ -271,90 +270,82 @@ Warning
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Any, Dict</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pytorch_lightning <span class="im">as</span> pl</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.config.lightning_config <span class="im">import</span> LightningAdvancedConfig</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.defaults <span class="im">import</span> DATASET_PATH, RESULTS_PATH</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.model.lightning_module.text_classification <span class="im">import</span> (</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    TextClassificationModule,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.pipeline.hf_preprocessing_pipeline <span class="im">import</span> (</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    HuggingFacePreprocessingPipeline,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>os.chdir(<span class="st">".."</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Any, Dict</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pytorch_lightning <span class="im">as</span> pl</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.config.lightning_config <span class="im">import</span> LightningAdvancedConfig</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.defaults <span class="im">import</span> DATASET_PATH, RESULTS_PATH</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.model.lightning_module.text_classification <span class="im">import</span> (</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    TextClassificationModule,</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.pipeline.lightning_classification <span class="im">import</span> LightningClassificationPipeline</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.task.lightning_task.text_classification <span class="im">import</span> TextClassificationTask</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.utils.utils <span class="im">import</span> build_output_path</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.pipeline.hf_preprocessing_pipeline <span class="im">import</span> (</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    HuggingFacePreprocessingPipeline,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.pipeline.lightning_classification <span class="im">import</span> LightningClassificationPipeline</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.task.lightning_task.text_classification <span class="im">import</span> TextClassificationTask</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> embeddings.utils.utils <span class="im">import</span> build_output_path</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/opt/conda/envs/embeddings/lib/python3.9/site-packages/tqdm/auto.py:22: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm</code></pre>
+</div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>embedding_name_or_path <span class="op">=</span> <span class="st">"hf-internal-testing/tiny-albert"</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>dataset_name <span class="op">=</span> <span class="st">"clarin-pl/polemo2-official"</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>dataset_path <span class="op">=</span> build_output_path(DATASET_PATH, embedding_name_or_path, dataset_name)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>output_path <span class="op">=</span> build_output_path(<span class="st">"."</span>, embedding_name_or_path, dataset_name, mkdirs<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>embedding_name_or_path <span class="op">=</span> <span class="st">"hf-internal-testing/tiny-albert"</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dataset_name <span class="op">=</span> <span class="st">"clarin-pl/polemo2-official"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>dataset_path <span class="op">=</span> build_output_path(DATASET_PATH, embedding_name_or_path, dataset_name)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>output_path <span class="op">=</span> build_output_path(RESULTS_PATH, embedding_name_or_path, dataset_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2023-02-13 23:05:26,246 - embeddings.utils.utils - WARNING - String 'hf-internal-testing/tiny-albert' contains '/'. Replacing it with '__'. Cleaned_text: hf-internal-testing__tiny-albert.
+2023-02-13 23:05:26,247 - embeddings.utils.utils - WARNING - String 'clarin-pl/polemo2-official' contains '/'. Replacing it with '__'. Cleaned_text: clarin-pl__polemo2-official.
+2023-02-13 23:05:26,254 - embeddings.utils.utils - WARNING - String 'hf-internal-testing/tiny-albert' contains '/'. Replacing it with '__'. Cleaned_text: hf-internal-testing__tiny-albert.
+2023-02-13 23:05:26,256 - embeddings.utils.utils - WARNING - String 'clarin-pl/polemo2-official' contains '/'. Replacing it with '__'. Cleaned_text: clarin-pl__polemo2-official.</code></pre>
+</div>
 </div>
 <section id="preprocess-and-downsample-data" class="level3">
 <h3 class="anchored" data-anchor-id="preprocess-and-downsample-data">Preprocess and downsample data</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> preprocess_data(path: <span class="bu">str</span>) <span class="op">-&gt;</span> Dict[<span class="bu">str</span>, Any]:</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pipeline <span class="op">=</span> HuggingFacePreprocessingPipeline(</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        dataset_name<span class="op">=</span>dataset_name,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        load_dataset_kwargs<span class="op">=</span>{</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">"train_domains"</span>: [<span class="st">"hotels"</span>, <span class="st">"medicine"</span>],</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"dev_domains"</span>: [<span class="st">"hotels"</span>, <span class="st">"medicine"</span>],</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"test_domains"</span>: [<span class="st">"hotels"</span>, <span class="st">"medicine"</span>],</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"text_cfg"</span>: <span class="st">"text"</span>,</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        },</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        persist_path<span class="op">=</span>path,</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        sample_missing_splits<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        ignore_test_subset<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        downsample_splits<span class="op">=</span>(<span class="fl">0.01</span>, <span class="fl">0.01</span>, <span class="fl">0.01</span>),</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        seed<span class="op">=</span><span class="dv">441</span>,</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    pipeline.run()</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dataset_name_or_path"</span>: path,</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"input_column_name"</span>: [<span class="st">"text"</span>],</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"target_column_name"</span>: <span class="st">"target"</span>,</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>dataset_kwargs <span class="op">=</span> preprocess_data(dataset_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Downloading and preparing dataset polemo2-official/default to /home/runner/.cache/huggingface/datasets/clarin-pl___polemo2-official/default-e0c1ce6ddfd81769/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70...
-Dataset polemo2-official downloaded and prepared to /home/runner/.cache/huggingface/datasets/clarin-pl___polemo2-official/default-e0c1ce6ddfd81769/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70. Subsequent calls will reuse this data.</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> preprocess_data(path: <span class="bu">str</span>) <span class="op">-&gt;</span> Dict[<span class="bu">str</span>, Any]:</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pipeline <span class="op">=</span> HuggingFacePreprocessingPipeline(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        dataset_name<span class="op">=</span>dataset_name,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        load_dataset_kwargs<span class="op">=</span>{</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">"train_domains"</span>: [<span class="st">"hotels"</span>, <span class="st">"medicine"</span>],</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"dev_domains"</span>: [<span class="st">"hotels"</span>, <span class="st">"medicine"</span>],</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"test_domains"</span>: [<span class="st">"hotels"</span>, <span class="st">"medicine"</span>],</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"text_cfg"</span>: <span class="st">"text"</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        persist_path<span class="op">=</span>path,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        sample_missing_splits<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        ignore_test_subset<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        downsample_splits<span class="op">=</span>(<span class="fl">0.01</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span>),</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        seed<span class="op">=</span><span class="dv">441</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    pipeline.run()</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dataset_name_or_path"</span>: path,</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"input_column_name"</span>: [<span class="st">"text"</span>],</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"target_column_name"</span>: <span class="st">"target"</span>,</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>dataset_kwargs <span class="op">=</span> preprocess_data(dataset_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Downloading data files:   0%|          | 0/2 [00:00&lt;?, ?it/s]
-Downloading data:   0%|          | 0.00/2.66M [00:00&lt;?, ?B/s]Downloading data: 100%|##########| 2.66M/2.66M [00:00&lt;00:00, 66.8MB/s]
-Downloading data files:  50%|#####     | 1/2 [00:00&lt;00:00,  5.25it/s]
-Downloading data:   0%|          | 0.00/2.20M [00:00&lt;?, ?B/s]Downloading data: 100%|##########| 2.20M/2.20M [00:00&lt;00:00, 63.0MB/s]
-Downloading data files: 100%|##########| 2/2 [00:00&lt;00:00,  5.93it/s]Downloading data files: 100%|##########| 2/2 [00:00&lt;00:00,  5.82it/s]
-Extracting data files:   0%|          | 0/2 [00:00&lt;?, ?it/s]Extracting data files: 100%|##########| 2/2 [00:00&lt;00:00, 1563.00it/s]
-Downloading data files:   0%|          | 0/2 [00:00&lt;?, ?it/s]
-Downloading data:   0%|          | 0.00/320k [00:00&lt;?, ?B/s]Downloading data: 100%|##########| 320k/320k [00:00&lt;00:00, 27.7MB/s]
-Downloading data files:  50%|#####     | 1/2 [00:00&lt;00:00,  7.27it/s]
-Downloading data:   0%|          | 0.00/281k [00:00&lt;?, ?B/s]Downloading data: 100%|##########| 281k/281k [00:00&lt;00:00, 43.1MB/s]
-Downloading data files: 100%|##########| 2/2 [00:00&lt;00:00,  5.73it/s]Downloading data files: 100%|##########| 2/2 [00:00&lt;00:00,  5.91it/s]
-Extracting data files:   0%|          | 0/2 [00:00&lt;?, ?it/s]Extracting data files: 100%|##########| 2/2 [00:00&lt;00:00, 1515.56it/s]
-Downloading data files:   0%|          | 0/2 [00:00&lt;?, ?it/s]
-Downloading data:   0%|          | 0.00/309k [00:00&lt;?, ?B/s]Downloading data: 100%|##########| 309k/309k [00:00&lt;00:00, 28.0MB/s]
-Downloading data files:  50%|#####     | 1/2 [00:00&lt;00:00,  6.27it/s]
-Downloading data:   0%|          | 0.00/280k [00:00&lt;?, ?B/s]Downloading data: 100%|##########| 280k/280k [00:00&lt;00:00, 40.7MB/s]
-Downloading data files: 100%|##########| 2/2 [00:00&lt;00:00,  6.99it/s]Downloading data files: 100%|##########| 2/2 [00:00&lt;00:00,  6.87it/s]
-Extracting data files:   0%|          | 0/2 [00:00&lt;?, ?it/s]Extracting data files: 100%|##########| 2/2 [00:00&lt;00:00, 1640.96it/s]
-Generating train split: 0 examples [00:00, ? examples/s]Generating train split: 1683 examples [00:00, 16772.71 examples/s]Generating train split: 3410 examples [00:00, 17060.96 examples/s]Generating train split: 5226 examples [00:00, 17555.09 examples/s]                                                                  Generating validation split: 0 examples [00:00, ? examples/s]                                                             Generating test split: 0 examples [00:00, ? examples/s]                                                         0%|          | 0/3 [00:00&lt;?, ?it/s]100%|##########| 3/3 [00:00&lt;00:00, 761.35it/s]
-Flattening the indices:   0%|          | 0/58 [00:00&lt;?, ? examples/s]                                                                     Saving the dataset (0/1 shards):   0%|          | 0/58 [00:00&lt;?, ? examples/s]Saving the dataset (1/1 shards): 100%|##########| 58/58 [00:00&lt;00:00, 23817.27 examples/s]                                                                                          Flattening the indices:   0%|          | 0/8 [00:00&lt;?, ? examples/s]                                                                    Saving the dataset (0/1 shards):   0%|          | 0/8 [00:00&lt;?, ? examples/s]Saving the dataset (1/1 shards): 100%|##########| 8/8 [00:00&lt;00:00, 3328.81 examples/s]                                                                                       Flattening the indices:   0%|          | 0/8 [00:00&lt;?, ? examples/s]                                                                    Saving the dataset (0/1 shards):   0%|          | 0/8 [00:00&lt;?, ? examples/s]Saving the dataset (1/1 shards): 100%|##########| 8/8 [00:00&lt;00:00, 2886.15 examples/s]                                                                                       </code></pre>
+<pre><code>Using custom data configuration default-e0c1ce6ddfd81769
+Found cached dataset polemo2-official (/root/.cache/huggingface/datasets/clarin-pl___polemo2-official/default-e0c1ce6ddfd81769/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70)
+100%|██████████| 3/3 [00:00&lt;00:00, 817.23it/s]
+Loading cached split indices for dataset at /root/.cache/huggingface/datasets/clarin-pl___polemo2-official/default-e0c1ce6ddfd81769/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70/cache-a54edce9681df8b7.arrow and /root/.cache/huggingface/datasets/clarin-pl___polemo2-official/default-e0c1ce6ddfd81769/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70/cache-09cf731207f31628.arrow
+Loading cached split indices for dataset at /root/.cache/huggingface/datasets/clarin-pl___polemo2-official/default-e0c1ce6ddfd81769/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70/cache-c48721732fabb729.arrow and /root/.cache/huggingface/datasets/clarin-pl___polemo2-official/default-e0c1ce6ddfd81769/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70/cache-f9d782422a65c7e6.arrow
+Loading cached split indices for dataset at /root/.cache/huggingface/datasets/clarin-pl___polemo2-official/default-e0c1ce6ddfd81769/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70/cache-0db6321193feb3ec.arrow and /root/.cache/huggingface/datasets/clarin-pl___polemo2-official/default-e0c1ce6ddfd81769/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70/cache-4e6c26839c3e4adf.arrow
+Loading cached processed dataset at /root/.cache/huggingface/datasets/clarin-pl___polemo2-official/default-e0c1ce6ddfd81769/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70/cache-e32b75da1d28bfd0.arrow
+Loading cached processed dataset at /root/.cache/huggingface/datasets/clarin-pl___polemo2-official/default-e0c1ce6ddfd81769/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70/cache-98cbedcc70a23855.arrow
+Loading cached processed dataset at /root/.cache/huggingface/datasets/clarin-pl___polemo2-official/default-e0c1ce6ddfd81769/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70/cache-b2cbb8ab856bac0f.arrow
+                                                                                         </code></pre>
 </div>
 </div>
-<hr>
-</section>
-<section id="preprocess_data" class="level3">
-<h3 class="anchored" data-anchor-id="preprocess_data">preprocess_data</h3>
-<blockquote class="blockquote">
-<pre><code> preprocess_data (path:str)</code></pre>
-</blockquote>
 </section>
 <section id="train-simple-downsampled-pipeline" class="level3">
 <h3 class="anchored" data-anchor-id="train-simple-downsampled-pipeline">Train simple downsampled pipeline</h3>
@@ -390,35 +381,109 @@ Flattening the indices:   0%|          | 0/58 [00:00&lt;?, ? examples/s]        
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>dataset_kwargs</span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pipeline.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>100%|██████████| 1/1 [00:00&lt;00:00,  6.73ba/s]
+100%|██████████| 1/1 [00:00&lt;00:00, 25.69ba/s]
+100%|██████████| 1/1 [00:00&lt;00:00, 26.51ba/s]
+Casting the dataset: 100%|██████████| 1/1 [00:00&lt;00:00, 113.84ba/s]
+Casting the dataset: 100%|██████████| 1/1 [00:00&lt;00:00, 68.70ba/s]
+Casting the dataset: 100%|██████████| 1/1 [00:00&lt;00:00, 103.15ba/s]
+Some weights of the model checkpoint at hf-internal-testing/tiny-albert were not used when initializing AlbertForSequenceClassification: ['predictions.LayerNorm.bias', 'predictions.LayerNorm.weight', 'predictions.bias', 'predictions.decoder.weight', 'predictions.decoder.bias', 'predictions.dense.bias', 'predictions.dense.weight']
+- This IS expected if you are initializing AlbertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing AlbertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of AlbertForSequenceClassification were not initialized from the model checkpoint at hf-internal-testing/tiny-albert and are newly initialized: ['classifier.bias', 'albert.pooler.weight', 'albert.pooler.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+GPU available: True, used: False
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+/opt/conda/envs/embeddings/lib/python3.9/site-packages/pytorch_lightning/trainer/trainer.py:1579: UserWarning: GPU available but not used. Set the gpus flag in your trainer `Trainer(gpus=1)` or script `--gpus=1`.
+  rank_zero_warn(
+
+  | Name          | Type                            | Params
+------------------------------------------------------------------
+0 | model         | AlbertForSequenceClassification | 352 K 
+1 | metrics       | MetricCollection                | 0     
+2 | train_metrics | MetricCollection                | 0     
+3 | val_metrics   | MetricCollection                | 0     
+4 | test_metrics  | MetricCollection                | 0     
+------------------------------------------------------------------
+132       Trainable params
+352 K     Non-trainable params
+352 K     Total params
+1.410     Total estimated model params size (MB)</code></pre>
+</div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Validation sanity check: 0it [00:00, ?it/s]Validation sanity check:   0%|          | 0/1 [00:00&lt;?, ?it/s]Validation sanity check: 100%|##########| 1/1 [00:00&lt;00:00,  5.49it/s]                                                                      Training: 0it [00:00, ?it/s]Training:   0%|          | 0/3 [00:00&lt;?, ?it/s]Epoch 0:   0%|          | 0/3 [00:00&lt;?, ?it/s] Epoch 0:  33%|###3      | 1/3 [00:00&lt;00:00,  2.86it/s]Epoch 0:  33%|###3      | 1/3 [00:00&lt;00:00,  2.85it/s, loss=1.39, v_num=, train/BaseLR=0.000, train/LambdaLR=0.000]Epoch 0:  67%|######6   | 2/3 [00:00&lt;00:00,  3.09it/s, loss=1.39, v_num=, train/BaseLR=0.000, train/LambdaLR=0.000]Epoch 0:  67%|######6   | 2/3 [00:00&lt;00:00,  3.09it/s, loss=1.39, v_num=, train/BaseLR=5e-6, train/LambdaLR=5e-6]  
-Validating: 0it [00:00, ?it/s]
-Validating:   0%|          | 0/1 [00:00&lt;?, ?it/s]
-Validating: 100%|##########| 1/1 [00:00&lt;00:00,  7.79it/s]Epoch 0: 100%|##########| 3/3 [00:00&lt;00:00,  3.83it/s, loss=1.39, v_num=, train/BaseLR=5e-6, train/LambdaLR=5e-6, val/MulticlassAccuracy=0.375, val/MulticlassPrecision=0.0938, val/MulticlassRecall=0.250, val/MulticlassF1Score=0.136]
-                                                         Epoch 0: 100%|##########| 3/3 [00:00&lt;00:00,  3.76it/s, loss=1.39, v_num=, train/BaseLR=5e-6, train/LambdaLR=5e-6, val/MulticlassAccuracy=0.375, val/MulticlassPrecision=0.0938, val/MulticlassRecall=0.250, val/MulticlassF1Score=0.136]
-Predicting: 2it [00:00, ?it/s]Predicting: 2it [00:00, ?it/s]</code></pre>
+<pre><code>Validation sanity check:   0%|          | 0/1 [00:00&lt;?, ?it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Map:   0%|          | 0/58 [00:00&lt;?, ? examples/s]                                                  Map:   0%|          | 0/8 [00:00&lt;?, ? examples/s]                                                 Map:   0%|          | 0/8 [00:00&lt;?, ? examples/s]                                                 Casting the dataset:   0%|          | 0/58 [00:00&lt;?, ? examples/s]                                                                  Casting the dataset:   0%|          | 0/8 [00:00&lt;?, ? examples/s]                                                                 Casting the dataset:   0%|          | 0/8 [00:00&lt;?, ? examples/s]                                                                 Downloading builder script:   0%|          | 0.00/4.20k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 4.20k/4.20k [00:00&lt;00:00, 962kB/s]
-Downloading builder script:   0%|          | 0.00/6.77k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 6.77k/6.77k [00:00&lt;00:00, 5.00MB/s]
-Downloading builder script:   0%|          | 0.00/7.36k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 7.36k/7.36k [00:00&lt;00:00, 5.34MB/s]
-Downloading builder script:   0%|          | 0.00/7.55k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 7.55k/7.55k [00:00&lt;00:00, 1.32MB/s]</code></pre>
+<pre><code>/opt/conda/envs/embeddings/lib/python3.9/site-packages/pytorch_lightning/trainer/data_loading.py:111: UserWarning: The dataloader, val_dataloader 0, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 48 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  rank_zero_warn(</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                                                      </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/opt/conda/envs/embeddings/lib/python3.9/site-packages/pytorch_lightning/trainer/data_loading.py:111: UserWarning: The dataloader, train_dataloader, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 48 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  rank_zero_warn(
+/opt/conda/envs/embeddings/lib/python3.9/site-packages/pytorch_lightning/trainer/data_loading.py:407: UserWarning: The number of training samples (2) is smaller than the logging interval Trainer(log_every_n_steps=50). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+  rank_zero_warn(</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoch 0: 100%|██████████| 3/3 [00:01&lt;00:00,  2.07it/s, loss=1.39, v_num=, train/BaseLR=5e-6, train/LambdaLR=5e-6, val/MulticlassAccuracy=0.375, val/MulticlassPrecision=0.0938, val/MulticlassRecall=0.250, val/MulticlassF1Score=0.136]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/opt/conda/envs/embeddings/lib/python3.9/site-packages/pytorch_lightning/trainer/data_loading.py:111: UserWarning: The dataloader, test_dataloader 0, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 48 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  rank_zero_warn(</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Testing: 100%|██████████| 2/2 [00:02&lt;00:00,  1.02s/it]--------------------------------------------------------------------------------
+DATALOADER:0 TEST RESULTS
+{'test/Loss': 1.3823001384735107,
+ 'test/MulticlassAccuracy': 0.4054054021835327,
+ 'test/MulticlassF1Score': 0.14423076808452606,
+ 'test/MulticlassPrecision': 0.10135135054588318,
+ 'test/MulticlassRecall': 0.25}
+--------------------------------------------------------------------------------
+Testing: 100%|██████████| 2/2 [00:02&lt;00:00,  1.04s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Restoring states from the checkpoint path at /app/resources/results/hf-internal-testing__tiny-albert/clarin-pl__polemo2-official/20230213_230526/checkpoints/epoch=0-step=1.ckpt
+Loaded model weights from checkpoint at /app/resources/results/hf-internal-testing__tiny-albert/clarin-pl__polemo2-official/20230213_230526/checkpoints/epoch=0-step=1.ckpt
+/opt/conda/envs/embeddings/lib/python3.9/site-packages/pytorch_lightning/trainer/data_loading.py:111: UserWarning: The dataloader, predict_dataloader 0, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 48 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  rank_zero_warn(</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Predicting: 100%|██████████| 2/2 [00:01&lt;?, ?it/s]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/app/embeddings/metric/hugging_face_metric.py:27: FutureWarning: load_metric is deprecated and will be removed in the next major version of datasets. Use 'evaluate.load' instead, from the new library 🤗 Evaluate: https://huggingface.co/docs/evaluate
+  datasets.load_metric(metric, **init_kwargs) if isinstance(metric, str) else metric
+/opt/conda/envs/embeddings/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+/opt/conda/envs/embeddings/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+/opt/conda/envs/embeddings/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))</code></pre>
 </div>
 </div>
 </section>
 <section id="load-model-from-chechpoint-automatically-generated-with-trainer" class="level3">
 <h3 class="anchored" data-anchor-id="load-model-from-chechpoint-automatically-generated-with-trainer">Load model from chechpoint automatically generated with Trainer</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ckpt_path <span class="op">=</span> output_path <span class="op">/</span> <span class="st">"checkpoints"</span> <span class="op">/</span> <span class="st">"epoch=0-step=1.ckpt"</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>task_from_ckpt <span class="op">=</span> TextClassificationTask.from_checkpoint(</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    checkpoint_path<span class="op">=</span>ckpt_path, output_path<span class="op">=</span>output_path,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>ckpt_path <span class="op">=</span> output_path <span class="op">/</span> <span class="st">"checkpoints"</span> <span class="op">/</span> <span class="st">"last.ckpt"</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>ckpt_path</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>task_from_ckpt <span class="op">=</span> TextClassificationTask.from_checkpoint(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    checkpoint_path<span class="op">=</span>ckpt_path, output_path<span class="op">=</span>output_path,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="alternatively-we-can-load-the-model" class="level4">
 <h4 class="anchored" data-anchor-id="alternatively-we-can-load-the-model">Alternatively we can load the model</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>model_from_ckpt <span class="op">=</span> TextClassificationModule.load_from_checkpoint(<span class="bu">str</span>(ckpt_path))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>model_from_ckpt <span class="op">=</span> TextClassificationModule.load_from_checkpoint(<span class="bu">str</span>(ckpt_path))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The warning appears when loading the model, however, it was validated that the loaded weights are the same as the weights that are being saved. The reason for this is that when the model_state_dict keys are loaded from the cached huggingface model some of them (cls.(…)) do not match the keys from the state_dict of the model weights that are saved.</p>
 <p>https://github.com/CLARIN-PL/embeddings/issues/225</p>
@@ -427,62 +492,22 @@ Downloading builder script:   0%|          | 0.00/7.55k [00:00&lt;?, ?B/s]Downlo
 <section id="use-task-from-checkpoint-for-predictions" class="level3">
 <h3 class="anchored" data-anchor-id="use-task-from-checkpoint-for-predictions">Use task from checkpoint for predictions</h3>
 <p><code>return_names</code> needs to be set to False since it uses the <code>datamodule</code> to retrieves the names while the datamodule is not loaded to <code>Trainer</code> in the <code>LightningTask</code> since we have not fitted it yet.</p>
-<div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>test_dataloader <span class="op">=</span> pipeline.datamodule.test_dataloader()</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>preds <span class="op">=</span> task_from_ckpt.predict(test_dataloader)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>preds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Predicting: 0it [00:00, ?it/s]Predicting: 100%|##########| 1/1 [00:00&lt;00:00, 113.61it/s]</code></pre>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-<pre><code>Predictions(y_pred=array([1, 1, 1, 1, 1, 1, 1, 1]), y_true=array([1, 0, 1, 1, 3, 2, 1, 0]), y_probabilities=array([[0.2481135 , 0.2536007 , 0.2469933 , 0.25129247],
-       [0.2481213 , 0.25361001, 0.24699411, 0.25127453],
-       [0.24812159, 0.25360343, 0.24699512, 0.25127986],
-       [0.2481318 , 0.25360057, 0.24699672, 0.25127086],
-       [0.24812104, 0.2536074 , 0.24699493, 0.25127658],
-       [0.24813914, 0.2535949 , 0.24698749, 0.25127843],
-       [0.24812792, 0.25360098, 0.24699186, 0.25127918],
-       [0.248134  , 0.25359967, 0.24698383, 0.25128242]], dtype=float32), names=array(['zero', 'minus', 'plus', 'amb'], dtype='&lt;U5'))</code></pre>
-</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>test_dataloader <span class="op">=</span> pipeline.datamodule.test_dataloader()</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>preds <span class="op">=</span> task_from_ckpt.predict(test_dataloader)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>preds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Alternatively we can implicitly assign the <code>datamodule</code> to <code>Trainer</code> in <code>LightningTask</code></p>
-<div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>task_from_ckpt.trainer.datamodule <span class="op">=</span> pipeline.datamodule</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>preds_with_names <span class="op">=</span> task_from_ckpt.predict(test_dataloader, return_names<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>preds_with_names</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Predicting: 0it [00:00, ?it/s]Predicting: 100%|##########| 1/1 [00:00&lt;00:00, 70.39it/s]</code></pre>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="3">
-<pre><code>Predictions(y_pred=array([1, 1, 1, 1, 1, 1, 1, 1]), y_true=array([1, 0, 1, 1, 3, 2, 1, 0]), y_probabilities=array([[0.2481135 , 0.2536007 , 0.2469933 , 0.25129247],
-       [0.2481213 , 0.25361001, 0.24699411, 0.25127453],
-       [0.24812159, 0.25360343, 0.24699512, 0.25127986],
-       [0.2481318 , 0.25360057, 0.24699672, 0.25127086],
-       [0.24812104, 0.2536074 , 0.24699493, 0.25127658],
-       [0.24813914, 0.2535949 , 0.24698749, 0.25127843],
-       [0.24812792, 0.25360098, 0.24699186, 0.25127918],
-       [0.248134  , 0.25359967, 0.24698383, 0.25128242]], dtype=float32), names=array(['zero', 'minus', 'plus', 'amb'], dtype='&lt;U5'))</code></pre>
-</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>task_from_ckpt.trainer.datamodule <span class="op">=</span> pipeline.datamodule</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>preds_with_names <span class="op">=</span> task_from_ckpt.predict(test_dataloader, return_names<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>preds_with_names</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can also use previosly loaded lightning model (<code>LightningModule</code>) outside of the task and get the predictions. To do this we also need to intitialize a <code>Trainer</code>.</p>
-<div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> pl.Trainer(default_root_dir<span class="op">=</span><span class="bu">str</span>(output_path))</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>preds_from_model <span class="op">=</span> trainer.predict(model_from_ckpt, dataloaders<span class="op">=</span>test_dataloader)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>preds_from_model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Predicting: 0it [00:00, ?it/s]Predicting: 100%|##########| 1/1 [00:00&lt;00:00, 129.27it/s]</code></pre>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="4">
-<pre><code>[(tensor([[-0.0176,  0.0043, -0.0221, -0.0049],
-          [-0.0176,  0.0043, -0.0221, -0.0049],
-          [-0.0176,  0.0043, -0.0221, -0.0049],
-          [-0.0175,  0.0043, -0.0221, -0.0049],
-          [-0.0176,  0.0043, -0.0221, -0.0049],
-          [-0.0175,  0.0043, -0.0221, -0.0049],
-          [-0.0175,  0.0043, -0.0221, -0.0049],
-          [-0.0175,  0.0043, -0.0222, -0.0049]]),
-  tensor([1, 1, 1, 1, 1, 1, 1, 1]))]</code></pre>
-</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> pl.Trainer(default_root_dir<span class="op">=</span><span class="bu">str</span>(output_path))</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>preds_from_model <span class="op">=</span> trainer.predict(model_from_ckpt, dataloaders<span class="op">=</span>test_dataloader)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>preds_from_model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
