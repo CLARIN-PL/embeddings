@@ -39,6 +39,7 @@ def question_answering_data_module(
             "return_offsets_mapping": True,
             "return_overflowing_tokens": True,
         },
+        use_cache=False,
     )
 
 
@@ -81,7 +82,7 @@ def scores(
     datamodule.setup(stage="fit")
     task.build_task_model()
     task.fit(datamodule)
-    datamodule.process_data(stage="test")
+    datamodule.process_data_with_cache(stage="test")
     predict_dataloader = datamodule.predict_dataloader()
 
     dataloader = predict_dataloader[0]

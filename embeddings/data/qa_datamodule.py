@@ -1,5 +1,6 @@
-import typing
+import os
 from copy import deepcopy
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import datasets
@@ -11,7 +12,10 @@ from transformers import AutoTokenizer, BatchEncoding
 
 from embeddings.data.datamodule import HuggingFaceDataModule, HuggingFaceDataset
 from embeddings.data.io import T_path
+from embeddings.utils.loggers import get_logger
+from embeddings.utils.utils import standardize_name
 
+_logger = get_logger(__name__)
 
 class CharToTokenMapper:
     @staticmethod
@@ -95,6 +99,8 @@ class CharToTokenMapper:
 
 
 class QuestionAnsweringDataModule(HuggingFaceDataModule):
+    CACHE_DEFAULT_DIR = Path(os.path.expanduser("~/.cache/embeddings/"))
+
     def __init__(
         self,
         dataset_name_or_path: T_path,
@@ -111,7 +117,8 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
         load_dataset_kwargs: Optional[Dict[str, Any]] = None,
         dataloader_kwargs: Optional[Dict[str, Any]] = None,
         seed: int = 441,
-        **kwargs: Any
+        use_cache: bool = False,
+        **kwargs: Any,
     ) -> None:
         self.question_field = question_field
         self.context_field = context_field
@@ -147,15 +154,34 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
             self.splits: List[str] = list(self.dataset_raw.keys())
         else:
             self.splits = ["train", "validation"]
-        self.process_data(stage="fit")
+        self.processed_data_cache_path = None
+        if use_cache:
+            self.processed_data_cache_path = (
+                QuestionAnsweringDataModule.CACHE_DEFAULT_DIR
+                / f"{standardize_name(str(dataset_name_or_path))}__{standardize_name(str(tokenizer_name_or_path))}"
+            )
+            self.processed_data_cache_path.mkdir(parents=True, exist_ok=True)
+            _logger.warning(f"Using datamodule caching. Cache path={self.processed_data_cache_path}")
 
-    @typing.overload
-    def process_data(self) -> None:
-        pass
+        self.process_data_with_cache(stage="fit")
 
-    @typing.overload
-    def process_data(self, stage: Optional[str] = None) -> None:
-        pass
+    def process_data_with_cache(self, stage: Optional[str] = None) -> None:
+        if stage is None:
+            return
+
+        if self.processed_data_cache_path:
+            data_cache_path = self.processed_data_cache_path / stage
+            if data_cache_path.exists():
+                _logger.warning(f"Loading cached datamodule from path {data_cache_path}")
+                self.dataset = datasets.load_from_disk(dataset_path=str(data_cache_path))
+            else:
+                _logger.warning(f"Cached datamodule not found. Processing datamodule {data_cache_path}")
+                self.process_data(stage=stage)
+                self.dataset.set_format(type="torch")
+                self.dataset.save_to_disk(str(data_cache_path))
+        else:
+            self.process_data(stage=stage)
+            self.dataset.set_format(type="torch")
 
     def process_data(self, stage: Optional[str] = None) -> None:
         assert isinstance(self.dataset_raw, datasets.DatasetDict)
@@ -164,9 +190,6 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
             self.dataset = DatasetDict(
                 {k: v for k, v in self.dataset.items() if k in {"train", "validation"}}
             )
-
-        if stage is None:
-            return
 
         columns = [c for c in self.dataset["train"].column_names if c not in self.LOADER_COLUMNS]
 
@@ -193,8 +216,6 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
             self.dataset[split] = self.dataset[split].remove_columns(
                 ["offset_mapping", "overflow_to_sample_mapping"]
             )
-
-        self.dataset.set_format(type="torch")
 
     def prepare_data(self) -> None:
         AutoTokenizer.from_pretrained(self.tokenizer_name_or_path)
@@ -233,7 +254,7 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
                 self.dataset_raw["train"].info.version = Version("0.0.1")
             self.data_loader_has_setup = True
         if self.processed_data_stage and (self.processed_data_stage != stage):
-            self.process_data(stage=stage)
+            self.process_data_with_cache(stage=stage)
             self.processed_data_stage = stage
 
     @property
@@ -248,5 +269,5 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
 
     def test_dataloader(self) -> DataLoader[HuggingFaceDataset]:
         if "test" in self.splits and not "test" in self.dataset.keys():
-            self.process_data(stage="test")
+            self.process_data_with_cache(stage="test")
         return super().test_dataloader()
