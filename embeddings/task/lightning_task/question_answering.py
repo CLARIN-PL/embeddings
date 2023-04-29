@@ -27,6 +27,7 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
         task_train_kwargs: Dict[str, Any],
         early_stopping_kwargs: Dict[str, Any],
         model_checkpoint_kwargs: Dict[str, Any],
+        logging_config: LightningLoggingConfig,
         finetune_last_n_layers: int = -1,
         compile_model_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
@@ -42,7 +43,7 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
             early_stopping_kwargs=early_stopping_kwargs,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
             compile_model_kwargs=compile_model_kwargs,
-            logging_config=LightningLoggingConfig.from_flags(),
+            logging_config=logging_config,
             hf_task_name=HuggingFaceTaskName.question_answering,
         )
         self.model_name_or_path = model_name_or_path
