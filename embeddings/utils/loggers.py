@@ -7,7 +7,9 @@ from typing import Any, Dict, Iterable, List, Optional, Union
 
 import wandb
 from pytorch_lightning import loggers as pl_loggers
+from pytorch_lightning.loggers.wandb import WandbLogger
 from typing_extensions import Literal
+from wandb.wandb_run import Run
 
 from embeddings.data.io import T_path
 
@@ -30,10 +32,12 @@ def get_logger(name: str, log_level: Union[str, int] = DEFAULT_LOG_LEVEL) -> log
 
 @dataclass
 class LightningLoggingConfig:
+    output_path: Union[Path, str] = "."
     loggers_names: List[Literal["wandb", "csv", "tensorboard"]] = field(default_factory=list)
     tracking_project_name: Optional[str] = None
     wandb_entity: Optional[str] = None
     wandb_logger_kwargs: Dict[str, Any] = field(default_factory=dict)
+    loggers: Optional[Dict[str, pl_loggers.Logger]] = field(init=False, default=None)
 
     def __post_init__(self) -> None:
         if "wandb" not in self.loggers_names and (
@@ -80,48 +84,43 @@ class LightningLoggingConfig:
 
     def get_lightning_loggers(
         self,
-        output_path: T_path,
         run_name: Optional[str] = None,
     ) -> List[pl_loggers.Logger]:
         """Based on configuration, provides pytorch-lightning loggers' callbacks."""
-        output_path = Path(output_path)
-        loggers: List[pl_loggers.Logger] = []
+        if self.loggers:
+            return list(self.loggers.values())
+        else:
+            self.output_path = Path(self.output_path)
+            self.loggers = {}
 
-        if self.use_tensorboard():
-            loggers.append(
-                pl_loggers.TensorBoardLogger(
+            if self.use_tensorboard():
+                self.loggers["tensorboard"] = pl_loggers.TensorBoardLogger(
                     name=run_name,
-                    save_dir=str(output_path.joinpath("tensorboard")),
+                    save_dir=str(self.output_path / "tensorboard"),
                 )
-            )
 
-        if self.use_wandb():
-            if not self.tracking_project_name:
-                raise ValueError(
-                    "Tracking project name is not passed. Pass tracking_project_name argument!"
-                )
-            save_dir = output_path.joinpath("wandb")
-            save_dir.mkdir(exist_ok=True)
-            loggers.append(
-                pl_loggers.wandb.WandbLogger(
+            if self.use_wandb():
+                if not self.tracking_project_name:
+                    raise ValueError(
+                        "Tracking project name is not passed. Pass tracking_project_name argument!"
+                    )
+                save_dir = self.output_path / "wandb"
+                save_dir.mkdir(exist_ok=True, parents=True)
+                self.loggers["wandb"] = pl_loggers.wandb.WandbLogger(
                     name=run_name,
                     save_dir=str(save_dir),
                     project=self.tracking_project_name,
                     entity=self.wandb_entity,
-                    reinit=True,
                     **self.wandb_logger_kwargs
                 )
-            )
 
-        if self.use_csv():
-            loggers.append(
-                pl_loggers.CSVLogger(
+            if self.use_csv():
+                self.loggers["csv"] = pl_loggers.CSVLogger(
                     name=run_name if run_name else "",
-                    save_dir=str(output_path.joinpath("csv")),
+                    save_dir=self.output_path / "csv",
                 )
-            )
 
-        return loggers
+            return list(self.loggers.values())
 
 
 class ExperimentLogger(abc.ABC):
@@ -170,3 +169,33 @@ class WandbWrapper(ExperimentLogger):
         for path in paths:
             artifact.add_file(path)
         wandb.log_artifact(artifact)
+
+
+class LightningWandbWrapper:
+    def __init__(self, logging_config: LightningLoggingConfig) -> None:
+        assert logging_config.use_wandb()
+        assert "wandb" in logging_config.loggers
+        assert isinstance(logging_config.loggers["wandb"], WandbLogger)
+        self.wandb_logger: WandbLogger = logging_config.loggers["wandb"]
+
+    def log_output(
+        self,
+        output_path: T_path,
+        ignore: Optional[Iterable[str]] = None,
+    ) -> None:
+        for entry in os.scandir(output_path):
+            if not ignore or entry.name not in ignore:
+                self.wandb_logger.experiment.save(entry.path, output_path)
+
+    def log_metrics(self, metrics: Dict[str, Any]) -> None:
+        self.wandb_logger.log_metrics(metrics)
+
+    def finish_logging(self) -> None:
+        self.wandb_logger.experiment.finish()
+        # self.wandb_logger.finalize()
+
+    def log_artifact(self, paths: Iterable[T_path], artifact_name: str, artifact_type: str) -> None:
+        artifact = wandb.Artifact(name=artifact_name, type=artifact_type)
+        for path in paths:
+            artifact.add_file(path)
+        self.wandb_logger.experiment.log_artifact(artifact)

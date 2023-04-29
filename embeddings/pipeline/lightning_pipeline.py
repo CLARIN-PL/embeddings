@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Any, Dict, Generic, Optional, TypeVar
 
@@ -8,7 +9,7 @@ from embeddings.data.datamodule import BaseDataModule, Data
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.model.model import Model
 from embeddings.pipeline.pipeline import Pipeline
-from embeddings.utils.loggers import LightningLoggingConfig, WandbWrapper
+from embeddings.utils.loggers import LightningLoggingConfig, LightningWandbWrapper, WandbWrapper
 from embeddings.utils.utils import get_installed_packages, standardize_name
 
 EvaluationResult = TypeVar("EvaluationResult")
@@ -46,25 +47,40 @@ class LightningPipeline(
         self.pipeline_kwargs = pipeline_kwargs
         self.pipeline_kwargs.pop("self")
         self.pipeline_kwargs.pop("pipeline_kwargs")
+        self.result = None
 
     def run(self, run_name: Optional[str] = None) -> EvaluationResult:
         if run_name:
             run_name = standardize_name(run_name)
         self._save_artifacts()
         model_result = self.model.execute(data=self.datamodule, run_name=run_name)
-        result = self.evaluator.evaluate(model_result)
+        self.result = self.evaluator.evaluate(model_result)
+        self._save_metrics()
         self._finish_logging()
-        return result
+        return self.result
 
     def _save_artifacts(self) -> None:
         srsly.write_json(self.output_path / "packages.json", get_installed_packages())
         with open(self.output_path / "pipeline_config.yaml", "w") as f:
             yaml.dump(self.pipeline_kwargs, stream=f)
 
+    def _save_metrics(self) -> None:
+        with open(self.output_path / "metrics.yaml", "w") as f:
+            yaml.dump(self.result.metrics, stream=f)
+
     def _finish_logging(self) -> None:
         if self.logging_config.use_wandb():
-            logger = WandbWrapper()
-            logger.log_output(
+            wrapper = LightningWandbWrapper(self.logging_config)
+            wrapper.log_output(
                 self.output_path, ignore={"wandb", "csv", "tensorboard", "checkpoints"}
             )
-            logger.finish_logging()
+            wrapper.log_metrics(self.result.metrics)
+            # assert self.output_path == self.logging_config.output_path
+            # for entry in os.scandir(self.output_path):
+            #     if entry.name not in {"wandb", "csv", "tensorboard", "checkpoints", "artifacts"}:
+            #         self.logging_config.loggers["wandb"].experiment.save(
+            #             entry.path, self.logging_config.output_path
+            #         )
+
+            # self.logging_config.loggers["wandb"].experiment.
+            wrapper.finish_logging()

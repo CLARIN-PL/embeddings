@@ -64,7 +64,9 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
     def predict(self, dataloader: Any, return_names: bool = True) -> Any:
         assert self.model is not None
         assert self.trainer is not None
-        return self.trainer.predict(model=self.model, dataloaders=dataloader)
+        return self.trainer.predict(
+            model=self.model, dataloaders=dataloader, return_predictions=True
+        )
 
     @staticmethod
     def postprocess_outputs(
@@ -92,6 +94,12 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
 
         dataloader = data.get_subset(subset=predict_subset)
         assert isinstance(dataloader, DataLoader)
+        if isinstance(self.trainer.strategy, pl.strategies.ddp.DDPStrategy):
+            self.setup_trainer(
+                run_name=run_name,
+                accelerator="gpu",
+                devices=[0],  # made predict only on single gpu,
+            )
         model_outputs = self.predict(dataloader=dataloader)
         result = self.postprocess_outputs(
             model_outputs=model_outputs, data=data, predict_subset=predict_subset

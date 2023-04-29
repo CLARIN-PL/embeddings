@@ -1,4 +1,5 @@
 import os
+import pickle
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -157,16 +158,33 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
             self.splits = ["train", "validation"]
         self.processed_data_cache_path = None
         if use_cache:
+            datasets.disable_caching()
             self.processed_data_cache_path = (
                 QuestionAnsweringDataModule.CACHE_DEFAULT_DIR
                 / f"{standardize_name(str(dataset_name_or_path))}__{standardize_name(str(tokenizer_name_or_path))}"
             )
             self.processed_data_cache_path.mkdir(parents=True, exist_ok=True)
             _logger.warning(
-                f"Using datamodule caching. Cache path={self.processed_data_cache_path}"
+                f"Using embeddingsdatamodule caching. Cache path={self.processed_data_cache_path}"
             )
 
         self.process_data_with_cache(stage="fit")
+
+    def cache_datamodule(self, path: Path, stage: str) -> None:
+        self.dataset.save_to_disk(str(path))
+        if stage != "fit":
+            with open(path / "overflow_to_sample_mapping", "wb") as f:
+                pickle.dump(obj=self.overflow_to_sample_mapping, file=f)
+            with open(path / "offset_mapping", "wb") as f:
+                pickle.dump(obj=self.offset_mapping, file=f)
+
+    def load_cached_datamodule(self, path: Path, stage: str) -> None:
+        self.dataset = datasets.load_from_disk(dataset_path=str(path))
+        if stage != "fit":
+            with open(path / "overflow_to_sample_mapping", "rb") as f:
+                self.overflow_to_sample_mapping = pickle.load(f)
+            with open(path / "offset_mapping", "rb") as f:
+                self.offset_mapping = pickle.load(f)
 
     def process_data_with_cache(self, stage: Optional[str] = None) -> None:
         if stage is None:
@@ -176,17 +194,17 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
             data_cache_path = self.processed_data_cache_path / stage
             if data_cache_path.exists():
                 _logger.warning(f"Loading cached datamodule from path {data_cache_path}")
-                self.dataset = datasets.load_from_disk(dataset_path=str(data_cache_path))
+                self.load_cached_datamodule(data_cache_path, stage=stage)
+                _logger.warning("Load completed!")
             else:
                 _logger.warning(
                     f"Cached datamodule not found. Processing datamodule {data_cache_path}"
                 )
                 self.process_data(stage=stage)
-                self.dataset.set_format(type="torch")
-                self.dataset.save_to_disk(str(data_cache_path))
+                _logger.warning(f"Saving cached datamodule at path {data_cache_path}")
+                self.cache_datamodule(data_cache_path, stage=stage)
         else:
             self.process_data(stage=stage)
-            self.dataset.set_format(type="torch")
 
     def process_data(self, stage: Optional[str] = None) -> None:
         assert isinstance(self.dataset_raw, datasets.DatasetDict)
@@ -213,14 +231,16 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
                     batch_size=self.processing_batch_size,
                     remove_columns=columns,
                 )
-
-            self.overflow_to_sample_mapping[split] = self.dataset[split][
-                "overflow_to_sample_mapping"
-            ]
-            self.offset_mapping[split] = self.dataset[split]["offset_mapping"]
+            if stage != "fit":
+                self.overflow_to_sample_mapping[split] = self.dataset[split][
+                    "overflow_to_sample_mapping"
+                ]
+                self.offset_mapping[split] = self.dataset[split]["offset_mapping"]
             self.dataset[split] = self.dataset[split].remove_columns(
                 ["offset_mapping", "overflow_to_sample_mapping"]
             )
+
+        self.dataset.set_format(type="torch")
 
     def prepare_data(self) -> None:
         AutoTokenizer.from_pretrained(self.tokenizer_name_or_path)
