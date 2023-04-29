@@ -1,10 +1,8 @@
 import abc
-from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import pytorch_lightning as pl
-import wandb
 from pytorch_lightning.accelerators import Accelerator
 from pytorch_lightning.callbacks import Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
@@ -55,7 +53,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         self.trainer: Optional[pl.Trainer] = None
         self.logging_config = logging_config
         self.tokenizer: Optional[AutoTokenizer] = None
-        self.callbacks: List[Callback] = None
+        self.callbacks: List[Callback] = []
 
         self.inference_mode = (
             self.task_train_kwargs.pop("inference_mode")
@@ -141,7 +139,8 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
             raise self.MODEL_UNDEFINED_EXCEPTION
         self.tokenizer = data.tokenizer
         self.callbacks = self._get_callbacks(dataset_subsets=list(data.load_dataset().keys()))
-        self.setup_trainer(run_name=run_name)
+        self.setup_trainer(run_name=run_name if run_name else "")
+        assert isinstance(self.trainer, pl.Trainer)
         try:
             self.trainer.fit(self.model, data)
         except Exception as e:
@@ -222,9 +221,10 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
         self.fit(data, run_name=run_name)
         dataloader = data.get_subset(subset=predict_subset)
         assert isinstance(dataloader, DataLoader)
+        assert isinstance(self.trainer, pl.Trainer)
         if isinstance(self.trainer.strategy, pl.strategies.ddp.DDPStrategy):
             self.setup_trainer(
-                run_name=run_name,
+                run_name=run_name if run_name else "",
                 accelerator="gpu",
                 devices=[0],  # made predict only on single gpu,
             )

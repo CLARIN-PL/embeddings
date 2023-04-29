@@ -94,9 +94,10 @@ class QuestionAnsweringTask(LightningTask[QuestionAnsweringDataModule, Dict[str,
 
         dataloader = data.get_subset(subset=predict_subset)
         assert isinstance(dataloader, DataLoader)
+        assert isinstance(self.trainer, pl.Trainer)
         if isinstance(self.trainer.strategy, pl.strategies.ddp.DDPStrategy):
             self.setup_trainer(
-                run_name=run_name,
+                run_name=run_name if run_name else "",
                 accelerator="gpu",
                 devices=[0],  # made predict only on single gpu,
             )

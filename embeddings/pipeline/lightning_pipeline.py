@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from typing import Any, Dict, Generic, Optional, TypeVar
 
@@ -9,7 +8,7 @@ from embeddings.data.datamodule import BaseDataModule, Data
 from embeddings.evaluator.evaluator import Evaluator
 from embeddings.model.model import Model
 from embeddings.pipeline.pipeline import Pipeline
-from embeddings.utils.loggers import LightningLoggingConfig, LightningWandbWrapper, WandbWrapper
+from embeddings.utils.loggers import LightningLoggingConfig, LightningWandbWrapper
 from embeddings.utils.utils import get_installed_packages, standardize_name
 
 EvaluationResult = TypeVar("EvaluationResult")
@@ -47,7 +46,7 @@ class LightningPipeline(
         self.pipeline_kwargs = pipeline_kwargs
         self.pipeline_kwargs.pop("self")
         self.pipeline_kwargs.pop("pipeline_kwargs")
-        self.result = None
+        self.result: Optional[EvaluationResult] = None
 
     def run(self, run_name: Optional[str] = None) -> EvaluationResult:
         if run_name:
@@ -65,8 +64,9 @@ class LightningPipeline(
             yaml.dump(self.pipeline_kwargs, stream=f)
 
     def _save_metrics(self) -> None:
+        metrics = getattr(self.result, "metrics")
         with open(self.output_path / "metrics.yaml", "w") as f:
-            yaml.dump(self.result.metrics, stream=f)
+            yaml.dump(metrics, stream=f)
 
     def _finish_logging(self) -> None:
         if self.logging_config.use_wandb():
@@ -74,13 +74,6 @@ class LightningPipeline(
             wrapper.log_output(
                 self.output_path, ignore={"wandb", "csv", "tensorboard", "checkpoints"}
             )
-            wrapper.log_metrics(self.result.metrics)
-            # assert self.output_path == self.logging_config.output_path
-            # for entry in os.scandir(self.output_path):
-            #     if entry.name not in {"wandb", "csv", "tensorboard", "checkpoints", "artifacts"}:
-            #         self.logging_config.loggers["wandb"].experiment.save(
-            #             entry.path, self.logging_config.output_path
-            #         )
-
-            # self.logging_config.loggers["wandb"].experiment.
+            metrics = getattr(self.result, "metrics")
+            wrapper.log_metrics(metrics)
             wrapper.finish_logging()

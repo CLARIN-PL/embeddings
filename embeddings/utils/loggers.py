@@ -9,7 +9,6 @@ import wandb
 from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.loggers.wandb import WandbLogger
 from typing_extensions import Literal
-from wandb.wandb_run import Run
 
 from embeddings.data.io import T_path
 
@@ -87,9 +86,7 @@ class LightningLoggingConfig:
         run_name: Optional[str] = None,
     ) -> List[pl_loggers.Logger]:
         """Based on configuration, provides pytorch-lightning loggers' callbacks."""
-        if self.loggers:
-            return list(self.loggers.values())
-        else:
+        if not self.loggers:
             self.output_path = Path(self.output_path)
             self.loggers = {}
 
@@ -120,7 +117,7 @@ class LightningLoggingConfig:
                     save_dir=self.output_path / "csv",
                 )
 
-            return list(self.loggers.values())
+        return list(self.loggers.values())
 
 
 class ExperimentLogger(abc.ABC):
@@ -174,6 +171,7 @@ class WandbWrapper(ExperimentLogger):
 class LightningWandbWrapper:
     def __init__(self, logging_config: LightningLoggingConfig) -> None:
         assert logging_config.use_wandb()
+        assert isinstance(logging_config.loggers, dict)
         assert "wandb" in logging_config.loggers
         assert isinstance(logging_config.loggers["wandb"], WandbLogger)
         self.wandb_logger: WandbLogger = logging_config.loggers["wandb"]
@@ -192,7 +190,6 @@ class LightningWandbWrapper:
 
     def finish_logging(self) -> None:
         self.wandb_logger.experiment.finish()
-        # self.wandb_logger.finalize()
 
     def log_artifact(self, paths: Iterable[T_path], artifact_name: str, artifact_type: str) -> None:
         artifact = wandb.Artifact(name=artifact_name, type=artifact_type)
