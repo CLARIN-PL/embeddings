@@ -72,7 +72,7 @@ class LightningQuestionAnsweringPipeline(
             early_stopping_kwargs=config.early_stopping_kwargs,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
             compile_model_kwargs=compile_model_kwargs,
-            logging_config=logging_config
+            logging_config=logging_config,
         )
         model: LightningModel[QuestionAnsweringDataModule, Dict[str, Any]] = LightningModel(
             task, predict_subset

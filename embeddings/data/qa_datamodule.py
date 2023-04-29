@@ -17,6 +17,7 @@ from embeddings.utils.utils import standardize_name
 
 _logger = get_logger(__name__)
 
+
 class CharToTokenMapper:
     @staticmethod
     def _get_tokens_ids(sequence_ids: List[Any], input_len: int) -> Tuple[int, int]:
@@ -161,7 +162,9 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
                 / f"{standardize_name(str(dataset_name_or_path))}__{standardize_name(str(tokenizer_name_or_path))}"
             )
             self.processed_data_cache_path.mkdir(parents=True, exist_ok=True)
-            _logger.warning(f"Using datamodule caching. Cache path={self.processed_data_cache_path}")
+            _logger.warning(
+                f"Using datamodule caching. Cache path={self.processed_data_cache_path}"
+            )
 
         self.process_data_with_cache(stage="fit")
 
@@ -175,7 +178,9 @@ class QuestionAnsweringDataModule(HuggingFaceDataModule):
                 _logger.warning(f"Loading cached datamodule from path {data_cache_path}")
                 self.dataset = datasets.load_from_disk(dataset_path=str(data_cache_path))
             else:
-                _logger.warning(f"Cached datamodule not found. Processing datamodule {data_cache_path}")
+                _logger.warning(
+                    f"Cached datamodule not found. Processing datamodule {data_cache_path}"
+                )
                 self.process_data(stage=stage)
                 self.dataset.set_format(type="torch")
                 self.dataset.save_to_disk(str(data_cache_path))
