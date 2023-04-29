@@ -11,6 +11,7 @@ from _pytest.tmpdir import TempdirFactory
 from embeddings.data.qa_datamodule import QuestionAnsweringDataModule
 from embeddings.evaluator.question_answering_evaluator import QuestionAnsweringEvaluator
 from embeddings.task.lightning_task.question_answering import QuestionAnsweringTask
+from embeddings.utils.loggers import LightningLoggingConfig
 from tests.fixtures.sample_qa_dataset import sample_question_answering_dataset
 
 
@@ -68,6 +69,7 @@ def question_answering_task() -> QuestionAnsweringTask:
         },
         early_stopping_kwargs={"monitor": "val/Loss", "patience": 1, "mode": "min"},
         model_checkpoint_kwargs={},
+        logging_config=LightningLoggingConfig.from_flags(),
     )
 
 
