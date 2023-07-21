@@ -162,8 +162,8 @@ class QAPredictionPostProcessor(QABasePostprocessor):
                 end_logits=end_logits[1:],
                 offset_mapping=offset_mappings[output_index],
             )
-        # Argument 1 to "append" of "list" has incompatible type "Optional[Dict[str, object]]"; expected "Dict[str, Any]"
-        predictions.append(min_no_answer_score)  # type: ignore[arg-type]
+        if isinstance(min_no_answer_score, dict):
+            predictions.append(min_no_answer_score)  # type: ignore[arg-type]
         # mypy thinks the function only returns Any
         predictions = sorted(predictions, key=lambda x: x["score"], reverse=True)[  # type: ignore[no-any-return]
             : self.top_k_answers

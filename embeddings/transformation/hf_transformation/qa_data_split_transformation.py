@@ -1,7 +1,7 @@
 from typing import Optional
 
 import pandas as pd
-from datasets import Dataset, DatasetDict
+from datasets import Dataset, DatasetDict, concatenate_datasets
 from sklearn.model_selection import train_test_split
 
 from embeddings.transformation.transformation import Transformation
@@ -16,6 +16,7 @@ class QuestionAnsweringSplitsTransformation(Transformation[Dataset, DatasetDict]
         seed: int,
         context_column: str = "context",
         stratify_column: Optional[str] = None,
+        use_multi_answers_as_test: bool = False,
     ):
         self.train_size = train_size
         self.dev_size = dev_size
@@ -23,9 +24,17 @@ class QuestionAnsweringSplitsTransformation(Transformation[Dataset, DatasetDict]
         self.seed = seed
         self.context_column = context_column
         self.stratify_column = stratify_column
+        self.use_multi_answers_as_validation = use_multi_answers_as_test
 
     def transform(self, data: Dataset) -> DatasetDict:
         data_df: pd.DataFrame = data.to_pandas()
+        multi_answers_df = (
+            data_df[data_df.has_multiple_answers == True]
+            if self.use_multi_answers_as_validation
+            else None
+        )
+        data_df = data_df[data_df.has_multiple_answers == False]
+
         dataset = DatasetDict()
         unique_contexts = list(sorted(data_df[self.context_column].unique()))
         context_ids = list(range(len(unique_contexts)))
@@ -77,6 +86,11 @@ class QuestionAnsweringSplitsTransformation(Transformation[Dataset, DatasetDict]
         elif self.test_size and not self.dev_size:
             dataset["test"] = Dataset.from_pandas(
                 data_df[data_df.context_id.isin(validation_indices)], preserve_index=False
+            )
+
+        if isinstance(multi_answers_df, pd.DataFrame):
+            dataset["test"] = concatenate_datasets(
+                [dataset["test"], Dataset.from_pandas(multi_answers_df, preserve_index=False)]
             )
 
         return dataset
