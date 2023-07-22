@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 import pandas as pd
 from datasets import Dataset, DatasetDict, concatenate_datasets
@@ -26,8 +26,22 @@ class QuestionAnsweringSplitsTransformation(Transformation[Dataset, DatasetDict]
         self.stratify_column = stratify_column
         self.use_multi_answers_as_validation = use_multi_answers_as_test
 
-    def transform(self, data: Dataset) -> DatasetDict:
-        data_df: pd.DataFrame = data.to_pandas()
+    def transform(self, data: Union[Dataset, DatasetDict]) -> DatasetDict:
+        if isinstance(data, Dataset):
+            data_df: pd.DataFrame = data.to_pandas()
+        elif isinstance(data, DatasetDict):
+            data_arr = []
+            for _, ds in data.items():
+                data_arr.append(ds.to_pandas())
+            data_df: pd.DataFrame = pd.concat(data_arr, ignore_index=True)
+        else:
+            raise ValueError(f"Data type not found: {type(data)}")
+
+        if "has_multiple_answers" not in data_df.columns:
+            data_df["has_multiple_answers"] = data_df["answers"].apply(
+                lambda x: len(x["text"]) != 1
+            )
+
         multi_answers_df = (
             data_df[data_df.has_multiple_answers == True]
             if self.use_multi_answers_as_validation
