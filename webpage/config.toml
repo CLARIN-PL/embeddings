@@ -2,3 +2,5 @@ baseURL = "https://embeddings.ml"
 languageCode = "en-us"
 title = "Clarin-PL Embeddigs Library"
 theme = "hugo-geekdoc"
+#[template]
+#  options = ["missingkey=zero"]

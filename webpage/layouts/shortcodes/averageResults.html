@@ -7,12 +7,14 @@
 
 {{ $metrics := slice }}
 {{ $metricsToIgnore := slice "classes" "f1_weighted" "recall_weighted" "precision_weighted" }}
-{{ range $.Site.Data.results }}
-   {{ range $k, $v := .metrics_avg }}
-      {{if (not (in $metricsToIgnore $k)) }}
-         {{ $metrics = uniq ($metrics | append $k) }}
-      {{end}}
-   {{ end }}
+{{ range $file, $result := $.Site.Data.results }}
+   {{if or (eq $tasktype "Tasks") (eq (index $result "leaderboard_task_name") $tasktype)}}
+        {{ range $k, $v := .metrics_avg }}
+           {{if (not (in $metricsToIgnore $k)) }}
+              {{ $metrics = uniq ($metrics | append $k) }}
+           {{end}}
+        {{ end }}
+     {{end}}
 {{ end }}
 {{ $sum := slice }}
 <style scoped>
