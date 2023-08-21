@@ -1,0 +1,18 @@
+{
+    "submission_name": "qa-kpwr_bm_25",
+    "dataset_name": "expansio/qa-kpwr",
+    "dataset_version": "0.0.0",
+    "embedding_name": "BM25",
+    "hparams": {},
+    "packages": [],
+    "config": null,
+    "leaderboard_task_name": "Information Retrieval",
+    "metrics": [
+      {
+        "NDCG@10": 0.3077,
+        "MAP@10": 0.21952,
+        "Recall@10": 0.59759,
+        "P@10": 0.05976
+      }
+    ]
+}
