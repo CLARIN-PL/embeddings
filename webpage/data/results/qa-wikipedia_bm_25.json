@@ -1,0 +1,18 @@
+{
+    "submission_name": "qa-wikipedia_bm_25",
+    "dataset_name": "qa-wikipedia",
+    "dataset_version": "0.0.0",
+    "embedding_name": "BM25",
+    "hparams": {},
+    "packages": [],
+    "config": null,
+    "leaderboard_task_name": "Information Retrieval",
+    "metrics": [
+      {
+        "NDCG@10": 0.39698,
+        "MAP@10": 0.28948,
+        "Recall@10": 0.75,
+        "P@10": 0.075
+      }
+    ]
+}
