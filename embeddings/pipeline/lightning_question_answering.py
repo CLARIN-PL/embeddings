@@ -2,6 +2,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import datasets
+import pandas as pd
+import yaml
 from pytorch_lightning.accelerators import Accelerator
 
 from embeddings.config.lightning_config import LightningQABasicConfig, LightningQAConfig
@@ -14,6 +16,7 @@ from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task import question_answering as qa
 from embeddings.utils.loggers import LightningLoggingConfig
+from embeddings.utils.utils import convert_qa_df_to_bootstrap_html
 
 
 class LightningQuestionAnsweringPipeline(
@@ -86,3 +89,17 @@ class LightningQuestionAnsweringPipeline(
             logging_config,
             pipeline_kwargs=pipeline_kwargs,
         )
+
+    def _save_metrics(self) -> None:
+        metrics = getattr(self.result, "metrics")
+        with open(self.output_path / "metrics.yaml", "w") as f:
+            yaml.dump(metrics, stream=f)
+
+        predictions_text = getattr(self.result, "predictions_text")
+        golds_text = getattr(self.result, "golds_text")
+        with open(self.output_path / "predictions.html", "w") as f:
+            f.write(
+                convert_qa_df_to_bootstrap_html(
+                    pd.DataFrame({"predictions": predictions_text, "golds": golds_text})
+                )
+            )

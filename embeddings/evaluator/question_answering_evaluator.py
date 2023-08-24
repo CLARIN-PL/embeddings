@@ -26,8 +26,21 @@ class QuestionAnsweringEvaluator(
 
     def metrics(
         self,
-    ) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]]]:
+    ) -> Dict[str, Metric[Union[List[Any], nptyping.NDArray[Any], torch.Tensor], Dict[Any, Any]],]:
         return {}
+
+    @staticmethod
+    def get_golds_text(references: List[QA_GOLD_ANSWER_TYPE]) -> Union[List[List[str]], List[str]]:
+        golds_text = []
+        for ref in references:
+            answers = ref["answers"]
+            assert isinstance(answers, dict)
+            golds_text.append(answers["text"])
+        return golds_text
+
+    @staticmethod
+    def get_predictions_text(predictions: List[QA_PREDICTED_ANSWER_TYPE]) -> List[str]:
+        return [str(it["prediction_text"]) for it in predictions]
 
     def evaluate(
         self, data: Union[Dict[str, nptyping.NDArray[Any]], Predictions, Dict[str, Any]]
@@ -51,5 +64,9 @@ class QuestionAnsweringEvaluator(
             {"id": it_id, **it["predicted_answer"]} for it_id, it in enumerate(outputs)
         ]
         metrics = SQUADv2Metric().calculate(predictions=predictions, references=references)
+        gold_texts = QuestionAnsweringEvaluator.get_golds_text(references)
+        predictions_text = QuestionAnsweringEvaluator.get_predictions_text(predictions)
 
-        return QuestionAnsweringEvaluationResults(data=outputs, **metrics)
+        return QuestionAnsweringEvaluationResults(
+            data=outputs, golds_text=gold_texts, predictions_text=predictions_text, **metrics
+        )
