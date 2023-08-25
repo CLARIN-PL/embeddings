@@ -18,9 +18,17 @@ QA_GOLD_ANSWER_TYPE = Dict[str, Union[Dict[str, Union[List[str], List[Any]]], st
 
 
 class QuestionAnsweringInferenceModule(pl.LightningModule):
-    def __init__(self, model_name: str, devices: str = "auto", accelerator: str = "auto") -> None:
+    def __init__(
+        self,
+        model_name: str,
+        devices: str = "auto",
+        accelerator: str = "auto",
+        use_auth_token: bool = False,
+    ) -> None:
         super().__init__()
-        self.model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+        self.model = AutoModelForQuestionAnswering.from_pretrained(
+            model_name, use_auth_token=use_auth_token
+        )
         self.trainer = pl.Trainer(devices=devices, accelerator=accelerator)
 
     def predict_step(
