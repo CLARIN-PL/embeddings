@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.475">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -18,9 +18,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -47,43 +48,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -119,7 +90,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
@@ -147,15 +119,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <span class="navbar-title">embeddings</span>
     </a>
   </div>
+        <div class="quarto-navbar-tools ms-auto">
+</div>
           <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">How to use our configs?</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../01_Tutorials/baseline_sklearn_models_tutorial.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../01_Tutorials/tutorial_how_to_use_config_space.html">How to use our configs?</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
@@ -163,7 +139,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title d-none d-lg-block">How to use our configs?</h1>
+      <h1 class="title">How to use our configs?</h1>
                   <div>
         <div class="description">
           Detailed tutorial about how to pass arguments to embeddings pipelines.
@@ -183,55 +159,63 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../index.html" class="sidebar-item-text sidebar-link">CLARIN Embeddings</a>
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CLARIN Embeddings</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Tutorials</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../01_Tutorials/baseline_sklearn_models_tutorial.html" class="sidebar-item-text sidebar-link">Baseline Sklearn-based models</a>
+  <a href="../01_Tutorials/baseline_sklearn_models_tutorial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Baseline Sklearn-based models</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../01_Tutorials/tutorial_how_to_use_config_space.html" class="sidebar-item-text sidebar-link active">How to use our configs?</a>
+  <a href="../01_Tutorials/tutorial_how_to_use_config_space.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">How to use our configs?</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../01_Tutorials/validate_lightning_models_inference.html" class="sidebar-item-text sidebar-link">LM-based models inference</a>
+  <a href="../01_Tutorials/validate_lightning_models_inference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LM-based models inference</span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">LEPISZCZE</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">LEPISZCZE</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../02_LEPISZCZE/lepiszcze.html" class="sidebar-item-text sidebar-link">LEPISZCZE</a>
+  <a href="../02_LEPISZCZE/lepiszcze.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LEPISZCZE</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../02_LEPISZCZE/submission.html" class="sidebar-item-text sidebar-link">Submission</a>
+  <a href="../02_LEPISZCZE/submission.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Submission</span></a>
   </div>
 </li>
       </ul>
@@ -239,6 +223,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -359,27 +344,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 Dataset polemo2-official downloaded and prepared to /home/runner/.cache/huggingface/datasets/clarin-pl___polemo2-official/all_text/0.0.0/2b75fdbe5def97538e81fb120f8752744b50729a4ce09bd75132bfc863a2fd70. Subsequent calls will reuse this data.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Downloading builder script:   0%|          | 0.00/5.90k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 5.90k/5.90k [00:00&lt;00:00, 3.41MB/s]
-Downloading metadata:   0%|          | 0.00/23.4k [00:00&lt;?, ?B/s]Downloading metadata: 100%|##########| 23.4k/23.4k [00:00&lt;00:00, 11.2MB/s]
-Downloading readme:   0%|          | 0.00/5.35k [00:00&lt;?, ?B/s]Downloading readme: 100%|##########| 5.35k/5.35k [00:00&lt;00:00, 3.02MB/s]
+<pre><code>Downloading builder script:   0%|          | 0.00/5.90k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 5.90k/5.90k [00:00&lt;00:00, 3.24MB/s]
+Downloading metadata:   0%|          | 0.00/23.4k [00:00&lt;?, ?B/s]Downloading metadata: 100%|##########| 23.4k/23.4k [00:00&lt;00:00, 15.0MB/s]
+Downloading readme:   0%|          | 0.00/5.35k [00:00&lt;?, ?B/s]Downloading readme: 100%|##########| 5.35k/5.35k [00:00&lt;00:00, 4.48MB/s]
 No config specified, defaulting to: polemo2-official/all_text
 Downloading data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]
-Downloading data:   0%|          | 0.00/5.37M [00:00&lt;?, ?B/s]
-Downloading data:  53%|#####3    | 2.87M/5.37M [00:00&lt;00:00, 28.7MB/s]Downloading data: 100%|##########| 5.37M/5.37M [00:00&lt;00:00, 35.6MB/s]
-Downloading data files: 100%|##########| 1/1 [00:03&lt;00:00,  3.16s/it]Downloading data files: 100%|##########| 1/1 [00:03&lt;00:00,  3.16s/it]
-Extracting data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]Extracting data files: 100%|##########| 1/1 [00:00&lt;00:00, 1262.58it/s]
+Downloading data:   0%|          | 0.00/5.37M [00:00&lt;?, ?B/s]Downloading data: 100%|##########| 5.37M/5.37M [00:00&lt;00:00, 56.0MB/s]
+Downloading data files: 100%|##########| 1/1 [00:00&lt;00:00,  2.86it/s]Downloading data files: 100%|##########| 1/1 [00:00&lt;00:00,  2.86it/s]
+Extracting data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]Extracting data files: 100%|##########| 1/1 [00:00&lt;00:00, 1348.22it/s]
 Downloading data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]
-Downloading data:   0%|          | 0.00/663k [00:00&lt;?, ?B/s]
-Downloading data:  69%|######8   | 458k/663k [00:00&lt;00:00, 4.56MB/s]Downloading data: 100%|##########| 663k/663k [00:00&lt;00:00, 5.31MB/s]
-Downloading data files: 100%|##########| 1/1 [00:03&lt;00:00,  3.08s/it]Downloading data files: 100%|##########| 1/1 [00:03&lt;00:00,  3.08s/it]
-Extracting data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]Extracting data files: 100%|##########| 1/1 [00:00&lt;00:00, 1319.38it/s]
+Downloading data:   0%|          | 0.00/663k [00:00&lt;?, ?B/s]Downloading data: 100%|##########| 663k/663k [00:00&lt;00:00, 22.5MB/s]
+Downloading data files: 100%|##########| 1/1 [00:00&lt;00:00,  3.84it/s]Downloading data files: 100%|##########| 1/1 [00:00&lt;00:00,  3.84it/s]
+Extracting data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]Extracting data files: 100%|##########| 1/1 [00:00&lt;00:00, 1512.01it/s]
 Downloading data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]
-Downloading data:   0%|          | 0.00/649k [00:00&lt;?, ?B/s]
-Downloading data: 100%|##########| 649k/649k [00:00&lt;00:00, 6.40MB/s]Downloading data: 100%|##########| 649k/649k [00:00&lt;00:00, 6.36MB/s]
-Downloading data files: 100%|##########| 1/1 [00:02&lt;00:00,  2.97s/it]Downloading data files: 100%|##########| 1/1 [00:02&lt;00:00,  2.97s/it]
-Extracting data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]Extracting data files: 100%|##########| 1/1 [00:00&lt;00:00, 1175.20it/s]
-Generating train split:   0%|          | 0/6573 [00:00&lt;?, ? examples/s]Generating train split:  18%|#8        | 1194/6573 [00:00&lt;00:00, 11897.52 examples/s]Generating train split:  41%|####      | 2664/6573 [00:00&lt;00:00, 13538.64 examples/s]Generating train split:  63%|######3   | 4155/6573 [00:00&lt;00:00, 14159.64 examples/s]Generating train split:  87%|########6 | 5700/6573 [00:00&lt;00:00, 14666.35 examples/s]                                                                                     Generating validation split:   0%|          | 0/823 [00:00&lt;?, ? examples/s]                                                                           Generating test split:   0%|          | 0/820 [00:00&lt;?, ? examples/s]                                                                       0%|          | 0/3 [00:00&lt;?, ?it/s]100%|##########| 3/3 [00:00&lt;00:00, 479.46it/s]
-Saving the dataset (0/1 shards):   0%|          | 0/7 [00:00&lt;?, ? examples/s]Saving the dataset (1/1 shards): 100%|##########| 7/7 [00:00&lt;00:00, 1485.99 examples/s]                                                                                       Saving the dataset (0/1 shards):   0%|          | 0/5 [00:00&lt;?, ? examples/s]Saving the dataset (1/1 shards): 100%|##########| 5/5 [00:00&lt;00:00, 1347.96 examples/s]                                                                                       Saving the dataset (0/1 shards):   0%|          | 0/5 [00:00&lt;?, ? examples/s]Saving the dataset (1/1 shards): 100%|##########| 5/5 [00:00&lt;00:00, 1345.28 examples/s]                                                                                       </code></pre>
+Downloading data:   0%|          | 0.00/649k [00:00&lt;?, ?B/s]Downloading data: 100%|##########| 649k/649k [00:00&lt;00:00, 25.2MB/s]
+Downloading data files: 100%|##########| 1/1 [00:00&lt;00:00,  4.94it/s]Downloading data files: 100%|##########| 1/1 [00:00&lt;00:00,  4.93it/s]
+Extracting data files:   0%|          | 0/1 [00:00&lt;?, ?it/s]Extracting data files: 100%|##########| 1/1 [00:00&lt;00:00, 1500.11it/s]
+Generating train split:   0%|          | 0/6573 [00:00&lt;?, ? examples/s]Generating train split:  20%|##        | 1321/6573 [00:00&lt;00:00, 13178.53 examples/s]Generating train split:  46%|####5     | 3000/6573 [00:00&lt;00:00, 14828.28 examples/s]Generating train split:  70%|#######   | 4627/6573 [00:00&lt;00:00, 15471.54 examples/s]Generating train split:  94%|#########4| 6201/6573 [00:00&lt;00:00, 15572.93 examples/s]                                                                                     Generating validation split:   0%|          | 0/823 [00:00&lt;?, ? examples/s]                                                                           Generating test split:   0%|          | 0/820 [00:00&lt;?, ? examples/s]                                                                       0%|          | 0/3 [00:00&lt;?, ?it/s]100%|##########| 3/3 [00:00&lt;00:00, 611.65it/s]
+Saving the dataset (0/1 shards):   0%|          | 0/7 [00:00&lt;?, ? examples/s]Saving the dataset (1/1 shards): 100%|##########| 7/7 [00:00&lt;00:00, 1618.62 examples/s]                                                                                       Saving the dataset (0/1 shards):   0%|          | 0/5 [00:00&lt;?, ? examples/s]Saving the dataset (1/1 shards): 100%|##########| 5/5 [00:00&lt;00:00, 1467.67 examples/s]                                                                                       Saving the dataset (0/1 shards):   0%|          | 0/5 [00:00&lt;?, ? examples/s]Saving the dataset (1/1 shards): 100%|##########| 5/5 [00:00&lt;00:00, 1499.68 examples/s]                                                                                       </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>DatasetDict({
@@ -400,12 +382,12 @@ Saving the dataset (0/1 shards):   0%|          | 0/7 [00:00&lt;?, ? examples/s]
 </div>
 <p>We have now our data prepared locally, now we need to define our <code>pipeline</code>.</p>
 <p>Let’s start from config. We will use parameters from <a href="https://huggingface.co/clarin-pl/lepiszcze-allegro__herbert-base-cased-polemo2"><code>clarin-pl/lepiszcze-allegro__herbert-base-cased-polemo2</code></a>, which configuration was obtained from <code>extensive hyperparmeter search</code>.</p>
-<div class="callout-warning callout callout-style-default callout-captioned">
+<div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-caption-container flex-fill">
+<div class="callout-title-container flex-fill">
 Warning
 </div>
 </div>
@@ -517,10 +499,10 @@ Warning
 <span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    config<span class="op">=</span>config</span>
 <span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Downloading (…)okenizer_config.json:   0%|          | 0.00/422 [00:00&lt;?, ?B/s]Downloading (…)okenizer_config.json: 100%|##########| 422/422 [00:00&lt;00:00, 77.7kB/s]
-Downloading spiece.model:   0%|          | 0.00/321k [00:00&lt;?, ?B/s]Downloading spiece.model: 100%|##########| 321k/321k [00:00&lt;00:00, 7.90MB/s]
-Downloading (…)/main/tokenizer.json:   0%|          | 0.00/478k [00:00&lt;?, ?B/s]Downloading (…)/main/tokenizer.json: 100%|##########| 478k/478k [00:00&lt;00:00, 6.72MB/s]
-Downloading (…)cial_tokens_map.json:   0%|          | 0.00/244 [00:00&lt;?, ?B/s]Downloading (…)cial_tokens_map.json: 100%|##########| 244/244 [00:00&lt;00:00, 63.7kB/s]
+<pre><code>Downloading (…)okenizer_config.json:   0%|          | 0.00/422 [00:00&lt;?, ?B/s]Downloading (…)okenizer_config.json: 100%|##########| 422/422 [00:00&lt;00:00, 37.2kB/s]
+Downloading spiece.model:   0%|          | 0.00/321k [00:00&lt;?, ?B/s]Downloading spiece.model: 100%|##########| 321k/321k [00:00&lt;00:00, 11.5MB/s]
+Downloading (…)/main/tokenizer.json:   0%|          | 0.00/478k [00:00&lt;?, ?B/s]Downloading (…)/main/tokenizer.json: 100%|##########| 478k/478k [00:00&lt;00:00, 18.8MB/s]
+Downloading (…)cial_tokens_map.json:   0%|          | 0.00/244 [00:00&lt;?, ?B/s]Downloading (…)cial_tokens_map.json: 100%|##########| 244/244 [00:00&lt;00:00, 85.9kB/s]
 Map:   0%|          | 0/7 [00:00&lt;?, ? examples/s]                                                 Map:   0%|          | 0/5 [00:00&lt;?, ? examples/s]                                                 Map:   0%|          | 0/5 [00:00&lt;?, ? examples/s]                                                 Casting the dataset:   0%|          | 0/7 [00:00&lt;?, ? examples/s]                                                                 Casting the dataset:   0%|          | 0/5 [00:00&lt;?, ? examples/s]                                                                 Casting the dataset:   0%|          | 0/5 [00:00&lt;?, ? examples/s]                                                                 </code></pre>
 </div>
 </div>
@@ -535,34 +517,28 @@ Map:   0%|          | 0/7 [00:00&lt;?, ? examples/s]                            
 <div class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> pipeline.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Sanity Checking: 0it [00:00, ?it/s]Sanity Checking:   0%|          | 0/1 [00:00&lt;?, ?it/s]Sanity Checking DataLoader 0:   0%|          | 0/1 [00:00&lt;?, ?it/s]Sanity Checking DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 29.14it/s]                                                                           Training: 0it [00:00, ?it/s]Training:   0%|          | 0/1 [00:00&lt;?, ?it/s]Epoch 0:   0%|          | 0/1 [00:00&lt;?, ?it/s] Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 13.67it/s]Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 13.59it/s, train/BaseLR=0.000, train/LambdaLR=0.000]
+<pre><code>Sanity Checking: 0it [00:00, ?it/s]Sanity Checking:   0%|          | 0/1 [00:00&lt;?, ?it/s]Sanity Checking DataLoader 0:   0%|          | 0/1 [00:00&lt;?, ?it/s]Sanity Checking DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 23.10it/s]                                                                           Training: 0it [00:00, ?it/s]Training:   0%|          | 0/1 [00:00&lt;?, ?it/s]Epoch 0:   0%|          | 0/1 [00:00&lt;?, ?it/s] Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 14.46it/s]Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 14.37it/s, train/BaseLR=0.000, train/LambdaLR=0.000]
 Validation: 0it [00:00, ?it/s]
 Validation:   0%|          | 0/1 [00:00&lt;?, ?it/s]
 Validation DataLoader 0:   0%|          | 0/1 [00:00&lt;?, ?it/s]
-Validation DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 103.49it/s]Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 10.59it/s, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.200, val/MulticlassPrecision=0.050, val/MulticlassRecall=0.250, val/MulticlassF1Score=0.0833]
-                                                                       Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 10.47it/s, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.200, val/MulticlassPrecision=0.050, val/MulticlassRecall=0.250, val/MulticlassF1Score=0.0833]Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00,  8.12it/s, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.200, val/MulticlassPrecision=0.050, val/MulticlassRecall=0.250, val/MulticlassF1Score=0.0833]
-Predicting: 0it [00:00, ?it/s]Predicting:   0%|          | 0/1 [00:00&lt;?, ?it/s]Predicting DataLoader 0:   0%|          | 0/1 [00:00&lt;?, ?it/s]Predicting DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 111.59it/s]Predicting DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 103.83it/s]</code></pre>
+Validation DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 117.55it/s]Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 11.49it/s, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.000, val/MulticlassPrecision=0.000, val/MulticlassRecall=0.000, val/MulticlassF1Score=0.000]
+                                                                       Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 11.36it/s, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.000, val/MulticlassPrecision=0.000, val/MulticlassRecall=0.000, val/MulticlassF1Score=0.000]Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00,  9.01it/s, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.000, val/MulticlassPrecision=0.000, val/MulticlassRecall=0.000, val/MulticlassF1Score=0.000]
+Predicting: 0it [00:00, ?it/s]Predicting:   0%|          | 0/1 [00:00&lt;?, ?it/s]Predicting DataLoader 0:   0%|          | 0/1 [00:00&lt;?, ?it/s]Predicting DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 143.05it/s]Predicting DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 132.91it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Downloading (…)lve/main/config.json:   0%|          | 0.00/787 [00:00&lt;?, ?B/s]Downloading (…)lve/main/config.json: 100%|##########| 787/787 [00:00&lt;00:00, 182kB/s]
-Downloading pytorch_model.bin:   0%|          | 0.00/730k [00:00&lt;?, ?B/s]Downloading pytorch_model.bin: 100%|##########| 730k/730k [00:00&lt;00:00, 14.1MB/s]
+<pre><code>Downloading (…)lve/main/config.json:   0%|          | 0.00/787 [00:00&lt;?, ?B/s]Downloading (…)lve/main/config.json: 100%|##########| 787/787 [00:00&lt;00:00, 169kB/s]
+Downloading pytorch_model.bin:   0%|          | 0.00/730k [00:00&lt;?, ?B/s]Downloading pytorch_model.bin: 100%|##########| 730k/730k [00:00&lt;00:00, 24.7MB/s]
 /home/runner/work/embeddings/embeddings/.venv/lib/python3.9/site-packages/pytorch_lightning/trainer/connectors/checkpoint_connector.py:189: UserWarning: .predict(ckpt_path="last") is set, but there is no last checkpoint available. No checkpoint will be loaded.
   rank_zero_warn(
-Downloading builder script:   0%|          | 0.00/4.20k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 4.20k/4.20k [00:00&lt;00:00, 2.58MB/s]
-Downloading builder script:   0%|          | 0.00/6.77k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 6.77k/6.77k [00:00&lt;00:00, 3.57MB/s]
-Downloading builder script:   0%|          | 0.00/7.36k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 7.36k/7.36k [00:00&lt;00:00, 2.41MB/s]
-Downloading builder script:   0%|          | 0.00/7.55k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 7.55k/7.55k [00:00&lt;00:00, 4.50MB/s]
-/home/runner/work/embeddings/embeddings/.venv/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Recall is ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.
-  _warn_prf(average, modifier, msg_start, len(result))
-/home/runner/work/embeddings/embeddings/.venv/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Recall is ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.
-  _warn_prf(average, modifier, msg_start, len(result))
+Downloading builder script:   0%|          | 0.00/4.20k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 4.20k/4.20k [00:00&lt;00:00, 4.02MB/s]
+Downloading builder script:   0%|          | 0.00/6.77k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 6.77k/6.77k [00:00&lt;00:00, 6.39MB/s]
+Downloading builder script:   0%|          | 0.00/7.36k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 7.36k/7.36k [00:00&lt;00:00, 7.60MB/s]
+Downloading builder script:   0%|          | 0.00/7.55k [00:00&lt;?, ?B/s]Downloading builder script: 100%|##########| 7.55k/7.55k [00:00&lt;00:00, 5.25MB/s]
 /home/runner/work/embeddings/embeddings/.venv/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
   _warn_prf(average, modifier, msg_start, len(result))
 /home/runner/work/embeddings/embeddings/.venv/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
   _warn_prf(average, modifier, msg_start, len(result))
 /home/runner/work/embeddings/embeddings/.venv/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
-  _warn_prf(average, modifier, msg_start, len(result))
-/home/runner/work/embeddings/embeddings/.venv/lib/python3.9/site-packages/sklearn/metrics/_classification.py:1344: UndefinedMetricWarning: Recall and F-score are ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.
   _warn_prf(average, modifier, msg_start, len(result))</code></pre>
 </div>
 </div>
@@ -570,67 +546,68 @@ Downloading builder script:   0%|          | 0.00/7.55k [00:00&lt;?, ?B/s]Downlo
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> pd.DataFrame.from_dict(asdict(metrics), orient<span class="op">=</span><span class="st">"index"</span>, columns<span class="op">=</span>[<span class="st">"values"</span>])</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="18">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>values</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>accuracy</th>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>f1_macro</th>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>f1_micro</th>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>f1_weighted</th>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>recall_macro</th>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>recall_micro</th>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>recall_weighted</th>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>precision_macro</th>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>precision_micro</th>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>precision_weighted</th>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>classes</th>
-      <td>{0: {'precision': 0.0, 'recall': 0.0, 'f1': 0....</td>
-    </tr>
-    <tr>
-      <th>data</th>
-      <td>{'y_pred': [0, 0, 0, 0, 0], 'y_true': [1, 1, 1...</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">values</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">accuracy</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">f1_macro</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">f1_micro</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">f1_weighted</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">recall_macro</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">recall_micro</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">recall_weighted</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">precision_macro</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">precision_micro</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">precision_weighted</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">classes</td>
+<td>{0: {'precision': 0.0, 'recall': 0.0, 'f1': 0....</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">data</td>
+<td>{'y_pred': [0, 0, 0, 0, 0], 'y_true': [1, 1, 1...</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -701,13 +678,13 @@ Parameters passed to the datamodule classes, currently <code>HuggingFaceDataModu
 <span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>metrics_adv_cfg <span class="op">=</span> pipeline.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Sanity Checking: 0it [00:00, ?it/s]Sanity Checking:   0%|          | 0/1 [00:00&lt;?, ?it/s]Sanity Checking DataLoader 0:   0%|          | 0/1 [00:00&lt;?, ?it/s]Sanity Checking DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 73.22it/s]                                                                           Training: 0it [00:00, ?it/s]Training:   0%|          | 0/1 [00:00&lt;?, ?it/s]Epoch 0:   0%|          | 0/1 [00:00&lt;?, ?it/s] Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 35.46it/s]Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 34.99it/s, train/BaseLR=0.000, train/LambdaLR=0.000]
+<pre><code>Sanity Checking: 0it [00:00, ?it/s]Sanity Checking:   0%|          | 0/1 [00:00&lt;?, ?it/s]Sanity Checking DataLoader 0:   0%|          | 0/1 [00:00&lt;?, ?it/s]Sanity Checking DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 79.17it/s]                                                                           Training: 0it [00:00, ?it/s]Training:   0%|          | 0/1 [00:00&lt;?, ?it/s]Epoch 0:   0%|          | 0/1 [00:00&lt;?, ?it/s] Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 45.14it/s]Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 44.58it/s, train/BaseLR=0.000, train/LambdaLR=0.000]
 Validation: 0it [00:00, ?it/s]
 Validation:   0%|          | 0/1 [00:00&lt;?, ?it/s]
 Validation DataLoader 0:   0%|          | 0/1 [00:00&lt;?, ?it/s]
-Validation DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 75.49it/s]Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 18.87it/s, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.000, val/MulticlassPrecision=0.000, val/MulticlassRecall=0.000, val/MulticlassF1Score=0.000]
-                                                                      Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 18.38it/s, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.000, val/MulticlassPrecision=0.000, val/MulticlassRecall=0.000, val/MulticlassF1Score=0.000]Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 13.88it/s, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.000, val/MulticlassPrecision=0.000, val/MulticlassRecall=0.000, val/MulticlassF1Score=0.000]
-Predicting: 0it [00:00, ?it/s]Predicting:   0%|          | 0/1 [00:00&lt;?, ?it/s]Predicting DataLoader 0:   0%|          | 0/1 [00:00&lt;?, ?it/s]Predicting DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 109.32it/s]Predicting DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 103.86it/s]</code></pre>
+Validation DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 115.87it/s]Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 24.96it/s, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.400, val/MulticlassPrecision=0.100, val/MulticlassRecall=0.250, val/MulticlassF1Score=0.143]
+                                                                       Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 24.26it/s, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.400, val/MulticlassPrecision=0.100, val/MulticlassRecall=0.250, val/MulticlassF1Score=0.143]Epoch 0: 100%|##########| 1/1 [00:00&lt;00:00, 16.79it/s, train/BaseLR=0.000, train/LambdaLR=0.000, val/MulticlassAccuracy=0.400, val/MulticlassPrecision=0.100, val/MulticlassRecall=0.250, val/MulticlassF1Score=0.143]
+Predicting: 0it [00:00, ?it/s]Predicting:   0%|          | 0/1 [00:00&lt;?, ?it/s]Predicting DataLoader 0:   0%|          | 0/1 [00:00&lt;?, ?it/s]Predicting DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 130.81it/s]Predicting DataLoader 0: 100%|##########| 1/1 [00:00&lt;00:00, 124.47it/s]</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Loading cached processed dataset at /home/runner/work/embeddings/embeddings/data/polemo2_downsampled/train/cache-f234959a87a0d2f7.arrow
@@ -731,67 +708,68 @@ Casting the dataset:   0%|          | 0/5 [00:00&lt;?, ? examples/s]            
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>metrics_adv_cfg <span class="op">=</span> pd.DataFrame.from_dict(asdict(metrics_adv_cfg), orient<span class="op">=</span><span class="st">"index"</span>, columns<span class="op">=</span>[<span class="st">"values"</span>])</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>metrics_adv_cfg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="21">
-
 <div>
 
-<table class="dataframe table table-sm table-striped">
-  <thead>
-    <tr>
-      <th></th>
-      <th>values</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>accuracy</th>
-      <td>0.6</td>
-    </tr>
-    <tr>
-      <th>f1_macro</th>
-      <td>0.25</td>
-    </tr>
-    <tr>
-      <th>f1_micro</th>
-      <td>0.6</td>
-    </tr>
-    <tr>
-      <th>f1_weighted</th>
-      <td>0.45</td>
-    </tr>
-    <tr>
-      <th>recall_macro</th>
-      <td>0.333333</td>
-    </tr>
-    <tr>
-      <th>recall_micro</th>
-      <td>0.6</td>
-    </tr>
-    <tr>
-      <th>recall_weighted</th>
-      <td>0.6</td>
-    </tr>
-    <tr>
-      <th>precision_macro</th>
-      <td>0.2</td>
-    </tr>
-    <tr>
-      <th>precision_micro</th>
-      <td>0.6</td>
-    </tr>
-    <tr>
-      <th>precision_weighted</th>
-      <td>0.36</td>
-    </tr>
-    <tr>
-      <th>classes</th>
-      <td>{0: {'precision': 0.6, 'recall': 1.0, 'f1': 0....</td>
-    </tr>
-    <tr>
-      <th>data</th>
-      <td>{'y_pred': [1, 1, 1, 1, 1], 'y_true': [1, 1, 1...</td>
-    </tr>
-  </tbody>
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">values</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">accuracy</td>
+<td>0.6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">f1_macro</td>
+<td>0.25</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">f1_micro</td>
+<td>0.6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">f1_weighted</td>
+<td>0.45</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">recall_macro</td>
+<td>0.333333</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">recall_micro</td>
+<td>0.6</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">recall_weighted</td>
+<td>0.6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">precision_macro</td>
+<td>0.2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">precision_micro</td>
+<td>0.6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">precision_weighted</td>
+<td>0.36</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">classes</td>
+<td>{0: {'precision': 0.6, 'recall': 1.0, 'f1': 0....</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">data</td>
+<td>{'y_pred': [1, 1, 1, 1, 1], 'y_true': [1, 1, 1...</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -829,9 +807,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -896,6 +888,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
