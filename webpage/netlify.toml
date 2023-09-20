@@ -2,5 +2,8 @@
   command = "hugo"
   publish = "public"
 
+[dev]
+  command = "hugo server -w"
+
 [build.environment]
   HUGO_VERSION = "0.89.4"
