@@ -1,0 +1,25 @@
+{
+  "submission_name": "msmarco_ict",
+  "dataset_name": "MSMARCO",
+  "dataset_version": "0.0.0",
+  "embedding_name": "ICT",
+  "hparams": {},
+  "packages": [],
+  "config": null,
+  "leaderboard_task_name": "Information Retrieval",
+  "metrics": [
+    {
+      "NDCG@10": 29.02,
+      "MRR@10": 43.91
+    }
+  ],
+  "metrics_avg": {
+      "NDCG@10": 29.02,
+      "MRR@10": 43.91
+    },
+  "metrics_std": {
+      "NDCG@10": 0.0,
+      "MRR@10": 0.0
+    },
+  "averaged_over": 1
+}

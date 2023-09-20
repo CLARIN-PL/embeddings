@@ -1,0 +1,25 @@
+{
+  "submission_name": "msmarco_bm_25",
+  "dataset_name": "MSMARCO",
+  "dataset_version": "0.0.0",
+  "embedding_name": "BM25",
+  "hparams": {},
+  "packages": [],
+  "config": null,
+  "leaderboard_task_name": "Information Retrieval",
+  "metrics": [
+    {
+      "NDCG@10": 31.50,
+      "MRR@10": 56.36
+    }
+  ],
+  "metrics_avg": {
+      "NDCG@10": 31.50,
+      "MRR@10": 56.36
+    },
+  "metrics_std": {
+      "NDCG@10": 0.0,
+      "MRR@10": 0.0
+    },
+  "averaged_over": 1
+}

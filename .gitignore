@@ -153,3 +153,5 @@ _docs
 
 lepiszcze-submissions/
 checkpoints/
+# Local Netlify folder
+.netlify

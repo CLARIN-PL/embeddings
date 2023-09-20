@@ -1,0 +1,34 @@
+{
+  "submission_name": "qa_all_allegro__herbert-base-cased",
+  "dataset_name": "qa_all",
+  "dataset_version": "0.0.0",
+  "embedding_name": "allegro/herbert-base-cased",
+  "hparams": {},
+  "packages": [],
+  "config": null,
+  "leaderboard_task_name": "Question Answering",
+  "metrics": [
+    {
+      "f1": 81.06677705918307,
+      "exact": 72.24858757062147,
+      "HasAns_f1": 72.2968454891892,
+      "HasAns_exact": 56.738437001594896,
+      "NoAns_f1": 92.54042775169536
+    }
+  ],
+  "metrics_avg": {
+    "f1": 81.06677705918307,
+    "exact": 72.24858757062147,
+    "HasAns_f1": 72.2968454891892,
+    "HasAns_exact": 56.738437001594896,
+    "NoAns_f1": 92.54042775169536
+  },
+  "metrics_std": {
+    "f1": 0,
+    "exact": 0,
+    "HasAns_f1": 0,
+    "HasAns_exact": 0,
+    "NoAns_f1": 0
+  },
+  "averaged_over": 1
+}
