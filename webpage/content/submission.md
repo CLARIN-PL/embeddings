@@ -11,13 +11,18 @@ geekdocBreadcrumb: false
 # Contribute to LEPISZCZE
 
 We invite the community to contribute to `LEPISZCZE` by submitting model results. You can either manually fill in your submissions or use the `embeddings` library for automatic generation.
+<br />
+<br />
 
 ## Table of Contents
-  * [1A. Manually Filled Submissions](#1a-manually-filled-submissions)
-  * [1B. Automatically Generated Submissions](#1b-generation-submission-using-embeddings-library) 
+  * [1.A Manually Filled Submissions](#1a-manually-filled-submissions)
+  * [1.B Example Submissions](#1b-example-submissions)
+  * [1.C Automatically Generated Submissions](#1c-generation-submission-using-embeddings-library) 
   * [2. Submitting submission as PR](#2-submit-via-pull-request)
 
-## 1A. Manually Filled Submissions
+<br />
+
+## 1.A Manually Filled Submissions
 
 Submissions **must include** the following information:
 
@@ -40,11 +45,11 @@ There are also optional submission keys, but we strongly recommend including all
 | **hparams** | Mapping of hyperparameters with their values. |
 | **packages** | Mapping of packages used for model training and evaluation, along with their versions. |
 
-Submissions should be in `.json` format.
+Submissions should be in `.json` format.   
+<br />
 
-
-### Examples 
-
+## 1.B Example Submissions 
+\
 {{< collapse title="Information Retrieval sample submission file without optional fields." >}}
 {
   "submission_name": "msmarco_bm_25",
@@ -71,8 +76,7 @@ Submissions should be in `.json` format.
   "averaged_over": 1
 }
 {{< /collapse >}}
-
-
+\
 {{< collapse title="Question Answering sample submission file with packages provided." >}}
 
 {
@@ -129,61 +133,59 @@ Submissions should be in `.json` format.
     },
     "averaged_over": 1
 }
-
 {{< /collapse >}}
-
-
-
-## 1B. Generation Submission using Embeddings library
+\
+## 1.C Generation Submission using Embeddings library
 
 
 - Install `embeddings` package
     
-    ```bash
-    pip install clarinpl-embeddings
-    ```
+```bash
+pip install clarinpl-embeddings
+```
     
 - Put your data in accordance with comments
     
-    ```python
-    import datasets
-    import numpy as np
-    
-    from embeddings.evaluator.evaluation_results import Predictions
-    from embeddings.evaluator.leaderboard import get_dataset_task
-    from embeddings.evaluator.submission import AveragedSubmission
-    from embeddings.utils.utils import get_installed_packages
-    
-    DATASET_NAME = "clarin-pl/polemo2-official"
-    TARGET_COLUMN_NAME = "target"
-    
-    hparams = {"hparam_name_1": 0.2, "hparam_name_2": 0.1}  # put your hyperparameters here!
-    
-    dataset = datasets.load_dataset(DATASET_NAME)
-    y_true = np.array(dataset["test"][TARGET_COLUMN_NAME])
-    # put your predictions from multiple runs below!
-    predictions = [
-        Predictions(
-            y_true=y_true, y_pred=np.random.randint(low=0, high=4, size=len(y_true))
-        )
-        for _ in range(5)
-    ]
-    
-    # make sure you are running on a training env or put exported packages below!
-    packages = get_installed_packages() 
-    submission = AveragedSubmission.from_predictions(
-        submission_name="your_submission_name",  # put your submission here!
-        dataset_name=DATASET_NAME,
-        dataset_version=dataset["train"].info.version.version_str,
-        embedding_name="your_embedding_model",  # put your embedding name here!
-        predictions=predictions,
-        hparams=hparams,
-        packages=packages,
-        task=get_dataset_task(DATASET_NAME),
+```python
+import datasets
+import numpy as np
+
+from embeddings.evaluator.evaluation_results import Predictions
+from embeddings.evaluator.leaderboard import get_dataset_task
+from embeddings.evaluator.submission import AveragedSubmission
+from embeddings.utils.utils import get_installed_packages
+
+DATASET_NAME = "clarin-pl/polemo2-official"
+TARGET_COLUMN_NAME = "target"
+
+hparams = {"hparam_name_1": 0.2, "hparam_name_2": 0.1}  # put your hyperparameters here!
+
+dataset = datasets.load_dataset(DATASET_NAME)
+y_true = np.array(dataset["test"][TARGET_COLUMN_NAME])
+# put your predictions from multiple runs below!
+predictions = [
+    Predictions(
+        y_true=y_true, y_pred=np.random.randint(low=0, high=4, size=len(y_true))
     )
-    
-    submission.save_json()
-    ```
+    for _ in range(5)
+]
+
+# make sure you are running on a training env or put exported packages below!
+packages = get_installed_packages() 
+submission = AveragedSubmission.from_predictions(
+    submission_name="your_submission_name",  # put your submission here!
+    dataset_name=DATASET_NAME,
+    dataset_version=dataset["train"].info.version.version_str,
+    embedding_name="your_embedding_model",  # put your embedding name here!
+    predictions=predictions,
+    hparams=hparams,
+    packages=packages,
+    task=get_dataset_task(DATASET_NAME),
+)
+
+submission.save_json()
+```
+<br />
 
 ## 2. Submit via pull request
 
