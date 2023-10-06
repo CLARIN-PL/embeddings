@@ -19,6 +19,7 @@ We invite the community to contribute to `LEPISZCZE` by submitting model results
   * [1.B Example Submissions](#1b-example-submissions)
   * [1.C Automatically Generated Submissions](#1c-generation-submission-using-embeddings-library) 
   * [2. Submitting submission as PR](#2-submit-via-pull-request)
+  * [3. Adding new dataset to LEPISZCZE](#3-adding-new-dataset-to-lepiszcze)
 
 <br />
 
@@ -213,3 +214,57 @@ submission.save_json()
     
 - create pull request on [https://github.com/CLARIN-PL/embeddings/pulls](https://github.com/CLARIN-PL/embeddings/pulls)
 - stay in touch with us in case of any problems
+
+
+## 3. Adding new dataset to LEPISZCZE
+
+Example how to add dataset that is not currently in Leaderboard.
+To do that three files will be needed:   
+- webpage/content/tasks/task{taksk_abrevation}.md   
+e.g.: [webpage/content/tasks/taskIR.md](https://raw.githubusercontent.com/CLARIN-PL/embeddings/main/webpage/content/tasks/taskIR.md) for Infromation Retrieval
+
+| Keys to be filled | Example |
+| -- | -- |
+| **[Task Name with CamelCase]** | InformationRetrieval |
+| **[Task Name]** | Information Retrieval |
+| **[Task Description]** | Information Retrieval (IR) is the process of locating and retrieving relevant data or documents from a large dataset based on user queries, often used in search engines | 
+
+Content to be filled replace **squared [] braces** :
+```html
+---
+url: "/tasks/[Task Name with CamelCase]}"
+type: docs
+geekdocNav: false
+geekdocBreadcrumb: false
+---
+
+{{< highlight html >}}
+{{</* pageHeader */>}}
+{{</* info taskname="[Task Name]" taskdesc="[Task Description]" */>}}
+{{</* averageResults tasktype="[Task Name]" */>}}
+{{</* results type="[Task Name] */>}}
+{{< /highlight >}}
+```
+
+- [webpage/layouts/shortcodes/homepage.html](https://raw.githubusercontent.com/CLARIN-PL/embeddings/main/webpage/layouts/shortcodes/homepage.html)
+
+Add new task name to the taskTypes collection of `webpage/layouts/shortcodes/homepage.html`
+
+```html
+...
+const taskTypes = [
+          "Punctuation Restoration",
+          "Paraphrase Classification",
+          "Political Advertising Detection",
+          "Sentiment Analysis",
+          "Part-of-speech Tagging",
+          "Named Entity Recognition",
+          "Q&A Classification",
+          "Entailment Classification",
+          "Aspect-based Sentiment Analysis",
+          "Abusive Clauses Detection",
+          "Dialogue Acts Classification",
+          "Question Answering"
+          "Information Retrieval"
+        ];
+```
