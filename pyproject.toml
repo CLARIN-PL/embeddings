@@ -67,6 +67,10 @@ jupyterlab = ">=3.5.0"
 [tool.poetry.group.dev.dependencies]
 nbdev = ">=2.3.11"
 
+[tool.poetry.group.cuda.dependencies]
+torch = {version = "2.1.0", source = "pytorch-gpu-src"}
+
+
 [tool.poe.tasks]
 black = "black --check ./"
 isort = "isort .  -c"
@@ -89,6 +93,12 @@ force-torch-cuda = "python -m pip install torch==1.12.1+cu113 torchvision==0.13.
 
 [tool.poetry.extras]
 developer = ["black", "mypy", "typing-extensions"]
+
+
+[[tool.poetry.source]]
+name = "pytorch-gpu-src"
+url = "https://download.pytorch.org/whl/cu121"
+priority = "explicit"
 
 [build-system]
 requires = ["setuptools", "poetry>=1.2", "poetry-core>=1.0.0"]
