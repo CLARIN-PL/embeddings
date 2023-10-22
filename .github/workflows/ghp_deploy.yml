@@ -2,7 +2,7 @@ name: CD
 on:
   push:
     branches:
-      ["main", "master", "271-create-documentation-and-library-presentation"]
+      ["main", "master", "271-create-documentation-and-library-presentation", "fix/fix-inference-tutorial"]
   workflow_dispatch:
 jobs:
   deploy_ghp:
