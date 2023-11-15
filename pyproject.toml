@@ -21,7 +21,7 @@ packages = [
 python = ">= 3.8.0, <4.0"
 annoy = { version=">=1.17.0", optional=true}
 appdirs = ">=1.4.4"
-click = "8.1.2" # temporary frozen due to problems with the 8.1.0 version
+click = ">=8.1.2"
 datasets = ">=1.16.1"
 evaluate = ">=0.4.0"
 intel-openmp = {version="^2022.0.3", platform="win32"}
@@ -50,7 +50,6 @@ typing-extensions = ">=4.0.1.0"
 wandb = ">=0.12.10"
 setuptools = ">=65.5.1"
 fastapi = ">=0.88"
-dvc = "^3.29.0"
 
 [tool.poetry.dev-dependencies]
 black = "23.3.0"
