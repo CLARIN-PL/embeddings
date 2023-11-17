@@ -12,9 +12,9 @@ Integrating datasets and tasks with model performance and efﬁciency allows aca
 
 ## Paper
 
-```
+
 Augustyniak, L.; Tagowski, K.; Sawczyn, A.; Janiak, D.; Bartusiak, R.; Szymczak, A.; Janz, A.; Szymański, P.; Wątroba, M.; Morzy, M.; Kajdanowicz, T.; Piasecki, M. This Is the Way: Designing and Compiling LEPISZCZE, a Comprehensive NLP Benchmark for Polish. In Advances in Neural Information Processing Systems; Koyejo, S., Mohamed, S., Agarwal, A., Belgrave, D., Cho, K., Oh, A., Eds.; Curran Associates, Inc., 2022; Vol. 35, pp 21805–21818.
-```
+
 
 ## Citation
 
