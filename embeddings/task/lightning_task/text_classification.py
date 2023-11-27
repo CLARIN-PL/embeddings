@@ -69,6 +69,7 @@ class TextClassificationTask(ClassificationLightningTask):
                 inference_mode=self.inference_mode,
                 **self.task_train_kwargs,
             )
+            self.model.trainer = self.trainer
         results = self.model.predict(dataloader=dataloader)
         results["names"] = np.array(self.model.target_names)
         return Predictions(**results)
