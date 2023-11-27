@@ -77,8 +77,6 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         predict_output = self._predict_with_trainer(dataloader)
         assert predict_output
         logits, predictions = zip(*predict_output)
-        logits = self.all_gather(logits)
-        predictions = self.all_gather(predictions)
         probabilities = softmax(torch.cat(logits), dim=1).numpy()
         predictions = torch.cat(predictions).numpy()
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
@@ -90,6 +88,14 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Optional[_PREDICT_OUTPUT]:
         assert self.trainer is not None
+
+        if (self.trainer_kwargs.get("accelerator", None) == "gpu") and (
+                torch.cuda.device_count() > 1
+        ):
+            pred_trainer_kwargs = self.trainer_kwargs.copy()
+            pred_trainer_kwargs["devices"] = 1
+            self.trainer = pl.Trainer(**pred_trainer_kwargs)
+
         try:
             return self.trainer.predict(
                 model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="last"
