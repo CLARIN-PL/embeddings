@@ -57,19 +57,7 @@ class TextClassificationTask(ClassificationLightningTask):
 
     def predict(self, dataloader: DataLoader[Any], return_names: bool = True) -> Predictions:
         assert self.model is not None
-        if (self.task_train_kwargs.get("accelerator", None) == "gpu") and (
-                torch.cuda.device_count() > 1
-        ):
-            pred_trainer_kwargs = self.task_train_kwargs.copy()
-            pred_trainer_kwargs["devices"] = 1
-            self.trainer = pl.Trainer(
-                default_root_dir=str(self.output_path),
-                callbacks=self.callbacks,
-                logger=self.loggers,
-                inference_mode=self.inference_mode,
-                **self.task_train_kwargs,
-            )
-        results = self.model.predict(dataloader=dataloader, trainer=self.trainer)
+        results = self.model.predict(dataloader=dataloader)
         results["names"] = np.array(self.model.target_names)
         return Predictions(**results)
 

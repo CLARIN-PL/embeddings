@@ -72,9 +72,9 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         return logits, preds
 
     def predict(
-        self, dataloader: DataLoader[HuggingFaceDataset], trainer=None
+        self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Dict[str, nptyping.NDArray[Any]]:
-        predict_output = self._predict_with_trainer(dataloader, trainer)
+        predict_output = self._predict_with_trainer(dataloader)
         assert predict_output
         logits, predictions = zip(*predict_output)
         probabilities = softmax(torch.cat(logits), dim=1).numpy()
@@ -85,25 +85,28 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         return result
 
     def _predict_with_trainer(
-        self, dataloader: DataLoader[HuggingFaceDataset], trainer=None
+        self, dataloader: DataLoader[HuggingFaceDataset]
     ) -> Optional[_PREDICT_OUTPUT]:
-        if trainer is not None:
-            self.trainer = trainer
         assert self.trainer is not None
 
-        try:
-            return self.trainer.predict(
-                model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="last"
-            )
-        except MisconfigurationException:  # model loaded but not fitted
-            _logger.warning(
-                "The best model checkpoint cannot be loaded because trainer.fit has not been called. Using current weights for prediction."
-            )
-            return self.trainer.predict(
-                model=self,
-                dataloaders=dataloader,
-                return_predictions=True,
-            )
+        torch.distributed.destroy_process_group()
+        if self.trainer.is_global_zero:
+            self.trainer = pl.Trainer(gpus=1)
+            try:
+                return self.trainer.predict(
+                    model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="last"
+                )
+            except MisconfigurationException:  # model loaded but not fitted
+                _logger.warning(
+                    "The best model checkpoint cannot be loaded because trainer.fit has not been called. Using current weights for prediction."
+                )
+                return self.trainer.predict(
+                    model=self,
+                    dataloaders=dataloader,
+                    return_predictions=True,
+                )
+        else:
+            raise RuntimeError("Got `False` for `trainer.is_global_zero` attribute!")
 
     def on_train_epoch_end(self) -> None:
         self._aggregate_and_log_metrics(self.train_metrics)
