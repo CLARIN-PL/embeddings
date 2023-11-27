@@ -89,41 +89,36 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         self, dataloader: DataLoader[HuggingFaceDataset], predpath
     ) -> Optional[_PREDICT_OUTPUT]:
         assert self.trainer is not None
-
         if self.trainer.num_devices <= 1:
-            try:
-                return self.trainer.predict(
-                    model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="last"
-                )
-            except MisconfigurationException:  # model loaded but not fitted
-                _logger.warning(
-                    "The best model checkpoint cannot be loaded because trainer.fit has not been called. Using current weights for prediction."
-                )
-                return self.trainer.predict(
-                    model=self,
-                    dataloaders=dataloader,
-                    return_predictions=True,
-                )
+            return_predictions = True
         else:
-            try:
-                self.trainer.predict(
-                    model=self, dataloaders=dataloader, return_predictions=False, ckpt_path="last"
-                )
-            except MisconfigurationException:  # model loaded but not fitted
-                _logger.warning(
-                    "The best model checkpoint cannot be loaded because trainer.fit has not been called. Using current weights for prediction."
-                )
-                self.trainer.predict(
-                    model=self,
-                    dataloaders=dataloader,
-                    return_predictions=False,
-                )
-            # self.trainer.predict(model=self, dataloaders=dataloader, return_predictions=False)
+            return_predictions = False
+
+        try:
+            predictions = self.trainer.predict(
+                model=self,
+                dataloaders=dataloader,
+                return_predictions=return_predictions,
+                ckpt_path="last"
+            )
+        except MisconfigurationException:  # model loaded but not fitted
+            _logger.warning(
+                "The best model checkpoint cannot be loaded because trainer.fit has not been called. Using current weights for prediction."
+            )
+            predictions = self.trainer.predict(
+                model=self,
+                dataloaders=dataloader,
+                return_predictions=return_predictions,
+            )
+
+        if not return_predictions:
             files = sorted(os.listdir(predpath))
-            preds = [torch.load(os.path.join(predpath, f))[0] for f in files if "predictions" in f]
-            indices = [torch.load(os.path.join(predpath, f))[0] for f in files if "batch_indices" in f]
-            print(preds)
-            print(indices)
+            distributed_predictions = [torch.load(os.path.join(predpath, f))[0] for f in files if "predictions" in f]
+            logits = torch.concat([preds[0] for preds in distributed_predictions])
+            labels = torch.concat([preds[1] for preds in distributed_predictions])
+            predictions = [logits, labels]
+
+        return predictions
 
     def on_train_epoch_end(self) -> None:
         self._aggregate_and_log_metrics(self.train_metrics)

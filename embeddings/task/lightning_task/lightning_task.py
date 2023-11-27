@@ -39,9 +39,9 @@ class CustomWriter(BasePredictionWriter):
         # the predictions of its respective rank
         torch.save(predictions, os.path.join(self.output_dir, f"predictions_{trainer.global_rank}.pt"))
 
-        # optionally, you can also save `batch_indices` to get the information about the data index
-        # from your prediction data
-        torch.save(batch_indices, os.path.join(self.output_dir, f"batch_indices_{trainer.global_rank}.pt"))
+        # # optionally, you can also save `batch_indices` to get the information about the data index
+        # # from your prediction data
+        # torch.save(batch_indices, os.path.join(self.output_dir, f"batch_indices_{trainer.global_rank}.pt"))
 
 
 class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModule, Output]):
