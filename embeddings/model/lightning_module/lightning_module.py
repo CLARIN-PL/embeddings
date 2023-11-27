@@ -77,6 +77,8 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         predict_output = self._predict_with_trainer(dataloader)
         assert predict_output
         logits, predictions = zip(*predict_output)
+        logits = self.all_gather(logits)
+        predictions = self.all_gather(predictions)
         probabilities = softmax(torch.cat(logits), dim=1).numpy()
         predictions = torch.cat(predictions).numpy()
         ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
