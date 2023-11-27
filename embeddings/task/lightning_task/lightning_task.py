@@ -94,7 +94,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
 
     def _get_callbacks(self, dataset_subsets: Sequence[str]) -> List[Callback]:
         self.predpath = self.output_path.joinpath("predictions")
-        self.predpath.mkdir(parents=False, exist_ok=False)
+        self.predpath.mkdir(parents=False, exist_ok=True)
         dirpath = self.output_path.joinpath("checkpoints")
         callbacks: List[Callback] = [
             ModelCheckpoint(
