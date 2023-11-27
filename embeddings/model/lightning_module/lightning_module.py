@@ -1,5 +1,6 @@
 import abc
 import inspect
+import os
 from inspect import signature
 from typing import Any, Dict, Generic, List, Literal, Optional, Tuple, TypeVar
 
@@ -72,9 +73,9 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         return logits, preds
 
     def predict(
-        self, dataloader: DataLoader[HuggingFaceDataset]
+        self, dataloader: DataLoader[HuggingFaceDataset], predpath
     ) -> Dict[str, nptyping.NDArray[Any]]:
-        predict_output = self._predict_with_trainer(dataloader)
+        predict_output = self._predict_with_trainer(dataloader, predpath)
         assert predict_output
         logits, predictions = zip(*predict_output)
         probabilities = softmax(torch.cat(logits), dim=1).numpy()
@@ -85,13 +86,11 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         return result
 
     def _predict_with_trainer(
-        self, dataloader: DataLoader[HuggingFaceDataset]
+        self, dataloader: DataLoader[HuggingFaceDataset], predpath
     ) -> Optional[_PREDICT_OUTPUT]:
         assert self.trainer is not None
 
-        torch.distributed.destroy_process_group()
-        if self.trainer.is_global_zero:
-            self.trainer = pl.Trainer(gpus=1)
+        if self.trainer.num_devices <= 1:
             try:
                 return self.trainer.predict(
                     model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="last"
@@ -106,7 +105,25 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
                     return_predictions=True,
                 )
         else:
-            return
+            try:
+                self.trainer.predict(
+                    model=self, dataloaders=dataloader, return_predictions=False, ckpt_path="last"
+                )
+            except MisconfigurationException:  # model loaded but not fitted
+                _logger.warning(
+                    "The best model checkpoint cannot be loaded because trainer.fit has not been called. Using current weights for prediction."
+                )
+                self.trainer.predict(
+                    model=self,
+                    dataloaders=dataloader,
+                    return_predictions=False,
+                )
+            # self.trainer.predict(model=self, dataloaders=dataloader, return_predictions=False)
+            files = sorted(os.listdir(predpath))
+            preds = [torch.load(os.path.join(predpath, f))[0] for f in files if "predictions" in f]
+            indices = [torch.load(os.path.join(predpath, f))[0] for f in files if "batch_indices" in f]
+            print(preds)
+            print(indices)
 
     def on_train_epoch_end(self) -> None:
         self._aggregate_and_log_metrics(self.train_metrics)
