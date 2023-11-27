@@ -72,9 +72,9 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         return logits, preds
 
     def predict(
-        self, dataloader: DataLoader[HuggingFaceDataset]
+        self, dataloader: DataLoader[HuggingFaceDataset], trainer=None
     ) -> Dict[str, nptyping.NDArray[Any]]:
-        predict_output = self._predict_with_trainer(dataloader)
+        predict_output = self._predict_with_trainer(dataloader, trainer)
         assert predict_output
         logits, predictions = zip(*predict_output)
         probabilities = softmax(torch.cat(logits), dim=1).numpy()
@@ -85,8 +85,10 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         return result
 
     def _predict_with_trainer(
-        self, dataloader: DataLoader[HuggingFaceDataset]
+        self, dataloader: DataLoader[HuggingFaceDataset], trainer=None
     ) -> Optional[_PREDICT_OUTPUT]:
+        if trainer is not None:
+            self.trainer = trainer
         assert self.trainer is not None
 
         try:
