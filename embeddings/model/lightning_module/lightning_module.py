@@ -106,7 +106,7 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
                     return_predictions=True,
                 )
         else:
-            raise RuntimeError("Got `False` for `trainer.is_global_zero` attribute!")
+            return
 
     def on_train_epoch_end(self) -> None:
         self._aggregate_and_log_metrics(self.train_metrics)
