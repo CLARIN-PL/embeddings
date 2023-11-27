@@ -89,13 +89,6 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
     ) -> Optional[_PREDICT_OUTPUT]:
         assert self.trainer is not None
 
-        if (self.trainer_kwargs.get("accelerator", None) == "gpu") and (
-                torch.cuda.device_count() > 1
-        ):
-            pred_trainer_kwargs = self.trainer_kwargs.copy()
-            pred_trainer_kwargs["devices"] = 1
-            self.trainer = pl.Trainer(**pred_trainer_kwargs)
-
         try:
             return self.trainer.predict(
                 model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="last"

@@ -96,9 +96,9 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
             raise self.MODEL_UNDEFINED_EXCEPTION
         self.tokenizer = data.tokenizer
 
-        callbacks = self._get_callbacks(dataset_subsets=list(data.load_dataset().keys()))
+        self.callbacks = self._get_callbacks(dataset_subsets=list(data.load_dataset().keys()))
 
-        inference_mode = (
+        self.inference_mode = (
             self.task_train_kwargs.pop("inference_mode")
             if "inference_mode" in self.task_train_kwargs.keys()
             else None
@@ -107,17 +107,17 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
             _logger.warning(
                 "PyTorch 2.0 compile mode is turned on! Pass None to compile_model_kwargs if the behavior is unintended."
             )
-            if inference_mode or inference_mode is None:
+            if self.inference_mode or self.inference_mode is None:
                 _logger.warning(
                     "PyTorch 2.0 compile mode does not support inference_mode! Setting Lightning Trainer inference_mode to False!"
                 )
                 inference_mode = False
-
+        self.loggers = self.logging_config.get_lightning_loggers(self.output_path, run_name)
         self.trainer = pl.Trainer(
             default_root_dir=str(self.output_path),
-            callbacks=callbacks,
-            logger=self.logging_config.get_lightning_loggers(self.output_path, run_name),
-            inference_mode=inference_mode,
+            callbacks=self.callbacks,
+            logger=self.loggers,
+            inference_mode=self.inference_mode,
             **self.task_train_kwargs,
         )
         try:
