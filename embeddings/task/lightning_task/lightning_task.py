@@ -231,6 +231,7 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
                 accelerator="gpu",
                 devices=[0],  # made predict only on single gpu,
             )
+            self.model.trainer = self.trainer
         result = self.predict(dataloader=dataloader)
         return result
 
