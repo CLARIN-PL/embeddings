@@ -55,6 +55,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         self.logging_config = logging_config
         self.tokenizer: Optional[AutoTokenizer] = None
         self.callbacks: List[Callback] = []
+        self.experiment_path: Optional[str] = None
 
         self.inference_mode = (
             self.task_train_kwargs.pop("inference_mode")
@@ -144,6 +145,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         assert isinstance(self.trainer, pl.Trainer)
         try:
             self.trainer.fit(self.model, data)
+            self.experiment_path = self.trainer.logger._experiment.path  # type: ignore
         except Exception as e:
             del self.trainer
             cleanup_torch_model_artifacts()
