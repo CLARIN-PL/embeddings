@@ -40,7 +40,7 @@ srsly = ">=2.4.1"
 scipy = ">=1.6.2"
 tensorboard = ">=2.4.1"
 tokenizers = ">=0.13.2"
-torch = "2.0.0"
+torch = "2.0.1"
 torchmetrics = ">=0.11.4"
 transformers = {extras = ["onnx"], version = ">=4.28.1"}
 typer = ">=0.4.0"

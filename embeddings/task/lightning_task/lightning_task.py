@@ -224,7 +224,6 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
         assert isinstance(dataloader, DataLoader)
         assert isinstance(self.trainer, pl.Trainer)
         if isinstance(self.trainer.strategy, pl.strategies.ddp.DDPStrategy):
-            print("Setuping trainer for predictions...")
             torch.distributed.destroy_process_group()
             self.setup_trainer(
                 run_name=run_name if run_name else "",
