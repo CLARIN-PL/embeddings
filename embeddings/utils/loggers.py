@@ -35,6 +35,7 @@ class LightningLoggingConfig:
     loggers_names: List[Literal["wandb", "csv", "tensorboard"]] = field(default_factory=list)
     tracking_project_name: Optional[str] = None
     wandb_entity: Optional[str] = None
+    wandb_run_id : Optional[str] = None
     wandb_logger_kwargs: Dict[str, Any] = field(default_factory=dict)
     loggers: Optional[Dict[str, pl_loggers.Logger]] = field(init=False, default=None)
 
@@ -103,11 +104,13 @@ class LightningLoggingConfig:
                     )
                 save_dir = self.output_path / "wandb"
                 save_dir.mkdir(exist_ok=True, parents=True)
+
                 self.loggers["wandb"] = pl_loggers.wandb.WandbLogger(
                     name=run_name,
                     save_dir=str(save_dir),
                     project=self.tracking_project_name,
                     entity=self.wandb_entity,
+                    id=self.wandb_run_id,
                     **self.wandb_logger_kwargs
                 )
 
