@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import pytorch_lightning as pl
+import torch.distributed
 from pytorch_lightning.accelerators import Accelerator
 from pytorch_lightning.callbacks import Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
@@ -223,6 +224,7 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
         assert isinstance(dataloader, DataLoader)
         assert isinstance(self.trainer, pl.Trainer)
         if isinstance(self.trainer.strategy, pl.strategies.ddp.DDPStrategy):
+            torch.distributed.destroy_process_group()
             self.setup_trainer(
                 run_name=run_name if run_name else "",
                 accelerator="gpu",
