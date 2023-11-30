@@ -69,10 +69,13 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
     def test_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         pass
 
-    def predict_step(self, *args: Any, **kwargs: Any) -> Optional[Tuple[STEP_OUTPUT, STEP_OUTPUT]]:
+    def predict_step(
+        self, *args: Any, **kwargs: Any
+    ) -> Optional[Tuple[STEP_OUTPUT, STEP_OUTPUT, STEP_OUTPUT]]:
         batch, batch_idx = args
         loss, logits, preds = self.shared_step(**batch)
-        return logits, preds
+        labels = batch.get("labels", None)
+        return logits, preds, labels
 
     def predict(
         self, dataloader: DataLoader[HuggingFaceDataset], predpath: str
@@ -90,27 +93,30 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             logits, preds = zip(*predictions)
             probabilities = softmax(torch.cat(logits), dim=1)
             preds = torch.cat(preds)
+            labels = torch.cat([x["labels"] for x in dataloader])
         else:
             files = sorted(os.listdir(predpath))
             all_preds = []
             all_logits = []
-            all_batch_indices = []
+            all_labels = []
+            # all_batch_indices = []
             for file in files:
                 if "predictions" in file:
                     with open(os.path.join(predpath, file), "rb") as f:
                         predictions = pickle.load(f)
-                    logits, preds = zip(*predictions)
+                    logits, preds, labels = zip(*predictions)
                     all_logits.append(torch.cat(logits))
                     all_preds.append(torch.cat(preds))
-                elif "batch_indices" in file:
-                    with open(os.path.join(predpath, file), "rb") as f:
-                        batch_indices = pickle.load(f)
-                        all_batch_indices.append(list(flatten(batch_indices)))
-            all_batch_indices = torch.Tensor([y for x in all_batch_indices for y in x]).long()
-            probabilities = softmax(torch.cat(all_logits), dim=1)[all_batch_indices]
-            preds = torch.cat(all_preds)[all_batch_indices]
+                    all_labels.append(torch.cat(labels))
+                # elif "batch_indices" in file:
+                #     with open(os.path.join(predpath, file), "rb") as f:
+                #         batch_indices = pickle.load(f)
+                #         all_batch_indices.append(list(flatten(batch_indices)))
+            # all_batch_indices = torch.Tensor([y for x in all_batch_indices for y in x]).long()
+            probabilities = softmax(torch.cat(all_logits), dim=1)
+            preds = torch.cat(all_preds)
+            labels = torch.cat(all_labels)
 
-        labels = torch.cat([x["labels"] for x in dataloader])
         result = {
             "y_pred": preds.numpy(),
             "y_true": labels.numpy(),
