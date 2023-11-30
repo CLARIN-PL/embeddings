@@ -92,19 +92,23 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             preds = torch.cat(preds)
         else:
             files = sorted(os.listdir(predpath))
-            predictions = []
-            batch_indices = []
+            all_preds = []
+            all_logits = []
+            all_batch_indices = []
             for file in files:
                 if "predictions" in file:
                     with open(os.path.join(predpath, file), "rb") as f:
-                        predictions.append(pickle.load(f))
+                        predictions = pickle.load(f)
+                    logits, preds = zip(*predictions)
+                    all_logits.append(torch.cat(logits))
+                    all_preds.append(torch.cat(preds))
                 elif "batch_indices" in file:
                     with open(os.path.join(predpath, file), "rb") as f:
-                        batch_indices.append(pickle.load(f))
-            batch_indices = list(flatten(batch_indices))
-            logits, preds = zip(*predictions)
-            probabilities = softmax(torch.cat(logits), dim=1)[batch_indices]
-            preds = torch.cat(preds)[batch_indices]
+                        batch_indices = pickle.load(f)
+                        all_batch_indices.append(list(flatten(batch_indices)))
+            all_batch_indices = torch.Tensor([y for x in all_batch_indices for y in x])
+            probabilities = softmax(torch.cat(all_logits), dim=1)[all_batch_indices]
+            preds = torch.cat(all_preds)[all_batch_indices]
 
         labels = torch.cat([x["labels"] for x in dataloader])
         result = {
