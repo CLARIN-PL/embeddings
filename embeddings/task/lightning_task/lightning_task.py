@@ -1,4 +1,5 @@
 import abc
+import os
 from pathlib import Path
 from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
@@ -225,6 +226,7 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
         assert isinstance(self.trainer, pl.Trainer)
         if isinstance(self.trainer.strategy, pl.strategies.ddp.DDPStrategy):
             torch.distributed.destroy_process_group()
+            os.environ["SLURM_NTASKS_PER_NODE"] = "1"
             self.setup_trainer(
                 run_name=run_name if run_name else "",
                 accelerator="gpu",
