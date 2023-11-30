@@ -17,6 +17,9 @@ class CustomPredictionWriter(BasePredictionWriter):
         torch.save(
             predictions, os.path.join(self.output_dir, f"predictions_{trainer.global_rank}.pt")
         )
+        import pickle
+        with open(os.path.join(self.output_dir, f"predictions_{trainer.global_rank}.pkl"), "wb") as f:
+            pickle.dump(predictions, f)
 
         # optionally, you can also save `batch_indices` to get the information about the data index
         # from your prediction data
