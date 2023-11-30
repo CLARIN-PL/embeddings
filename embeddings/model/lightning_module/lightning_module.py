@@ -92,12 +92,15 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             preds = torch.cat(preds)
         else:
             files = sorted(os.listdir(predpath))
-            preds = [
-                torch.load(os.path.join(predpath, f))[0] for f in files if "predictions" in f
-            ]
-            batch_indices = [
-                torch.load(os.path.join(predpath, f))[0] for f in files if "batch_indices" in f
-            ]
+            predictions = []
+            batch_indices = []
+            for file in files:
+                if "predictions" in file:
+                    with open(os.path.join(predpath, file), "rb") as f:
+                        predictions.append(pickle.load(f))
+                elif "batch_indices" in file:
+                    with open(os.path.join(predpath, file), "rb") as f:
+                        batch_indices.append(pickle.load(f))
             batch_indices = list(flatten(batch_indices))
             logits, preds = zip(*predictions)
             probabilities = softmax(torch.cat(logits), dim=1)[batch_indices]
@@ -224,14 +227,3 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             num_training_steps=self.total_steps,
         )
         return [{"scheduler": scheduler, "interval": "step", "frequency": 1}]
-
-
-logits = [
-    torch.load(os.path.join(predpath, f))[0] for f in files if "logits" in f
-]
-preds = [
-    torch.load(os.path.join(predpath, f))[0] for f in files if "predictions" in f
-]
-batch_indices = [
-    torch.load(os.path.join(predpath, f))[0] for f in files if "batch_indices" in f
-]
