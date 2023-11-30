@@ -1,14 +1,6 @@
 {{ $type := default "Tasks" (.Get "type") }}
 {{ $leaderboard := slice "leaderboard_task_name"}}
-{{ $metrics := slice }}
 {{ $metricsToIgnore := slice "classes" "f1_weighted" "recall_weighted" "precision_weighted" }}
-{{ range $.Site.Data.results }}
-   {{ range $k, $v := .metrics_avg }}
-      {{if (not (in $metricsToIgnore $k)) }}
-         {{ $metrics = uniq ($metrics | append $k) }}
-      {{end}}
-   {{ end }}
-{{ end }}
 
 {{ $metricsStd := slice }}
 {{ range $.Site.Data.results }}
@@ -23,21 +15,32 @@
 {{ $classHeaderItems := slice}}
 {{ $datasets := slice }}
 {{ range $file, $result := $.Site.Data.results }}
-    
-   <div id="modal-data{{$file}}" style="display:none;">{"items":[{{ range $i, $m := .metrics_avg.classes }}{"class_name": "{{$i}}",{{ range $key, $result := $m}}"{{$key}}":"{{$result}}",{{end}}},{{end}}]}</div>
 
+
+{{ $hasClassesKey := false }}
+{{ range $key, $_ := .metrics_avg}}
+  {{ if eq $key "classes" }}
+    {{ $hasClassesKey = true }}
+  {{ end }}
+{{ end }}
+
+{{ if $hasClassesKey }}
+   <div id="modal-data{{$file}}" style="display:none;">{"items":[{{ range $i, $m := .metrics_avg.classes }}{"class_name": "{{$i}}",{{ range $key, $result := $m}}"{{$key}}":"{{$result}}",{{end}}},{{end}}]}</div>
+{{end}}
 
    {{if or (eq $type "Tasks") (eq (index $result $leaderboard) $type)}}
         {{ $datasets = uniq ($datasets | append (index $result "dataset_name")) }}
     {{end}}
 
     <textarea style="display:none;" id="json-input{{$file}}" autocomplete="off">{{jsonify (dict "indent" " ") $result}}</textarea>
-    
+
+   {{ if $hasClassesKey }}
     {{ range $m := .metrics_avg.classes }}
        {{ range $key, $result := $m}}                                  
           {{ $classHeaderItems = uniq ($classHeaderItems | append $key) }}                           
        {{end}}
     {{end}}
+   {{end}}
 
 {{end}}
 
@@ -130,6 +133,19 @@
 
 <div id="content" style="display: none;">
    {{ range $index, $dataset := $datasets }}
+   {{ $metrics := slice }}
+   {{ range $file, $result := $.Site.Data.results }}
+   {{if or (eq $type "Tasks") (eq (index $result $leaderboard) $type)}}
+         {{if eq (index $result "dataset_name") $dataset }}
+            {{ range $k, $v := .metrics_avg }}
+               {{if (not (in $metricsToIgnore $k)) }}
+                  {{ $metrics = uniq ($metrics | append $k) }}
+               {{end}}
+            {{ end }}
+         {{end}}
+      {{end}}
+{{ end }}
+
    <div>
       <table id="data-table-{{$index}}" >
          <thead>
