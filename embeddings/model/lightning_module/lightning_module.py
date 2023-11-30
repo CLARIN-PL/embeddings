@@ -96,7 +96,7 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             batch_indices = [
                 torch.load(os.path.join(predpath, f))[0] for f in files if "batch_indices" in f
             ]
-            batch_indices = torch.cat(batch_indices).long()
+            batch_indices = flatten(batch_indices)
             logits, preds = zip(*predictions)
             probabilities = softmax(torch.cat(logits), dim=1)[batch_indices]
             preds = torch.cat(preds)[batch_indices]
@@ -107,6 +107,7 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             "y_true": labels.numpy(),
             "y_probabilities": probabilities.numpy(),
         }
+
         assert all(isinstance(x, np.ndarray) for x in result.values())
         return result
 
@@ -221,3 +222,12 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             num_training_steps=self.total_steps,
         )
         return [{"scheduler": scheduler, "interval": "step", "frequency": 1}]
+
+
+import collections.abc
+
+def flatten(x):
+    if isinstance(x, collections.abc.Iterable):
+        return [a for i in x for a in flatten(i)]
+    else:
+        return [x]
