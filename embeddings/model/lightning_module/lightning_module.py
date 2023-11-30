@@ -1,6 +1,7 @@
 import abc
 import inspect
 import os
+import pickle
 from inspect import signature
 from typing import Any, Dict, Generic, List, Literal, Optional, Tuple, TypeVar
 
@@ -90,14 +91,16 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             preds = torch.cat(preds)
         else:
             files = sorted(os.listdir(predpath))
-            predictions = [
+            logits = [
+                torch.load(os.path.join(predpath, f))[0] for f in files if "logits" in f
+            ]
+            preds = [
                 torch.load(os.path.join(predpath, f))[0] for f in files if "predictions" in f
             ]
             batch_indices = [
                 torch.load(os.path.join(predpath, f))[0] for f in files if "batch_indices" in f
             ]
-            batch_indices = flatten(batch_indices)
-            logits, preds = zip(*predictions)
+            batch_indices = [y for x in batch_indices for y in x]
             probabilities = softmax(torch.cat(logits), dim=1)[batch_indices]
             preds = torch.cat(preds)[batch_indices]
 
@@ -222,12 +225,3 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             num_training_steps=self.total_steps,
         )
         return [{"scheduler": scheduler, "interval": "step", "frequency": 1}]
-
-
-import collections.abc
-
-def flatten(x):
-    if isinstance(x, collections.abc.Iterable):
-        return [a for i in x for a in flatten(i)]
-    else:
-        return [x]
