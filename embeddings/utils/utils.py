@@ -3,11 +3,11 @@ import importlib
 import os.path
 import pprint
 import zipfile
+from collections.abc import Iterable
 from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any, Dict, List, Optional, Tuple, Union
-from collections.abc import Iterable
 
 import numpy as np
 import pkg_resources
