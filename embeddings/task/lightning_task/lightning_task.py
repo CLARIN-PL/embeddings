@@ -20,6 +20,7 @@ from embeddings.model.lightning_module.lightning_module import LightningModule
 from embeddings.task.lightning_task.hf_task import HuggingFaceTaskName
 from embeddings.task.task import Output, Task
 from embeddings.utils.lightning_callbacks.best_epoch_callback import BestEpochCallback
+from embeddings.utils.lightning_callbacks.custom_prediction_writer import CustomPredictionWriter
 from embeddings.utils.loggers import LightningLoggingConfig, get_logger
 from embeddings.utils.torch_utils import cleanup_torch_model_artifacts
 
@@ -27,23 +28,6 @@ _logger = get_logger(__name__)
 
 LightningDataModules = Union[HuggingFaceDataModule, QuestionAnsweringDataModule]
 LightningDataModule = TypeVar("LightningDataModule", bound=LightningDataModules)
-
-
-class CustomWriter(BasePredictionWriter):
-    def __init__(self, output_dir, write_interval):
-        super().__init__(write_interval)
-        self.output_dir = output_dir
-
-    def write_on_epoch_end(self, trainer, pl_module, predictions, batch_indices):
-        # this will create N (num processes) files in `output_dir` each containing
-        # the predictions of its respective rank
-        torch.save(
-            predictions, os.path.join(self.output_dir, f"predictions_{trainer.global_rank}.pt")
-        )
-
-        # # optionally, you can also save `batch_indices` to get the information about the data index
-        # # from your prediction data
-        # torch.save(batch_indices, os.path.join(self.output_dir, f"batch_indices_{trainer.global_rank}.pt"))
 
 
 class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModule, Output]):
@@ -100,7 +84,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         dirpath = self.output_path.joinpath("checkpoints")
         callbacks: List[Callback] = [
             ModelCheckpoint(dirpath=dirpath, **self.model_checkpoint_kwargs),
-            CustomWriter(output_dir=str(self.predpath), write_interval="epoch"),
+            CustomPredictionWriter(output_dir=str(self.predpath), write_interval="epoch"),
         ]
         if "validation" in dataset_subsets:
             callbacks.append(BestEpochCallback())

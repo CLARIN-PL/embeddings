@@ -86,21 +86,27 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         if return_predictions:
             assert predictions is not None
             logits, preds = zip(*predictions)
-            labels = torch.cat([x["labels"] for x in dataloader]).numpy()
-            probabilities = softmax(torch.cat(logits), dim=1).numpy()
-            preds = torch.cat(preds).numpy()
+            probabilities = softmax(torch.cat(logits), dim=1)
+            preds = torch.cat(preds)
         else:
             files = sorted(os.listdir(predpath))
             predictions = [
                 torch.load(os.path.join(predpath, f))[0] for f in files if "predictions" in f
             ]
-            logits, labels = zip(*predictions)
-            labels = torch.cat(labels).numpy()
-            logits = torch.cat(logits)
-            probabilities = softmax(logits, dim=1).numpy()
-            preds = torch.argmax(logits, dim=1).numpy()
+            batch_indices = [
+                torch.load(os.path.join(predpath, f))[0] for f in files if "batch_indices" in f
+            ]
+            batch_indices = torch.cat(batch_indices).long()
+            logits, preds = zip(*predictions)
+            probabilities = softmax(torch.cat(logits), dim=1)[batch_indices]
+            preds = torch.cat(preds)[batch_indices]
 
-        result = {"y_pred": preds, "y_true": labels, "y_probabilities": probabilities}
+        labels = torch.cat([x["labels"] for x in dataloader])
+        result = {
+            "y_pred": preds.numpy(),
+            "y_true": labels.numpy(),
+            "y_probabilities": probabilities.numpy(),
+        }
         assert all(isinstance(x, np.ndarray) for x in result.values())
         return result
 
