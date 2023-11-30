@@ -90,10 +90,11 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
 
         if return_predictions:
             assert predictions is not None
-            logits, preds = zip(*predictions)
+            logits, preds, labels = zip(*predictions)
             probabilities = softmax(torch.cat(logits), dim=1)
             preds = torch.cat(preds)
-            labels = torch.cat([x["labels"] for x in dataloader])
+            labels = torch.cat(labels)
+            # labels = torch.cat([x["labels"] for x in dataloader])
         else:
             files = sorted(os.listdir(predpath))
             all_preds = []
