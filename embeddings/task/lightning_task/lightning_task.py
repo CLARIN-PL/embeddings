@@ -136,7 +136,7 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         self.trainer = pl.Trainer(
             default_root_dir=str(self.output_path),
             callbacks=callbacks,
-            logger=self.logging_config.get_lightning_loggers(self.output_path, run_name),
+            logger=self.logging_config.get_lightning_loggers(run_name),
             inference_mode=inference_mode,
             **self.task_train_kwargs,
         )
