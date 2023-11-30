@@ -1,10 +1,13 @@
 import abc
+import os
 from pathlib import Path
 from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks import Callback, ModelCheckpoint
+import torch
+from pytorch_lightning.callbacks import BasePredictionWriter, Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
+from pytorch_lightning.profilers import AdvancedProfiler, PyTorchProfiler
 from torch.utils.data import DataLoader
 from transformers import AutoModel, AutoTokenizer
 
@@ -18,6 +21,7 @@ from embeddings.model.lightning_module.lightning_module import LightningModule
 from embeddings.task.lightning_task.hf_task import HuggingFaceTaskName
 from embeddings.task.task import Output, Task
 from embeddings.utils.lightning_callbacks.best_epoch_callback import BestEpochCallback
+from embeddings.utils.lightning_callbacks.custom_prediction_writer import CustomPredictionWriter
 from embeddings.utils.loggers import LightningLoggingConfig, get_logger
 from embeddings.utils.torch_utils import cleanup_torch_model_artifacts
 
@@ -76,10 +80,12 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         return None
 
     def _get_callbacks(self, dataset_subsets: Sequence[str]) -> List[Callback]:
+        self.predpath = self.output_path.joinpath("predictions")
+        self.predpath.mkdir(parents=False, exist_ok=True)
+        dirpath = self.output_path.joinpath("checkpoints")
         callbacks: List[Callback] = [
-            ModelCheckpoint(
-                dirpath=self.output_path.joinpath("checkpoints"), **self.model_checkpoint_kwargs
-            )
+            ModelCheckpoint(dirpath=dirpath, **self.model_checkpoint_kwargs),
+            CustomPredictionWriter(output_dir=str(self.predpath), write_interval="epoch"),
         ]
         if "validation" in dataset_subsets:
             callbacks.append(BestEpochCallback())
@@ -112,12 +118,20 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
                     "PyTorch 2.0 compile mode does not support inference_mode! Setting Lightning Trainer inference_mode to False!"
                 )
                 inference_mode = False
-
+        profiler_kwarg = self.task_train_kwargs.pop("profiler")
+        if profiler_kwarg == "pytorch":
+            profiler_dirpath = self.output_path / "profiler_logs"
+            profiler_dirpath.mkdir(exist_ok=True, parents=False)
+            profiler = PyTorchProfiler(dirpath=profiler_dirpath, filename="perf_logs")
+        else:
+            profiler = None
+        # profiler = AdvancedProfiler(dirpath=str(self.output_path), filename="perf_logs")
         self.trainer = pl.Trainer(
             default_root_dir=str(self.output_path),
             callbacks=callbacks,
-            logger=self.logging_config.get_lightning_loggers(self.output_path, run_name),
+            logger=self.logging_config.get_lightning_loggers(run_name),
             inference_mode=inference_mode,
+            profiler=profiler,
             **self.task_train_kwargs,
         )
         try:

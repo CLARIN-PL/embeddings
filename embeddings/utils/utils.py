@@ -3,6 +3,7 @@ import importlib
 import os.path
 import pprint
 import zipfile
+from collections.abc import Iterable
 from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -152,3 +153,11 @@ def compress_and_remove(filepath: T_path) -> None:
     ) as arc:
         arc.write(filepath, arcname=filepath.name)
     filepath.unlink()
+
+
+def flatten(xs: Iterable[Any]):
+    for x in xs:
+        if isinstance(x, Iterable) and not isinstance(x, (str, bytes)):
+            yield from flatten(x)
+        else:
+            yield x

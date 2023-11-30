@@ -1,5 +1,7 @@
 import abc
 import inspect
+import os
+import pickle
 from inspect import signature
 from typing import Any, Dict, Generic, List, Literal, Optional, Tuple, TypeVar
 
@@ -17,6 +19,7 @@ from transformers import get_linear_schedule_with_warmup
 
 from embeddings.data.datamodule import HuggingFaceDataset
 from embeddings.utils.loggers import get_logger
+from embeddings.utils.utils import flatten
 
 Model = TypeVar("Model")
 
@@ -66,31 +69,75 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
     def test_step(self, *args: Any, **kwargs: Any) -> Optional[STEP_OUTPUT]:
         pass
 
-    def predict_step(self, *args: Any, **kwargs: Any) -> Optional[Tuple[STEP_OUTPUT, STEP_OUTPUT]]:
+    def predict_step(
+        self, *args: Any, **kwargs: Any
+    ) -> Optional[Tuple[STEP_OUTPUT, STEP_OUTPUT, STEP_OUTPUT]]:
         batch, batch_idx = args
         loss, logits, preds = self.shared_step(**batch)
-        return logits, preds
+        labels = batch.get("labels", None)
+        return logits, preds, labels
 
     def predict(
-        self, dataloader: DataLoader[HuggingFaceDataset]
+        self, dataloader: DataLoader[HuggingFaceDataset], predpath: str
     ) -> Dict[str, nptyping.NDArray[Any]]:
-        predict_output = self._predict_with_trainer(dataloader)
-        assert predict_output
-        logits, predictions = zip(*predict_output)
-        probabilities = softmax(torch.cat(logits), dim=1).numpy()
-        predictions = torch.cat(predictions).numpy()
-        ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
-        result = {"y_pred": predictions, "y_true": ground_truth, "y_probabilities": probabilities}
+        assert self.trainer is not None
+        if self.trainer.num_devices <= 1:
+            return_predictions = True
+        else:
+            return_predictions = False
+
+        predictions = self._predict_with_trainer(dataloader, return_predictions=return_predictions)
+
+        if return_predictions:
+            assert predictions is not None
+            logits, preds, labels = zip(*predictions)
+            probabilities = softmax(torch.cat(logits), dim=1)
+            preds = torch.cat(preds)
+            labels = torch.cat(labels)
+            # labels = torch.cat([x["labels"] for x in dataloader])
+        else:
+            files = sorted(os.listdir(predpath))
+            all_preds = []
+            all_logits = []
+            all_labels = []
+            # all_batch_indices = []
+            for file in files:
+                if "predictions" in file:
+                    with open(os.path.join(predpath, file), "rb") as f:
+                        predictions = pickle.load(f)
+                    logits, preds, labels = zip(*predictions)
+                    all_logits.append(torch.cat(logits))
+                    all_preds.append(torch.cat(preds))
+                    all_labels.append(torch.cat(labels))
+                # elif "batch_indices" in file:
+                #     with open(os.path.join(predpath, file), "rb") as f:
+                #         batch_indices = pickle.load(f)
+                #         all_batch_indices.append(list(flatten(batch_indices)))
+            # all_batch_indices = torch.Tensor([y for x in all_batch_indices for y in x]).long()
+            probabilities = softmax(torch.cat(all_logits), dim=1)
+            preds = torch.cat(all_preds)
+            labels = torch.cat(all_labels)
+
+        result = {
+            "y_pred": preds.numpy(),
+            "y_true": labels.numpy(),
+            "y_probabilities": probabilities.numpy(),
+        }
+
         assert all(isinstance(x, np.ndarray) for x in result.values())
         return result
 
     def _predict_with_trainer(
-        self, dataloader: DataLoader[HuggingFaceDataset]
+        self, dataloader: DataLoader[HuggingFaceDataset], return_predictions: bool
     ) -> Optional[_PREDICT_OUTPUT]:
         assert self.trainer is not None
+
         try:
             return self.trainer.predict(
-                model=self, dataloaders=dataloader, return_predictions=True, ckpt_path="last"
+                model=self,
+                dataloaders=dataloader,
+                return_predictions=return_predictions,
+                ckpt_path="last",
             )
         except MisconfigurationException:  # model loaded but not fitted
             _logger.warning(
@@ -99,7 +146,7 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             return self.trainer.predict(
                 model=self,
                 dataloaders=dataloader,
-                return_predictions=True,
+                return_predictions=return_predictions,
             )
 
     def on_train_epoch_end(self) -> None:

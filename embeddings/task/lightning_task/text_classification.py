@@ -55,7 +55,7 @@ class TextClassificationTask(ClassificationLightningTask):
 
     def predict(self, dataloader: DataLoader[Any], return_names: bool = True) -> Predictions:
         assert self.model is not None
-        results = self.model.predict(dataloader=dataloader)
+        results = self.model.predict(dataloader=dataloader, predpath=str(self.predpath))
         results["names"] = np.array(self.model.target_names)
         return Predictions(**results)
 
