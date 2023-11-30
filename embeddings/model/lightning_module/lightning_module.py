@@ -73,52 +73,58 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
         return logits, preds
 
     def predict(
-        self, dataloader: DataLoader[HuggingFaceDataset], predpath
+        self, dataloader: DataLoader[HuggingFaceDataset], predpath: str
     ) -> Dict[str, nptyping.NDArray[Any]]:
-        predict_output = self._predict_with_trainer(dataloader, predpath)
-        assert predict_output
-        logits, predictions = zip(*predict_output)
-        probabilities = softmax(torch.cat(logits), dim=1).numpy()
-        predictions = torch.cat(predictions).numpy()
-        ground_truth = torch.cat([x["labels"] for x in dataloader]).numpy()
-        result = {"y_pred": predictions, "y_true": ground_truth, "y_probabilities": probabilities}
-        assert all(isinstance(x, np.ndarray) for x in result.values())
-        return result
-
-    def _predict_with_trainer(
-        self, dataloader: DataLoader[HuggingFaceDataset], predpath
-    ) -> Optional[_PREDICT_OUTPUT]:
         assert self.trainer is not None
         if self.trainer.num_devices <= 1:
             return_predictions = True
         else:
             return_predictions = False
 
+        predictions = self._predict_with_trainer(dataloader, return_predictions=return_predictions)
+
+        if return_predictions:
+            assert predictions is not None
+            logits, preds = zip(*predictions)
+            labels = torch.cat([x["labels"] for x in dataloader]).numpy()
+            probabilities = softmax(torch.cat(logits), dim=1).numpy()
+            preds = torch.cat(preds).numpy()
+        else:
+            files = sorted(os.listdir(predpath))
+            predictions = [
+                torch.load(os.path.join(predpath, f))[0] for f in files if "predictions" in f
+            ]
+            logits, labels = zip(*predictions)
+            labels = torch.cat(labels).numpy()
+            logits = torch.cat(logits)
+            probabilities = softmax(logits, dim=1).numpy()
+            preds = torch.argmax(logits, dim=1).numpy()
+
+        result = {"y_pred": preds, "y_true": labels, "y_probabilities": probabilities}
+        assert all(isinstance(x, np.ndarray) for x in result.values())
+        return result
+
+    def _predict_with_trainer(
+        self, dataloader: DataLoader[HuggingFaceDataset], return_predictions: bool
+    ) -> Optional[_PREDICT_OUTPUT]:
+        assert self.trainer is not None
+
         try:
-            predictions = self.trainer.predict(
+            return self.trainer.predict(
                 model=self,
                 dataloaders=dataloader,
                 return_predictions=return_predictions,
-                ckpt_path="last"
+                ckpt_path="last",
             )
         except MisconfigurationException:  # model loaded but not fitted
             _logger.warning(
                 "The best model checkpoint cannot be loaded because trainer.fit has not been called. Using current weights for prediction."
             )
-            predictions = self.trainer.predict(
+            return self.trainer.predict(
                 model=self,
                 dataloaders=dataloader,
                 return_predictions=return_predictions,
             )
-
-        if not return_predictions:
-            files = sorted(os.listdir(predpath))
-            distributed_predictions = [torch.load(os.path.join(predpath, f))[0] for f in files if "predictions" in f]
-            logits = torch.concat([preds[0] for preds in distributed_predictions])
-            labels = torch.concat([preds[1] for preds in distributed_predictions])
-            predictions = [logits, labels]
-
-        return predictions
 
     def on_train_epoch_end(self) -> None:
         self._aggregate_and_log_metrics(self.train_metrics)

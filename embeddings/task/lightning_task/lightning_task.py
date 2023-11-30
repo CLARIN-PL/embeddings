@@ -37,7 +37,9 @@ class CustomWriter(BasePredictionWriter):
     def write_on_epoch_end(self, trainer, pl_module, predictions, batch_indices):
         # this will create N (num processes) files in `output_dir` each containing
         # the predictions of its respective rank
-        torch.save(predictions, os.path.join(self.output_dir, f"predictions_{trainer.global_rank}.pt"))
+        torch.save(
+            predictions, os.path.join(self.output_dir, f"predictions_{trainer.global_rank}.pt")
+        )
 
         # # optionally, you can also save `batch_indices` to get the information about the data index
         # # from your prediction data
@@ -97,10 +99,8 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         self.predpath.mkdir(parents=False, exist_ok=True)
         dirpath = self.output_path.joinpath("checkpoints")
         callbacks: List[Callback] = [
-            ModelCheckpoint(
-                dirpath=dirpath, **self.model_checkpoint_kwargs
-            ),
-            CustomWriter(output_dir=str(self.predpath), write_interval="epoch")
+            ModelCheckpoint(dirpath=dirpath, **self.model_checkpoint_kwargs),
+            CustomWriter(output_dir=str(self.predpath), write_interval="epoch"),
         ]
         if "validation" in dataset_subsets:
             callbacks.append(BestEpochCallback())
@@ -117,9 +117,9 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
             raise self.MODEL_UNDEFINED_EXCEPTION
         self.tokenizer = data.tokenizer
 
-        self.callbacks = self._get_callbacks(dataset_subsets=list(data.load_dataset().keys()))
+        callbacks = self._get_callbacks(dataset_subsets=list(data.load_dataset().keys()))
 
-        self.inference_mode = (
+        inference_mode = (
             self.task_train_kwargs.pop("inference_mode")
             if "inference_mode" in self.task_train_kwargs.keys()
             else None
@@ -128,17 +128,16 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
             _logger.warning(
                 "PyTorch 2.0 compile mode is turned on! Pass None to compile_model_kwargs if the behavior is unintended."
             )
-            if self.inference_mode or self.inference_mode is None:
+            if inference_mode or inference_mode is None:
                 _logger.warning(
                     "PyTorch 2.0 compile mode does not support inference_mode! Setting Lightning Trainer inference_mode to False!"
                 )
                 inference_mode = False
-        self.loggers = self.logging_config.get_lightning_loggers(self.output_path, run_name)
         self.trainer = pl.Trainer(
             default_root_dir=str(self.output_path),
-            callbacks=self.callbacks,
-            logger=self.loggers,
-            inference_mode=self.inference_mode,
+            callbacks=callbacks,
+            logger=self.logging_config.get_lightning_loggers(self.output_path, run_name),
+            inference_mode=inference_mode,
             **self.task_train_kwargs,
         )
         try:
