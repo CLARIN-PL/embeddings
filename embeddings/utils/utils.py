@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any, Dict, List, Optional, Tuple, Union
+from collections.abc import Iterable
 
 import numpy as np
 import pkg_resources
@@ -152,3 +153,11 @@ def compress_and_remove(filepath: T_path) -> None:
     ) as arc:
         arc.write(filepath, arcname=filepath.name)
     filepath.unlink()
+
+
+def flatten(xs: Iterable[Any]):
+    for x in xs:
+        if isinstance(x, Iterable) and not isinstance(x, (str, bytes)):
+            yield from flatten(x)
+        else:
+            yield x

@@ -19,6 +19,7 @@ from transformers import get_linear_schedule_with_warmup
 
 from embeddings.data.datamodule import HuggingFaceDataset
 from embeddings.utils.loggers import get_logger
+from embeddings.utils.utils import flatten
 
 Model = TypeVar("Model")
 
@@ -91,16 +92,14 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             preds = torch.cat(preds)
         else:
             files = sorted(os.listdir(predpath))
-            logits = [
-                torch.load(os.path.join(predpath, f))[0] for f in files if "logits" in f
-            ]
             preds = [
                 torch.load(os.path.join(predpath, f))[0] for f in files if "predictions" in f
             ]
             batch_indices = [
                 torch.load(os.path.join(predpath, f))[0] for f in files if "batch_indices" in f
             ]
-            batch_indices = [y for x in batch_indices for y in x]
+            batch_indices = list(flatten(batch_indices))
+            logits, preds = zip(*predictions)
             probabilities = softmax(torch.cat(logits), dim=1)[batch_indices]
             preds = torch.cat(preds)[batch_indices]
 
@@ -225,3 +224,14 @@ class LightningModule(pl.LightningModule, abc.ABC, Generic[Model]):
             num_training_steps=self.total_steps,
         )
         return [{"scheduler": scheduler, "interval": "step", "frequency": 1}]
+
+
+logits = [
+    torch.load(os.path.join(predpath, f))[0] for f in files if "logits" in f
+]
+preds = [
+    torch.load(os.path.join(predpath, f))[0] for f in files if "predictions" in f
+]
+batch_indices = [
+    torch.load(os.path.join(predpath, f))[0] for f in files if "batch_indices" in f
+]
