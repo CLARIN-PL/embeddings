@@ -12,7 +12,7 @@ class CustomPredictionWriter(BasePredictionWriter):
     def write_on_epoch_end(self, trainer, pl_module, predictions, batch_indices):
         # this will create N (num processes) files in `output_dir` each containing
         # the predictions of its respective rank
-        predictions = torch.cat([preds[0] for preds in predictions]).cpu()
+        predictions = [(x.cpu(), y.cpu()) for (x, y) in predictions]
         torch.save(
             predictions, os.path.join(self.output_dir, f"predictions_{trainer.global_rank}.pt")
         )
