@@ -7,6 +7,7 @@ import pytorch_lightning as pl
 import torch
 from pytorch_lightning.callbacks import BasePredictionWriter, Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
+from pytorch_lightning.profilers import AdvancedProfiler, PyTorchProfiler
 from torch.utils.data import DataLoader
 from transformers import AutoModel, AutoTokenizer
 
@@ -117,11 +118,20 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
                     "PyTorch 2.0 compile mode does not support inference_mode! Setting Lightning Trainer inference_mode to False!"
                 )
                 inference_mode = False
+        profiler_kwarg = self.task_train_kwargs.pop("profiler")
+        if profiler_kwarg == "pytorch":
+            profiler_dirpath = self.output_path / "profiler_logs"
+            profiler_dirpath.mkdir(exist_ok=True, parents=False)
+            profiler = PyTorchProfiler(dirpath=profiler_dirpath, filename="perf_logs")
+        else:
+            profiler = None
+        # profiler = AdvancedProfiler(dirpath=str(self.output_path), filename="perf_logs")
         self.trainer = pl.Trainer(
             default_root_dir=str(self.output_path),
             callbacks=callbacks,
             logger=self.logging_config.get_lightning_loggers(run_name),
             inference_mode=inference_mode,
+            profiler=profiler,
             **self.task_train_kwargs,
         )
         try:
