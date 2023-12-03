@@ -301,18 +301,20 @@ div.csl-indent {
                                   ators.accelerator.Accelerator,NoneType]=
                                   'auto', logging_config:embeddings.utils.
                                   loggers.LightningLoggingConfig=Lightning
-                                  LoggingConfig(loggers_names=[],
+                                  LoggingConfig(output_path='.',
+                                  loggers_names=[],
                                   tracking_project_name=None,
                                   wandb_entity=None,
-                                  wandb_logger_kwargs={}), tokenizer_name_
-                                  or_path:Union[pathlib.Path,str,NoneType]
-                                  =None, predict_subset:embeddings.data.da
-                                  taset.LightingDataModuleSubset=&lt;Lighting
-                                  DataModuleSubset.TEST: 'test'&gt;, load_dat
-                                  aset_kwargs:Optional[Dict[str,Any]]=None
-                                  , model_checkpoint_kwargs:Optional[Dict[
-                                  str,Any]]=None, compile_model_kwargs:Opt
-                                  ional[Dict[str,Any]]=None)</code></pre>
+                                  wandb_logger_kwargs={}, loggers=None), t
+                                  okenizer_name_or_path:Union[pathlib.Path
+                                  ,str,NoneType]=None, predict_subset:embe
+                                  ddings.data.dataset.LightingDataModuleSu
+                                  bset=&lt;LightingDataModuleSubset.TEST:
+                                  'test'&gt;, load_dataset_kwargs:Optional[Di
+                                  ct[str,Any]]=None, model_checkpoint_kwar
+                                  gs:Optional[Dict[str,Any]]=None, compile
+                                  _model_kwargs:Optional[Dict[str,Any]]=No
+                                  ne)</code></pre>
 </blockquote>
 <p>Helper class that provides a standard way to create an ABC using inheritance.</p>
 <p>We want to store submission data in a specific directory.</p>
