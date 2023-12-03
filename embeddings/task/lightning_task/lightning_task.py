@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Dict, Generic, List, Optional, Sequence, Type, TypeVar, Union
 
 import pytorch_lightning as pl
+from pytorch_lightning.accelerators import Accelerator
 from pytorch_lightning.callbacks import Callback, ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from torch.utils.data import DataLoader
@@ -52,6 +53,22 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         self.trainer: Optional[pl.Trainer] = None
         self.logging_config = logging_config
         self.tokenizer: Optional[AutoTokenizer] = None
+        self.callbacks: List[Callback] = []
+
+        self.inference_mode = (
+            self.task_train_kwargs.pop("inference_mode")
+            if "inference_mode" in self.task_train_kwargs.keys()
+            else None
+        )
+        if isinstance(self.compile_model_kwargs, dict):
+            _logger.warning(
+                "PyTorch 2.0 compile mode is turned on! Pass None to compile_model_kwargs if the behavior is unintended."
+            )
+            if self.inference_mode or self.inference_mode is None:
+                _logger.warning(
+                    "PyTorch 2.0 compile mode does not support inference_mode! Setting Lightning Trainer inference_mode to False!"
+                )
+                self.inference_mode = False
 
     @property
     def best_epoch(self) -> Optional[float]:
@@ -87,6 +104,32 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
                 callbacks.append(EarlyStopping(**self.early_stopping_kwargs))
         return callbacks
 
+    def setup_trainer(
+        self,
+        run_name: str,
+        accelerator: Optional[Union[str, Accelerator]] = None,
+        devices: Optional[Union[List[int], str, int]] = None,
+    ) -> None:
+        if self.trainer:
+            del self.trainer
+            cleanup_torch_model_artifacts()
+
+        accelerator = accelerator if accelerator else self.task_train_kwargs["accelerator"]
+        devices = devices if devices else self.task_train_kwargs["devices"]
+        task_train_kwargs = {
+            k: v for k, v in self.task_train_kwargs.items() if k not in ("accelerator", "devices")
+        }
+
+        self.trainer = pl.Trainer(
+            default_root_dir=str(self.output_path),
+            callbacks=self.callbacks,
+            logger=self.logging_config.get_lightning_loggers(run_name=run_name),
+            inference_mode=self.inference_mode,
+            accelerator=accelerator,
+            devices=devices,
+            **task_train_kwargs,
+        )
+
     def fit(
         self,
         data: LightningDataModule,
@@ -95,31 +138,9 @@ class LightningTask(Task[LightningDataModule, Output], Generic[LightningDataModu
         if not self.model:
             raise self.MODEL_UNDEFINED_EXCEPTION
         self.tokenizer = data.tokenizer
-
-        callbacks = self._get_callbacks(dataset_subsets=list(data.load_dataset().keys()))
-
-        inference_mode = (
-            self.task_train_kwargs.pop("inference_mode")
-            if "inference_mode" in self.task_train_kwargs.keys()
-            else None
-        )
-        if isinstance(self.compile_model_kwargs, dict):
-            _logger.warning(
-                "PyTorch 2.0 compile mode is turned on! Pass None to compile_model_kwargs if the behavior is unintended."
-            )
-            if inference_mode or inference_mode is None:
-                _logger.warning(
-                    "PyTorch 2.0 compile mode does not support inference_mode! Setting Lightning Trainer inference_mode to False!"
-                )
-                inference_mode = False
-
-        self.trainer = pl.Trainer(
-            default_root_dir=str(self.output_path),
-            callbacks=callbacks,
-            logger=self.logging_config.get_lightning_loggers(self.output_path, run_name),
-            inference_mode=inference_mode,
-            **self.task_train_kwargs,
-        )
+        self.callbacks = self._get_callbacks(dataset_subsets=list(data.load_dataset().keys()))
+        self.setup_trainer(run_name=run_name if run_name else "")
+        assert isinstance(self.trainer, pl.Trainer)
         try:
             self.trainer.fit(self.model, data)
         except Exception as e:
@@ -200,6 +221,13 @@ class ClassificationLightningTask(LightningTask[HuggingFaceDataModule, Predictio
         self.fit(data, run_name=run_name)
         dataloader = data.get_subset(subset=predict_subset)
         assert isinstance(dataloader, DataLoader)
+        assert isinstance(self.trainer, pl.Trainer)
+        if isinstance(self.trainer.strategy, pl.strategies.ddp.DDPStrategy):
+            self.setup_trainer(
+                run_name=run_name if run_name else "",
+                accelerator="gpu",
+                devices=[0],  # made predict only on single gpu,
+            )
         result = self.predict(dataloader=dataloader)
         return result
 

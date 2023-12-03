@@ -38,7 +38,9 @@ class BaseModelExporter(abc.ABC):
 
     def __post_init__(self, path: T_path) -> None:
         self._export_path = pathlib.Path(path) if not isinstance(path, pathlib.Path) else path
-        self._export_path.mkdir(parents=True, exist_ok=False)
+        if self._export_path.exists():
+            raise ValueError(f"Path {str(self._export_path)} already exists!")
+        self._export_path.mkdir(parents=True, exist_ok=True)
 
     @staticmethod
     def _check_tokenizer(tokenizer: Optional[AutoTokenizer]) -> None:
