@@ -2,6 +2,13 @@
 {{ $leaderboard := slice "leaderboard_task_name"}}
 {{ $metricsToIgnore := slice "classes" "f1_weighted" "recall_weighted" "precision_weighted" }}
 
+{{ $displayNames := dict
+    "qa_wikipedia" "expansio/qa-wikipedia"
+    "qa_nkjp" "expansio/qa-nkjp"
+    "qa_kpwr" "expansio/qa-kpwr"
+    "qa_all" "expansio/qa-all"
+}}
+
 {{ $metricsStd := slice }}
 {{ range $.Site.Data.results }}
    {{ range $k, $v := .metrics_std }}
@@ -123,7 +130,13 @@
       }
 </style>
 
+{{ $datasetsDisplay := slice }}
+{{ range $d := $datasets }}
+   {{ $datasetsDisplay = $datasetsDisplay | append (index $displayNames $d | default $d) }}
+{{ end }}
+
 <input type="hidden" id="datasets-list" value="{{$datasets}}">
+<input type="hidden" id="datasets-display-list" value="{{ delimit $datasetsDisplay "|" }}">
 <div style="margin-top: 2em;">
    <div class="container title-container">     
       <div class="title">Dataset model's ranking</div>
@@ -197,6 +210,9 @@
       datasets = datasets.replace("/", "-");
       datasets = datasets.split(" ");
 
+      const displaysInput = document.getElementById("datasets-display-list");
+      let displays = displaysInput.value.split("|");
+
       const select = document.createElement("select");
       select.value = datasets[0];
       select.classList.add("select-view");
@@ -216,7 +232,7 @@
          }
          const e = document.createElement("option");
          e.value = d;
-         e.innerText = d;
+         e.innerText = displays[i] || d;
          select.appendChild(e);
       })
       const main = document.getElementById("content");
