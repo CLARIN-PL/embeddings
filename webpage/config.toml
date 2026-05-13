@@ -1,4 +1,12 @@
-baseURL = "https://embeddings.ml"
+baseURL = "http://lepiszcze.clarin-pl.eu"
 languageCode = "en-us"
 title = "Clarin-PL Embeddigs Library"
 theme = "hugo-geekdoc"
+pygmentsCodeFences = true
+pygmentsUseClasses = false
+
+[markup]
+  defaultMarkdownHandler = 'goldmark'
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+        unsafe = true
