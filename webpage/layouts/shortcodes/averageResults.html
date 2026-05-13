@@ -9,7 +9,7 @@
 {{ $metricsToIgnore := slice "classes" "f1_weighted" "recall_weighted" "precision_weighted" }}
 {{ range $file, $result := $.Site.Data.results }}
    {{if or (eq $tasktype "Tasks") (eq (index $result "leaderboard_task_name") $tasktype)}}
-        {{if (not (or (eq (index $result "leaderboard_task_name") "Information Retrieval") (eq (index $result "leaderboard_task_name") "Question Answering")))}}
+        {{if (not (eq (index $result "leaderboard_task_name") "Question Answering"))}}
             {{ range $k, $v := .metrics_avg }}
                {{if (not (in $metricsToIgnore $k)) }}
                   {{ $metrics = uniq ($metrics | append $k) }}
@@ -36,7 +36,7 @@
        <div class="title">Model ranking</div>
        <p style="text-align: center;">Average model performance across all tasks.</p>
         {{else}}
-           {{if (not (or (eq $tasktype "Information Retrieval") (eq $tasktype "Question Answering")))}}
+           {{if (not (eq $tasktype "Question Answering"))}}
             <div class="title">Model's task ranking</div>
             <p style="text-align: center;">Average model performance across task datasets.</p>
             {{end}}
@@ -44,7 +44,7 @@
        {{end}}
        
 </div>
-    {{if (not (or (eq $tasktype "Information Retrieval") (eq $tasktype "Question Answering")))}}
+    {{if (not (eq $tasktype "Question Answering"))}}
 
     <div id="data-tasktype" style="visibility: hidden; height: 0px; overflow: hidden;">{{ $tasktype }}</div>
     <div id="data-average" style="visibility: hidden; height: 0px; overflow: hidden;">
@@ -123,8 +123,10 @@
         let values = new Array(0);
         uniqueModels.forEach(model => {
             let modelObj = {model: model};
+            const modelTasks = new Set();
             dataArray.forEach(el =>{
                 if( (tasktype == "Tasks" || el.task == tasktype) && el.model == model){
+                    modelTasks.add(el.task);
                     uniqueMetric.forEach( m =>{
                         if(el.metric == m){
                             if(modelObj[m+"_sum"] == undefined){
@@ -140,6 +142,9 @@
                     })
                 }
             })
+            if (tasktype == "Tasks" && modelTasks.size <= 1) {
+                return;
+            }
             if(Object.keys(modelObj).length>1){
                 const deleteKeys = Object.keys(modelObj).filter( item => item.includes("_sum") || item.includes("_count"));
                 deleteKeys.forEach(d => {
