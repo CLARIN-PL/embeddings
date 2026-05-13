@@ -51,33 +51,6 @@ Submissions should be in `.json` format.
 
 ## 1.B Example Submissions 
 \
-{{< collapse title="Information Retrieval sample submission file without optional fields." >}}
-{
-  "submission_name": "msmarco_bm_25",
-  "dataset_name": "MSMARCO",
-  "dataset_version": "0.0.1",
-  "embedding_name": "BM25",
-  "hparams": {},
-  "packages": [],
-  "leaderboard_task_name": "Information Retrieval",
-  "metrics": [
-    {
-      "NDCG@10": 31.50,
-      "MRR@10": 56.36
-    }
-  ],
-  "metrics_avg": {
-      "NDCG@10": 31.50,
-      "MRR@10": 56.36
-    },
-  "metrics_std": {
-      "NDCG@10": 0.0,
-      "MRR@10": 0.0
-    },
-  "averaged_over": 1
-}
-{{< /collapse >}}
-\
 {{< collapse title="Question Answering sample submission file with packages provided." >}}
 
 {
@@ -221,13 +194,13 @@ submission.save_json()
 Example how to add dataset that is not currently in Leaderboard.
 To do that three files will be needed:   
 - webpage/content/tasks/task{taksk_abrevation}.md   
-e.g.: [webpage/content/tasks/taskIR.md](https://raw.githubusercontent.com/CLARIN-PL/embeddings/main/webpage/content/tasks/taskIR.md) for Infromation Retrieval
+e.g.: [webpage/content/tasks/taskQA.md](https://raw.githubusercontent.com/CLARIN-PL/embeddings/main/webpage/content/tasks/taskQA.md) for Question Answering
 
 | Keys to be filled | Example |
 | -- | -- |
-| **[Task Name with CamelCase]** | InformationRetrieval |
-| **[Task Name]** | Information Retrieval |
-| **[Task Description]** | Information Retrieval (IR) is the process of locating and retrieving relevant data or documents from a large dataset based on user queries, often used in search engines | 
+| **[Task Name with CamelCase]** | QuestionAnswering |
+| **[Task Name]** | Question Answering |
+| **[Task Description]** | Question Answering (QA) is the task of automatically returning an answer to a natural-language question, given a passage or knowledge source. | 
 
 Content to be filled replace **squared [] braces** :
 ```html
@@ -265,6 +238,5 @@ const taskTypes = [
           "Abusive Clauses Detection",
           "Dialogue Acts Classification",
           "Question Answering"
-          "Information Retrieval"
         ];
 ```
