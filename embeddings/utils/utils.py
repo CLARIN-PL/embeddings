@@ -9,6 +9,7 @@ from tempfile import NamedTemporaryFile
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
+import pandas as pd
 import pkg_resources
 import requests
 import yaml
@@ -152,3 +153,32 @@ def compress_and_remove(filepath: T_path) -> None:
     ) as arc:
         arc.write(filepath, arcname=filepath.name)
     filepath.unlink()
+
+
+def convert_qa_df_to_bootstrap_html(df: pd.DataFrame) -> str:
+    boostrap_cdn = (
+        '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" '
+        'integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">'
+    )
+
+    output = (
+        "<!DOCTYPE html>"
+        + "\n"
+        + "<html>"
+        + "\n"
+        + "<head>"
+        + "\n"
+        + boostrap_cdn
+        + "\n"
+        + '<meta charset="utf-8">'
+        + "\n"
+        + "</head>"
+        + "\n"
+        + "<body>"
+        + "\n"
+        + df.to_html(classes=["table table-bordered table-striped table-hover"])
+        + "\n"
+        + "</body>"
+    )
+    assert isinstance(output, str)
+    return output

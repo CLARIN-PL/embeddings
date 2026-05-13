@@ -145,6 +145,7 @@ def hf_datamodule(
         load_dataset_kwargs={},
         dataloader_kwargs=config.dataloader_kwargs,
         doc_stride=config.task_model_kwargs["doc_stride"],
+        use_cache=False,
         **config.datamodule_kwargs,
     )
     dm.setup("test")

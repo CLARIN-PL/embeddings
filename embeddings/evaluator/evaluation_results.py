@@ -110,3 +110,13 @@ class QuestionAnsweringEvaluationResults(EvaluationResults):
     NoAns_f1: Optional[float] = None
     NoAns_total: Optional[float] = None
     data: Optional[Data] = None
+    golds_text: Optional[Union[List[List[str]], List[str]]] = None
+    predictions_text: Optional[List[str]] = None
+
+    @property
+    def metrics(self) -> Dict[str, Any]:
+        result = asdict(self)
+        result.pop("data")
+        result.pop("golds_text")
+        result.pop("predictions_text")
+        return result

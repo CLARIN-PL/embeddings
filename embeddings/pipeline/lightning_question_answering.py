@@ -2,6 +2,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import datasets
+import pandas as pd
+import wandb
 from pytorch_lightning.accelerators import Accelerator
 
 from embeddings.config.lightning_config import LightningQABasicConfig, LightningQAConfig
@@ -13,7 +15,8 @@ from embeddings.evaluator.question_answering_evaluator import QuestionAnsweringE
 from embeddings.model.lightning_model import LightningModel
 from embeddings.pipeline.lightning_pipeline import LightningPipeline
 from embeddings.task.lightning_task import question_answering as qa
-from embeddings.utils.loggers import LightningLoggingConfig
+from embeddings.utils.loggers import LightningLoggingConfig, LightningWandbWrapper
+from embeddings.utils.utils import convert_qa_df_to_bootstrap_html
 
 
 class LightningQuestionAnsweringPipeline(
@@ -72,6 +75,7 @@ class LightningQuestionAnsweringPipeline(
             early_stopping_kwargs=config.early_stopping_kwargs,
             model_checkpoint_kwargs=model_checkpoint_kwargs,
             compile_model_kwargs=compile_model_kwargs,
+            logging_config=logging_config,
         )
         model: LightningModel[QuestionAnsweringDataModule, Dict[str, Any]] = LightningModel(
             task, predict_subset
@@ -85,3 +89,21 @@ class LightningQuestionAnsweringPipeline(
             logging_config,
             pipeline_kwargs=pipeline_kwargs,
         )
+
+    def _finish_logging(self) -> None:
+        if self.logging_config.use_wandb():
+            wrapper = LightningWandbWrapper(self.logging_config)
+            wrapper.log_output(
+                self.output_path, ignore={"wandb", "csv", "tensorboard", "checkpoints"}
+            )
+            metrics = getattr(self.result, "metrics")
+            wrapper.log_metrics(metrics)
+
+            predictions_text = getattr(self.result, "predictions_text")
+            golds_text = getattr(self.result, "golds_text")
+            preditions_html = convert_qa_df_to_bootstrap_html(
+                pd.DataFrame({"predictions": predictions_text, "golds": golds_text})
+            )
+
+            wrapper.wandb_logger.experiment.log({"predictions": wandb.Html(preditions_html)})
+            wrapper.finish_logging()
