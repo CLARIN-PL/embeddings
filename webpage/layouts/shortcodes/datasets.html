@@ -8,10 +8,21 @@
     "clarin-pl/aspectemo"
     "laugustyniak/political-advertising-pl"}}
 
-{{ $newDatasets := slice 
+{{ $newDatasets := slice
     "dialogue-acts"
     "laugustyniak/abusive-clauses-pl"
-    "clarin-pl/dialogue-acts"}}
+    "clarin-pl/dialogue-acts"
+    "qa_wikipedia"
+    "qa_nkjp"
+    "qa_kpwr"
+    "qa_all"}}
+
+{{ $displayNames := dict
+    "qa_wikipedia" "expansio/qa-wikipedia"
+    "qa_nkjp" "expansio/qa-nkjp"
+    "qa_kpwr" "expansio/qa-kpwr"
+    "qa_all" "expansio/qa-all"
+}}
 
 <style> 
 .accordion-item{
@@ -23,7 +34,7 @@
         <div class="accordion-item">
         <h2 class="accordion-header" id="heading{{$dataset}}">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{$i}}" aria-expanded="false">
-                {{ $dataset }}
+                {{ index $displayNames $dataset | default $dataset }}
                 {{ range $new := $newBDatasets}}
                     {{if (eq $dataset $new)}}
                         <sup style="color: royalblue;">&MediumSpace;New benchmark!</sup>
